@@ -1,0 +1,9 @@
+[build]
+  base = "nervous-energy"
+  command = "npm run build"
+  publish = "nervous-energy/out"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
