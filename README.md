@@ -76,6 +76,6 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - Unit and integration tests
 
 ## License
-[MIT License](LICENSE) - See LICENSE file for details
+See LICENSE file for details - [MIT License](LICENSE.md)
 
 Lewis Bass - [lewisbass@vt.edu](mailto:lewisbass@vt.edu)
