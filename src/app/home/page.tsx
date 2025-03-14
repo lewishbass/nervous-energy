@@ -6,7 +6,7 @@ export default function Home() {
           <section className="bg2 p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-4 tc1">Featured Content</h2>
             <p className="tc2">
-              Welcome to our platform. This is where you'll find the latest updates and featured content.
+              Welcome to our platform. This is where youll find the latest updates and featured content.
             </p>
           </section>
           
