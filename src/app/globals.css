@@ -1,24 +1,138 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root{
+  --khr: #EC343E;
+  --kho: #F47820;
+  --khy: #FEE606;
+  --khg: #1AB157;
+  --khb: #01AFEE;
+  --khp: #EC018C;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.tout{
+  -webkit-text-fill-color: #FFF;
+  -webkit-text-stroke: 11px #000;
+  paint-order: stroke fill;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.tc1 {
+  color:#000;
+}
+.dark .tc1 {
+  color:#ddd;
+}
+
+.tc2 {
+  color:#222;
+}
+.dark .tc2 {
+  color:#bbb;
+}
+
+.tc3 {
+  color:#555;
+}
+.dark .tc3 {
+  color:#777;
+}
+
+.bg1 {
+  background-color:#fff;
+}
+.dark .bg1 {
+  background-color:#040404;
+}
+
+.bg2 {
+  background-color:#eee;
+}
+.dark .bg2 {
+  background-color:#141418;
+}
+
+.bg3 {
+  background-color:#ddd;
+}
+.dark .bg3 {
+  background-color:#181620;
+}
+
+.bg4 {
+  background-color:#222;
+}
+.dark .bg4 {
+  background-color:#ddd;
+}
+
+.bg5 {
+  background-color:#000;
+}
+.dark .bg5 {
+  background-color:#fff;
+}
+
+.bt1{
+  cursor: pointer;
+  user-select: none;
+  background-color: none;
+}
+.dark .bt1{
+  background-color: none;
+}
+.bt1:hover{
+  background-color: #0001;
+}
+.dark .bt1:hover{
+  background-color: #fff1;
+}
+
+.bt2{
+  cursor: pointer;
+  user-select: none;
+  background-color: #0001;
+}
+.dark .bt2{
+  background-color: #fff2;
+}
+.bt2:hover{
+  background-color: #0002;
+}
+.dark .bt2:hover{
+  background-color: #fff3;
+}
+
+.bd1{
+  background-color: #0001;
+  backdrop-filter: blur(5px);
+}
+
+.dark .bd1{
+  background-color: #fff1;
+}
+
+.wg svg{
+  transition: transform 0.2s ease;
+}
+.wg:hover svg{
+  animation: wiggle 0.25s ease 1;
+}
+
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
 }
