@@ -18,6 +18,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'widthExpanding' | 'heightExpanding' | 'complete'>('initial');
+  const [isClosing, setIsClosing] = useState(1);
 
   // Reset and manage animation sequence when modal opens/closes
   useEffect(() => {
@@ -55,10 +56,13 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   }, [isOpen]);
 
   const resetModal = () => {
-    onClose();
-    setIsLoading(true);
-    setContentVisible(false);
-    setAnimationPhase('initial');
+    setIsClosing(0);
+    setTimeout(() => {
+      onClose();
+      setIsLoading(true);
+      setAnimationPhase('initial');
+      setIsClosing(1);
+    }, 500);
   };
 
   // Don't render if modal isn't open and we're in initial state
@@ -72,7 +76,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
           <motion.div
             className="fixed inset-0 bd1 z-200 cursor-pointer"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isClosing }}
             exit={{ opacity: 0 }}
             onClick={resetModal}
           >
@@ -116,7 +120,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: contentVisible ? 1 : 0 }}
                     transition={{
-                      opacity: { duration: 0.8 }
+                      opacity: { duration: 0.6 }
                     }}
                     exit={{ opacity: 0 }}
                     style={{ 

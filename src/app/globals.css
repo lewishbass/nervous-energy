@@ -115,12 +115,12 @@ body {
 }
 
 .bd1{
-  background-color: #0001;
-  backdrop-filter: blur(5px);
+  background-color: #00000010;
+  backdrop-filter: blur(2px);
 }
 
 .dark .bd1{
-  background-color: #fff1;
+  background-color: #ffffff10;
 }
 
 .wg svg{
