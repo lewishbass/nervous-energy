@@ -11,7 +11,7 @@ import {
   FaSun,
   FaMoon
 } from 'react-icons/fa';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useClickAway } from '@/hooks/useClickAway';
 import SearchExpand from './SearchExpand';
@@ -26,12 +26,31 @@ interface MenuProps {
 
 export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, openProfileModal }: MenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [version, setVersion] = useState<string | null>(null);
 
   useClickAway(menuRef, () => {
     if (isOpen) {
       onClose();
     }
   });
+
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const response = await fetch('/.netlify/functions/version');
+        if (response.ok) {
+          const data = await response.json();
+          setVersion(data.version);
+        } else {
+          console.error('Failed to fetch version');
+        }
+      } catch (error) {
+        console.error('Error fetching version:', error);
+      }
+    };
+
+    fetchVersion();
+  }, []);
 
   // Example search dictionary - replace with your actual data or API route
   const searchDictionary = [
@@ -104,12 +123,12 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
         </nav>
       </div>
 
-      {/* Dark Mode Toggle */}
+      {/* Dark Mode Toggle with Version Label */}
       <div className="p-6">
+        
         <button 
           onClick={toggleDark}
-          className="w-full flex items-cent!
-          er gap-4 p-3 bt1 rounded-lg transition-colors"
+          className="w-full flex items-center gap-4 p-3 bt1 rounded-lg transition-colors"
         >
           <div className="relative w-8 h-8 rounded-full">
             <FaSun className="absolute w-full h-full transition-all duration-600 rotate-0 opacity-100 translate-y-0 text-yellow-500 dark:rotate-90 dark:opacity-0 dark:-translate-y-0" />
@@ -117,6 +136,11 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
           </div>
           <span className="text-lg">Dark Mode</span>
         </button>
+        {version && (
+          <div className="text-xs text-right opacity-10 mb-2">
+            Backend v{version}
+          </div>
+        )}
       </div>
     </div>
   );
