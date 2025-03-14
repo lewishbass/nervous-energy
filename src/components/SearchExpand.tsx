@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 // Types for props and search results
 interface SearchResult {
@@ -138,7 +137,7 @@ export default function SearchExpand({
     // Store in local storage
     const recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
     const updatedSearches = [
-      { term: searchTerm, result: result.name, timestamp: Date.now() }
+      { term: searchTerm, result: result.name, timestamp: Date.now() }, ...recentSearches
     ];
     localStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
     

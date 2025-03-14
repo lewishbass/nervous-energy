@@ -54,12 +54,22 @@ export default function RootLayout({
     const savedProfileModalState = localStorage.getItem('isProfileModalOpen');
     const savedScrollPosition = localStorage.getItem('scrollPosition');
 
-    savedDarkModeState && setIsDark(JSON.parse(savedDarkModeState));
-    savedMenuState && setIsMenuOpen(JSON.parse(savedMenuState));
-    savedMessageModalState && setIsMessageModalOpen(JSON.parse(savedMessageModalState));
-    savedProfileModalState && setIsProfileModalOpen(JSON.parse(savedProfileModalState));
-    savedScrollPosition && window.scrollTo(0, JSON.parse(savedScrollPosition));
-  }, []);
+    if (savedDarkModeState !== null) {
+      setIsDark(JSON.parse(savedDarkModeState));
+    }
+    if (savedMenuState !== null) {
+      setIsMenuOpen(JSON.parse(savedMenuState));
+    }
+    if (savedMessageModalState !== null) {
+      setIsMessageModalOpen(JSON.parse(savedMessageModalState));
+    }
+    if (savedProfileModalState !== null) {
+      setIsProfileModalOpen(JSON.parse(savedProfileModalState));
+    }
+    if (savedScrollPosition !== null) {
+      window.scrollTo(0, JSON.parse(savedScrollPosition));
+    }
+    }, []);
 
 
   // return html

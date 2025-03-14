@@ -5,7 +5,6 @@
 
 import React from 'react';
 import ModalTemplate from './ModalTemplate';
-import Image from 'next/image';
 
 interface ProfileModalProps {
   isOpen: boolean;
