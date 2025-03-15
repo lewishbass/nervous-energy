@@ -42,6 +42,14 @@ function RootLayoutContent({
     }
   };
 
+  const handleMessageClick = () => {
+    if (isLoggedIn) {
+      setIsMessageModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
+
   // Store and load page state
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -91,7 +99,7 @@ function RootLayoutContent({
             isOpen={isMenuOpen} 
             toggleDark={toggleDark}
             onClose={() => setIsMenuOpen(isMessageModalOpen || isProfileModalOpen || isAuthModalOpen)}
-            openMessageModal={() => setIsMessageModalOpen(true)}
+            openMessageModal={handleMessageClick}
             openProfileModal={handleProfileClick}
             isLoggedIn={isLoggedIn}
             username={username}

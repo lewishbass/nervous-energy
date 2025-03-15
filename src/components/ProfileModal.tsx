@@ -118,7 +118,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
 
         <div className="pt-3 mt-2 border-t-2 border-gray-200">
             <button 
-            className="w-full text-center py-2 text-red-500"
+            className="w-full text-center py-2 text-red-500 cursor-pointer"
             onClick={logoutAndClose}
             >
             Log Out

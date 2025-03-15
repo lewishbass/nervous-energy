@@ -49,6 +49,9 @@ export const handler: Handler = async (event) => {
     if (path === 'login') {
       return await handleLogin(requestBody);
     }
+    if (path === 'user-exists'){
+      return await handleUserExists(requestBody);
+    }
     return {
       statusCode: 404,
       body: JSON.stringify({ error: 'Path not found' }),
@@ -65,6 +68,34 @@ export const handler: Handler = async (event) => {
     };
   }
 };
+
+async function handleUserExists(requestBody: any) {
+  const { username } = requestBody;
+  const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
+  var username_suggestion = null;
+  if(existingUser){
+    for (let i = 1; i < 100; i++) {
+      const suggestedUsername = `${username}${i}`;
+      const existingSuggestion = await User.findOne({ username: { $regex: new RegExp(`^${suggestedUsername}$`, 'i') } });
+      if (!existingSuggestion) {
+        username_suggestion = suggestedUsername;
+        break;
+      }
+    }
+  }
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({ 
+      exists: !!existingUser,
+      suggestion: username_suggestion
+     }),
+  }
+}
+  
 
 async function handleLogin(requestBody: any) {
   const { username, password } = requestBody;
@@ -147,7 +178,7 @@ async function handleRegistration(requestBody: any) {
     };
   }
   // Check if username already exists
-  const existingUser = await User.findOne({ username });
+  const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
   if (existingUser) {
     return {
       statusCode: 409, // Conflict

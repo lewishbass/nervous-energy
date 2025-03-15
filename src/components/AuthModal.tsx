@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
+import { FaSpinner, FaCheck, FaTimes } from 'react-icons/fa';
+import ColorProgressBar from './ColorProgressBar';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -19,8 +21,70 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [validationError, setValidationError] = useState('');
   const [activeForm, setActiveForm] = useState<'login' | 'register'>('login');
   const [successMessage, setSuccessMessage] = useState('');
+  const usernameCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [usernameValid, setUsernameValid] = useState<'checking' | 'valid' | 'invalid' | 'error' | 'none'>('none');
 
   const { login, register, isLoading, error } = useAuth();
+
+  useEffect(() => {
+    if (isOpen) {
+      setLoginUsername('');
+      setLoginPassword('');
+      setRegisterUsername('');
+      setRegisterPassword('');
+      setRegisterConfirmPassword('');
+      setValidationError('');
+      setSuccessMessage('');
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (validationError) {
+      setTimeout(() => {
+        setValidationError('');
+      }, 3000);
+    }
+  });
+
+  // Add new useEffect for username checking with debounce
+  useEffect(() => {
+    console.log('Checking username:', registerUsername);
+    // Clear any existing timeout
+    if (usernameCheckTimeoutRef.current) {
+      clearTimeout(usernameCheckTimeoutRef.current);
+    }
+    
+    // If username is empty, don't check
+    if (!registerUsername){
+      setUsernameValid('none');
+      return
+    }
+    
+    setUsernameValid('checking');
+    
+    // Set a new timeout
+    usernameCheckTimeoutRef.current = setTimeout(async () => {
+      const result = await checkUserExists(registerUsername);
+      if(result.error){
+        setValidationError('Error checking username');
+        setUsernameValid('error');
+      } else if (result.exists) {
+        setValidationError(`${registerUsername} is already taken${result.suggestion ? ` try ${result.suggestion}` : ''}`);
+        setUsernameValid('invalid');
+      } else {
+        // Clear validation error if username is available
+        setValidationError('');
+        setUsernameValid('valid');
+      }
+    }, 50);
+    
+    // Cleanup function to clear timeout when component unmounts or username changes again
+    return () => {
+      if (usernameCheckTimeoutRef.current) {
+        clearTimeout(usernameCheckTimeoutRef.current);
+      }
+    };
+  }, [registerUsername]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +97,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
     
     try {
-      await login(loginUsername, loginPassword);
-      if (error) {
-        setValidationError(error);
+      const successful_login = await login(loginUsername, loginPassword);
+      console.log("Login Success:", successful_login);
+      // @ts-ignore
+      if (successful_login !== true) {
         return;
       }
       setSuccessMessage('Login successful! Redirecting...');
@@ -45,10 +110,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
       
       // Close modal after a short delay to show the success message
       setTimeout(() => {
+        setSuccessMessage('');
+        setValidationError('');
         onClose();
-      }, 1500);
+      }, 2500);
     } catch (err) {
-      // Error handling is done in the context
+      // @ts-ignore
+      console.log('login modal error: ' + err.message);
+      return
     }
   };
 
@@ -68,7 +137,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
     
     try {
-      await register(registerUsername, registerPassword);
+      const successful_register = await register(registerUsername, registerPassword);
+      // @ts-ignore
+      if (successful_register !== true) {
+        return;
+      }
+
       setSuccessMessage('Registration successful! Welcome!');
       // Clear form after successful registration
       setRegisterUsername('');
@@ -77,26 +151,50 @@ const AuthModal: React.FC<AuthModalProps> = ({
       
       // Close modal after a short delay to show the success message
       setTimeout(() => {
+        setSuccessMessage('');
+        setValidationError('');
         onClose();
-      }, 1500);
+      }, 2500);
     } catch (err) {
-      // Error handling is done in the context
+      // @ts-ignore
+      console.log('login modal error: ' + err.message);
     }
   };
 
+  // Checks if user exists and gets suggestions
+  const checkUserExists = async (username: string) => {
+    try {
+     const response = await fetch('/.netlify/functions/auth/user-exists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to check username');
+      }
+      const data = await response.json();
+      return { exists: data.exists, suggestion: data.suggestion, error: false };
+    } catch (error) {
+      console.error('Error checking username:', error);
+      return { exists: true, suggestion: null, error: true };
+    }
+  }
+
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register">
-      {error && (
-        <div className="mb-4 p-2 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded">
-          {error}
-        </div>
-      )}
       
-      {successMessage && (
-        <div className="mb-4 p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
+        <div className={'mb-[-1.4em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-2' : '')}
+        style={{height: (error || validationError)? '2.4em' : '0px', opacity: (error || validationError)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out'}}>
+            {error} {validationError}
+        </div>
+      
+      
+        <div className="mb-4 mt-0 p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
+        style={{height: (successMessage)? '2.4em' : '0px', opacity: (successMessage)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out'}}>
           {successMessage}
         </div>
-      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Login Form */}
@@ -115,6 +213,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your username"
                 disabled={isLoading}
+                autoComplete='username'
               />
             </div>
             <div>
@@ -129,12 +228,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter your password"
                 disabled={isLoading}
+                autoComplete='current-password'
               />
             </div>
             <button
               type="submit"
               className={`w-full py-2 bt2 rounded-lg tc2 font-medium ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
               disabled={isLoading}
+              onClick={() => setActiveForm('login')}
             >
               {isLoading && activeForm === 'login' ? (
                 <span className="flex items-center justify-center">
@@ -150,22 +251,32 @@ const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Register Form */}
-        <div className="space-y-4 md:border-l md:pl-6 pt-6 md:pt-0">
+        <div className="space-y-4 md:border-l-2 border-gray-200 md:pl-6 pt-6 md:pt-0">
           <h3 className="text-xl font-bold tc1">Register</h3>
           <form onSubmit={handleRegister} className="space-y-3">
             <div>
               <label htmlFor="register-username" className="block text-sm font-medium tc3 mb-1">
                 Username
               </label>
+              <div className="relative h-[2.4em]">
               <input
                 id="register-username"
                 type="text"
                 value={registerUsername}
                 onChange={(e) => setRegisterUsername(e.target.value)}
-                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="absolute w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Choose a username"
                 disabled={isLoading}
+                autoComplete='username'
               />
+              <div className="absolute right-2 top-2 w-6 h-6 flex items-center justify-center mw-0 mh-0 m-0 p-0">
+                  <div style={{opacity: usernameValid === 'none' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute rounded-full min-h-5 min-w-5 border-4 border-blue-500"/>
+                  <div style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute animate-spin rounded-full min-h-5 min-w-5 border-t-4 border-r-4 border-yellow-500"/>
+                  <FaCheck style={{opacity: usernameValid === 'valid' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-green-500" />
+                  <FaTimes style={{opacity: usernameValid === 'invalid' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-yellow-500" />
+                  <FaTimes style={{opacity: usernameValid === 'error' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-red-500" />
+                </div>
+              </div>
             </div>
             <div>
               <label htmlFor="register-password" className="block text-sm font-medium tc3 mb-1">
@@ -179,7 +290,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Create a password"
                 disabled={isLoading}
+                autoComplete='new-password'
               />
+            </div>
+            <div>
+              <ColorProgressBar max={10} current={registerPassword.length} className="w-full h-2.5" />
             </div>
             <div>
               <label htmlFor="register-confirm-password" className="block text-sm font-medium tc3 mb-1">
@@ -193,6 +308,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Confirm your password"
                 disabled={isLoading}
+                autoComplete='new-password'
               />
             </div>
             <button
