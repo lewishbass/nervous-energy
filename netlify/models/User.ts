@@ -33,40 +33,25 @@ const UserSchema = new mongoose.Schema({
       lastSeen: Date,
    },
    data: {
-      friends: {
-         type: [String],
-         default: [],
-      },
-      friendRequests: {
-         type: [String],
-         default: [],
-      },
-      history: {
-         type: [{
-            timeStamp: Date,
-            action: String,
-            data: String,
-         }],
-         default: [],
-      },
-      chats:{
-         type: [{
-            chatId: String,
-            chatName: String,
-            chatType: String,
-            chatMembers: [String],
-         }],
-         default: [],
-      },
-      notifications: {
-         type: [{
-            timeStamp: Date,
-            type: String,
-            data: String,
-            read: Boolean,
-         }],
-         default: [],
-      },
+      friends: [String],
+      friendRequests: [String],
+      history: [{
+         timeStamp: Date,
+         action: String,
+         data: String,
+      }],
+      chats: [{
+         chatId: String,
+         chatName: String,
+         chatType: String,
+         chatMembers: [String],
+      }],
+      notifications: [{
+         timeStamp: Date,
+         type: String,
+         data: String,
+         read: Boolean,
+      }],
    },
 });
 
@@ -75,9 +60,23 @@ UserSchema.pre('save', async function(next) {
    
    // Track changes to username, password, and profile data
    const user = this;
+   if(!user.data) user.data = { 
+      friends: [], 
+      friendRequests: [],
+      // @ts-ignore 
+      history: [],
+      // @ts-ignore
+      chats: [], 
+      notifications: [] 
+   };
+
+   
+
+      
    
    // Check for changes to username or password
    if (user.isModified('username')) {
+      // @ts-ignore
       user.data.history.push({
          timeStamp: new Date(),
          action: 'username_changed',
@@ -91,16 +90,19 @@ UserSchema.pre('save', async function(next) {
              .filter((path: string) => path.startsWith('profile.'));    
       modifiedPaths.forEach(path => {
          const field = path.split('.')[1];
+         // @ts-ignore
          user.data.history.push({
             timeStamp: new Date(),
             action: `profile_${field}_changed`,
-            data: user.profile[field]
+            // @ts-ignore
+            data: user.profile[field] as string
          });
       });
    }
 
    // Only hash the password if it has been modified (or is new)
    if (user.isModified('password')) {
+      // @ts-ignore
       user.data.history.push({
              timeStamp: new Date(),
              action: 'password_changed',
@@ -112,6 +114,7 @@ UserSchema.pre('save', async function(next) {
          user.password = hash;
          next();
       } catch (error) {
+         // @ts-ignore
          return next(error);
       }
    }
