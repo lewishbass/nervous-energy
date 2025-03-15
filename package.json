@@ -34,5 +34,9 @@
     "eslint-config-next": "15.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "eslintConfig": {
+    "ban-ts-ignore": false
   }
+  
 }
