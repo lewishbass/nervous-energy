@@ -72,7 +72,6 @@ const UserSchema = new mongoose.Schema({
 
 // Pre-save hook to hash password if modified
 UserSchema.pre('save', async function(next) {
-   const user = this;
    
    // Track changes to username, password, and profile data
    const user = this;
