@@ -14,7 +14,7 @@ export const handler: Handler = async () => {
     const mongoose = await connectMongoDB();
     
     // Get MongoDB version using admin command
-    // @ts-ignore
+    // @ts-expect-error because i said so
     const admin = mongoose.connection.db.admin();
     const serverInfo = await admin.serverInfo();
     dbVersion = serverInfo.version;

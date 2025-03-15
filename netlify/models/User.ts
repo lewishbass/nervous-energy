@@ -62,16 +62,16 @@ UserSchema.pre('save', async function(next) {
    if(!user.data) user.data = { 
       friends: [], 
       friendRequests: [],
-      // @ts-ignore
+      // @ts-expect-error because i said so
       history: [],
-      // @ts-ignore
+      // @ts-expect-error because i said so
       chats: [], 
       notifications: [] 
    };
 
    // Check for changes to username or password
    if (user.isModified('username')) {
-      // @ts-ignore
+      // @ts-expect-error because i said so
       user.data.history.push({
          timeStamp: new Date(),
          action: 'username_changed',
@@ -85,11 +85,11 @@ UserSchema.pre('save', async function(next) {
              .filter((path: string) => path.startsWith('profile.'));    
       modifiedPaths.forEach(path => {
          const field = path.split('.')[1];
-         // @ts-ignore
+         // @ts-expect-error because i said so
          user.data.history.push({
             timeStamp: new Date(),
             action: `profile_${field}_changed`,
-            // @ts-ignore
+            // @ts-expect-error because i said so
             data: user.profile[field] as string
          });
       });
@@ -97,7 +97,7 @@ UserSchema.pre('save', async function(next) {
 
    // Only hash the password if it has been modified (or is new)
    if (user.isModified('password')) {
-      // @ts-ignore 
+      // @ts-expect-error because i said so 
       user.data.history.push({
          timeStamp: new Date(),
          action: 'password_changed',
