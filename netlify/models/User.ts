@@ -97,7 +97,7 @@ UserSchema.pre('save', async function(next) {
 
    // Only hash the password if it has been modified (or is new)
    if (user.isModified('password')) {
-      // @ts-expect-error
+      // @ts-expect-error 
       user.data.history.push({
          timeStamp: new Date(),
          action: 'password_changed',
