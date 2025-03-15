@@ -57,7 +57,7 @@ export const ColorProgressBar: React.FC<ColorProgressBarProps> = ({
   }, [percentage]);
   
   return (
-   <div className={`w-full bg-gray-200 rounded-full h-2.5 ${className} overflow-hidden`}
+   <div className={`w-full bg-gray-500/30 rounded-full h-2.5 ${className} overflow-hidden`}
      style={{opacity: disappear && percentage >= 100 ? 0 : 1,
             maxHeight: disappear && percentage >= 100 ? 0 : '2.5rem',
             transition: 'opacity 0.5s ease-out 0.5s, max-height 0.5s ease-out 0.5s'

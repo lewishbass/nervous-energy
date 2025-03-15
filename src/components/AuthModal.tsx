@@ -76,7 +76,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         setValidationError('');
         setUsernameValid('valid');
       }
-    }, 50);
+    }, 300);
     
     // Cleanup function to clear timeout when component unmounts or username changes again
     return () => {
@@ -214,7 +214,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="text"
                 value={loginUsername}
                 onChange={(e) => setLoginUsername(e.target.value)}
-                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
                 placeholder="Enter your username"
                 disabled={isLoading}
                 autoComplete='username'
@@ -229,7 +229,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
                 placeholder="Enter your password"
                 disabled={isLoading}
                 autoComplete='current-password'
@@ -268,7 +268,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="text"
                 value={registerUsername}
                 onChange={(e) => setRegisterUsername(e.target.value)}
-                className="absolute w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="absolute w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
                 placeholder="Choose a username"
                 disabled={isLoading}
                 autoComplete='username'
@@ -291,7 +291,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="password"
                 value={registerPassword}
                 onChange={(e) => setRegisterPassword(e.target.value)}
-                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
                 placeholder="Create a password"
                 disabled={isLoading}
                 autoComplete='new-password'
@@ -309,7 +309,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 type="password"
                 value={registerConfirmPassword}
                 onChange={(e) => setRegisterConfirmPassword(e.target.value)}
-                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
                 placeholder="Confirm your password"
                 disabled={isLoading}
                 autoComplete='new-password'
