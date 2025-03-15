@@ -15,7 +15,7 @@ module.exports = {
     //   'error',
     //   {
     //     'ts-ignore': false,
-    //     'ts-expect-error': false,
+    //     'ts-ignore': false,
     //   },
     // ],
   },

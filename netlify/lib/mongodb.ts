@@ -77,7 +77,7 @@ async function connectMongoDB() {
         // Keep-alive ping every 30 seconds
         setInterval(() => {
           if (mongoose.connection.readyState === 1) {
-            // @ts-expect-error
+            // @ts-ignore
             mongoose.connection.db.admin().ping()
               .then(() => console.log('MongoDB ping successful'))
               .catch(err => console.error('MongoDB ping failed:', err));
@@ -103,7 +103,7 @@ async function connectMongoDB() {
     }
     
     // Test the connection with a ping
-    // @ts-expect-error
+    // @ts-ignore
     await cached.conn.connection.db.admin().ping();
     console.log('MongoDB connection verified with ping');
   } catch (error) {

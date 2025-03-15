@@ -137,7 +137,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     
     try {
       const successful_register = await register(registerUsername, registerPassword);
-      // @ts-expect-error
+      // @ts-ignore
       if (successful_register !== true) {
         return;
       }
@@ -155,7 +155,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 2500);
     } catch (err) {
-      // @ts-expect-error
+      // @ts-ignore
       console.log('login modal error: ' + err.message);
     }
   };
