@@ -3,12 +3,13 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import connectMongoDB from '../lib/mongodb';
-import User from '../models/User';
+import User from '../models/User';  // Import the model directly, not the schema
 
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
 
 export const handler: Handler = async (event) => {
+  
   // Only allow POST method
   if (event.httpMethod !== 'POST') {
     return {
@@ -32,8 +33,14 @@ export const handler: Handler = async (event) => {
   const path = event.path.split('/').pop();
   
   try {
-    // Connect to MongoDB
-    await connectMongoDB();
+    // Connect to MongoDB - ensure we wait for connection to be ready
+    console.log('Connecting to MongoDB...');
+    const mongoose = await connectMongoDB();
+    console.log('MongoDB connection established');
+
+    // Check if the User collection exists and is valid
+    // No need to check for collection existence here as mongoose
+    // will handle collection creation when needed
     
     // Handle registration
     if (path === 'register') {
@@ -51,7 +58,10 @@ export const handler: Handler = async (event) => {
     console.error('Authentication error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ 
+        error: 'Internal server error', 
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
     };
   }
 };
@@ -136,7 +146,6 @@ async function handleRegistration(requestBody: any) {
       body: JSON.stringify({ error: 'Username and password are required' }),
     };
   }
-
   // Check if username already exists
   const existingUser = await User.findOne({ username });
   if (existingUser) {

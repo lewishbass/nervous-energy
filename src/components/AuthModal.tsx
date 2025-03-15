@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
 import ModalTemplate from './ModalTemplate';
+import { useAuth } from '@/context/AuthContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (username: string, password: string) => Promise<void>;
-  onRegister: (username: string, password: string) => Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ 
   isOpen, 
-  onClose, 
-  onLogin, 
-  onRegister,
-  isLoading = false,
-  error: contextError = null
+  onClose,
 }) => {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -27,8 +20,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [activeForm, setActiveForm] = useState<'login' | 'register'>('login');
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Combined error from context or validation
-  const error = contextError || validationError;
+  const { login, register, isLoading, error } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +33,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
     
     try {
-      await onLogin(loginUsername, loginPassword);
+      await login(loginUsername, loginPassword);
+      if (error) {
+        setValidationError(error);
+        return;
+      }
       setSuccessMessage('Login successful! Redirecting...');
       // Clear form after successful login
       setLoginUsername('');
@@ -72,7 +68,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
     
     try {
-      await onRegister(registerUsername, registerPassword);
+      await register(registerUsername, registerPassword);
       setSuccessMessage('Registration successful! Welcome!');
       // Clear form after successful registration
       setRegisterUsername('');

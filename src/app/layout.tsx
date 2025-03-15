@@ -23,7 +23,7 @@ function RootLayoutContent({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
-  const { isLoggedIn, username, login, register, logout } = useAuth();
+  const { isLoggedIn, username } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -117,14 +117,10 @@ function RootLayoutContent({
           <ProfileModal
             isOpen={isProfileModalOpen}
             onClose={() => setIsProfileModalOpen(false)}
-            username={username}
-            handleLogout={logout}
           />
           <AuthModal
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
-            onLogin={login}
-            onRegister={register}
           />
         </div>
       </body>

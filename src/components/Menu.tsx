@@ -164,7 +164,7 @@ export default function Menu({
           <span className="text-lg">Dark Mode</span>
         </button>
         {backendVersion && (
-          <div className="text-xs text-right opacity-35 mb-[-16] mt-4 tc1">
+          <div className="text-xs text-right opacity-35 mb-[-16] mt-[-0] tc1">
             Backend v{backendVersion} 
             {dbStatus && (
               <span className={`ml-1 ${dbStatus === 'connected' ? 'text-green-500' : 'text-red-500'}`}>

@@ -1,6 +1,5 @@
-
-
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const UserSchema = new mongoose.Schema({
    id: {
@@ -63,17 +62,13 @@ UserSchema.pre('save', async function(next) {
    if(!user.data) user.data = { 
       friends: [], 
       friendRequests: [],
-      // @ts-ignore 
+      // @ts-ignore
       history: [],
       // @ts-ignore
       chats: [], 
       notifications: [] 
    };
 
-   
-
-      
-   
    // Check for changes to username or password
    if (user.isModified('username')) {
       // @ts-ignore
@@ -104,24 +99,26 @@ UserSchema.pre('save', async function(next) {
    if (user.isModified('password')) {
       // @ts-ignore
       user.data.history.push({
-             timeStamp: new Date(),
-             action: 'password_changed',
-             data: '*'.repeat(user.password.length)
-           });
+         timeStamp: new Date(),
+         action: 'password_changed',
+         data: '*'.repeat(user.password.length)
+      });
+      
       try {
-         const salt = await mongoose.Promise.resolve(require('bcrypt').genSalt(10));
-         const hash = await mongoose.Promise.resolve(require('bcrypt').hash(user.password, salt));
+         // Fix: Use bcrypt directly instead of mongoose.Promise.resolve
+         const salt = await bcrypt.genSalt(10);
+         const hash = await bcrypt.hash(user.password, salt);
          user.password = hash;
-         next();
       } catch (error) {
-         // @ts-ignore
-         return next(error);
+         return next(error as Error);
       }
    }
 
    return next();
 });
 
+// Ensure we're using the mongoose.model approach correctly
+const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+export default UserModel;
 

@@ -5,20 +5,18 @@
 
 import React from 'react';
 import ModalTemplate from './ModalTemplate';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  username?: string;
-  handleLogout?: () => void;
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, username, handleLogout }) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   // Dummy user data - use actual username if provided
   const user = {
-    username: username || 'johndoe123',
-    fullName: username ? `${username} User` : 'John Doe', // Simple transformation for demo
-    email: username ? `${username.toLowerCase()}@example.com` : 'john.doe@example.com',
+    fullName: 'John Doe', // Simple transformation for demo
+    email: 'john.doe@example.com',
     bio: 'Passionate reader, tech enthusiast, and avid hiker. Always looking for the next adventure in books and in life.',
     location: 'San Francisco, CA',
     birthday: 'January 15, 1990',
@@ -28,9 +26,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, username, 
     favoriteGenres: ['Science Fiction', 'Mystery', 'Biography']
   };
 
+  const { username, logout } = useAuth();
+
   const logoutAndClose = () => {
-    if (handleLogout) {
-      handleLogout();
+    if (logout) {
+      logout();
     }
     onClose();
   };
@@ -48,7 +48,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, username, 
           </div>
           <div>
             <h2 className="text-xl font-bold tc1">{user.fullName}</h2>
-            <p className="text-sm tc3">@{user.username}</p>
+            <p className="text-sm tc3">@{username}</p>
           </div>
         </div>
 
