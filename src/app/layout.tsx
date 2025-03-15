@@ -6,11 +6,13 @@ import Navbar from '@/components/Navbar';
 import Menu from '@/components/Menu';
 import MessageModal from '@/components/MessageModal';
 import ProfileModal from '@/components/ProfileModal';
+import AuthModal from '@/components/AuthModal';
 import { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({
+function RootLayoutContent({
   children,
 }: {
   children: React.ReactNode;
@@ -19,6 +21,9 @@ export default function RootLayout({
   const [isDark, setIsDark] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  
+  const { isLoggedIn, username, login, register, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -29,7 +34,13 @@ export default function RootLayout({
     localStorage.setItem('isDarkMode', JSON.stringify(!isDark));
   };
 
-  
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      setIsProfileModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   // Store and load page state
   useEffect(() => {
@@ -69,10 +80,8 @@ export default function RootLayout({
     if (savedScrollPosition !== null) {
       window.scrollTo(0, JSON.parse(savedScrollPosition));
     }
-    }, []);
+  }, []);
 
-
-  // return html
   return (
     <html lang="en">
       <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} style={{ backgroundColor: isDark ? '#000' : '#fff' }}>
@@ -81,9 +90,11 @@ export default function RootLayout({
           <Menu 
             isOpen={isMenuOpen} 
             toggleDark={toggleDark}
-            onClose={() => setIsMenuOpen(isMessageModalOpen || isProfileModalOpen)}
+            onClose={() => setIsMenuOpen(isMessageModalOpen || isProfileModalOpen || isAuthModalOpen)}
             openMessageModal={() => setIsMessageModalOpen(true)}
-            openProfileModal={() => setIsProfileModalOpen(true)}
+            openProfileModal={handleProfileClick}
+            isLoggedIn={isLoggedIn}
+            username={username}
           />
         </div>
         <Navbar onMenuToggle={toggleMenu} isMenuOpen={isMenuOpen} />
@@ -106,9 +117,29 @@ export default function RootLayout({
           <ProfileModal
             isOpen={isProfileModalOpen}
             onClose={() => setIsProfileModalOpen(false)}
+            username={username}
+            handleLogout={logout}
+          />
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            onLogin={login}
+            onRegister={register}
           />
         </div>
       </body>
     </html>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthProvider>
+      <RootLayoutContent>{children}</RootLayoutContent>
+    </AuthProvider>
   );
 }

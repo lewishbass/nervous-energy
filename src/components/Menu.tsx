@@ -22,11 +22,23 @@ interface MenuProps {
   onClose: () => void;
   openMessageModal: () => void;
   openProfileModal: () => void;
+  isLoggedIn?: boolean;
+  username?: string;
 }
 
-export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, openProfileModal }: MenuProps) {
+export default function Menu({ 
+  isOpen, 
+  toggleDark, 
+  onClose, 
+  openMessageModal, 
+  openProfileModal,
+  isLoggedIn,
+  username 
+}: MenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [version, setVersion] = useState<string | null>(null);
+  const [backendVersion, setBackendVersion] = useState<string | null>(null);
+  const [dbVersion, setDbVersion] = useState<string | null>(null);
+  const [dbStatus, setDbStatus] = useState<string | null>(null);
 
   useClickAway(menuRef, () => {
     if (isOpen) {
@@ -40,7 +52,9 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
         const response = await fetch('/.netlify/functions/version');
         if (response.ok) {
           const data = await response.json();
-          setVersion(data.version);
+          setBackendVersion(data.version);
+          setDbVersion(data.database?.version);
+          setDbStatus(data.database?.status);
         } else {
           console.error('Failed to fetch version');
         }
@@ -64,6 +78,20 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
   return (
     <div ref={menuRef} className="absolute top-0 right-0 w-[300px] h-full bg2 tc2 flex flex-col">
       <div className="pt-24 px-6 flex-grow">
+        {/* User Info (if logged in) */}
+        
+            <div className="flex items-center gap-4" style={{maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '20px': '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}>
+            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+              <span className="text-lg font-bold tc3">
+              {(username || 'J').charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="font-medium">{username || "John Doe"}</p>
+            </div>
+            </div>
+        
+
         {/* Quick Action Buttons */}
         <div className="flex justify-between gap-1 mb-12 relative w-50 mx-auto">
           {/* Search Component */}
@@ -79,26 +107,26 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
           </div>
 
           {/* Other Action Buttons */}
-            <button 
-              className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
-              onClick={(e) => {
-                e.preventDefault();
-                openMessageModal();
-                //onClose();
-              }}
-            >
-              <FaEnvelope className="w-5 h-5" />
-            </button>
-            <button 
-              className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
-              onClick={(e) => {
-                e.preventDefault();
-                openProfileModal();
-                //onClose();
-              }}
-            >
-              <FaUser className="w-5 h-5" />
-            </button>
+          <button 
+            className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
+            onClick={(e) => {
+              e.preventDefault();
+              openMessageModal();
+              //onClose();
+            }}
+          >
+            <FaEnvelope className="w-5 h-5" />
+          </button>
+          <button 
+            className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
+            onClick={(e) => {
+              e.preventDefault();
+              openProfileModal();
+              //onClose();
+            }}
+          >
+            <FaUser className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Navigation Links */}
@@ -125,7 +153,6 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
 
       {/* Dark Mode Toggle with Version Label */}
       <div className="p-6">
-        
         <button 
           onClick={toggleDark}
           className="w-full flex items-center gap-4 p-3 bt1 rounded-lg transition-colors"
@@ -136,9 +163,14 @@ export default function Menu({ isOpen, toggleDark, onClose, openMessageModal, op
           </div>
           <span className="text-lg">Dark Mode</span>
         </button>
-        {version && (
-          <div className="text-xs text-right opacity-10 mb-2">
-            Backend v{version}
+        {backendVersion && (
+          <div className="text-xs text-right opacity-35 mb-[-16] mt-4 tc1">
+            Backend v{backendVersion} 
+            {dbStatus && (
+              <span className={`ml-1 ${dbStatus === 'connected' ? 'text-green-500' : 'text-red-500'}`}>
+                | DB {dbStatus === 'connected' ? `v${dbVersion}` : dbStatus}
+              </span>
+            )}
           </div>
         )}
       </div>

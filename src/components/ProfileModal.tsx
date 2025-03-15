@@ -9,14 +9,16 @@ import ModalTemplate from './ModalTemplate';
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  username?: string;
+  handleLogout?: () => void;
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
-  // Dummy user data
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, username, handleLogout }) => {
+  // Dummy user data - use actual username if provided
   const user = {
-    username: 'johndoe123',
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
+    username: username || 'johndoe123',
+    fullName: username ? `${username} User` : 'John Doe', // Simple transformation for demo
+    email: username ? `${username.toLowerCase()}@example.com` : 'john.doe@example.com',
     bio: 'Passionate reader, tech enthusiast, and avid hiker. Always looking for the next adventure in books and in life.',
     location: 'San Francisco, CA',
     birthday: 'January 15, 1990',
@@ -24,6 +26,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     booksRead: 47,
     friends: 218,
     favoriteGenres: ['Science Fiction', 'Mystery', 'Biography']
+  };
+
+  const logoutAndClose = () => {
+    if (handleLogout) {
+      handleLogout();
+    }
+    onClose();
   };
 
   return (
@@ -108,12 +117,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="pt-3 mt-2 border-t-2 border-gray-200">
-          <button 
+            <button 
             className="w-full text-center py-2 text-red-500"
-            onClick={() => alert('Logout functionality coming soon!')}
-          >
+            onClick={logoutAndClose}
+            >
             Log Out
-          </button>
+            </button>
         </div>
       </div>
     </ModalTemplate>
