@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     catch(err){
-      setError('Failed to connect to backend');
+      setError('Failed to connect to backend' + (err instanceof Error ? (": " + err.message) : ''));
       return false;
     }
     return true;

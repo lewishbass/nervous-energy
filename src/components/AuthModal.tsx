@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
-import { FaSpinner, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaTimes } from 'react-icons/fa';
 import ColorProgressBar from './ColorProgressBar';
 
 interface AuthModalProps {

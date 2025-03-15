@@ -54,7 +54,7 @@ export const ColorProgressBar: React.FC<ColorProgressBarProps> = ({
       const g = 255;
       return `rgb(${r}, ${g}, 0)`;
     }
-  }, [percentage]);
+  }, [percentage, constantColor]);
   
   return (
    <div className={`w-full bg-gray-500/30 rounded-full h-2.5 ${className} overflow-hidden`}
