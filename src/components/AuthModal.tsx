@@ -182,16 +182,20 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
   }
 
+  const passwordStrength = (password: string) => {
+    return Math.sqrt(password.length)/Math.sqrt(10) + (new Set(password)).size/10 + ((/[^a-zA-Z0-9]/).test(password) ? 1 : 0) + ((/[a-z]/).test(password) && (/[A-Z]/).test(password) ? 1 : 0) + (/[0-9]/.test(password) ? 1 : 0);
+  }
+
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register">
       
-        <div className={'mb-[-1.4em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-2' : '')}
+        <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-2' : '')}
         style={{height: (error || validationError)? '2.4em' : '0px', opacity: (error || validationError)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out'}}>
             {error} {validationError}
         </div>
       
       
-        <div className="mb-4 mt-0 p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
+        <div className="mb-4 mt-[3] p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
         style={{height: (successMessage)? '2.4em' : '0px', opacity: (successMessage)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out'}}>
           {successMessage}
         </div>
@@ -294,7 +298,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
             <div>
-              <ColorProgressBar max={10} current={registerPassword.length} className="w-full h-2.5" />
+              <ColorProgressBar max={5} current={passwordStrength(registerPassword)} disappear={true} className="w-full h-2.5 mt-[-4px] mb-[-8px]"/>
             </div>
             <div>
               <label htmlFor="register-confirm-password" className="block text-sm font-medium tc3 mb-1">
@@ -310,6 +314,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 disabled={isLoading}
                 autoComplete='new-password'
               />
+            </div>
+            <div>
+              <ColorProgressBar max={Math.max(registerPassword.length, registerConfirmPassword.length)} current={Array.from(registerPassword).filter((char, index) => char === registerConfirmPassword[index]).length} disappear={true} className="w-full h-2.5 mt-[-4px]" constantColor={"#00ff00"}/>
             </div>
             <button
               type="submit"
