@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions';
 import jwt from 'jsonwebtoken';
+// @ts-expect-error because i said so
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import connectMongoDB from '../lib/mongodb';
