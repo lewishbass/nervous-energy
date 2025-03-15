@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 
 const UserSchema = new mongoose.Schema({
    id: {
@@ -106,8 +105,8 @@ UserSchema.pre('save', async function(next) {
       
       try {
          // Fix: Use bcrypt directly instead of mongoose.Promise.resolve
-         const salt = await bcrypt.genSalt(10);
-         const hash = await bcrypt.hash(user.password, salt);
+         const salt = await require("bcrypt").genSalt(10);
+         const hash = await require("bcrypt").hash(user.password, salt);
          user.password = hash;
       } catch (error) {
          return next(error as Error);

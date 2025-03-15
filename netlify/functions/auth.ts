@@ -1,7 +1,5 @@
 import { Handler } from '@netlify/functions';
 import jwt from 'jsonwebtoken';
-// @ts-expect-error because i said so
-import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import connectMongoDB from '../lib/mongodb';
 import User from '../models/User';  // Import the model directly, not the schema
@@ -120,7 +118,7 @@ async function handleLogin(requestBody: any) {
   }
 
   // Compare passwords
-  const passwordMatch = await bcrypt.compare(password, user.password);
+  const passwordMatch = await require('bcrypt').compare(password, user.password);
 
   if (!passwordMatch) {
     return {
