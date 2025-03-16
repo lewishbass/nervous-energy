@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, useMemo} from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface ModalTemplateProps {

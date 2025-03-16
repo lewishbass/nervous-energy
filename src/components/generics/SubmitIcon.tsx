@@ -20,7 +20,7 @@
 //  - submitted invalid: value submitted and response invalid/error - returns to changed after 2 seconds - red FaTimes
 //  - submitted valid: value submitted and response valid - updates (last successful data) - returns to no change after 2 seconds - green FaCheck
 
-import React, { useState, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { FaCog, FaTimes, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -40,12 +40,14 @@ enum SubmitState {
 }
 
 interface SubmitIconProps {
-  data: any;
+  data: string | number | boolean | Date;
   submitField: string;
   submitRoute: string;
-  validationFunction?: (data: any) => boolean;
-  onSuccess?: (response: any) => void;
-  onError?: (error: any) => void;
+  validationFunction?: (data: string | number | boolean | Date) => boolean;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onSuccess?: (response) => void;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onError?: (error) => void;
 }
 
 export interface SubmitIconRef {
@@ -62,7 +64,7 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
   onError
 }, ref) => {
   const [submitState, setSubmitState] = useState<SubmitState>(SubmitState.IDLE);
-  const [lastSuccessfulData, setLastSuccessfulData] = useState<any>(data);
+  const [lastSuccessfulData, setLastSuccessfulData] = useState<string | number | boolean | Date>(data);
 
   // Function to update state based on data changes
   const update = useMemo(() => {

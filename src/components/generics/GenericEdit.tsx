@@ -12,7 +12,7 @@
 // - submit route: route to submit data
 
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import StringEdit from './StringEdit';
 //import { FaEdit } from 'react-icons/fa';
 //import SubmitIcon from './SubmitIcon';
@@ -20,7 +20,7 @@ import StringEdit from './StringEdit';
 interface GenericEditProps {
    type: string,
    editable?: boolean,
-   value: any,
+   value: string | number | boolean  | Date,
    placeholder: any,
    options?: string[],
    submitField?: string,
@@ -40,6 +40,9 @@ const GenericEdit: React.FC<GenericEditProps> = ({
    const renderSpecificEdit = () => {
       switch (type) {
          case 'string':
+            if(typeof value !== 'string'){
+               value = value.toString();
+            }
             return (
               <StringEdit
                 editable={editable}
@@ -64,7 +67,7 @@ const GenericEdit: React.FC<GenericEditProps> = ({
          case 'color':
             return (<div/>);*/
          default:
-            return (<div>{value}</div>);
+            return (<div>{value.toString()}</div>);
       }
    }
 
