@@ -22,7 +22,7 @@ interface GenericEditProps {
    editable?: boolean,
    value: any,
    placeholder: any,
-   options: string[],
+   options?: string[],
    submitField?: string,
    submitRoute?: string,
 }
