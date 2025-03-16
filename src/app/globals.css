@@ -99,17 +99,30 @@ body {
   background-color: #fff1;
 }
 
+
 .bt2{
   cursor: pointer;
   user-select: none;
   background-color: #0001;
+  transition: transform 0.2s ease,
+              background-color 0.3s ease,
+              box-shadow 0.3s ease;
 }
+
+.bt2:hover:active{
+  transform: translateY(1px);
+  box-shadow: inset 0 0 10px 0 rgba(0,0,0,0.2);
+}
+
 .dark .bt2{
   background-color: #fff2;
 }
 .bt2:hover{
   background-color: #0002;
+  transform: translateY(-1px);
 }
+
+
 .dark .bt2:hover{
   background-color: #fff3;
 }
@@ -137,4 +150,11 @@ body {
   25% { transform: rotate(-10deg); }
   75% { transform: rotate(10deg); }
   100% { transform: rotate(0deg); }
+}
+
+@keyframes jiggle {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-4); }
+  75% { transform: translateY(4); }
+  100% { transform: translateY(0); }
 }

@@ -68,12 +68,13 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 3. Configure environment variables in Netlify dashboard
 
 ## TODO
-- Netlify backend implementation
-- Login page design and functionality
-- Authentication context setup
-- User profile management
-- Content management system
-- Unit and integration tests
+- [+]Netlify backend implementation
+- [+]Login page design and functionality
+- [+]Authentication context setup
+- [ ]User Data backend
+- [ ]User profile editors
+- [ ]Content management system
+- [ ]Unit and integration tests
 
 ## License
 [MIT License](LICENSE) - See LICENSE file for details

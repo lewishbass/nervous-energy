@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode, useMemo} from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface ModalTemplateProps {
@@ -49,7 +49,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
         }, 400);
         
         return () => clearTimeout(heightTimer);
-      }, 1000);
+      }, 100);
       
       return () => clearTimeout(loadingTimer);
     }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaCog} from 'react-icons/fa';
 import ColorProgressBar from './ColorProgressBar';
 
 interface AuthModalProps {
@@ -158,7 +158,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
       console.log('login modal error: ' + err.message);
     }
   };
-
   // Checks if user exists and gets suggestions
   const checkUserExists = async (username: string) => {
     try {
@@ -193,7 +192,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       
       
-        <div className="mb-4 mt-[3] p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
+        <div className="mb-2 mt-[6] p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
         style={{height: (successMessage)? '2.4em' : '0px', opacity: (successMessage)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out'}}>
           {successMessage}
         </div>
@@ -272,11 +271,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 autoComplete='username'
               />
               <div className="absolute right-2 top-2 w-6 h-6 flex items-center justify-center mw-0 mh-0 m-0 p-0">
-                  <div style={{opacity: usernameValid === 'none' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute rounded-full min-h-5 min-w-5 border-4 border-blue-500"/>
-                  <div style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute animate-spin rounded-full min-h-5 min-w-5 border-t-4 border-r-4 border-yellow-500"/>
-                  <FaCheck style={{opacity: usernameValid === 'valid' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-green-500" />
-                  <FaTimes style={{opacity: usernameValid === 'invalid' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-yellow-500" />
-                  <FaTimes style={{opacity: usernameValid === 'error' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute text-red-500" />
+                  <div style={{opacity: usernameValid === 'none' ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute rounded-full min-h-5 min-w-5 border-4 border-blue-500"/>
+                  {/*<div style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute animate-spin rounded-full min-h-5 min-w-5 border-t-4 border-r-4 border-yellow-500"/>*/}
+                  <FaCog   style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute animate-spin text-yellow-500"/>
+                  <FaCheck style={{opacity: usernameValid === 'valid'    ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-green-500" />
+                  <FaTimes style={{opacity: usernameValid === 'invalid'  ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-yellow-500" />
+                  <FaTimes style={{opacity: usernameValid === 'error'    ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-red-500" />
                 </div>
               </div>
             </div>

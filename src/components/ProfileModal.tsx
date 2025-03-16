@@ -6,6 +6,7 @@
 import React from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
+import GenericEdit from './generics/GenericEdit';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   };
 
   const { username, logout } = useAuth();
+  const [isEditing, setIsEditing] = React.useState<boolean>(false);
 
   const logoutAndClose = () => {
     if (logout) {
@@ -34,6 +36,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     }
     onClose();
   };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  }
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
@@ -55,9 +61,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         {/* Edit Profile Button */}
         <button 
           className="w-full py-2 bt2 rounded-lg tc2 font-medium"
-          onClick={() => alert('Edit profile functionality coming soon!')}
+          style={{boxShadow: !isEditing ? 'none' : 'inset 0 2px 8px rgba(0,0,0,0.15)'}}
+          onClick={() => toggleEdit()}
         >
-          Edit Profile
+          <div>Edit Profile</div>
         </button>
 
         {/* User Details */}
@@ -80,6 +87,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           <div className="space-y-3">
             <div>
               <h3 className="text-sm font-semibold tc3">Email</h3>
+              <GenericEdit type="string" editable={isEditing} value={"john.doe@edit.com"} placeholder={"your@email"}/>
               <p className="tc2">{user.email}</p>
             </div>
             

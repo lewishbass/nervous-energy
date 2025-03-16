@@ -92,7 +92,7 @@ function RootLayoutContent({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} style={{ backgroundColor: isDark ? '#000' : '#fff' }}>
+      <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} >
         {/* Menu */}
         <div className="fixed inset-0 z-0">
           <Menu 
