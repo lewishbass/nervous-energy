@@ -39,11 +39,13 @@ enum SubmitState {
   INVALID
 }
 
+type GenericValue = string | number | boolean | Date;
+
 interface SubmitIconProps {
-  data: string | number | boolean | Date;
+  data: GenericValue;
   submitField: string;
   submitRoute: string;
-  validationFunction?: (data: string | number | boolean | Date) => boolean;
+  validationFunction?: (data: GenericValue) => boolean;
   // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
   onSuccess?: (response) => void;
   // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
@@ -52,7 +54,9 @@ interface SubmitIconProps {
 
 export interface SubmitIconRef {
   submit: () => Promise<boolean>;
-  update: () => void;
+  update: () => ChangeState;
+  idle: () => boolean;
+  lastSuccessfulData: GenericValue;
 }
 
 const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
@@ -68,6 +72,7 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
 
   const { token, username, isLoggedIn } = useAuth();
 
+  
   // Function to update state based on data changes
   const update = useMemo(() => {
     if (JSON.stringify(data) === JSON.stringify(lastSuccessfulData)) return ChangeState.NO_CHANGE;
@@ -77,8 +82,14 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
    return isValid ? ChangeState.VALID : ChangeState.INVALID;
   }, [data, lastSuccessfulData, validationFunction]);
 
+  // Check if component is idle
+  const idle = useMemo(() => {
+    return (submitState === SubmitState.IDLE || submitState === SubmitState.VALID) && update === ChangeState.NO_CHANGE;
+  }, [submitState, update]);
+
   // Submit function to send data to backend
   const submit = async (): Promise<boolean> => {
+    console.log("submitting: ", data, " to ", submitRoute, " with field: ", submitField);
     // Only submit if state is CHANGED_VALID
     if (update !== ChangeState.VALID && submitState !== SubmitState.IDLE) {
       return false;
@@ -91,14 +102,11 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
          setSubmitState(SubmitState.INVALID);
          return false;
       }
-      // @ts-expect-error because i said so
-      const payload = { [submitField]: data , token: token, username: username};
-      // @ts-expect-error because i said so
+      const payload = { updates: {[submitField]: data} , token: token, username: username, action: 'set'};
       const response = await axios.post(submitRoute, payload);
-      // @ts-expect-error because i said so
-      const data = response.data;
-
-      if(response.ok === false) {
+      const responseData = response.data;
+      
+      if(response.status !== 200 || responseData.error) {
         setSubmitState(SubmitState.INVALID);
         return false;
       }
@@ -114,6 +122,7 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
       if (onSuccess) onSuccess(response);
       return true;
     } catch (error) {
+      console.error(error);
       setSubmitState(SubmitState.INVALID);
       
       // Return to IDLE state after 2 seconds
@@ -129,7 +138,9 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
   // Expose functions to parent component
   useImperativeHandle(ref, () => ({
     submit,
-    update: () => update
+    update: () => update,
+    idle: () => idle,
+    lastSuccessfulData
   }));
 
   // Render different icons based on state

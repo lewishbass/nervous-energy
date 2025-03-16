@@ -3,10 +3,12 @@
 // dummy data
 // displays user data
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import GenericEdit from './generics/GenericEdit';
+
+const PROFILE_ROUTE = '/.netlify/functions/profile';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -40,6 +42,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   }
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsEditing(false);
+    }
+  }, [isOpen]);
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
@@ -87,7 +95,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           <div className="space-y-3">
             <div>
               <h3 className="text-sm font-semibold tc3">Email</h3>
-              <GenericEdit type="string" editable={isEditing} value={"john.doe@edit.com"} placeholder={"your@email"}/>
+              <GenericEdit type="string" editable={isEditing} value={"john.doe@edit.com"} placeholder={"your@email"} submitField='email' submitRoute={PROFILE_ROUTE}/>
               <p className="tc2">{user.email}</p>
             </div>
             
