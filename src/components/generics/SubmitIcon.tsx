@@ -87,7 +87,6 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
     setSubmitState(SubmitState.SUBMITTING);
     
     try {
-      const auth = useAuth();
       if (isLoggedIn === false) {
          setSubmitState(SubmitState.INVALID);
          return false;
