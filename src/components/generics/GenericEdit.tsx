@@ -17,11 +17,13 @@ import StringEdit from './StringEdit';
 //import { FaEdit } from 'react-icons/fa';
 //import SubmitIcon from './SubmitIcon';
 
+type GenericValue = string | number | boolean | Date;
+
 interface GenericEditProps {
    type: string,
    editable?: boolean,
-   value: string | number | boolean  | Date,
-   placeholder: any,
+   value: GenericValue,
+   placeholder: GenericValue,
    options?: string[],
    submitField?: string,
    submitRoute?: string,
@@ -36,13 +38,15 @@ const GenericEdit: React.FC<GenericEditProps> = ({
    submitField,
    submitRoute,
 }) => {
+   if(options){
+      console.log(options);
+   }
 
    const renderSpecificEdit = () => {
       switch (type) {
          case 'string':
-            if(typeof value !== 'string'){
-               value = value.toString();
-            }
+            if(typeof value !== 'string') value = value.toString();
+            if(typeof placeholder !== 'string') placeholder = placeholder.toString();
             return (
               <StringEdit
                 editable={editable}

@@ -66,6 +66,8 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
   const [submitState, setSubmitState] = useState<SubmitState>(SubmitState.IDLE);
   const [lastSuccessfulData, setLastSuccessfulData] = useState<string | number | boolean | Date>(data);
 
+  const { token, username, isLoggedIn } = useAuth();
+
   // Function to update state based on data changes
   const update = useMemo(() => {
     if (JSON.stringify(data) === JSON.stringify(lastSuccessfulData)) return ChangeState.NO_CHANGE;
@@ -86,12 +88,12 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
     
     try {
       const auth = useAuth();
-      if (!auth.isLoggedIn) {
+      if (isLoggedIn === false) {
          setSubmitState(SubmitState.INVALID);
          return false;
       }
       // @ts-expect-error because i said so
-      const payload = { [submitField]: data , token: auth.token, username: auth.username};
+      const payload = { [submitField]: data , token: token, username: username};
       // @ts-expect-error because i said so
       const response = await axios.post(submitRoute, payload);
       // @ts-expect-error because i said so

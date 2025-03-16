@@ -8,8 +8,10 @@ interface StringEditProps {
   placeholder?: string;
   submitField?: string;
   submitRoute?: string;
-  onSuccess?: (response: any) => void;
-  onError?: (error: any) => void;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onSuccess?: (response) => void;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onError?: (error) => void;
 }
 
 const StringEdit: React.FC<StringEditProps> = ({
