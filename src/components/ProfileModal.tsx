@@ -31,10 +31,8 @@ interface UserProfile {
   };
   data: {
     lastSeen: Date;
-    // @ts-expect-error these are dynamically typed
-    friends?: any[];
-    // @ts-expect-error these are dynamically typed
-    history?: any[];
+    friends?: [];
+    history?: [];
   };
 }
 
@@ -97,7 +95,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       fetchUserProfile();
     }
-  }, [isOpen, username, fetchUserProfile]);
+  }, [isOpen, username]);
 
   useEffect(() => {
     if (!isOpen) {

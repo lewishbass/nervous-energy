@@ -145,12 +145,12 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
     lastSuccessfulData
   }));
 
-  interface ClickIconEvent {
+  /*interface ClickIconEvent {
     preventDefault: () => void;
     stopPropagation: () => void;
   }
 
-  /*const clickIcon = (e: ClickIconEvent) => {
+  const clickIcon = (e: ClickIconEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
