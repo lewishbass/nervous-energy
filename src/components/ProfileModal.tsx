@@ -3,7 +3,7 @@
 // dummy data
 // displays user data
 
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import GenericEdit from './generics/GenericEdit';
@@ -31,7 +31,9 @@ interface UserProfile {
   };
   data: {
     lastSeen: Date;
+    // @ts-expect-error these are dynamically typed
     friends?: any[];
+    // @ts-expect-error these are dynamically typed
     history?: any[];
   };
 }
@@ -95,7 +97,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       fetchUserProfile();
     }
-  }, [isOpen, username]);
+  }, [isOpen, username, fetchUserProfile]);
 
   useEffect(() => {
     if (!isOpen) {

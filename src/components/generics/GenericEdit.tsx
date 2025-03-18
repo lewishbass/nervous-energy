@@ -115,7 +115,6 @@ const GenericEdit: React.FC<GenericEditProps> = ({
               <DateEdit
                 editable={editable}
                 value={value}
-                placeholder={placeholder}
                 submitField={submitField}
                 submitRoute={submitRoute}
               />

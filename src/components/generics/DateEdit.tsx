@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import SubmitIcon, { SubmitIconRef } from './SubmitIcon';
-import { get } from 'http';
+
 
 interface DateEditProps {
   editable?: boolean;
@@ -21,7 +21,6 @@ const YEAR_MAX = 2030;
 const DateEdit: React.FC<DateEditProps> = ({
   editable = true,
   value,
-  placeholder = 'Select date',
   submitField,
   submitRoute,
   onSuccess,
@@ -70,13 +69,7 @@ const DateEdit: React.FC<DateEditProps> = ({
     setYear(value.getFullYear());
   }, [value]);
 
-  // Toggle editing mode
-  const toggleEdit = () => {
-    if (editable) {
-      setIsEditing(!isEditing);
-    }
-  };
-
+  
   // Handle wheel events for scrolling
   const handleWheel = (
     e: React.WheelEvent<HTMLSelectElement>,
@@ -232,10 +225,10 @@ const DateEdit: React.FC<DateEditProps> = ({
               data={date}
               submitField={submitField}
               submitRoute={submitRoute}
-              /*onSuccess={(response) => {
-                setIsEditing(false);
+              onSuccess={(response) => {
+                //setIsEditing(false);
                 if (onSuccess) onSuccess(response);
-              }}*/
+              }}
               onError={onError}
             />}
           </div>

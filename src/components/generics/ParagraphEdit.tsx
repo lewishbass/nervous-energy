@@ -52,7 +52,6 @@ const ParagraphEdit: React.FC<ParagraphEditProps> = ({
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = `auto`;
     }
   }, [value, isEditing]);

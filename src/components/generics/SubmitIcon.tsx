@@ -150,12 +150,12 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
     stopPropagation: () => void;
   }
 
-  const clickIcon = (e: ClickIconEvent) => {
+  /*const clickIcon = (e: ClickIconEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
     submit();
-  }
+  }*/
 
   // Render different icons based on state
   const renderIcon = () => {
