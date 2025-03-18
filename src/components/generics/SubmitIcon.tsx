@@ -42,6 +42,7 @@ enum SubmitState {
 type GenericValue = string | number | boolean | Date;
 
 interface SubmitIconProps {
+  className?: string;
   data: GenericValue;
   submitField: string;
   submitRoute: string;
@@ -60,6 +61,7 @@ export interface SubmitIconRef {
 }
 
 const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
+  className,
   data,
   submitField,
   submitRoute,
@@ -143,12 +145,24 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
     lastSuccessfulData
   }));
 
+  interface ClickIconEvent {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }
+
+  const clickIcon = (e: ClickIconEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    submit();
+  }
+
   // Render different icons based on state
   const renderIcon = () => {
     const ss = submitState;
     const us = update;
     return (
-      <>
+      <div >{/*onClick={(e) => clickIcon(e)}>*/}
         <div 
           className={`absolute w-5 h-5 border-4 border-blue-500 rounded-full transition-opacity duration-250 ease-in-out ${
           (ss === SubmitState.IDLE && us === ChangeState.NO_CHANGE) ? 'opacity-100' : 'opacity-0'}`}/>
@@ -168,13 +182,15 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
         <FaTimes className={`absolute w-5 h-5 transition-opacity duration-250 ease-in-out text-yellow-500 ${
           (ss === SubmitState.IDLE && us === ChangeState.INVALID) ? 'opacity-100' : 'opacity-0'}`}/>
 
-      </>
+      </div>
     );
   };
 
   return (
-    <div className="relative w-5 h-5">
-      {renderIcon()}
+    <div className={`${className}`}>
+      <div className="relative w-5 h-5">
+        {renderIcon()}
+      </div>
     </div>
   );
 });

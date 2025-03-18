@@ -14,12 +14,15 @@
 
 import React from 'react';
 import StringEdit from './StringEdit';
+import ParagraphEdit from './ParagraphEdit';
+import DateEdit from './DateEdit';
 //import { FaEdit } from 'react-icons/fa';
 //import SubmitIcon from './SubmitIcon';
 
-type GenericValue = string | number | boolean | Date;
+type GenericValue = string | number | boolean | Date | null;
 
 interface GenericEditProps {
+   className?: string,
    type: string,
    editable?: boolean,
    value: GenericValue,
@@ -30,6 +33,7 @@ interface GenericEditProps {
 }
 
 const GenericEdit: React.FC<GenericEditProps> = ({
+   className = "",
    type = 'string',
    editable = true,
    value,
@@ -45,6 +49,8 @@ const GenericEdit: React.FC<GenericEditProps> = ({
    const renderSpecificEdit = () => {
       switch (type) {
          case 'string':
+            if(!value) value = "";
+            if(!placeholder) placeholder = "";
             if(typeof value !== 'string') value = value.toString();
             if(typeof placeholder !== 'string') placeholder = placeholder.toString();
             return (
@@ -56,11 +62,65 @@ const GenericEdit: React.FC<GenericEditProps> = ({
                 submitRoute={submitRoute}
               />
             );
-         /*case 'paragraph':
-            return (<div/>);
+         case 'word':
+               if(!value) value = "";
+               if(!placeholder) placeholder = "";
+               if(typeof value !== 'string') value = value.toString();
+               if(typeof placeholder !== 'string') placeholder = placeholder.toString();
+               return (
+                 <StringEdit
+                   editable={editable}
+                   value={value}
+                   placeholder={placeholder}
+                   submitField={submitField}
+                   submitRoute={submitRoute}
+                   fitContent={true}
+                 />
+               );
+         case 'paragraph':
+            if(!value) value = "";
+            if(!placeholder) placeholder = "";
+            if(typeof value !== 'string') value = value.toString();
+            if(typeof placeholder !== 'string') placeholder = placeholder.toString();
+            return (
+              <ParagraphEdit
+                editable={editable}
+                value={value}
+                placeholder={placeholder}
+                submitField={submitField}
+                submitRoute={submitRoute}
+              />
+            );
          case 'date':
-            return (<div/>);
-         case 'time':
+            if(!(value instanceof Date)){
+               if (typeof value === 'number') {
+                value = new Date(value);
+               } else if (typeof value === 'string') {
+                value = new Date(value);
+               } else {
+                value = new Date();
+               }
+             }
+             if(!(placeholder instanceof Date)){
+               if (typeof placeholder === 'number') {
+                placeholder = new Date(placeholder);
+               } else if (typeof placeholder === 'string') {
+                placeholder = new Date(placeholder);
+               } else {
+                placeholder = new Date();
+               }
+             }
+
+            return (
+              <DateEdit
+                editable={editable}
+                value={value}
+                placeholder={placeholder}
+                submitField={submitField}
+                submitRoute={submitRoute}
+              />
+            );
+         /*case 'time':
             return (<div/>);
          case 'number':
             return (<div/>);
@@ -71,12 +131,12 @@ const GenericEdit: React.FC<GenericEditProps> = ({
          case 'color':
             return (<div/>);*/
          default:
-            return (<div>{value.toString()}</div>);
+            return (<div>{value ? value.toString() : "none"}</div>);
       }
    }
 
    return (
-      <div className="w-full">
+      <div className={"w-full " + className}>
         {renderSpecificEdit()}
       </div>
    );

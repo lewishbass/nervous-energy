@@ -1,6 +1,7 @@
 import { Handler } from '@netlify/functions';
 import connectMongoDB from '../lib/mongodb';
 import User from '../models/User';  // Import the model directly, not the schema
+import { validateUser, sanitizeUser } from '../lib/backendutils';
 
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
@@ -37,6 +38,12 @@ export const handler: Handler = async (event) => {
     if (requestBody.action === 'set') {
       console.log('Handling profile edit...');
       return await handleProfileEdit(requestBody);
+    } else if (requestBody.action === 'getSelf') {
+      console.log('Handling self profile fetch...');
+      return await handleSelfProfileFetch(requestBody);
+    } else if (requestBody.action === 'get') {
+      console.log('Handling profile fetch...');
+      return await handleProfileFetch(requestBody);
     }
 
     return {
@@ -56,6 +63,90 @@ export const handler: Handler = async (event) => {
   }
 };
 
+async function handleProfileFetch(requestBody: any) {
+  const { username, token, toFetch } = requestBody;
+  
+  // Validate required fields
+  if (!username || !token || !toFetch) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, token, tofetch are required' }),
+    };
+  }
+  if (!Array.isArray(toFetch)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'toFetch needs to be array of strings, got ' + typeof toFetch }),
+    };
+  }
+  for (let i = 0; i < toFetch.length; i++) {
+    if (typeof toFetch[i] !== 'string') {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'toFetch needs to be string or array of strings, got ' + typeof toFetch[i] + ' in position ' + i }),
+      };
+    }
+  }  
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Find users by username
+  const users = await User.find({ username: { $in: toFetch } });
+
+  // Return public profile data using sanitizeUser
+  const publicProfiles = users.map((fetchedUser) => sanitizeUser(fetchedUser, (fetchedUser.id === user.id) ? "self" : (fetchedUser.data.friends.includes(user.id) ? "friend" : "public")));
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(publicProfiles),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+}
+
+async function handleSelfProfileFetch(requestBody: any) {
+  const { username, token } = requestBody;
+  
+  // Validate required fields
+  if (!username || !token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username and token are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Return all profile data using sanitizeUser with "self" level
+  return {
+    statusCode: 200,
+    body: JSON.stringify({user: sanitizeUser(user, "self")}),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+}
 
 async function handleProfileEdit(requestBody: any) {
   const { username, token, updates } = requestBody;
@@ -68,34 +159,18 @@ async function handleProfileEdit(requestBody: any) {
     };
   }
 
-  // Find user by username
-  const user = await User.findOne({ username });
-  
-  if (!user) {
-    console.log('User not found');
+
+  // Verify JWT token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: 'User not found' }),
+      body: JSON.stringify({ error: validation.error }),
     };
   }
 
-  // Verify JWT token
-  try {
-    const decoded = require('jsonwebtoken').verify(token, JWT_SECRET);
-    if (decoded.username !== username) {
-      console.log('Token username mismatch');
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ error: 'Invalid token' }),
-      };
-    }
-  } catch (error) {
-    console.log('Invalid token: ', error);
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Invalid token' }),
-    };
-  }
+  const user = validation.user;
 
   // Update field in user profile
    const updateFields = Object.keys(updates);
@@ -122,7 +197,7 @@ async function handleProfileEdit(requestBody: any) {
    }
 
   // Update last seen timestamp
-  user.profile.lastSeen = new Date();
+  user.data.lastSeen = new Date();
   await user.save();
 
   // Return success

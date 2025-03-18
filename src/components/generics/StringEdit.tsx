@@ -12,6 +12,7 @@ interface StringEditProps {
   onSuccess?: (response) => void;
   // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
   onError?: (error) => void;
+  fitContent?: boolean;
 }
 
 const StringEdit: React.FC<StringEditProps> = ({
@@ -22,6 +23,7 @@ const StringEdit: React.FC<StringEditProps> = ({
   submitRoute,
   onSuccess,
   onError,
+  fitContent = false,
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [value, setValue] = useState<string>(initialValue);
@@ -70,14 +72,16 @@ const StringEdit: React.FC<StringEditProps> = ({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => setIsEditing(false)}
-          className="w-full px-1 py-1 text-[17px] rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className={`${fitContent? "field-sizing-content" : "w-full"} px-1 py-1 max-w-[100%] rounded focus:outline-none focus:ring-2 focus:ring-blue-300`}
+          style={{paddingRight: ((editable) ? '1.75rem' : '0rem'), transition: 'padding-right 0.3s ease-in-out'}}
         />
       ) : (
         <div 
-          className="w-full px-1 py-1 truncate tc2 text-[17px]"
+          className="w-full px-1 py-1 truncate"
+          style={{paddingRight: ((editable) ? '1.75rem' : '0rem'), transition: 'padding-right 0.3s ease-in-out'}}
           onClick={undefined/*toggleEdit*/}
         >
-          {value || <span className="opacity-0.5">{placeholder}</span>}
+          {(value && value.length>0)? value : <span style={{opacity:0.25}} className="">{placeholder}</span>}
         </div>
       )}
       
@@ -86,7 +90,7 @@ const StringEdit: React.FC<StringEditProps> = ({
         
         {submitField && submitRoute && (
           <div className="ml-2 absolute right-1"
-          style={{opacity: isEditing ? 1 : 0, pointerEvents: 'none', transition: 'opacity 0.3s ease-in-out'}}>
+          style={{opacity: isEditing ? 1 : 0, pointerEvents: 'none', cursor:"pointer", transition: 'opacity 0.3s ease-in-out'}}>
             <SubmitIcon
               ref={submitIconRef}
               data={value}
@@ -97,13 +101,13 @@ const StringEdit: React.FC<StringEditProps> = ({
             />
           </div>
         )}
-        {(
+        
           <FaEdit
             className={"absolute right-1 w-5 h-5 cursor-pointer " + (submitIconRef.current?.idle() ? 'text-blue-500 hover:text-blue-700' : 'text-yellow-500 hover:text-yellow-600')}
             style={{opacity: (editable && !isEditing) ? 1 : 0, pointerEvents: (editable && !isEditing) ? 'auto' : 'none', cursor: (editable && !isEditing) ? 'pointer' : 'default', transition: 'opacity 0.3s ease-in-out'}}
             onClick={toggleEdit}
           />
-        )}
+        
       </div>
     </div>
   );

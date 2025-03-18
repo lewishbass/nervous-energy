@@ -28,9 +28,9 @@ const UserSchema = new mongoose.Schema({
       profilePicture: String,
       location: String,
       birthday: Date,
-      lastSeen: Date,
    },
    data: {
+      lastSeen: Date,
       friends: [String],
       friendRequests: [String],
       history: [{

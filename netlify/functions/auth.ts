@@ -128,7 +128,7 @@ async function handleLogin(requestBody: any) {
   }
 
   // Update last seen timestamp
-  user.profile.lastSeen = new Date();
+  user.data.lastSeen = new Date();
   await user.save();
 
   // Generate JWT token
@@ -199,7 +199,6 @@ async function handleRegistration(requestBody: any) {
         profilePicture: profile.profilePicture || '',
         location: profile.location || '',
         birthday: profile.birthday || null,
-        lastSeen: new Date(),
       },
       data: {
         friends: [],
@@ -207,6 +206,7 @@ async function handleRegistration(requestBody: any) {
         history: [],
         chats: [],
         notifications: [],
+        lastSeen: new Date(),
       },
     });
 

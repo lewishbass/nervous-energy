@@ -74,15 +74,20 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bd1 z-200 cursor-pointer"
+            className="modal-closer fixed inset-0 bd1 z-200 cursor-pointer"
             initial={{ opacity: 0 }}
             animate={{ opacity: isClosing }}
             exit={{ opacity: 0 }}
-            onClick={resetModal}
+            onMouseDown={(e) => {
+              const target = e.target as HTMLElement;
+              if (target.classList.contains('modal-closer')) {
+              resetModal();
+              }
+            }}
           >
           
           {/* Modal container */}
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="modal-closer fixed inset-0 flex items-center justify-center z-50 p-4">
             <motion.div
               className="bg1 rounded-lg shadow-md overflow-hidden"
               initial={{ width: '200px', height: '120px' }}

@@ -3,7 +3,7 @@
 // dummy data
 // displays user data
 
-import React, { useEffect } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import GenericEdit from './generics/GenericEdit';
@@ -15,22 +15,69 @@ interface ProfileModalProps {
   onClose: () => void;
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
-  // Dummy user data - use actual username if provided
-  const user = {
-    fullName: 'John Doe', // Simple transformation for demo
-    email: 'john.doe@example.com',
-    bio: 'Passionate reader, tech enthusiast, and avid hiker. Always looking for the next adventure in books and in life.',
-    location: 'San Francisco, CA',
-    birthday: 'January 15, 1990',
-    joinDate: 'March 2021',
-    booksRead: 47,
-    friends: 218,
-    favoriteGenres: ['Science Fiction', 'Mystery', 'Biography']
+// Define user profile interface based on backend data structure
+interface UserProfile {
+  username: string;
+  id?: string;
+  createdAt?: Date;
+  profile: {
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+    bio: string;
+    email?: string;
+    location?: string;
+    birthday?: Date;
   };
+  data: {
+    lastSeen: Date;
+    friends?: any[];
+    history?: any[];
+  };
+}
 
-  const { username, logout } = useAuth();
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
+  // Replace dummy data with state for real user data
+  const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { username, token, logout } = useAuth();
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+
+  // Function to fetch user profile from backend
+  const fetchUserProfile = async () => {
+    if (!username || !token) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(PROFILE_ROUTE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getSelf',
+          username,
+          token
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setUserData(data.user);
+      } else {
+        setError(data.error || 'Failed to load profile');
+      }
+    } catch (err) {
+      setError('Error connecting to server');
+      console.error('Error fetching profile:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const logoutAndClose = () => {
     if (logout) {
@@ -43,11 +90,49 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     setIsEditing(!isEditing);
   }
 
+  // Fetch user data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchUserProfile();
+    }
+  }, [isOpen, username]);
+
   useEffect(() => {
     if (!isOpen) {
       setIsEditing(false);
     }
   }, [isOpen]);
+
+  // Display loading state
+  if (isLoading) {
+    return (
+      <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
+        <div className="flex justify-center items-center h-40">
+          <p className="text-gray-500">Loading profile data...</p>
+        </div>
+      </ModalTemplate>
+    );
+  }
+
+  // Display error state
+  if (error) {
+    return (
+      <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
+        <div className="flex justify-center items-center h-40 flex-col">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button 
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            onClick={fetchUserProfile}
+          >
+            Retry
+          </button>
+        </div>
+      </ModalTemplate>
+    );
+  }
+
+  // Use fallback data if userData is not available yet
+ 
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
@@ -57,12 +142,31 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           <div className="relative w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
             {/* Placeholder for profile image */}
             <span className="text-2xl text-gray-600">
-              {user.fullName.charAt(0)}
+              {userData ? userData.username.charAt(0) : '-'}
             </span>
           </div>
           <div>
-            <h2 className="text-xl font-bold tc1">{user.fullName}</h2>
-            <p className="text-sm tc3">@{username}</p>
+            <div className="max-w-50 text-2xl font-bold tc1 flex flex-direction-row items-center">
+
+              <GenericEdit
+                className="mr-2"
+                type="word"
+                editable={isEditing}
+                value={userData?.profile.firstName || ""}
+                placeholder={"First"}
+                submitField='firstName'
+                submitRoute={PROFILE_ROUTE}
+              />
+              <GenericEdit
+                type="word"
+                editable={isEditing}
+                value={userData?.profile.lastName || ""}
+                placeholder={"Last"}
+                submitField='lastName'
+                submitRoute={PROFILE_ROUTE}
+              />
+            </div>
+            <p className="text-sm tc3">@{userData ? userData.username : "-"}</p>
           </div>
         </div>
 
@@ -79,11 +183,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="p-2 bg2 rounded-lg">
-              <div className="font-bold tc1">{user.booksRead}</div>
+              <div className="font-bold tc1">{userData?.data.history?.length}</div>
               <div className="text-xs tc3">Books Read</div>
             </div>
             <div className="p-2 bg2 rounded-lg">
-              <div className="font-bold tc1">{user.friends}</div>
+              <div className="font-bold tc1">{userData?.data.friends?.length}</div>
               <div className="text-xs tc3">Friends</div>
             </div>
             <div className="p-2 bg2 rounded-lg">
@@ -93,36 +197,73 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div className="space-y-3">
-            <div>
+            <div className="text-[17px] tc2">
               <h3 className="text-sm font-semibold tc3">Email</h3>
-              <GenericEdit type="string" editable={isEditing} value={"john.doe@edit.com"} placeholder={"your@email"} submitField='email' submitRoute={PROFILE_ROUTE}/>
-              <p className="tc2">{user.email}</p>
+              <GenericEdit 
+                type="string" 
+                editable={isEditing} 
+                value={userData?.profile.email || ""} 
+                placeholder={"your@email"} 
+                submitField='email' 
+                submitRoute={PROFILE_ROUTE}
+              />
             </div>
             
-            <div>
+            <div className="tc2 text-[17px]">
               <h3 className="text-sm font-semibold tc3">Bio</h3>
-              <p className="tc2">{user.bio}</p>
+              <GenericEdit 
+                type="paragraph" 
+                editable={isEditing} 
+                value={userData?.profile.bio || ""} 
+                placeholder={"Tell us about yourself"} 
+                submitField='bio' 
+                submitRoute={PROFILE_ROUTE}
+              />
             </div>
             
-            <div>
+            <div  className="text-[17px] tc2">
               <h3 className="text-sm font-semibold tc3">Location</h3>
-              <p className="tc2">{user.location}</p>
+              <GenericEdit 
+                type="string" 
+                editable={isEditing} 
+                value={userData?.profile.location || ""} 
+                placeholder={"Where are you from"} 
+                submitField='location' 
+                submitRoute={PROFILE_ROUTE}
+              />
             </div>
             
-            <div>
+            <div  className="text-[17px] tc2">
               <h3 className="text-sm font-semibold tc3">Birthday</h3>
-              <p className="tc2">{user.birthday}</p>
+              <GenericEdit 
+                type="date" 
+                editable={isEditing} 
+                value={userData?.profile.birthday ? userData.profile.birthday : null} 
+                placeholder={Date.now()} 
+                submitField='birthday' 
+                submitRoute={PROFILE_ROUTE}
+              />
             </div>
             
-            <div>
+            <div className='text-[17px] tc2'>
               <h3 className="text-sm font-semibold tc3">Member Since</h3>
-              <p className="tc2">{user.joinDate}</p>
+                <span className='ml-1'>
+                  {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    //second: 'numeric',
+                    //fractionalSecondDigits: 3
+                    }) : 'Unknown'}
+                </span>
             </div>
 
             <div>
               <h3 className="text-sm font-semibold tc3">Favorite Genres</h3>
               <div className="flex flex-wrap gap-2 mt-1">
-                {user.favoriteGenres.map((genre, index) => (
+                {["Sci-Fi", "Fantasy"].map((genre, index) => (
                   <span key={index} className="px-2 py-1 text-xs rounded-full bg3 tc2">
                     {genre}
                   </span>
