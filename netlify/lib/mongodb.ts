@@ -79,7 +79,7 @@ async function connectMongoDB() {
           if (mongoose.connection.readyState === 1) {
             // @ts-expect-error because i said so
             mongoose.connection.db.admin().ping()
-              .then(() => console.log('MongoDB ping successful'))
+              //.then(() => console.log('MongoDB ping successful'))
               .catch(err => console.error('MongoDB ping failed:', err));
           }
         }, 30000);

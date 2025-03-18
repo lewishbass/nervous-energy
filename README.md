@@ -72,8 +72,9 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]Login page design and functionality
 - [+]Authentication context setup
 - [ ]Deload modals when not in user and animation is done
-- [ ]User Data backend
-- [ ]User profile editors
+- [+]User Data backend
+- [+]User profile editors
+- [ ]Messaging and social dashboard
 - [ ]Content management system
 - [ ]Unit and integration tests
 

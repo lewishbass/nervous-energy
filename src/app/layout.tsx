@@ -7,6 +7,7 @@ import Menu from '@/components/Menu';
 import MessageModal from '@/components/MessageModal';
 import ProfileModal from '@/components/ProfileModal';
 import AuthModal from '@/components/AuthModal';
+import HeadMetadata from '@/components/HeadMetadata';
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 
@@ -91,7 +92,8 @@ function RootLayoutContent({
   }, []);
 
   return (
-    <html lang="en">
+    <html lang="en" className='no-sb'>
+      <HeadMetadata />
       <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} >
         {/* Menu */}
         <div className="fixed inset-0 z-0">

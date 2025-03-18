@@ -158,3 +158,16 @@ body {
   75% { transform: translateY(4); }
   100% { transform: translateY(0); }
 }
+
+.no-sb{
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+}
+/*thin scrollbar with noi buttons and transparent background*/
+.thin-sb{
+  scrollbar-width: thin;
+  -ms-overflow-style: thin;
+  
+}
+

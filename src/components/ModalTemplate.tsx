@@ -120,7 +120,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
               <AnimatePresence>
                 {!isLoading && (
                   <motion.div
-                    className="p-4 cursor-default"
+                    className="p-4 cursor-default no-sb"
                     onClick={(e) => e.stopPropagation()}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: contentVisible ? 1 : 0 }}
@@ -130,6 +130,8 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     exit={{ opacity: 0 }}
                     style={{ 
                       minHeight: animationPhase === 'heightExpanding' || animationPhase === 'complete' ? '200px' : '0',
+                      maxHeight: '90vh',
+                      overflowY: 'scroll',
                       display: isLoading ? 'none' : 'block'
                     }}
                   >

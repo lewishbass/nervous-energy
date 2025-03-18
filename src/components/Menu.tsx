@@ -68,11 +68,11 @@ export default function Menu({
 
   // Example search dictionary - replace with your actual data or API route
   const searchDictionary = [
-    { name: 'Home', link: '/home', keyword: 'dashboard' },
-    { name: 'Books', link: '/books', keyword: 'reading library' },
-    { name: 'Events', link: '/events', keyword: 'calendar schedule' },
-    { name: 'Shop', link: '/shop', keyword: 'store purchase' },
-    { name: 'Friends', link: '/friends', keyword: 'social network' }
+    { name: 'Home', link: '/home', keyword: 'dashboard', requireAuth: false },
+    { name: 'Books', link: '/books', keyword: 'reading library', requireAuth: false },
+    { name: 'Events', link: '/events', keyword: 'calendar schedule', requireAuth: false },
+    { name: 'Shop', link: '/shop', keyword: 'store purchase', requireAuth: false },
+    { name: 'Friends', link: '/friends', keyword: 'social network', requireAuth: true }
   ];
 
   return (
@@ -132,17 +132,18 @@ export default function Menu({
         {/* Navigation Links */}
         <nav className="space-y-4">
           {[
-            { href: '/home', icon: FaHome, label: 'Home' },
-            { href: '/books', icon: FaBook, label: 'Books' },
-            { href: '/events', icon: FaCalendar, label: 'Events' },
-            { href: '/shop', icon: FaStore, label: 'Shop' },
-            { href: '/friends', icon: FaUsers, label: 'Friends' },
+            { href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
+            { href: '/books', icon: FaBook, label: 'Books', requireAuth: false },
+            { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
+            { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
+            { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
             <Link 
               key={item.href} 
               href={item.href}
               onClick={onClose}
               className="flex items-center gap-5 p-3 bt1 rounded-lg transition-colors my-0 py-4 px-4 wg"
+              style={{maxHeight: (!item.requireAuth || isLoggedIn ? '50px' : '0px'), marginBottom: (!item.requireAuth || isLoggedIn ? '10px': '0px'), opacity: (!item.requireAuth || isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-lg">{item.label}</span>

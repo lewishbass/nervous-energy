@@ -27,7 +27,6 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  console.log(requestBody);
   
   try {
     // Connect to MongoDB - ensure we wait for connection to be ready
@@ -64,7 +63,7 @@ export const handler: Handler = async (event) => {
 };
 
 async function handleProfileFetch(requestBody: any) {
-  const { username, token, toFetch } = requestBody;
+  const { username, token, toFetch, isId } = requestBody;
   
   // Validate required fields
   if (!username || !token || !toFetch) {
@@ -91,7 +90,7 @@ async function handleProfileFetch(requestBody: any) {
   // Validate token
   const validation = await validateUser(username, token);
   if (validation.error !== "OK") {
-    console.log(validation);
+    //console.log(validation);
     return {
       statusCode: 401,
       body: JSON.stringify({ error: validation.error }),
@@ -100,10 +99,22 @@ async function handleProfileFetch(requestBody: any) {
   const user = validation.user;
 
   // Find users by username
-  const users = await User.find({ username: { $in: toFetch } });
-
+  let users = [];
+  if (isId && isId === true){
+    console.log("Fetching by ID " + toFetch);
+    users = await User.find({ id: { $in: toFetch } });
+  }
+  else{
+    console.log("Fetching by username " + toFetch);
+    users = await User.find({ username: { $in: toFetch } });
+  }
   // Return public profile data using sanitizeUser
+  
   const publicProfiles = users.map((fetchedUser) => sanitizeUser(fetchedUser, (fetchedUser.id === user.id) ? "self" : (fetchedUser.data.friends.includes(user.id) ? "friend" : "public")));
+
+  /*for (let i = 0; i < publicProfiles.length; i++) {
+    console.log(publicProfiles[i].username + " : " + publicProfiles[i].data.lastSeen);
+  }*/
 
   return {
     statusCode: 200,
