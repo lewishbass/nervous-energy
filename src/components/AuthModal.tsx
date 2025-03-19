@@ -26,6 +26,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { login, register, isLoading, error } = useAuth();
 
+  
+
   useEffect(() => {
     if (isOpen) {
       setLoginUsername('');
@@ -40,11 +42,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   useEffect(() => {
     if (validationError) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setValidationError('');
-      }, 3000);
+      }, 3000); // Clear after 5 seconds
+
+      return () => clearTimeout(timer);
     }
-  });
+  }, [validationError]);
+
+  useEffect(() => {
+
+  }, [validationError]);
 
   // Add new useEffect for username checking with debounce
   useEffect(() => {
@@ -182,11 +190,23 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const passwordStrength = (password: string) => {
     return Math.sqrt(password.length)/Math.sqrt(10) + (new Set(password)).size/10 + ((/[^a-zA-Z0-9]/).test(password) ? 1 : 0) + ((/[a-z]/).test(password) && (/[A-Z]/).test(password) ? 1 : 0) + (/[0-9]/.test(password) ? 1 : 0);
   }
+  useEffect(() => {
+    if (registerPassword.length < 8) {
+      setValidationError('Password must be at least 8 characters long');
+    } else if (passwordStrength(registerPassword) < 3) {
+      setValidationError('Password must be stronger');
+    } else if( validationError?.includes("Password must")) {
+      setValidationError('');
+    }
+
+
+
+  },[registerPassword]);
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register">
       
-        <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-2' : '')}
+        <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100' : '')}
         style={{height: (error || validationError)? '2.4em' : '0px', opacity: (error || validationError)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out'}}>
             {error} {validationError}
         </div>

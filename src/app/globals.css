@@ -171,3 +171,92 @@ body {
   
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg) ;
+  }
+  to {
+    transform: rotate(360deg) 
+  }
+}
+
+.spin {
+  animation: spin 8s linear infinite;
+}
+
+/* Variations with different speeds */
+.spin-slow {
+  animation: spin 20s linear infinite;
+}
+.spin-veryslow {
+  animation: spin 500s linear infinite;
+}
+
+.spin-fast {
+  animation: spin 3s linear infinite;
+}
+
+.anisvg path{
+  stroke-dasharray: 500;
+  fill-opacity: 0;
+  stroke-opacity: 0;
+  stroke-dashoffset: 500;
+  animation: dash-move 10s linear forwards;
+  stroke-linecap: round;
+  stroke-width: 5px;
+}
+
+@keyframes dash-move{
+
+  0% {
+    stroke-dashoffset: 500;
+    stroke-opacity: 0;
+    fill-opacity: 0;
+  }
+  5% {
+    stroke-opacity: 1;
+  }
+  45%{
+    fill-opacity: 0;
+  }
+  50% {
+    fill-opacity: 1;
+  }
+  95% {
+    stroke-opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -500;
+    fill-opacity: 1;
+    stroke-opacity: 0;
+
+  }
+}
+
+.rainbow-text{
+  position: relative;
+  top:0;
+  left:0;
+  animation: rainbow 1s normal 0s 10 linear,
+             updown 1s normal 0s 10 ease;
+  filter:saturate(200%);
+ }
+
+ @keyframes rainbow {
+  0%     { color: #ff6666; } /* Bright red */
+  16.67% { color: #ffcc66; } /* Bright orange */
+  33.33% { color: #ffff66; } /* Bright yellow */
+  50%    { color: #66ff66; } /* Bright green */
+  66.67% { color: #6666ff; } /* Bright blue */
+  83.33% { color: #9966ff; } /* Bright indigo */
+  100%   { color: #ff6666; } /* Bright red */
+}
+
+@keyframes updown{
+  25%{
+    top:-2px;
+  }
+  75%{
+    top:2px;
+  }
+}

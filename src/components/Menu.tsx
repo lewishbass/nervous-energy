@@ -78,18 +78,7 @@ export default function Menu({
   return (
     <div ref={menuRef} className="absolute top-0 right-0 w-[300px] h-full bg2 tc2 flex flex-col">
       <div className="pt-24 px-6 flex-grow">
-        {/* User Info (if logged in) */}
         
-            <div className="flex items-center gap-4" style={{maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '20px': '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}>
-            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-lg font-bold tc3">
-              {(username || 'J').charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <p className="font-medium">{username || "John Doe"}</p>
-            </div>
-            </div>
         
 
         {/* Quick Action Buttons */}
@@ -151,7 +140,18 @@ export default function Menu({
           ))}
         </nav>
       </div>
-
+        {/* User Info (if logged in) */}
+        
+        <div className="mx-8 flex items-center gap-4" style={{maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '10px': '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}>
+            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+              <span className="text-lg font-bold tc3">
+              {(username || 'J').charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p className="font-medium">{username || "John Doe"}</p>
+            </div>
+            </div>
       {/* Dark Mode Toggle with Version Label */}
       <div className="p-6">
         <button 
