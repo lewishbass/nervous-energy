@@ -7,19 +7,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development
 export async function validateUser(username: string, token: string) {
   // Find user by username
   const user = await User.findOne({ username });
-  if (!user) 
-    return {user:null, error:"User not found"};
+  if (!user)
+    return { user: null, error: "User not found" };
   // Verify JWT token
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
     if (decoded.username !== username) {
-      return {user:null, error:"Token username mismatch"};
+      return { user: null, error: "Token username mismatch" };
     }
   }
   catch (error) {
-    return {user:null, error:"Invalid token"};
+    return { user: null, error: "Invalid token" };
   }
-  return {user:user, error:"OK"};
+  return { user: user, error: "OK" };
 }
 
 export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {

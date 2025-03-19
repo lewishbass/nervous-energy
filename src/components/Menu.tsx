@@ -1,12 +1,12 @@
 'use client';
 
-import { 
-  FaEnvelope, 
-  FaUser, 
-  FaHome, 
-  FaBook, 
-  FaCalendar, 
-  FaStore, 
+import {
+  FaEnvelope,
+  FaUser,
+  FaHome,
+  FaBook,
+  FaCalendar,
+  FaStore,
   FaUsers,
   FaSun,
   FaMoon
@@ -26,14 +26,14 @@ interface MenuProps {
   username?: string;
 }
 
-export default function Menu({ 
-  isOpen, 
-  toggleDark, 
-  onClose, 
-  openMessageModal, 
+export default function Menu({
+  isOpen,
+  toggleDark,
+  onClose,
+  openMessageModal,
   openProfileModal,
   isLoggedIn,
-  username 
+  username
 }: MenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
@@ -78,25 +78,15 @@ export default function Menu({
   return (
     <div ref={menuRef} className="absolute top-0 right-0 w-[300px] h-full bg2 tc2 flex flex-col">
       <div className="pt-24 px-6 flex-grow">
-        
-        
-
         {/* Quick Action Buttons */}
         <div className="flex justify-between gap-1 mb-12 relative w-50 mx-auto">
           {/* Search Component */}
           <div className="left-0">
-            <SearchExpand 
-              width={48} 
-              height={48} 
-              expandWidth={240} 
-              expandOffset={-20}
-              searchDictionary={searchDictionary}
-              placeholder="Search ..."
-            />
+            <SearchExpand width={48} height={48} expandWidth={240} expandOffset={-20} searchDictionary={searchDictionary} placeholder="Search ..." />
           </div>
 
           {/* Other Action Buttons */}
-          <button 
+          <button
             className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
             onClick={(e) => {
               e.preventDefault();
@@ -106,7 +96,7 @@ export default function Menu({
           >
             <FaEnvelope className="w-5 h-5" />
           </button>
-          <button 
+          <button
             className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
             onClick={(e) => {
               e.preventDefault();
@@ -127,12 +117,12 @@ export default function Menu({
             { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
-            <Link 
-              key={item.href} 
+            <Link
+              key={item.href}
               href={item.href}
               onClick={onClose}
               className="flex items-center gap-5 p-3 bt1 rounded-lg transition-colors my-0 py-4 px-4 wg"
-              style={{maxHeight: (!item.requireAuth || isLoggedIn ? '50px' : '0px'), marginBottom: (!item.requireAuth || isLoggedIn ? '10px': '0px'), opacity: (!item.requireAuth || isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}
+              style={{ maxHeight: (!item.requireAuth || isLoggedIn ? '50px' : '0px'), marginBottom: (!item.requireAuth || isLoggedIn ? '10px' : '0px'), opacity: (!item.requireAuth || isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out' }}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-lg">{item.label}</span>
@@ -140,21 +130,21 @@ export default function Menu({
           ))}
         </nav>
       </div>
-        {/* User Info (if logged in) */}
-        
-        <div className="mx-8 flex items-center gap-4" style={{maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '10px': '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'}}>
-            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-lg font-bold tc3">
-              {(username || 'J').charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <div>
-              <p className="font-medium">{username || "John Doe"}</p>
-            </div>
-            </div>
+      {/* User Info (if logged in) */}
+
+      <div className="mx-8 flex items-center gap-4" style={{ maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '10px' : '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out' }}>
+        <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+          <span className="text-lg font-bold tc3">
+            {(username || 'J').charAt(0).toUpperCase()}
+          </span>
+        </div>
+        <div>
+          <p className="font-medium">{username || "John Doe"}</p>
+        </div>
+      </div>
       {/* Dark Mode Toggle with Version Label */}
       <div className="p-6">
-        <button 
+        <button
           onClick={toggleDark}
           className="w-full flex items-center gap-4 p-3 bt1 rounded-lg transition-colors"
         >
@@ -166,11 +156,9 @@ export default function Menu({
         </button>
         {backendVersion && (
           <div className="text-xs text-right opacity-35 mb-[-16] mt-[-0] tc1">
-            Backend v{backendVersion} 
+            Backend v{backendVersion}
             {dbStatus && (
-              <span className={`ml-1 ${dbStatus === 'connected' ? 'text-green-500' : 'text-red-500'}`}>
-                | DB {dbStatus === 'connected' ? `v${dbVersion}` : dbStatus}
-              </span>
+              <span className={`ml-1 ${dbStatus === 'connected' ? 'text-green-500' : 'text-red-500'}`}> | DB {dbStatus === 'connected' ? `v${dbVersion}` : dbStatus} </span>
             )}
           </div>
         )}

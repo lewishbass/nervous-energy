@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
-import { FaCheck, FaTimes, FaCog} from 'react-icons/fa';
+import { FaCheck, FaTimes, FaCog } from 'react-icons/fa';
 import ColorProgressBar from './ColorProgressBar';
 
 interface AuthModalProps {
@@ -9,8 +9,8 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ 
-  isOpen, 
+const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
   onClose,
 }) => {
   const [loginUsername, setLoginUsername] = useState('');
@@ -26,7 +26,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { login, register, isLoading, error } = useAuth();
 
-  
+
 
   useEffect(() => {
     if (isOpen) {
@@ -61,19 +61,19 @@ const AuthModal: React.FC<AuthModalProps> = ({
     if (usernameCheckTimeoutRef.current) {
       clearTimeout(usernameCheckTimeoutRef.current);
     }
-    
+
     // If username is empty, don't check
-    if (!registerUsername){
+    if (!registerUsername) {
       setUsernameValid('none');
       return
     }
-    
+
     setUsernameValid('checking');
-    
+
     // Set a new timeout
     usernameCheckTimeoutRef.current = setTimeout(async () => {
       const result = await checkUserExists(registerUsername);
-      if(result.error){
+      if (result.error) {
         setValidationError('Error checking username');
         setUsernameValid('error');
       } else if (result.exists) {
@@ -85,7 +85,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         setUsernameValid('valid');
       }
     }, 300);
-    
+
     // Cleanup function to clear timeout when component unmounts or username changes again
     return () => {
       if (usernameCheckTimeoutRef.current) {
@@ -98,12 +98,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setValidationError('');
     setSuccessMessage('');
-    
+
     if (!loginUsername || !loginPassword) {
       setValidationError('Please fill in all fields');
       return;
     }
-    
+
     try {
       const successful_login = await login(loginUsername, loginPassword);
       console.log("Login Success:", successful_login);
@@ -114,7 +114,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       // Clear form after successful login
       setLoginUsername('');
       setLoginPassword('');
-      
+
       // Close modal after a short delay to show the success message
       setTimeout(() => {
         setSuccessMessage('');
@@ -132,17 +132,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setValidationError('');
     setSuccessMessage('');
-    
+
     if (!registerUsername || !registerPassword) {
       setValidationError('Please fill in all fields');
       return;
     }
-    
+
     if (registerPassword !== registerConfirmPassword) {
       setValidationError('Passwords do not match');
       return;
     }
-    
+
     try {
       const successful_register = await register(registerUsername, registerPassword);
       if (successful_register !== true) {
@@ -154,7 +154,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setRegisterUsername('');
       setRegisterPassword('');
       setRegisterConfirmPassword('');
-      
+
       // Close modal after a short delay to show the success message
       setTimeout(() => {
         setSuccessMessage('');
@@ -169,7 +169,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   // Checks if user exists and gets suggestions
   const checkUserExists = async (username: string) => {
     try {
-     const response = await fetch('/.netlify/functions/auth/user-exists', {
+      const response = await fetch('/.netlify/functions/auth/user-exists', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,35 +188,35 @@ const AuthModal: React.FC<AuthModalProps> = ({
   }
 
   const passwordStrength = (password: string) => {
-    return Math.sqrt(password.length)/Math.sqrt(10) + (new Set(password)).size/10 + ((/[^a-zA-Z0-9]/).test(password) ? 1 : 0) + ((/[a-z]/).test(password) && (/[A-Z]/).test(password) ? 1 : 0) + (/[0-9]/.test(password) ? 1 : 0);
+    return Math.sqrt(password.length) / Math.sqrt(10) + (new Set(password)).size / 10 + ((/[^a-zA-Z0-9]/).test(password) ? 1 : 0) + ((/[a-z]/).test(password) && (/[A-Z]/).test(password) ? 1 : 0) + (/[0-9]/.test(password) ? 1 : 0);
   }
   useEffect(() => {
     if (registerPassword.length < 8) {
       setValidationError('Password must be at least 8 characters long');
     } else if (passwordStrength(registerPassword) < 3) {
       setValidationError('Password must be stronger');
-    } else if( validationError?.includes("Password must")) {
+    } else if (validationError?.includes("Password must")) {
       setValidationError('');
     }
 
 
 
-  },[registerPassword]);
+  }, [registerPassword]);
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register">
-      
-        <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100' : '')}
-        style={{height: (error || validationError)? '2.4em' : '0px', opacity: (error || validationError)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out'}}>
-            {error} {validationError}
-        </div>
-      
-      
-        <div className="mb-2 mt-[6] p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
-        style={{height: (successMessage)? '2.4em' : '0px', opacity: (successMessage)? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out'}}>
-          {successMessage}
-        </div>
-      
+
+      <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100' : '')}
+        style={{ height: (error || validationError) ? '2.4em' : '0px', opacity: (error || validationError) ? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out' }}>
+        {error} {validationError}
+      </div>
+
+
+      <div className="mb-2 mt-[6] p-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded"
+        style={{ height: (successMessage) ? '2.4em' : '0px', opacity: (successMessage) ? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out' }}>
+        {successMessage}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Login Form */}
         <div className="space-y-4">
@@ -280,23 +280,23 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 Username
               </label>
               <div className="relative h-[2.4em]">
-              <input
-                id="register-username"
-                type="text"
-                value={registerUsername}
-                onChange={(e) => setRegisterUsername(e.target.value)}
-                className="absolute w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
-                placeholder="Choose a username"
-                disabled={isLoading}
-                autoComplete='username'
-              />
-              <div className="absolute right-2 top-2 w-6 h-6 flex items-center justify-center mw-0 mh-0 m-0 p-0">
-                  <div style={{opacity: usernameValid === 'none' ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute rounded-full min-h-5 min-w-5 border-4 border-blue-500"/>
+                <input
+                  id="register-username"
+                  type="text"
+                  value={registerUsername}
+                  onChange={(e) => setRegisterUsername(e.target.value)}
+                  className="absolute w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3"
+                  placeholder="Choose a username"
+                  disabled={isLoading}
+                  autoComplete='username'
+                />
+                <div className="absolute right-2 top-2 w-6 h-6 flex items-center justify-center mw-0 mh-0 m-0 p-0">
+                  <div style={{ opacity: usernameValid === 'none' ? 1 : 0, transition: 'opacity 0.25s ease' }} className="absolute rounded-full min-h-5 min-w-5 border-4 border-blue-500" />
                   {/*<div style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.5s ease'}} className="absolute animate-spin rounded-full min-h-5 min-w-5 border-t-4 border-r-4 border-yellow-500"/>*/}
-                  <FaCog   style={{opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute animate-spin text-yellow-500"/>
-                  <FaCheck style={{opacity: usernameValid === 'valid'    ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-green-500" />
-                  <FaTimes style={{opacity: usernameValid === 'invalid'  ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-yellow-500" />
-                  <FaTimes style={{opacity: usernameValid === 'error'    ? 1 : 0, transition: 'opacity 0.25s ease'}} className="absolute text-red-500" />
+                  <FaCog style={{ opacity: usernameValid === 'checking' ? 1 : 0, transition: 'opacity 0.25s ease' }} className="absolute animate-spin text-yellow-500" />
+                  <FaCheck style={{ opacity: usernameValid === 'valid' ? 1 : 0, transition: 'opacity 0.25s ease' }} className="absolute text-green-500" />
+                  <FaTimes style={{ opacity: usernameValid === 'invalid' ? 1 : 0, transition: 'opacity 0.25s ease' }} className="absolute text-yellow-500" />
+                  <FaTimes style={{ opacity: usernameValid === 'error' ? 1 : 0, transition: 'opacity 0.25s ease' }} className="absolute text-red-500" />
                 </div>
               </div>
             </div>
@@ -316,7 +316,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
             <div>
-              <ColorProgressBar max={5} current={passwordStrength(registerPassword)} disappear={true} className="w-full h-2.5 mt-[-4px] mb-[-8px]"/>
+              <ColorProgressBar max={5} current={passwordStrength(registerPassword)} disappear={true} className="w-full h-2.5 mt-[-4px] mb-[-8px]" />
             </div>
             <div>
               <label htmlFor="register-confirm-password" className="block text-sm font-medium tc3 mb-1">
@@ -334,7 +334,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               />
             </div>
             <div>
-              <ColorProgressBar max={Math.max(registerPassword.length, registerConfirmPassword.length)} current={Array.from(registerPassword).filter((char, index) => char === registerConfirmPassword[index]).length} disappear={true} className="w-full h-2.5 mt-[-4px]" constantColor={"#00ff00"}/>
+              <ColorProgressBar max={Math.max(registerPassword.length, registerConfirmPassword.length)} current={Array.from(registerPassword).filter((char, index) => char === registerConfirmPassword[index]).length} disappear={true} className="w-full h-2.5 mt-[-4px]" constantColor={"#00ff00"} />
             </div>
             <button
               type="submit"

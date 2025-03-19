@@ -71,10 +71,14 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]Netlify backend implementation
 - [+]Login page design and functionality
 - [+]Authentication context setup
-- [ ]Deload modals when not in user and animation is done
+- [ ]Deload modals when not in user and animation is done, WAIT FOR LOAD ON ANIMATION
 - [+]User Data backend
 - [+]User profile editors
+- [ ]log out on token expiration
+- [ ]Friend Management - requires friend request notifications
+- [ ]Book downloads
 - [ ]Messaging and social dashboard
+- [ ]Playground section
 - [ ]Content management system
 - [ ]Unit and integration tests
 
