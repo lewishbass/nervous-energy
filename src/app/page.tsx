@@ -108,7 +108,7 @@ export default function Home() {
 			  </DragCard>
 			  <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
 				  <Image
-					  src="/VT.webp"
+					  src="/VT.svg"
 					  alt="Home Sweet Home"
 					  className="absolute inset-0 w-full h-full object-cover mix-blend-soft-light grayscale-50 blur-[2px] select-none pointer-events-none"
 					  width={100}
