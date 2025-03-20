@@ -309,6 +309,34 @@ export default function Friends() {
     }
   }
 
+  const handleRescindRequest = async (friendUsername: string) => {
+    if (!username || !token) {
+      return;
+    }
+    try {
+      const response = await fetch('/.netlify/functions/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'rescindFriendRequest',
+          username,
+          token,
+          friendUsername
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to rescind friend request');
+      }
+
+      // Refresh the user list to show updated status
+      setRequestsRefresh(prev => prev + 1);
+    } catch (err) {
+      console.error('Error rescinding friend request:', err);
+      // Handle error
+    }
+  }
+
   const getFriendshipButton = (user: OtherUser) => {
     // Define common button/label classes
     const baseClasses = "px-3 py-1 rounded-full text-sm text-white";
@@ -326,9 +354,10 @@ export default function Friends() {
         isButton = false;
         break;
       case 'pending':
-        buttonClasses = `${baseClasses} bg-yellow-500`;
+        buttonClasses = `${baseClasses} bg-yellow-500 hover:bg-yellow-600`;
         buttonText = "Request Pending";
-        isButton = false;
+        onClick = () => handleRescindRequest(user.username);
+        isButton = true;
         break;
       case 'received':
         buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
@@ -352,7 +381,6 @@ export default function Friends() {
         {buttonText}
       </button>
     );
-
   };
 
   if (isLoading) {

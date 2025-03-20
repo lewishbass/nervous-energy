@@ -46,6 +46,9 @@ export const handler: Handler = async (event) => {
     } else if (requestBody.action === 'acceptFriendRequest') {
       console.log('Handling accept friend request...');
       return await handleAcceptFriendRequest(requestBody);
+    } else if (requestBody.action === 'rescindFriendRequest') {
+      console.log('Handling rescind friend request...');
+      return await handleRescindFriendRequest(requestBody);
     }
 
     return {
@@ -247,6 +250,50 @@ const handleAcceptFriendRequest = async (requestBody: any) => {
     JSON.stringify({ senderId: user.id }),
     false
   );
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  };
+};
+
+const handleRescindFriendRequest = async (requestBody: any) => {
+  const { username, token, friendUsername } = requestBody;
+
+  // Validate required fields
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Find friend user
+  const friend = await User.findOne({ username: friendUsername });
+  if (!friend) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'Friend not found' }),
+    };
+  }
+
+  // Check if there's a pending request to rescind
+  if (!user.data.pendingFriends.includes(friend.id)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'No pending friend request to this user' }),
+    };
+  }
+
+  // Remove from pending and request lists
+  user.data.pendingFriends = user.data.pendingFriends.filter((id: string) => id.toString() !== friend.id.toString());
+  friend.data.friendRequests = friend.data.friendRequests.filter((id: string) => id.toString() !== user.id.toString());
+
+  // Save both users
+  await user.save();
+  await friend.save();
 
   return {
     statusCode: 200,
