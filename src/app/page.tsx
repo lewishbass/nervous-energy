@@ -131,15 +131,15 @@ export default function Home() {
           <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Experience</h2>
           <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Work</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
-            <a href="https://eng.vt.edu/ceed/ceed-pre-college-programs/imagination.html" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT CEED Engineering Outreach Camps</a>
+					  <a draggable="false" href="https://eng.vt.edu/ceed/ceed-pre-college-programs/imagination.html" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT CEED Engineering Outreach Camps</a>
 
 				  </p>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
-					  <a href="https://people.cs.vt.edu/onufriev" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT Computational Bio-Physics</a>
+					  <a draggable="false" href="https://people.cs.vt.edu/onufriev" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT Computational Bio-Physics</a>
 				  </p>
 				  <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Publications</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
-					  <a href="https://pubs.acs.org/doi/abs/10.1021/acs.jctc.3c00981" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ Improving Accuracy of Physics-Based Hydration Free Energy with Machine Learning</a>
+					  <a draggable="false" href="https://pubs.acs.org/doi/abs/10.1021/acs.jctc.3c00981" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ Improving Accuracy of Physics-Based Hydration Free Energy with Machine Learning</a>
 				  </p>
         </DragCard>
 

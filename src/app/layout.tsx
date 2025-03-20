@@ -7,6 +7,7 @@ import Menu from '@/components/Menu';
 import MessageModal from '@/components/MessageModal';
 import ProfileModal from '@/components/ProfileModal';
 import AuthModal from '@/components/AuthModal';
+import NotificationModal from '@/components/NotificationModal';
 import HeadMetadata from '@/components/HeadMetadata';
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -23,6 +24,7 @@ function RootLayoutContent({
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   
   const { isLoggedIn, username } = useAuth();
 
@@ -51,12 +53,21 @@ function RootLayoutContent({
     }
   };
 
+  const handleNotificationClick = () => {
+    if (isLoggedIn) {
+      setIsNotificationModalOpen(true);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
+
   // Store and load page state
   useEffect(() => {
     const handleBeforeUnload = () => {
       localStorage.setItem('isMenuOpen', JSON.stringify(isMenuOpen));
       localStorage.setItem('isMessageModalOpen', JSON.stringify(isMessageModalOpen));
       localStorage.setItem('isProfileModalOpen', JSON.stringify(isProfileModalOpen));
+      localStorage.setItem('isNotificationModalOpen', JSON.stringify(isNotificationModalOpen));
       localStorage.setItem('scrollPosition', JSON.stringify(window.scrollY));
     };
 
@@ -65,13 +76,14 @@ function RootLayoutContent({
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isMenuOpen, isMessageModalOpen, isProfileModalOpen]);
+  }, [isMenuOpen, isMessageModalOpen, isProfileModalOpen, isNotificationModalOpen]);
 
   useEffect(() => {
     const savedDarkModeState = localStorage.getItem('isDarkMode');
     const savedMenuState = localStorage.getItem('isMenuOpen');
     const savedMessageModalState = localStorage.getItem('isMessageModalOpen');
     const savedProfileModalState = localStorage.getItem('isProfileModalOpen');
+    const savedNotificationModalState = localStorage.getItem('isNotificationModalOpen');
     const savedScrollPosition = localStorage.getItem('scrollPosition');
 
     if (savedDarkModeState !== null) {
@@ -85,6 +97,9 @@ function RootLayoutContent({
     }
     if (savedProfileModalState !== null) {
       setIsProfileModalOpen(JSON.parse(savedProfileModalState));
+    }
+    if (savedNotificationModalState !== null) {
+      setIsNotificationModalOpen(JSON.parse(savedNotificationModalState));
     }
     if (savedScrollPosition !== null) {
       window.scrollTo(0, JSON.parse(savedScrollPosition));
@@ -100,11 +115,10 @@ function RootLayoutContent({
           <Menu 
             isOpen={isMenuOpen} 
             toggleDark={toggleDark}
-            onClose={() => setIsMenuOpen(isMessageModalOpen || isProfileModalOpen || isAuthModalOpen)}
+            onClose={() => setIsMenuOpen(isMessageModalOpen || isProfileModalOpen || isAuthModalOpen || isNotificationModalOpen)}
             openMessageModal={handleMessageClick}
             openProfileModal={handleProfileClick}
-            isLoggedIn={isLoggedIn}
-            username={username}
+            openNotificationModal={handleNotificationClick}
           />
         </div>
         <Navbar onMenuToggle={toggleMenu} isMenuOpen={isMenuOpen} />
@@ -131,6 +145,10 @@ function RootLayoutContent({
           <AuthModal
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
+          />
+          <NotificationModal
+            isOpen={isNotificationModalOpen}
+            onClose={() => setIsNotificationModalOpen(false)}
           />
         </div>
       </body>

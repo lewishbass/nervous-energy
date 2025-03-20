@@ -103,21 +103,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // Display loading state
-  if (isLoading) {
-    return (
-      <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
-        <div className="flex justify-center items-center h-40">
-          <p className="text-gray-500">Loading profile data...</p>
-        </div>
-      </ModalTemplate>
-    );
-  }
-
   // Display error state
   if (error) {
     return (
-      <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
+      <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile" contentLoading={false}>
         <div className="flex justify-center items-center h-40 flex-col">
           <p className="text-red-500 mb-4">{error}</p>
           <button 
@@ -125,6 +114,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
             onClick={fetchUserProfile}
           >
             Retry
+          </button>
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-lg mt-2"
+            onClick={logoutAndClose}
+          >
+            Log Out
           </button>
         </div>
       </ModalTemplate>
@@ -135,7 +130,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
  
 
   return (
-    <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile">
+    <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile" contentLoading={isLoading}>
       <div className="space-y-6">
         {/* Profile Header with Avatar */}
         <div className="flex items-center space-x-4">

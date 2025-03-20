@@ -42,29 +42,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   const verifyBackend = async () => {
-    
+
     // Basic check to verify backend connection
-    try{
+    try {
       const versionResponse = await fetch(`${API_BASE_URL}/version`);
-      if(!versionResponse.ok){
+      if (!versionResponse.ok) {
         setError('Failed to connect to backend');
         return false;
       }
       const data = await versionResponse.json();
-      if(data.database?.status !== 'connected'){
+      if (data.database?.status !== 'connected') {
         setError('Database not connected');
         return false;
       }
     }
-    catch(err){
+    catch (err) {
       setError('Failed to connect to backend' + (err instanceof Error ? (": " + err.message) : ''));
       return false;
     }
     return true;
   }
 
-  useEffect(() =>{
-    if(error){
+  useEffect(() => {
+    if (error) {
       setTimeout(() => setError(null), 3000);
     }
   });
@@ -73,11 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
 
-    if(!await verifyBackend()){
+    if (!await verifyBackend()) {
       setIsLoading(false);
       return false;
     }
-    
+
     // Attempt login
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
         body: JSON.stringify({ username, password }),
       });
-      
+
       console.log("Login Response", response);
       if (!response.ok) {
         const errorData = await response.json();
@@ -95,29 +95,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const data = await response.json();
-      if(data.success){
+      if (data.success) {
         setError(null);
-      }else{
+      } else {
         setError('Login Unsuccessful');
       }
-      
+
       // Save auth data
       setIsLoggedIn(true);
       setUsername(username);
       setToken(data.token);
       setUser(data.user);
-      
+
       // Store in localStorage
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data.user));
       setIsLoading(false);
       return true;
-      
+
     } catch (err) {
       setError('Login Failed' + (err instanceof Error ? (": " + err.message) : ''));
       setIsLoading(false);
       return false;
-    } 
+    }
     setIsLoading(false);
     return false;
   };
@@ -126,11 +126,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
 
-    if(!await verifyBackend()){
+    if (!await verifyBackend()) {
       setIsLoading(false);
       return false;
     }
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
@@ -147,19 +147,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await response.json();
       setError(null);
-      
+
       // Save auth data
       setIsLoggedIn(true);
       setUsername(username);
       setToken(data.token);
       setUser(data.user);
-      
+
       // Store in localStorage
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('userData', JSON.stringify(data.user));
       setIsLoading(false);
       return true;
-      
+
     } catch (err) {
       setError('Registration failed' + (err instanceof Error ? (": " + err.message) : ''));
       setIsLoading(false);
@@ -175,17 +175,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsername('');
     setToken(null);
     setUser(null);
-    
+
     // Clear storage
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
   };
 
+  const verifyToken = async () => {
+    if (!token) return false;
+
+    try {
+      const response = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getSelf',
+          username,
+          token
+        }),
+      });
+      if (!response.ok) {
+        logout();
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error verifying token:', err);
+      logout();
+      return false;
+    }
+  }
+
   // Check for existing auth on mount
   useEffect(() => {
     const storedToken = localStorage.getItem('authToken');
     const storedUserData = localStorage.getItem('userData');
-
+    verifyToken();
     if (storedToken && storedUserData) {
       try {
         const userData = JSON.parse(storedUserData) as User;
@@ -201,16 +228,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ 
-      isLoggedIn, 
-      username, 
-      token, 
-      user, 
-      isLoading, 
-      error, 
-      login, 
-      register, 
-      logout 
+    <AuthContext.Provider value={{
+      isLoggedIn,
+      username,
+      token,
+      user,
+      isLoading,
+      error,
+      login,
+      register,
+      logout
     }}>
       {children}
     </AuthContext.Provider>

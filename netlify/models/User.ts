@@ -1,3 +1,4 @@
+import { u } from 'framer-motion/client';
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
@@ -32,23 +33,29 @@ const UserSchema = new mongoose.Schema({
    data: {
       lastSeen: Date,
       friends: [String],
+      pendingFriends: [String],
       friendRequests: [String],
       history: [{
          timeStamp: Date,
          action: String,
          data: String,
       }],
+      updatedChats: Boolean,
       chats: [{
          chatId: String,
          chatName: String,
          chatType: String,
          chatMembers: [String],
+         newMessages: Boolean,
       }],
+      newNotifications: Boolean,
       notifications: [{
          timeStamp: Date,
-         type: String,
+         message: String,
+         notificationType: String,
          data: String,
          read: Boolean,
+         id: String,
       }],
    },
 });
@@ -65,6 +72,7 @@ UserSchema.pre('save', async function(next) {
       history: [],
       // @ts-expect-error because i said so
       chats: [], 
+      // @ts-expect-error because i said so
       notifications: [] 
    };
 

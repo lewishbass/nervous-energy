@@ -6,13 +6,15 @@ interface ModalTemplateProps {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  contentLoading?: boolean;
 }
 
 const ModalTemplate: React.FC<ModalTemplateProps> = ({
   isOpen,
   onClose,
   children,
-  title
+  title,
+  contentLoading = true,
 }) => {
   // Animation states
   const [isLoading, setIsLoading] = useState(true);
@@ -24,10 +26,13 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   useEffect(() => {
     if (isOpen) {
       // Reset states
+
       setIsLoading(true);
       setContentVisible(false);
       setAnimationPhase('initial');
-      
+
+      if (contentLoading) return;
+
       // 1 second loading time
       const loadingTimer = setTimeout(() => {
         setIsLoading(false);
@@ -53,7 +58,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
       
       return () => clearTimeout(loadingTimer);
     }
-  }, [isOpen]);
+  }, [isOpen, contentLoading]);
 
   const resetModal = () => {
     setIsClosing(0);

@@ -260,3 +260,38 @@ body {
     top:2px;
   }
 }
+
+@keyframes fade-in{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+.fade-in{
+  animation: fade-in 1s ease;
+}
+
+@keyframes hwipe-in{
+  0%{
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  100%{
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+.hwipe-in{
+  animation: hwipe-in 1s ease;
+}
+
+@keyframes shift-in{
+  0%{
+    max-height: 0;
+  }
+  100%{
+  }
+}
+.shift-in{
+  animation: shift-in 1s ease;
+}

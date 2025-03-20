@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import { v4 as uuidv4 } from 'uuid';
 
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
@@ -75,3 +76,35 @@ export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {
 
   return sanitizedUser;
 }
+
+export type Notification = {
+  timeStamp: Date;
+  message: String;
+  notificationType: String;
+  data: String;
+  read: boolean;
+  id: String;
+}
+
+export async function sendNotification(sender: any, receiver: any, message: string, type: string, data: string, save: boolean = true) {
+  // Find user by username
+  let decoded_data = JSON.parse(data);
+  decoded_data["sender"] = sender.id;
+  const notification = {
+    timeStamp: new Date(),
+    message: message as String,
+    notificationType: type as String,
+    data: JSON.stringify(decoded_data) as String,
+    read: false as Boolean,
+    id: uuidv4() as String,
+  };
+
+  receiver.data.notifications.push(notification);
+
+  receiver.data.newNotifications = true;
+  if (save)
+    await receiver.save();
+
+  return { error: "OK" };
+}
+

@@ -43,6 +43,18 @@ export const handler: Handler = async (event) => {
     } else if (requestBody.action === 'get') {
       console.log('Handling profile fetch...');
       return await handleProfileFetch(requestBody);
+    } else if (requestBody.action === 'getIsUpdated') {
+      console.log('Handling isUpdated...');
+      return await handleIsUpdated(requestBody);
+    } else if (requestBody.action === 'getNotifications') {
+      console.log('Handling notifications fetch...');
+      return await handleNotificationsFetch(requestBody);
+    } else if (requestBody.action === 'dismissNotification') {
+      console.log('Handling notification dismissal...');
+      return await handleNotificationDismissal(requestBody);
+    } else if (requestBody.action === 'markNotificationRead') {
+      console.log('Handling mark notification as read...');
+      return await handleMarkNotificationRead(requestBody);
     }
 
     return {
@@ -127,6 +139,9 @@ async function handleProfileFetch(requestBody: any) {
 }
 
 async function handleSelfProfileFetch(requestBody: any) {
+  // 1 second loading time
+  //await new Promise(resolve => setTimeout(resolve, 1000));
+
   const { username, token } = requestBody;
   
   // Validate required fields
@@ -221,3 +236,170 @@ async function handleProfileEdit(requestBody: any) {
   };
 }
 
+const handleIsUpdated = async (requestBody: any) => {
+  const { username } = requestBody;
+  if (!username) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username is required' }),
+    };
+  }
+
+  // dont validate fetch just the updatedChats and newNotifications
+
+  let user = await User.findOne({ username }, "data.updatedChats data.newNotifications");
+  if (!user) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'User not found' }),
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      updatedChats: user.data.updatedChats || false,
+      newNotifications: user.data.newNotifications || false
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+}
+
+const handleNotificationsFetch = async (requestBody: any) => {
+
+  const { username, token } = requestBody;
+  if (!username || !token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username and token are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+  user.data.newNotifications = false;
+  await user.save();
+
+  // Return notifications
+  return {
+    statusCode: 200,
+    body: JSON.stringify(user.data.notifications),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+};
+
+const handleNotificationDismissal = async (requestBody: any) => {
+  const { username, token, notificationId } = requestBody;
+
+  if (!username || !token || !notificationId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, token, and notificationId are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+
+  const user = validation.user;
+
+  // Find and remove or mark the notification as read
+  if (user.data.notifications) {
+    // Option 1: Remove the notification
+    for (let i = 0; i < user.data.notifications.length; i++) {
+      console.log(user.data.notifications[i] + " : " + notificationId);
+      console.log(user.data.notifications[i].id + " : " + notificationId);
+    }
+    user.data.notifications = user.data.notifications.filter(
+      (notification: any) => notification.id.toString() !== notificationId.toString()
+    );
+
+    // Option 2: Mark as read (uncomment if you prefer this approach)
+    // user.data.notifications.forEach((notification: any) => {
+    //   if (notification.id.toString() === notificationId.toString()) {
+    //     notification.read = true;
+    //   }
+    // });
+
+    await user.save();
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+};
+
+const handleMarkNotificationRead = async (requestBody: any) => {
+  const { username, token, notificationId } = requestBody;
+
+  if (!username || !token || !notificationId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, token, and notificationId are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+
+  const user = validation.user;
+
+  // Find and mark the notification as read
+  if (user.data.notifications) {
+    let updated = false;
+
+    for (let i = 0; i < user.data.notifications.length; i++) {
+      if (user.data.notifications[i].id.toString() === notificationId.toString()) {
+        user.data.notifications[i].read = true;
+        updated = true;
+        break;
+      }
+    }
+
+    if (updated) {
+      await user.save();
+    }
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+};

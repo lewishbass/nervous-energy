@@ -15,6 +15,9 @@ import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useClickAway } from '@/hooks/useClickAway';
 import SearchExpand from './SearchExpand';
+import { useAuth } from '@/context/AuthContext';
+
+const PROFILE_ROUTE = '/.netlify/functions/profile';
 
 interface MenuProps {
   toggleDark: () => void;
@@ -22,8 +25,7 @@ interface MenuProps {
   onClose: () => void;
   openMessageModal: () => void;
   openProfileModal: () => void;
-  isLoggedIn?: boolean;
-  username?: string;
+  openNotificationModal: () => void;
 }
 
 export default function Menu({
@@ -32,19 +34,66 @@ export default function Menu({
   onClose,
   openMessageModal,
   openProfileModal,
-  isLoggedIn,
-  username
+  openNotificationModal,
 }: MenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [backendVersion, setBackendVersion] = useState<string | null>(null);
   const [dbVersion, setDbVersion] = useState<string | null>(null);
   const [dbStatus, setDbStatus] = useState<string | null>(null);
 
+  const [newChats, setNewChats] = useState<boolean>(false);
+  const [newNotifications, setNewNotifications] = useState<boolean>(false);
+
+
+  const { username, isLoggedIn } = useAuth();
+
   useClickAway(menuRef, () => {
     if (isOpen) {
       onClose();
     }
   });
+
+  useEffect(() => {
+    const intervalId = setInterval(checkNotification, 10000); // Check every 10 seconds
+
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, [username, newChats, newNotifications]);
+
+  const checkNotification = async () => {
+    try {
+      const response = await fetch(PROFILE_ROUTE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getIsUpdated',
+          username: username,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.newChats) {
+          if (!newChats) {
+            console.log('New chat!');
+            setNewChats(true);
+          }
+        }
+
+        if (data.newNotifications) {
+          if (!newNotifications) {
+            console.log('New notification!');
+            setNewNotifications(true);
+          }
+        }
+
+      } else {
+        console.error('Failed to check notifications');
+      }
+    } catch (error) {
+      console.error('Error checking notifications:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchVersion = async () => {
@@ -91,7 +140,6 @@ export default function Menu({
             onClick={(e) => {
               e.preventDefault();
               openMessageModal();
-              //onClose();
             }}
           >
             <FaEnvelope className="w-5 h-5" />
@@ -101,7 +149,6 @@ export default function Menu({
             onClick={(e) => {
               e.preventDefault();
               openProfileModal();
-              //onClose();
             }}
           >
             <FaUser className="w-5 h-5" />
@@ -110,8 +157,7 @@ export default function Menu({
 
         {/* Navigation Links */}
         <nav className="space-y-4">
-          {[
-            { href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
+          {[{ href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
             { href: '/books', icon: FaBook, label: 'Books', requireAuth: false },
             { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
             { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
@@ -132,14 +178,40 @@ export default function Menu({
       </div>
       {/* User Info (if logged in) */}
 
-      <div className="mx-8 flex items-center gap-4" style={{ maxHeight: (isLoggedIn ? '50px' : '0px'), marginBottom: (isLoggedIn ? '10px' : '0px'), opacity: (isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out' }}>
-        <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+      <div
+        className="mx-8 flex items-center gap-4 cursor-pointer hover:bg1 p-2 rounded-lg transition-colors"
+        style={{
+          paddingTop: (isLoggedIn ? '10px' : '0px'),
+          maxHeight: (isLoggedIn ? '70px' : '0px'),
+          marginBottom: (isLoggedIn ? '10px' : '0px'),
+          opacity: (isLoggedIn ? 1 : 0),
+          overflow: 'hidden',
+          transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out'
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          if (isLoggedIn) {
+            openNotificationModal();
+            setNewNotifications(false);
+          }
+        }}
+      >
+        <div className="relative w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+          {(newNotifications) && (
+            <>
+              <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+              <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full" />
+            </>
+          )}
           <span className="text-lg font-bold tc3">
             {(username || 'J').charAt(0).toUpperCase()}
           </span>
         </div>
         <div>
           <p className="font-medium">{username || "John Doe"}</p>
+          {newNotifications && (
+            <p className="text-xs text-red-500">New notifications</p>
+          )}
         </div>
       </div>
       {/* Dark Mode Toggle with Version Label */}

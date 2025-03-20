@@ -14,10 +14,11 @@ const DragCard: React.FC<DragCardProps> = ({ children, className = '', style = {
   return (
     <motion.div
       drag
-      whileDrag={{ scale: 1.1, boxShadow: "5px 5px 5px #0004", rotate: 0 }}
+      whileDrag={{ scale: 1.1, boxShadow: "8px 8px 8px #0003", rotate: 0 }}
       className={`cursor-grab active:cursor-grabbing ${className}`}
       style={{
         ...style,
+        boxShadow: "3px 3px 5px #0002",
         position: 'absolute',
         userSelect: 'none',
         zIndex: 1,
