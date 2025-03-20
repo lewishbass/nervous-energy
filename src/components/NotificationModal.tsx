@@ -10,7 +10,7 @@ export type Notification = {
   notificationType: string;
   data: string; // stringified JSON
   read: boolean;
-  id: String; // uuidv4
+  id: string; // uuidv4
 }
 
 interface NotificationModalProps {
@@ -25,7 +25,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
   const [newChats, setNewChats] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [newNotificationIds, setNewNotificationIds] = useState<Set<String>>(new Set());
+  const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
 
   const fetchNotifications = useCallback(async () => {
     if (!username || !token) return;
@@ -46,12 +46,12 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
         }),
       });
       if (response.ok) {
-        let data = await response.json();
+        const data = await response.json();
         for (let i = 0; i < data.length; i++) {
           try {
             data[i] = JSON.parse(data[i]);
           } catch (e) {
-            console.error("Could not parse data", data[i]);
+            console.error("Could not parse data", e);
           }
         }
         console.log(data[0]);
@@ -108,7 +108,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
     }
   }, [username, token, newChats, newNotifications, fetchNotifications]);
 
-  const dismissNotification = async (notificationId: String) => {
+  const dismissNotification = async (notificationId: string) => {
     if (!username || !token) return;
     
     try {
@@ -200,7 +200,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
   // Track new notifications for animation
   useEffect(() => {
     if (notifications.length > 0) {
-      const newIds = new Set<String>();
+      const newIds = new Set<string>();
       notifications.forEach(notification => {
         if (!notification.read) {
           newIds.add(notification.id);

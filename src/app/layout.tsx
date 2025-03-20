@@ -26,7 +26,7 @@ function RootLayoutContent({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   
-  const { isLoggedIn, username } = useAuth();
+  const { isLoggedIn } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
