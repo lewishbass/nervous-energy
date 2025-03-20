@@ -26,6 +26,7 @@ export async function validateUser(username: string, token: string) {
 export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {
   // Base user object with information available to all (public)
   const sanitizedUser = {
+    id: user.id,
     username: user.username,
     profile: {
       firstName: user.profile.firstName,
@@ -54,8 +55,6 @@ export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {
 
   // Add self level information (all data)
   if (auth === "self") {
-    // @ts-expect-error user info is dynamically typed
-    sanitizedUser.id = user.id;
     // @ts-expect-error user info is dynamically typed
     sanitizedUser.createdAt = user.createdAt;
     sanitizedUser.profile = {

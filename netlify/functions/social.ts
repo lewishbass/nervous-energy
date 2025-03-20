@@ -49,6 +49,9 @@ export const handler: Handler = async (event) => {
     } else if (requestBody.action === 'rescindFriendRequest') {
       console.log('Handling rescind friend request...');
       return await handleRescindFriendRequest(requestBody);
+    } else if (requestBody.action === 'removeFriend') {
+      console.log('Handling remove friend...');
+      return await handleRemoveFriend(requestBody);
     }
 
     return {
@@ -110,7 +113,7 @@ const handlePeopleSearch = async (requestBody: any) => {
 }
 
 const handleFriendRequest = async (requestBody: any) => {
-  const { username, token, friendUsername } = requestBody;
+  const { username, token, friendId } = requestBody;
 
   // Validate required fields
   const validation = await validateUser(username, token);
@@ -123,8 +126,8 @@ const handleFriendRequest = async (requestBody: any) => {
   }
   const user = validation.user;
 
-  // Find friend user
-  const friend = await User.findOne({ username: friendUsername });
+  // Find friend user by ID
+  const friend = await User.findOne({ id: friendId });
   if (!friend) {
     return {
       statusCode: 404,
@@ -200,7 +203,7 @@ const handleFriendshipStatus = async (requestBody: any) => {
 };
 
 const handleAcceptFriendRequest = async (requestBody: any) => {
-  const { username, token, friendUsername } = requestBody;
+  const { username, token, friendId } = requestBody;
 
   // Validate required fields
   const validation = await validateUser(username, token);
@@ -212,8 +215,8 @@ const handleAcceptFriendRequest = async (requestBody: any) => {
   }
   const user = validation.user;
 
-  // Find friend user
-  const friend = await User.findOne({ username: friendUsername });
+  // Find friend user by ID
+  const friend = await User.findOne({ id: friendId });
   if (!friend) {
     return {
       statusCode: 404,
@@ -258,7 +261,7 @@ const handleAcceptFriendRequest = async (requestBody: any) => {
 };
 
 const handleRescindFriendRequest = async (requestBody: any) => {
-  const { username, token, friendUsername } = requestBody;
+  const { username, token, friendId } = requestBody;
 
   // Validate required fields
   const validation = await validateUser(username, token);
@@ -270,8 +273,8 @@ const handleRescindFriendRequest = async (requestBody: any) => {
   }
   const user = validation.user;
 
-  // Find friend user
-  const friend = await User.findOne({ username: friendUsername });
+  // Find friend user by ID
+  const friend = await User.findOne({ id: friendId });
   if (!friend) {
     return {
       statusCode: 404,
@@ -294,6 +297,60 @@ const handleRescindFriendRequest = async (requestBody: any) => {
   // Save both users
   await user.save();
   await friend.save();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  };
+};
+
+const handleRemoveFriend = async (requestBody: any) => {
+  const { username, token, friendId } = requestBody;
+
+  // Validate required fields
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Find friend user by ID
+  const friend = await User.findOne({ id: friendId });
+  if (!friend) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'Friend not found' }),
+    };
+  }
+
+  // Check if they are actually friends
+  if (!user.data.friends.includes(friend.id)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Not friends with this user' }),
+    };
+  }
+
+  // Remove from each other's friends lists
+  user.data.friends = user.data.friends.filter((id: string) => id.toString() !== friend.id.toString());
+  friend.data.friends = friend.data.friends.filter((id: string) => id.toString() !== user.id.toString());
+
+  // Save both users
+  await user.save();
+  await friend.save();
+
+  // Optionally notify the other user
+  await sendNotification(
+    user,
+    friend,
+    `${username} has removed you from their friends list`,
+    'friendRemoved',
+    JSON.stringify({ senderId: user.id }),
+    false
+  );
 
   return {
     statusCode: 200,

@@ -295,3 +295,14 @@ body {
 .shift-in{
   animation: shift-in 1s ease;
 }
+
+@keyframes shift-out{
+  0%{
+  }
+  100%{
+    max-height: 0;
+  }
+}
+.shift-out{
+  animation: shift-out 1s ease;
+}

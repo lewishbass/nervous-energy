@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import ModalTemplate from './ModalTemplate';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
+const SOCIAL_ROUTE = '/.netlify/functions/social';
 
 export type Notification = {
   timeStamp: Date;
@@ -179,6 +180,43 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
     }
   };
 
+  const acceptFriendRequest = async (notification: Notification) => {
+    if (!username || !token) return;
+
+    try {
+      // Parse the notification data to get the sender's ID
+      const friendData = JSON.parse(notification.data);
+      const friendId = friendData.senderId;
+
+      if (!friendId) {
+        console.error('Friend ID not found in notification data');
+        return;
+      }
+
+      const response = await fetch(SOCIAL_ROUTE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'acceptFriendRequest',
+          username: username,
+          token: token,
+          friendId: friendId
+        }),
+      });
+      const data = await response.json();
+      if (response.ok || true) {
+        // After accepting, dismiss the notification
+        await dismissNotification(notification.id);
+      } else {
+        console.error('Failed to accept friend request', response);
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
+  };
+
   // Initial fetch when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -246,7 +284,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
               <div key={notification.id.toString() || ''}
                 className={`relative p-4 bg2 rounded-lg transition-all duration-500 ${
                   newNotificationIds.has(notification.id) ? 'fade-in double-wipe shift-in' : ''
-                } ${!notification.read ? 'cursor-pointer hover:bg-opacity-80' : ''}`}
+                  } ${!notification.read ? 'hover:bg-opacity-80' : ''}`}
                 >
                   
                 <button
@@ -262,8 +300,8 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                 <div 
                   className="flex items-start"
                   onClick={(e) => {
-                    // Prevent triggering if clicking on dismiss button
-                    if (e.target instanceof Element && e.target.closest('button')) return;
+                    // Prevent triggering if clicking on dismiss button or accept button
+                    if (e.target instanceof Element && (e.target.closest('button'))) return;
                     markAsRead(notification);
                   }}
                 >
@@ -292,7 +330,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                   </div>
                   
                   <div className="flex-1">
-                      <div className="flex items-center">
+                      <div className="flex items-center tc1">
                         {notification.message}
                         {newNotificationIds.has(notification.id) && (
                           <div className="relative">
@@ -302,6 +340,19 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                         )}
                       </div>
                     <p className="tc3 text-xs mt-1">{formatDate(notification.timeStamp)}</p>
+
+                      {/* Add accept button for friend requests */}
+                      {notification.notificationType === 'friendRequest' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            acceptFriendRequest(notification);
+                          }}
+                          className="mt-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm transition-colors cursor-pointer"
+                        >
+                          Accept Request
+                        </button>
+                      )}
                   </div>
                 </div>
               </div>

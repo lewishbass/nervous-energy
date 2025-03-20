@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { FaUserPlus, FaUserFriends, FaClock, FaCheck, FaUserMinus } from 'react-icons/fa';
 
 // Define interfaces for API responses and data structures
 interface UserProfile {
@@ -23,6 +24,7 @@ interface User {
   username: string;
   profile: UserProfile;
   data: UserData;
+  id: string;
 }
 
 interface SelfResponse {
@@ -37,6 +39,7 @@ interface Friend {
   bio: string;
   lastSeen?: Date;
   location: string;
+  id: string;
 }
 
 interface OtherUser {
@@ -53,8 +56,8 @@ export default function Friends() {
   const [isLoadingOthers, setIsLoadingOthers] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [friendshipStatus, setFriendshipStatus] = useState<{ [key: string]: string }>({});
   const [requestsRefresh, setRequestsRefresh] = useState<number>(0);
+  const [removingFriends, setRemovingFriends] = useState<Set<string>>(new Set());
   
   const { username, token, isLoggedIn } = useAuth();
 
@@ -89,7 +92,6 @@ export default function Friends() {
         
         // Get the friends' usernames from the user's data
         const friendIds = selfData.user.data.friends || [];
-        console.log(friendIds);
         if (friendIds.length === 0) {
           setFriends([]);
           setIsLoading(false);
@@ -127,7 +129,8 @@ export default function Friends() {
           profilePicture: friend.profile.profilePicture,
           bio: friend.profile.bio || '',
           lastSeen: friend.data.lastSeen,
-          location: friend.profile.location || '-'
+          location: friend.profile.location || '-',
+          id: friend.id,
         }));
 
         setFriends(formattedFriends);
@@ -194,7 +197,6 @@ export default function Friends() {
           });
         }
 
-        setFriendshipStatus(statusMap);
 
         const response = await fetch('/.netlify/functions/social', {
           method: 'POST',
@@ -254,7 +256,7 @@ export default function Friends() {
     setSearchTerm(e.target.value);
   };
 
-  const handleFriendRequest = async (friendUsername: string) => {
+  const handleFriendRequest = async (friendId: string) => {
     if(!username || !token) {
       return;
     }
@@ -266,7 +268,7 @@ export default function Friends() {
           action: 'friendRequest',
           username,
           token,
-          friendUsername
+          friendId
         })
       });
 
@@ -282,7 +284,7 @@ export default function Friends() {
     }
   }
 
-  const handleAcceptRequest = async (friendUsername: string) => {
+  const handleAcceptRequest = async (friendId: string) => {
     if (!username || !token) {
       return;
     }
@@ -294,7 +296,7 @@ export default function Friends() {
           action: 'acceptFriendRequest',
           username,
           token,
-          friendUsername
+          friendId
         })
       });
 
@@ -309,7 +311,7 @@ export default function Friends() {
     }
   }
 
-  const handleRescindRequest = async (friendUsername: string) => {
+  const handleRescindRequest = async (friendId: string) => {
     if (!username || !token) {
       return;
     }
@@ -321,7 +323,7 @@ export default function Friends() {
           action: 'rescindFriendRequest',
           username,
           token,
-          friendUsername
+          friendId
         })
       });
 
@@ -337,32 +339,84 @@ export default function Friends() {
     }
   }
 
+  const handleRemoveFriend = async (friendId: string) => {
+    if (!username || !token) {
+      return;
+    }
+    try {
+      // Add friend to removing set to trigger animation
+      setRemovingFriends(prev => new Set(prev).add(friendId));
+
+      const response = await fetch('/.netlify/functions/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'removeFriend',
+          username,
+          token,
+          friendId
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Failed to remove friend: ' + data.error);
+      }
+
+      // Wait for animation to complete before refreshing the list
+      setTimeout(() => {
+        // Remove from the friends list locally
+        setFriends(prev => prev.filter(friend => friend.id !== friendId));
+        // Refresh other data
+        setRequestsRefresh(prev => prev + 1);
+        // Remove from the removing set
+        setRemovingFriends(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(friendId);
+          return newSet;
+        });
+      }, 500); // Match this to animation duration
+    } catch (err) {
+      console.error('Error removing friend:', err);
+      // Reset removing state if there's an error
+      setRemovingFriends(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(friendId);
+        return newSet;
+      });
+    }
+  }
+
   const getFriendshipButton = (user: OtherUser) => {
     // Define common button/label classes
-    const baseClasses = "px-3 py-1 rounded-full text-sm text-white";
+    const baseClasses = "px-3 py-1 rounded-full text-sm text-white flex items-center justify-center";
 
     // Define status-specific classes and properties
     let buttonClasses = baseClasses;
-    let buttonText = "Add Friend";
-    let onClick = () => handleFriendRequest(user.username);
+    let buttonIcon = <FaUserPlus className="text-lg" />;
+    let toolTipText = "Add Friend";
+    let onClick = () => handleFriendRequest(user.id);
     let isButton = true;
 
     switch (user.status) {
       case 'friends':
         buttonClasses = `${baseClasses} bg-green-500`;
-        buttonText = "Friends";
+        buttonIcon = <FaUserFriends className="text-lg" />;
+        toolTipText = "Friends";
         isButton = false;
         break;
       case 'pending':
         buttonClasses = `${baseClasses} bg-yellow-500 hover:bg-yellow-600`;
-        buttonText = "Request Pending";
-        onClick = () => handleRescindRequest(user.username);
+        buttonIcon = <FaClock className="text-lg" />;
+        toolTipText = "Request Pending";
+        onClick = () => handleRescindRequest(user.id);
         isButton = true;
         break;
       case 'received':
         buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
-        buttonText = "Accept Request";
-        onClick = () => handleAcceptRequest(user.username);
+        buttonIcon = <FaCheck className="text-lg" />;
+        toolTipText = "Accept Request";
+        onClick = () => handleAcceptRequest(user.id);
         break;
       default:
         buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
@@ -376,9 +430,11 @@ export default function Friends() {
         disabled={!isButton}
         style={{
           transition: 'background-color 0.2s',
+          aspectRatio: '1 / 1',
         }}
+        title={toolTipText}
       >
-        {buttonText}
+        {buttonIcon}
       </button>
     );
   };
@@ -408,18 +464,27 @@ export default function Friends() {
       ) : (
         <div className="grid gap-4 mb-8">
           {friends.map((friend, index) => (
-            <div key={index} className="bg2 p-6 rounded-lg shadow flex items-center justify-between">
+            <div
+              key={index}
+              className={`bg2 p-6 rounded-lg shadow flex items-center justify-between transition-all duration-1000 ${removingFriends.has(friend.id) ? 'opacity-0 transform -translate-x-full shift-out' : ''
+                }`}
+            >
               <div>
                 <h2 className="text-xl font-semibold mb-2 tc1">{friend.username}</h2>
                 <p className="tc2">Last seen: {formatLastSeen(friend.lastSeen)}</p>
               </div>
-              {/*<span className={`px-3 py-1 rounded-full text-sm ${
-                friend.status === 'Online' 
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-              }`}>
-                {friend.status}
-              </span>*/}
+              <button
+                className="px-3 py-1 rounded-full text-sm text-white bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                onClick={() => handleRemoveFriend(friend.id)}
+                style={{
+                  transition: 'background-color 0.2s',
+                  aspectRatio: '1 / 1',
+                }}
+                disabled={removingFriends.has(friend.id)}
+                title="Remove Friend"
+              >
+                {removingFriends.has(friend.id) ? <FaClock className="text-lg" /> : <FaUserMinus className="text-lg" />}
+              </button>
             </div>
           ))}
         </div>
@@ -441,7 +506,7 @@ export default function Friends() {
         </div>
 
           <div className="grid gap-4">
-            {otherUsers.map((user, index) => (
+          {otherUsers.map((user) => (
               <div key={user.id} className="bg2 p-4 rounded-lg shadow flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold mb-1 tc1">{user.username}</h3>
