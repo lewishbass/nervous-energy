@@ -20,6 +20,7 @@ export async function validateUser(username: string, token: string) {
   catch (error) {
     return { user: null, error: "Invalid token" };
   }
+  user.data.lastSeen = new Date();
   return { user: user, error: "OK" };
 }
 
