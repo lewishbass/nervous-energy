@@ -205,7 +205,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
           friendId: friendId
         }),
       });
-      const data = await response.json();
+      //const data = await response.json();
       if (response.ok || true) {
         // After accepting, dismiss the notification
         await dismissNotification(notification.id);
