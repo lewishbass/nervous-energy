@@ -42,6 +42,8 @@ interface Friend {
 interface OtherUser {
   username: string;
   lastSeen: Date;
+  status?: 'none' | 'pending' | 'received' | 'friends';
+  id: string;
 }
 
 export default function Friends() {
@@ -51,11 +53,16 @@ export default function Friends() {
   const [isLoadingOthers, setIsLoadingOthers] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [friendshipStatus, setFriendshipStatus] = useState<{ [key: string]: string }>({});
+  const [requestsRefresh, setRequestsRefresh] = useState<number>(0);
   
-  const {username, token} = useAuth();
+  const { username, token, isLoggedIn } = useAuth();
 
   useEffect(() => {
     const fetchFriends = async (): Promise<void> => {
+      if (!isLoggedIn) {
+        return;
+      }
       try {
         setIsLoading(true);
         
@@ -135,18 +142,59 @@ export default function Friends() {
         setIsLoading(false);
       }
     };
-    
+
+
+
     fetchFriends();
-  }, [username, token]);
+  }, [username, token, isLoggedIn]);
 
 
   useEffect(() => {
-    
-
     const fetchOtherUsers = async (): Promise<void> => {
       try {
         setIsLoadingOthers(true);
         
+        if (!username || !token) {
+          throw new Error('Not authenticated');
+        }
+
+        // First get friendship status data
+        const statusResponse = await fetch('/.netlify/functions/social', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'getFriendshipStatus',
+            username,
+            token
+          })
+        });
+
+        if (!statusResponse.ok) {
+          throw new Error('Failed to fetch friendship statuses');
+        }
+
+        const statusData = await statusResponse.json();
+        const statusMap: { [key: string]: string } = {};
+
+        if (statusData.friends) {
+          statusData.friends.forEach((friendId: string) => {
+            statusMap[friendId] = 'friends';
+          });
+        }
+
+        if (statusData.pendingFriends) {
+          statusData.pendingFriends.forEach((pendingId: string) => {
+            statusMap[pendingId] = 'pending';
+          });
+        }
+
+        if (statusData.friendRequests) {
+          statusData.friendRequests.forEach((requestId: string) => {
+            statusMap[requestId] = 'received';
+          });
+        }
+
+        setFriendshipStatus(statusMap);
 
         const response = await fetch('/.netlify/functions/social', {
           method: 'POST',
@@ -163,7 +211,16 @@ export default function Friends() {
         }
 
         const usersData = await response.json();
-        setOtherUsers(usersData);
+
+        // Enhance user data with friendship status
+        const enhancedUsers = usersData.map((user: OtherUser) => {
+          return {
+            ...user,
+            status: statusMap[user.id] || 'none'
+          };
+        });
+
+        setOtherUsers(enhancedUsers);
       } catch (err) {
         console.error('Error fetching other users:', err);
         // We don't set the main error state here to avoid blocking the friends list
@@ -173,7 +230,7 @@ export default function Friends() {
     };
 
     fetchOtherUsers();
-  }, [searchTerm]);
+  }, [searchTerm, username, token, requestsRefresh]);
 
   // Helper function to format the last seen timestamp
   const formatLastSeen = (timestamp: Date | undefined): string => {
@@ -212,17 +269,91 @@ export default function Friends() {
           friendUsername
         })
       });
-      console.log(response);
+
       if (!response.ok) {
         throw new Error('Failed to send friend request');
       }
 
-      // Handle success
+      // Refresh the user list to show updated status
+      setRequestsRefresh(prev => prev + 1);
     } catch (err) {
       console.error('Error sending friend request:', err);
       // Handle error
     }
   }
+
+  const handleAcceptRequest = async (friendUsername: string) => {
+    if (!username || !token) {
+      return;
+    }
+    try {
+      const response = await fetch('/.netlify/functions/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'acceptFriendRequest',
+          username,
+          token,
+          friendUsername
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to accept friend request');
+      }
+
+      // Refresh the user list to show updated status
+      setRequestsRefresh(prev => prev + 1);
+    } catch (err) {
+      console.error('Error accepting friend request:', err);
+    }
+  }
+
+  const getFriendshipButton = (user: OtherUser) => {
+    // Define common button/label classes
+    const baseClasses = "px-3 py-1 rounded-full text-sm text-white";
+
+    // Define status-specific classes and properties
+    let buttonClasses = baseClasses;
+    let buttonText = "Add Friend";
+    let onClick = () => handleFriendRequest(user.username);
+    let isButton = true;
+
+    switch (user.status) {
+      case 'friends':
+        buttonClasses = `${baseClasses} bg-green-500`;
+        buttonText = "Friends";
+        isButton = false;
+        break;
+      case 'pending':
+        buttonClasses = `${baseClasses} bg-yellow-500`;
+        buttonText = "Request Pending";
+        isButton = false;
+        break;
+      case 'received':
+        buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
+        buttonText = "Accept Request";
+        onClick = () => handleAcceptRequest(user.username);
+        break;
+      default:
+        buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
+        break;
+    }
+
+    return (
+      <button
+        className={buttonClasses}
+        onClick={isButton ? onClick : undefined}
+        disabled={!isButton}
+        style={{
+          transition: 'background-color 0.2s',
+        }}
+      >
+        {buttonText}
+      </button>
+    );
+
+  };
 
   if (isLoading) {
     return <div className="p-6 max-w-4xl mx-auto">
@@ -280,29 +411,24 @@ export default function Friends() {
             className="p-2 border border-gray-300 rounded w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
         </div>
-        
-        {isLoadingOthers ? (
-          <p className="tc2">Loading other users...</p>
-        ) : otherUsers.length === 0 ? (
-          <p className="tc2">No other users found.</p>
-        ) : (
+
           <div className="grid gap-4">
             {otherUsers.map((user, index) => (
-              <div key={index} className="bg2 p-4 rounded-lg shadow flex items-center justify-between">
+              <div key={user.id} className="bg2 p-4 rounded-lg shadow flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold mb-1 tc1">{user.username}</h3>
                   <p className="tc2">Last seen: {formatLastSeen(user.lastSeen)}</p>
                 </div>
-                <button 
-                  className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm"
-                  onClick={() => {handleFriendRequest(user.username);}}
-                >
-                  Add Friend
-                </button>
+                {getFriendshipButton(user)}
               </div>
             ))}
           </div>
-        )}
+
+        {isLoadingOthers ? (
+          <p className="tc2">Loading other users...</p>
+        ) : otherUsers.length === 0 ? (
+          <p className="tc2">No other users found.</p>
+        ) : (<div />)}
       </div>
     </div>
   );

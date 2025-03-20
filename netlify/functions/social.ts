@@ -35,11 +35,17 @@ export const handler: Handler = async (event) => {
     console.log('MongoDB connection established');
 
     if (requestBody.action === 'searchPeople') {
-      console.log('Handling profile edit...');
+      console.log('Handling people search...');
       return await handlePeopleSearch(requestBody);
     } else if (requestBody.action === 'friendRequest') {
       console.log('Handling friend request...');
       return await handleFriendRequest(requestBody);
+    } else if (requestBody.action === 'getFriendshipStatus') {
+      console.log('Handling friendship status request...');
+      return await handleFriendshipStatus(requestBody);
+    } else if (requestBody.action === 'acceptFriendRequest') {
+      console.log('Handling accept friend request...');
+      return await handleAcceptFriendRequest(requestBody);
     }
 
     return {
@@ -87,10 +93,11 @@ const handlePeopleSearch = async (requestBody: any) => {
   if (max_return && typeof max_return === 'number')
     findLimit = Math.min(max_return, 50);
 
-  let users = await User.find(query, 'username data.lastSeen').limit(findLimit).lean();
+  let users = await User.find(query, 'username data.lastSeen id').limit(findLimit).lean();
   for (const user of users) {
     user.lastSeen = user.data.lastSeen;
     delete user.data;
+    // Keep _id for friendship status checks
     console.log(user);
   }
   return {
@@ -122,7 +129,7 @@ const handleFriendRequest = async (requestBody: any) => {
     };
   }
 
-  /*if (user.data.friends.includes(friend.id)) {
+  if (user.data.friends.includes(friend.id)) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'Already friends' }),
@@ -135,7 +142,7 @@ const handleFriendRequest = async (requestBody: any) => {
       statusCode: 400,
       body: JSON.stringify({ error: 'Friend request already exists' }),
     };
-  }*/
+  }
 
   // Send notification
   const sent = await sendNotification(
@@ -158,6 +165,88 @@ const handleFriendRequest = async (requestBody: any) => {
   await user.save();
   friend.data.friendRequests.push(user.id);
   await friend.save();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+  };
+};
+
+const handleFriendshipStatus = async (requestBody: any) => {
+  const { username, token } = requestBody;
+
+  // Validate the user
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Return friendship status data
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      friends: user.data.friends,
+      pendingFriends: user.data.pendingFriends,
+      friendRequests: user.data.friendRequests
+    }),
+  };
+};
+
+const handleAcceptFriendRequest = async (requestBody: any) => {
+  const { username, token, friendUsername } = requestBody;
+
+  // Validate required fields
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Find friend user
+  const friend = await User.findOne({ username: friendUsername });
+  if (!friend) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'Friend not found' }),
+    };
+  }
+
+  // Check if there's a pending request to accept
+  if (!user.data.friendRequests.includes(friend.id)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'No friend request from this user' }),
+    };
+  }
+
+  // Add each other to friends lists
+  user.data.friends.push(friend.id);
+  friend.data.friends.push(user.id);
+
+  // Remove from pending and request lists
+  user.data.friendRequests = user.data.friendRequests.filter((id: string) => id.toString() !== friend.id.toString());
+  friend.data.pendingFriends = friend.data.pendingFriends.filter((id: string) => id.toString() !== user.id.toString());
+
+  // Save both users
+  await user.save();
+  await friend.save();
+
+  // Send notification to the other user that request was accepted
+  await sendNotification(
+    user,
+    friend,
+    `${username} accepted your friend request`,
+    'friendRequestAccepted',
+    JSON.stringify({ senderId: user.id }),
+    false
+  );
 
   return {
     statusCode: 200,

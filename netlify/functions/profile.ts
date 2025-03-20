@@ -113,11 +113,11 @@ async function handleProfileFetch(requestBody: any) {
   // Find users by username
   let users = [];
   if (isId && isId === true){
-    console.log("Fetching by ID " + toFetch);
+    //console.log("Fetching by ID " + toFetch);
     users = await User.find({ id: { $in: toFetch } });
   }
   else{
-    console.log("Fetching by username " + toFetch);
+    //console.log("Fetching by username " + toFetch);
     users = await User.find({ username: { $in: toFetch } });
   }
   // Return public profile data using sanitizeUser
@@ -327,10 +327,6 @@ const handleNotificationDismissal = async (requestBody: any) => {
   // Find and remove or mark the notification as read
   if (user.data.notifications) {
     // Option 1: Remove the notification
-    for (let i = 0; i < user.data.notifications.length; i++) {
-      console.log(user.data.notifications[i] + " : " + notificationId);
-      console.log(user.data.notifications[i].id + " : " + notificationId);
-    }
     user.data.notifications = user.data.notifications.filter(
       (notification: any) => notification.id.toString() !== notificationId.toString()
     );
