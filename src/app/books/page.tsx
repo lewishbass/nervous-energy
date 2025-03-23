@@ -1,3 +1,5 @@
+// books/page.tsx
+
 export default function Books() {
     const books = [
       { title: 'The Great Adventure', author: 'John Doe', genre: 'Fiction' },

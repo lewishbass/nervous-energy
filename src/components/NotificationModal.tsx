@@ -283,7 +283,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
               {notifications.map((notification) => (
               <div key={notification.id.toString() || ''}
                 className={`relative p-4 bg2 rounded-lg transition-all duration-500 ${
-                  newNotificationIds.has(notification.id) ? 'fade-in double-wipe shift-in' : ''
+                  newNotificationIds.has(notification.id) ? 'fade-in shift-in' : ''
                   } ${!notification.read ? 'hover:bg-opacity-80' : ''}`}
                 >
                   

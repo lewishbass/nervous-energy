@@ -1,4 +1,4 @@
-import { u } from 'framer-motion/client';
+
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({

@@ -75,7 +75,7 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]User Data backend
 - [+]User profile editors
 - [+]log out on token expiration
-- [ ]Friend Management - requires friend request notifications
+- [+]Friend Management - requires friend request notifications
 - [ ]Book downloads
 - [ ]Messaging and social dashboard
 - [ ]Playground section

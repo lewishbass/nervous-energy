@@ -9,13 +9,15 @@ import {
   FaStore,
   FaUsers,
   FaSun,
-  FaMoon
+  FaMoon,
+  FaPuzzlePiece
 } from 'react-icons/fa';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useClickAway } from '@/hooks/useClickAway';
 import SearchExpand from './SearchExpand';
 import { useAuth } from '@/context/AuthContext';
+import { toys } from '@/data/toys';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 
@@ -44,7 +46,6 @@ export default function Menu({
   const [newChats, setNewChats] = useState<boolean>(false);
   const [newNotifications, setNewNotifications] = useState<boolean>(false);
 
-
   const { username, isLoggedIn } = useAuth();
 
   useClickAway(menuRef, () => {
@@ -54,10 +55,12 @@ export default function Menu({
   });
 
   useEffect(() => {
-    const intervalId = setInterval(checkNotification, 10000); // Check every 10 seconds
+    if (isLoggedIn) {
+      const intervalId = setInterval(checkNotification, 10000); // Check every 10 seconds
 
-    return () => clearInterval(intervalId); // Clean up interval on unmount
-  }, [username, newChats, newNotifications]);
+      return () => clearInterval(intervalId); // Clean up interval on unmount
+    }
+  }, [username, newChats, newNotifications, isLoggedIn]);
 
   const checkNotification = async () => {
     try {
@@ -115,13 +118,22 @@ export default function Menu({
     fetchVersion();
   }, []);
 
-  // Example search dictionary - replace with your actual data or API route
+  // Create search dictionary combining base entries with dynamically generated toy entries
   const searchDictionary = [
-    { name: 'Home', link: '/home', keyword: 'dashboard', requireAuth: false },
-    { name: 'Books', link: '/books', keyword: 'reading library', requireAuth: false },
-    { name: 'Events', link: '/events', keyword: 'calendar schedule', requireAuth: false },
-    { name: 'Shop', link: '/shop', keyword: 'store purchase', requireAuth: false },
-    { name: 'Friends', link: '/friends', keyword: 'social network', requireAuth: true }
+    { name: 'Home', link: '/home', keyword: 'dashboard', description: 'Go to the dashboard', requireAuth: false },
+    { name: 'Books', link: '/books', keyword: 'reading library', description: 'Explore our collection of books', requireAuth: false },
+    { name: 'Events', link: '/events', keyword: 'calendar schedule', description: 'View upcoming events', requireAuth: false },
+    { name: 'Shop', link: '/shop', keyword: 'store purchase', description: 'Visit our online shop', requireAuth: false },
+    { name: 'Friends', link: '/friends', keyword: 'social network', description: 'Connect with friends', requireAuth: true },
+    { name: 'Toys', link: '/toys', keyword: 'interactive demo ml machine learning', description: 'Explore interactive machine learning demos', requireAuth: false },
+    // Add toy entries dynamically from the centralized toys data
+    ...toys.map(toy => ({
+      name: toy.title,
+      link: toy.link,
+      keyword: toy.keywords,
+      description: toy.description,
+      requireAuth: toy.reqAuth
+    }))
   ];
 
   return (
@@ -161,6 +173,7 @@ export default function Menu({
             { href: '/books', icon: FaBook, label: 'Books', requireAuth: false },
             { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
             { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
+            { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
             <Link

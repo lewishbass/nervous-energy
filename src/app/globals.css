@@ -306,3 +306,67 @@ body {
 .shift-out{
   animation: shift-out 1s ease;
 }
+
+.be{
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin: 10px auto;
+  background-color: #f9f8f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: fit-content;
+  max-width: 800px;
+  margin-bottom: 40px;
+  font-size: 1.2rem;
+}
+.be:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+ .dark .be{
+  background-color: #28282d;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark .be:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+.eq{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: fit-content;
+  min-width: 50%;
+  margin: 30px auto;
+  padding:20px;
+  outline: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.eq:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 4px rgba(0, 0, 0, 0.3);
+  outline-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark .eq {
+  background-color: #222;
+  outline-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark .eq:hover {
+  box-shadow: 0 8px 4px rgba(0, 0, 0, 0.7);
+  outline-color: rgba(255, 255, 255, 0.2);
+}
+
+.recharts-wrapper .recharts-cartesian-grid-horizontal line:first-child,
+.recharts-wrapper .recharts-cartesian-grid-horizontal line:last-child,
+.recharts-wrapper .recharts-cartesian-grid-vertical line:first-child,
+.recharts-wrapper .recharts-cartesian-grid-vertical line:last-child {
+  stroke-opacity: 0 !important;
+}

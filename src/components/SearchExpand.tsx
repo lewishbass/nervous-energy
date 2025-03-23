@@ -3,12 +3,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 // Types for props and search results
 interface SearchResult {
   name: string;
   link: string;
   keyword: string;
+  description: string;
+  requireAuth: boolean;
 }
 
 interface SearchExpandProps {
@@ -20,6 +23,7 @@ interface SearchExpandProps {
   searchDictionary?: SearchResult[]; // Optional dictionary of results
   placeholder?: string;
 }
+
 
 export default function SearchExpand({
   width = 40,
@@ -42,6 +46,8 @@ export default function SearchExpand({
   const abortControllerRef = useRef<AbortController | null>(null);
   
   const isExpanded = isHardExpanded || isSoftExpanded;
+
+  const { isLoggedIn } = useAuth();
 
   // Handle user typing in the input
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,8 +102,9 @@ export default function SearchExpand({
     if (searchDictionary) {
       // Filter from provided dictionary
       const results = searchDictionary.filter(item => 
-        item.name.toLowerCase().includes(searchTermLower) || 
-        item.keyword.toLowerCase().includes(searchTermLower)
+        (item.name.toLowerCase().includes(searchTermLower) ||
+          item.keyword.toLowerCase().includes(searchTermLower))
+        && (!item.requireAuth || isLoggedIn)
       );
       setSearchResults(results);
       return;
@@ -203,8 +210,8 @@ export default function SearchExpand({
               onClick={() => handleResultClick(result)}
             >
               <div className="font-medium">{result.name}</div>
-              {result.keyword && result.keyword !== result.name && (
-                <div className="text-sm text-gray-500">{result.keyword}</div>
+              {result.description && (
+                <div className="text-sm text-gray-500">{result.description}</div>
               )}
             </div>
           ))}
