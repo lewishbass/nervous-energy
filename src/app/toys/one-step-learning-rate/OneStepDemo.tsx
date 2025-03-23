@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 	ReferenceLine, ResponsiveContainer, Legend, ReferenceDot, Label
@@ -203,13 +203,13 @@ const OneStepDemo: React.FC = () => {
 			<div style={{ fontFamily: 'monospace', fontSize: '0.9em' }} className="grid grid-cols-1 md:grid-cols-2 gap-1">
 				<div>
 					<p><strong>Function:</strong> f(w) = {fixedDisplay(a)}w² + {fixedDisplay(b)}w + {fixedDisplay(c)}</p>
-					<p><strong>Derivative:</strong> f'(w) = {fixedDisplay(2 * a)}w + {fixedDisplay(b)}</p>
-					<p><strong>Second Derivative:</strong> f''(w) = {fixedDisplay(2 * a)}</p>
-					<p><strong>Optimal Rate:</strong> η = 1/f''(w) = {fixedDisplay(optimalLearningRate)}</p>
+					<p><strong>Derivative:</strong> f&apos;(w) = {fixedDisplay(2 * a)}w + {fixedDisplay(b)}</p>
+					<p><strong>Second Derivative:</strong> f&apos;&apos;(w) = {fixedDisplay(2 * a)}</p>
+					<p><strong>Optimal Rate:</strong> η = 1/f&apos;&apos;(w) = {fixedDisplay(optimalLearningRate)}</p>
 				</div>
 				<div>
 					<p><strong>Current Point:</strong> w₀ = {fixedDisplay(w0)}, f(w₀) = {fixedDisplay(y0)}</p>
-					<p><strong>Gradient at w₀:</strong> f'(w₀) = {fixedDisplay(firstDerivativeAtW0)}</p>
+					<p><strong>Gradient at w₀:</strong> f&apos;(w₀) = {fixedDisplay(firstDerivativeAtW0)}</p>
 					<p><strong>After One Step:</strong> w₁ = {fixedDisplay(w1)}, f(w₁) = {fixedDisplay(y1)}</p>
 					<p><strong>Optimal Point:</strong> w* = {fixedDisplay(wOptimal)}, f(w*) = {fixedDisplay(yOptimal)}</p>
 				</div>

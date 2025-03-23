@@ -95,9 +95,9 @@ const CircleAnimation: React.FC<CircleAnimationProps> = ({
       if (secondClosestDistance > radiusRange[1]) radius = radius;
       else if(closestCircle && secondClosestCircle){ 
         //move circle so its touching closest and second closest
-        let x1 = closestCircle.x, y1 = closestCircle.y, r1 = closestCircle.radius;
-        let x2 = secondClosestCircle.x, y2 = secondClosestCircle.y, r2 = secondClosestCircle.radius;
-        let r = radius;
+        const x1 = closestCircle.x, y1 = closestCircle.y, r1 = closestCircle.radius;
+        const x2 = secondClosestCircle.x, y2 = secondClosestCircle.y, r2 = secondClosestCircle.radius;
+        const r = radius;
         // Equations of circles:
         // (x - x1)^2 + (y - y1)^2 = (r + r1)^2  (1)
         // (x - x2)^2 + (y - y2)^2 = (r + r2)^2  (2)
@@ -165,7 +165,7 @@ const CircleAnimation: React.FC<CircleAnimationProps> = ({
             
       }
 
-      let color = `rgba(255, 255, 255, ${seededRandom(0.5, 1, seed + seedOffset + 8)*((radius/radiusRange[1])**0.65)})`;
+      const color = `rgba(255, 255, 255, ${seededRandom(0.5, 1, seed + seedOffset + 8) * ((radius / radiusRange[1]) ** 0.65)})`;
 
       // Create a new circle with animation properties
       newCircles.push({

@@ -7,11 +7,10 @@ import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 
 export default function XGWeightInit() {
   useEffect(() => {
-    // Typescript doesn't know about window.MathJax
-    // @ts-ignore
+
+    // @ts-expect-error typescript doesn't know about mathjax
     if (typeof window !== 'undefined' && window.MathJax) {
-      // Typescript doesn't know about window.MathJax
-      // @ts-ignore
+      // @ts-expect-error typescript doesn't know mathjax
       window.MathJax.typeset();
     }
   }, []);// add [] dependency to run only once
