@@ -370,3 +370,35 @@ body {
 .recharts-wrapper .recharts-cartesian-grid-vertical line:last-child {
   stroke-opacity: 0 !important;
 }
+
+.lnk {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 2px solid transparent;
+  color: #007bff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 2em;
+}
+
+.lnk:hover {
+  color: #0056b3;
+  border-color: #0056b380;
+  text-decoration: none;
+}
+
+.lnk:focus,
+.lnk:active {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.dark .lnk {
+  color: #66baff80;
+}
+
+.dark .lnk:hover {
+  color: #a0d8ff;
+  border-color: #a0d8ff80;
+  text-decoration: none;
+}

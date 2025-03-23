@@ -36,7 +36,7 @@ const StarBackground = () => {
 			newStars.push(
 				<div
 					key={i}
-					className="absolute rounded-full invert"
+					className="absolute rounded-full invert dark:invert-0"
 					style={{
 						width: `${size}px`,
 						height: `${size}px`,

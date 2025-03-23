@@ -133,6 +133,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setValidationError('');
     setSuccessMessage('');
 
+
     if (!registerUsername || !registerPassword) {
       setValidationError('Please fill in all fields');
       return;
@@ -140,6 +141,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
     if (registerPassword !== registerConfirmPassword) {
       setValidationError('Passwords do not match');
+      return;
+    }
+
+
+    if (validatePassword(registerPassword) !== true) {
       return;
     }
 
@@ -190,17 +196,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const passwordStrength = (password: string) => {
     return Math.sqrt(password.length) / Math.sqrt(10) + (new Set(password)).size / 10 + ((/[^a-zA-Z0-9]/).test(password) ? 1 : 0) + ((/[a-z]/).test(password) && (/[A-Z]/).test(password) ? 1 : 0) + (/[0-9]/.test(password) ? 1 : 0);
   }
-  useEffect(() => {
+
+  const validatePassword = (password: string) => {
     if (registerPassword.length < 8) {
       setValidationError('Password must be at least 8 characters long');
+      return false;
     } else if (passwordStrength(registerPassword) < 3) {
       setValidationError('Password must be stronger');
+      return false;
     } else if (validationError?.includes("Password must")) {
       setValidationError('');
+      return true;
     }
-
-
-
+  }
+  useEffect(() => {
+    validatePassword(registerPassword);
   }, [registerPassword]);
 
   return (

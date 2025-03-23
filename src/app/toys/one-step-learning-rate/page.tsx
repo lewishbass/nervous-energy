@@ -32,7 +32,7 @@ export default function OneStepLearningRate() {
 				<div className="mb-6">
 					<Link
 						href="/toys"
-						className="inline-flex items-center px-4 py-2 opacity-60 backdrop-blur-sm rounded-lg tc4 hover:opacity-100 hover:translate-x-[-2px] transition-all duration-200 shadow-md"
+						className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-x-[-2px] transition-all duration-200 shadow-md"
 						style={{ background: "var(--khg)" }}
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,7 +46,7 @@ export default function OneStepLearningRate() {
 
 				<div className="prose dark:prose-invert max-w-none">
 					<p className="tc2 text-lg">
-						Understanding optimal learning rates for quadratic loss functions in neural networks.
+						Using taylor expansions to increase the speed of convergence in gradient descent.
 					</p>
 
 					<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Problem</h2>
@@ -171,18 +171,18 @@ export default function OneStepLearningRate() {
 					</p>
 
 					<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Interactive Demonstration</h2>
-					<div className="be">
-						<div className="">
+					<div className="be min-w-full">
+						<div className="min-w-full">
 							<OneStepDemo />
 						</div>
 					</div>
 
-					<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Key Concepts</h2>
-					<ul className="list-disc pl-6 tc2">
-						<li>Functions rarely are only second order, but incorporating more derivatives into gradient descent can seed up convergence </li>
+					<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Takeaways</h2>
+					<ul className="list-disc pl-6 tc2 space-y-4">
+						<li>As the magnitude of the derivatives beyond the second increase, the estimation becomes less accurate</li>
+						<li>Functions rarely are only second order, but incorporating more derivatives into gradient descent can speed up convergence </li>
 						<li>The cost of calculating second order derivatives for fields grows with the dimension</li>
-						<li>The closer a function is to quadratic, the better this works</li>
-						<li>Computing the Hessian can be the most computationally expensive part of this</li>
+						<li>Computing the Hessian and its inverse, can be more expensive than multiple steps of first gradient descent</li>
 					</ul>
 					<div className='mb-100'/>
 					
