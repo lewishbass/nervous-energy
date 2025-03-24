@@ -331,7 +331,7 @@ export default function BackProp() {
             </ul>
 
             <p className="mb-4">
-              Here's what this network looks like:
+              Here is what this network looks like:
             </p>
 
             <div className="invert-0 dark:invert-100">
