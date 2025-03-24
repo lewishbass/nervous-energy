@@ -4,7 +4,7 @@ import Link from 'next/link';
 import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
 import { useEffect } from 'react';
 import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
-import BackPropDemo from './BackPropDemo';
+//import BackPropDemo from './BackPropDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import NetworkGraph from './NetworkGraph';
 import FiveLayerNetwork from './FiveLayerNetwork';
@@ -326,7 +326,7 @@ export default function BackProp() {
             <ul className="list-disc pl-6 mb-4">
               <li>\( p \) is average pooling with stride 2</li>
               <li>\( c \) is a 1D 0-pad convolution with a kernel size of 3</li>
-              <li>\( \\theta_1 \) is the weights for the convolution (size 3)</li>
+              <li>\( \theta_1 \) are the weights for the convolution (size 3)</li>
               <li>\( x \) is input of size 4</li>
             </ul>
 
@@ -337,10 +337,70 @@ export default function BackProp() {
             <div className="invert-0 dark:invert-100">
               <FiveLayerNetwork />
             </div>
+            <p className="mb-[-24] text-center w-full text-[1.5em] underline underline-offset-4">
+              Forward Pass
+            </p>
+            <div className="eq">
+              {`\\[\\Large
+               c_i = x_{i-1} \\theta_0 + x_i \\theta_1 + x_{i+1} \\theta_2
+              \\]`}
+              {`\\[\\Large
+               p_i = \\frac{c_{2i} + c_{2i+1}}{2}
+              \\]`}
+              {`\\[\\Large
+               \\sigma_i = \\frac{e^{p_i}}{e^{p_0} + e^{p_1}}
+              \\]`}
+              {`\\[\\Large
+                L = -z_* + log( e^{p_0} + e^{p_1} )
+              \\]`}
+            </div>
+
+            <table className="eq">
+
+              <tbody className="">
+                <tr>
+                  <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
+                    {`\\( \\frac{\\partial L}{\\partial p_1 } \\)`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    = <span style={{ color: "var(--khg)" }}>{`\\( -y_i + \\sigma(p_i)  \\)`}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
+                    {`\\( \\frac{\\partial L}{\\partial c_i} \\)`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial p_i} \\)`}</span>
+                    <span style={{ color: "var(--khr)" }}> {`\\( \\frac{\\partial p_i}{\\partial c_i2} \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}>{`\\( (-y_i + \\sigma(p_i)) \\)`}</span>
+                    <span style={{ color: "var(--khr)" }}> {`\\( (\\frac{1}{2} )  \\)`}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
+                    {`\\( \\frac{\\partial L}{\\partial \\theta_i } \\)`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial c } \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial c}{ \\partial \\theta_i }\\)`}</span> =
+                    <span style={{ color: "var(--khg)" }}>{`\\( (-y+\\sigma(p)/2) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( x_{i-1} + x_i + x_{i+1} ) \\)`}</span>{`\\( \\)`}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
+                    {`\\( \\frac{\\partial L}{\\partial x_i} \\)`}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial c} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial c}{\\partial x_i} \\)`}</span> =
+                    <span style={{ color: "var(--khg)" }}>{`\\( (-y+\\sigma(p)/2) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\theta \\)`}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
           </div>
 
-          <h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Interactive Demonstration</h2>
+          {/*<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Interactive Demonstration</h2>
           <div className="be min-w-fill">
             <BackPropDemo />
           </div>
@@ -360,7 +420,7 @@ export default function BackProp() {
             <li>Backpropagation enables efficient training by computing all gradients in a single forward and backward pass</li>
             <li>The algorithm can face challenges like vanishing or exploding gradients in deep networks</li>
             <li>Modern variants and optimizations of backpropagation form the basis of all deep learning systems</li>
-          </ul>
+          </ul>*/}
           <div className="mb-100" />
         </div>
       </div>

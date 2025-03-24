@@ -100,6 +100,7 @@ const FiveLayerNetwork: React.FC = () => {
 		layers.forEach(layer => {
 			// Add layer label
 			svg.append("text")
+				// @ts-expect-error ts doesnt know these types
 				.attr("x", layer.x)
 				.attr("y", 50)
 				.attr("text-anchor", "middle")
@@ -111,6 +112,7 @@ const FiveLayerNetwork: React.FC = () => {
 			// Add layer description if needed
 			if (layer.type === "pooling") {
 				svg.append("text")
+					// @ts-expect-error ts doesnt know these types
 					.attr("x", layer.x)
 					.attr("y", 70)
 					.attr("text-anchor", "middle")
