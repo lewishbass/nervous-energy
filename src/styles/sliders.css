@@ -83,3 +83,32 @@ input[type=range][orient=vertical]::-moz-range-track {
   padding-top: 2px;
   padding-bottom: 2px;
 }
+
+/* Dark mode styles */
+.dark input[type=range]::-webkit-slider-runnable-track {
+  background: #3a3a3a;
+}
+
+.dark input[type=range]::-moz-range-track {
+  background: #3a3a3a;
+}
+
+.dark input[type=range]::-webkit-slider-thumb {
+  background-color: #6c67c7;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.dark input[type=range]::-moz-range-thumb {
+  background-color: #6c67c7;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.dark input[type=range]:hover::-webkit-slider-thumb,
+.dark input[type=range]:focus::-webkit-slider-thumb {
+  background-color: #8884d8;
+}
+
+.dark input[type=range]:hover::-moz-range-thumb,
+.dark input[type=range]:focus::-moz-range-thumb {
+  background-color: #8884d8;
+}

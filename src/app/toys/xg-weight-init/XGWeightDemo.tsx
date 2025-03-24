@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import './XGWeightDemo.css';
+import '@/styles/sliders.css';
 import * as tf from '@tensorflow/tfjs';
 import VerticalHistogram from './VerticalHistogram';
 

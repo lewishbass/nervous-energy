@@ -2,22 +2,13 @@
 
 import Link from 'next/link';
 import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
-//import { useEffect } from 'react';
-//import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
-//import BackPropDemo from './BackPropDemo';
+import BackPropDemo from './BackPropDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import NetworkGraph from './NetworkGraph';
 import FiveLayerNetwork from './FiveLayerNetwork';
 import { MathJax } from 'better-react-mathjax';
 
 export default function BackProp() {
-  //  useEffect(() => {
-  //    // @ts-expect-error typescript doesn't know about mathjax
-  //    if (typeof window !== 'undefined' && window.MathJax) {
-  //      // @ts-expect-error typescript doesn't know mathjax
-  //      window.MathJax.typeset();
-  //    }
-  //  }, []);// add [] dependency to run only once
 
   return (
     <div className="relative min-h-screen">
@@ -439,7 +430,7 @@ export default function BackProp() {
 
           </div>
 
-          {/*<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Interactive Demonstration</h2>
+          <h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Interactive Demonstration</h2>
           <div className="be min-w-fill">
             <BackPropDemo />
           </div>
@@ -459,7 +450,7 @@ export default function BackProp() {
             <li>Backpropagation enables efficient training by computing all gradients in a single forward and backward pass</li>
             <li>The algorithm can face challenges like vanishing or exploding gradients in deep networks</li>
             <li>Modern variants and optimizations of backpropagation form the basis of all deep learning systems</li>
-          </ul>*/}
+          </ul>
           <div className="mb-100" />
         </div>
       </div>
