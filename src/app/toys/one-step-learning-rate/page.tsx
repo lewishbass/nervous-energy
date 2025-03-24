@@ -5,6 +5,7 @@ import SquareAnimation from '@/components/backgrounds/SquareAnimation';
 import { useEffect } from 'react';
 import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 import OneStepDemo from './OneStepDemo';
+import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 
 export default function OneStepLearningRate() {
 	useEffect(() => {
@@ -29,7 +30,7 @@ export default function OneStepLearningRate() {
 
 			{/* Content with slight transparency for background visibility */}
 			<div className="relative z-10 p-6 max-w-4xl mx-auto backdrop-blur-sm min-h-screen tc2">
-				<div className="mb-6">
+				<div className="mb-6 flex justify-between items-center">
 					<Link
 						href="/toys"
 						className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-x-[-2px] transition-all duration-200 shadow-md"
@@ -40,6 +41,16 @@ export default function OneStepLearningRate() {
 						</svg>
 						Back to Toys
 					</Link>
+
+					<div className="flex gap-2">
+						<DownloadButton
+							relativePath="src/app/toys/one-step-learning-rate/page.tsx"
+							fileName="one-step-learning-rate_page.tsx"
+						/>
+						<GitHubButton
+							relativePath="src/app/toys/one-step-learning-rate/"
+						/>
+					</div>
 				</div>
 
 				<h1 className="text-4xl font-bold mb-6 tc1">One Step Learning Rate</h1>

@@ -86,7 +86,7 @@ export default function Toys() {
 				}}
 				className='invert dark:invert-0'
 			/>
-			<div style={{ animation: "fade-in 10s ease 0.2s forwards" }}><StarBackground /></div>
+			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards" }}><StarBackground /></div>
 
 
 			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Interactive ML Toys</h1>

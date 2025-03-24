@@ -198,10 +198,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
   }
 
   const validatePassword = (password: string) => {
-    if (registerPassword.length < 8) {
+    if (password.length < 8) {
       setValidationError('Password must be at least 8 characters long');
       return false;
-    } else if (passwordStrength(registerPassword) < 3) {
+    } else if (passwordStrength(password) < 3) {
       setValidationError('Password must be stronger');
       return false;
     } else if (validationError?.includes("Password must")) {
