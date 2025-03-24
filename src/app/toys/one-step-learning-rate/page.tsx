@@ -2,21 +2,11 @@
 
 import Link from 'next/link';
 import SquareAnimation from '@/components/backgrounds/SquareAnimation';
-//import { useEffect } from 'react';
-//import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 import OneStepDemo from './OneStepDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
+import { MathJax } from 'better-react-mathjax';
 
 export default function OneStepLearningRate() {
-	//	useEffect(() => {
-	//
-	//		// @ts-expect-error typescript doesn't know about mathjax
-	//		if (typeof window !== 'undefined' && window.MathJax) {
-	//			// @ts-expect-error typescript doesn't know mathjax
-	//			window.MathJax.typeset();
-	//		}
-	//	}, []);// add [] dependency to run only once
-
 	return (
 		<div className="relative min-h-screen">
 			{/* Background animation */}
@@ -63,19 +53,25 @@ export default function OneStepLearningRate() {
 					<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Problem</h2>
 					<p className="be"> A hypothetical one dimensional neural network where the loss function is a <b className="tc1">quadratic</b> function of the weights:
 						<div className="eq">
+							<MathJax>
 							{`\\[\\Large
 								L(w): \\mathbb{R} \\rightarrow \\mathbb{R} \\
 							\\]`}
+							</MathJax>
 						</div>
 						And learning update:
 						<div className="eq">
+							<MathJax>
 							{`\\[\\Large
 								w_{t+1} = w_t - \\frac{dL}{dw}(w_t) \\
 							\\]`}
+							</MathJax>
 						</div>
-						Assuming that there is a single global extreme \(f(w_*)\), how do you determine the optimal learning rate:
+						Assuming that there is a single global extreme <MathJax inline>{`\\(f(w_*)\\)`}</MathJax>, how do you determine the optimal learning rate:
 						<div className="eq">
+							<MathJax>
 							{`\\[ \\Large \\quad \\eta_* \\text{st:} \\quad w_t+ \\eta_* \\frac{dL}{dw}(w_t) = w_* \\]`}
+							</MathJax>
 						</div>
 						that allows you to reach the global extreme in one step?
 					</p>
@@ -85,55 +81,71 @@ export default function OneStepLearningRate() {
 							The loss function is quadratic, so any derivative beyond the second is zero.
 						</p>
 						<p className="mb-4">
-							This means that the <b className="tc1">Taylor Expansion</b> of the derivative of the loss function at point \( w_* \) can be written using only two terms:
+							This means that the <b className="tc1">Taylor Expansion</b> of the derivative of the loss function at point <MathJax inline>{`\\( w_* \\)`}</MathJax> can be written using only two terms:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									\\frac{dL}{dw}(w_*) = \\frac{dL}{dw}(w_t) + \\frac{d^2L}{dw^2}(w_t)(w_* - w_t)
 								\\]`}
+								</MathJax>
 							</div>
-							\( w_* \) is a <b className="tc1">unique</b> maximum on a smooth curve, so the first derivative at that point is zero:
+							<MathJax inline>{`\\( w_* \\)`}</MathJax> is a <b className="tc1">unique</b> maximum on a smooth curve, so the first derivative at that point is zero:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									\\frac{dL}{dw}(w_*) = 0
 								\\]`}
+								</MathJax>
 							</div>
 							substituting this into the <b className="tc1">Taylor Expansion</b>, yields:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									0 = \\frac{dL}{dw}(w_t) + \\frac{d^2L}{dw^2}(w_t)(w_* - w_t)
 								\\]`}
+								</MathJax>
 							</div>
-							and solving for \( w_* \):
+							and solving for <MathJax inline>{`\\( w_* \\)`}</MathJax>:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									w_* = w_t -\\frac{\\frac{dL}{dw}(w_t)}{\\frac{d^2L}{dw^2}(w_t)}
 								\\]`}
+								</MathJax>
 							</div>
 							which can be written in terms of the original learning step:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									w_* = w_t - \\frac{1}{\\frac{d^2L}{dw^2}(w_t)} \\frac{dL}{dw}(w_t)
 								\\]`}
+								</MathJax>
 							</div>
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									w_* = w_t - \\eta \\frac{dL}{dw}(w_t)
 								\\]`}
+								</MathJax>
 							</div>
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									\\eta = \\frac{1}{\\frac{d^2L}{dw^2}(w_t)}
 								\\]`}
+								</MathJax>
 							</div>
 						</p>
-						It can be assumed that {`\\( \\frac{d^2L}{dw^2}(w_t) \\)`} is not zero.
+						It can be assumed that <MathJax inline>{`\\( \\frac{d^2L}{dw^2}(w_t) \\)`}</MathJax> is not zero.
 						If it is, then the equation is either monotonic or constant, and does not have a global extreme.
 
 					</p>
 					<p className="be">
 						If L is a field over a vector space:
 						<div className="eq">
+							<MathJax>
 							{`\\[\\Large L: \\mathbb{R}^n \\rightarrow \\mathbb{R} \\]`}
+							</MathJax>
 						</div>
 						<p className="mb-4">
 							the math is slightly more complicated, but the same principle applies.
@@ -142,42 +154,52 @@ export default function OneStepLearningRate() {
 							The <b className="tc1">Taylor Expansion</b> is truncated at the second term under the assumption that
 							each term of the loss function is a component of at most two dimensions.
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									\\nabla L (w_*) = \\nabla L(w_t) + H \\big[L(w_t) \\big] (w_* - w_t)
 								\\]`}
+								</MathJax>
 							</div>
-							Where \( H \) is the <b className="tc1">Hessian</b> of the loss function.
+							Where <MathJax inline>{`\\( H \\)`}</MathJax> is the <b className="tc1">Hessian</b> of the loss function.
 						</p>
 						<p className="mb-4">
 							The same assumption can be made about the gradient at the local extreme:
 
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large \\nabla L = \\overrightarrow{0} \\]`}
+								</MathJax>
 							</div>
 							and substituted in to the <b className="tc1">Taylor Expansion</b>:
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									\\overrightarrow{0} = \\nabla L(w_t) + H \\big[L(w_t) \\big] (w_* - w_t)
 								\\]`}
+								</MathJax>
 							</div>
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large
 									w_* = w_t - H^{-1} \\big[L(w_t) \\big] \\nabla L(w_t)
 								\\]`}
+								</MathJax>
 							</div>
 							<div className="eq">
+								<MathJax>
 								{`\\[\\Large	
 									\\eta = H^{-1} \\big[L(w_t) \\big]
 								\\]`}
+								</MathJax>
 							</div>
 
-							If any of the eigenvalues of {`\\( H^{-1} \\)`} are 0,
+							If any of the eigenvalues of <MathJax inline>{`\\( H^{-1} \\)`}</MathJax> are 0,
 							the directional derivative of its corresponding eigenvector is 0.
 							This means that the loss function is either constant or monotonic in that direction,
 							and does not have a global extreme.
 						</p>
 						<p>
-							Therefore \( H \) has a full set of non-zero eigenvalues and is invertible.
+							Therefore <MathJax inline>{`\\( H \\)`}</MathJax> has a full set of non-zero eigenvalues and is invertible.
 						</p>
 					</p>
 

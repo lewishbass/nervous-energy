@@ -11,6 +11,7 @@ import NotificationModal from '@/components/NotificationModal';
 import HeadMetadata from '@/components/HeadMetadata';
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { MathJaxContext } from 'better-react-mathjax';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -162,8 +163,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
-      <RootLayoutContent>{children}</RootLayoutContent>
-    </AuthProvider>
+    <MathJaxContext>
+      <AuthProvider>
+        <RootLayoutContent>{children}</RootLayoutContent>
+      </AuthProvider>
+    </MathJaxContext>
   );
 }

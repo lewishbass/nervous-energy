@@ -8,6 +8,7 @@ import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import NetworkGraph from './NetworkGraph';
 import FiveLayerNetwork from './FiveLayerNetwork';
+import { MathJax } from 'better-react-mathjax';
 
 export default function BackProp() {
   //  useEffect(() => {
@@ -79,15 +80,17 @@ export default function BackProp() {
 
 
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                f(g(x))' = f'(g(x)) \\cdot g'(x)
               \\]`}
+              </MathJax>
             </div>
           </div>
           <h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Backpropogation</h2>
           <div className="be">
             <p className="mb-4">
-              The simple MLP \(  L \circ f( \theta_3) \circ f( \theta_2 ) \circ f( \theta_1 )  ( x ) \),
+              The simple MLP <MathJax inline>{`\\(  L \\circ f( \\theta_3) \\circ f( \\theta_2 ) \\circ f( \\theta_1 )  ( x ) \\)`}</MathJax>,
               can be represented as a graph:
             </p>
 
@@ -99,30 +102,38 @@ export default function BackProp() {
               Where:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li>\( L \) is the loss function</li>
-              <li>{`\\( \\theta_i \\)`} are the weights for neuron i</li>
-              <li>\( f \) is the activation function of the neuron</li>
-              <li>\( g \) is a neuron without activation</li>
-              <li>\( a_i \) is the output to layer \( i \)</li>
-              <li>\( z_i \) is the output to layer \( i \) before activation</li>
+              <li><MathJax inline>{`\\( L \\)`}</MathJax> is the loss function</li>
+              <li><MathJax inline>{`\\( \\theta_i \\)`}</MathJax> are the weights for neuron i</li>
+              <li><MathJax inline>{`\\( f \\)`}</MathJax> is the activation function of the neuron</li>
+              <li><MathJax inline>{`\\( g \\)`}</MathJax> is a neuron without activation</li>
+              <li><MathJax inline>{`\\( a_i \\)`}</MathJax> is the output to layer <MathJax inline>{`\\( i \\)`}</MathJax></li>
+              <li><MathJax inline>{`\\( z_i \\)`}</MathJax> is the output to layer <MathJax inline>{`\\( i \\)`}</MathJax> before activation</li>
             </ul>
 
             <p className="mb-4">
               First the graph is evaluated forwards, calculating the value at each layer based on x
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                a_1 = f( \\theta_1, x )
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                a_2 = f( \\theta_2, a_1 )
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                a_3 = f( \\theta_3, a_2 )
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                L = L( a_3 )
               \\]`}
+              </MathJax>
             </div>
 
             <p className="mb-4">
@@ -130,29 +141,39 @@ export default function BackProp() {
             </p>
             <div className="eq" style={{ display: 'block' }}>
               <div style={{ alignSelf: "left", justifySelf: "left" }}>
+                <MathJax>
                 {`\\[\\Large
                \\frac{\\partial L}{\\partial x} = \\frac{\\partial L}{\\partial a_3} \\cdot \\frac{\\partial a_3}{\\partial a_2} \\cdot \\frac{\\partial a_2}{\\partial a_1} \\cdot \\frac{\\partial a_1}{\\partial x}
               \\]`}
+                </MathJax>
               </div>
               <div style={{ alignSelf: "left", justifySelf: "left" }}>
+                <MathJax>
                 {`\\[\\Large
                \\frac{\\partial L}{\\partial a_3} = L'( a_3 ) 
               \\]`}
+                </MathJax>
               </div>
               <div style={{ alignSelf: "left", justifySelf: "left" }}>
+                <MathJax>
                 {`\\[\\Large
                \\frac{\\partial L}{\\partial a_2} = L'( a_3 ) \\cdot f'( \\theta_3, a_2 )
               \\]`}
+                </MathJax>
               </div>
               <div style={{ alignSelf: "left", justifySelf: "left" }}>
+                <MathJax>
                 {`\\[\\Large
                \\frac{\\partial L}{\\partial a_1} = L'( a_3 ) \\cdot f'( \\theta_3, a_2 ) \\cdot f'( \\theta_2, a_1 )
               \\]`}
+                </MathJax>
               </div>
               <div style={{ alignSelf: "left", justifySelf: "left" }}>
+                <MathJax>
                 {`\\[\\Large
                \\frac{\\partial L}{\\partial x} = L'( a_3 ) \\cdot f'( \\theta_3, a_2 ) \\cdot f'( \\theta_2, a_1 ) \\cdot f'( \\theta_1, x )
               \\]`}
+                </MathJax>
               </div>
             </div>
 
@@ -165,82 +186,81 @@ export default function BackProp() {
 
             <p className="mb-4">
               If each neuron has activation
-              <br />{`\\( \\sigma(x) = \\frac{1}{1+e^{-x}} \\)`}<span className='ml-29' /> {`\\( \\sigma'(x) = \\sigma(x) \\cdot (1 - \\sigma(x)) \\)`}
-              <br /> {`\\( \L(a_3) = \\frac{1}{2} \\Sigma (y_i - a_{3i}) \\)`} <span className='ml-8' /> {`\\( \L'(a_3) = a_3 - y \\)`}
+              <br /><MathJax inline>{`\\( \\sigma(x) = \\frac{1}{1+e^{-x}} \\)`}</MathJax><span className='ml-29' /> <MathJax inline>{`\\( \\sigma'(x) = \\sigma(x) \\cdot (1 - \\sigma(x)) \\)`}</MathJax>
+              <br /> <MathJax inline>{`\\( L(a_3) = \\frac{1}{2} \\Sigma (y_i - a_{3i}) \\)`}</MathJax> <span className='ml-8' /> <MathJax inline>{`\\( L'(a_3) = a_3 - y \\)`}</MathJax>
               <br />at all positions in the network:
             </p>
             <table className="eq">
-
               <tbody className="">
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial a_{3i} } \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3i} } \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( a_{3i} -y_i \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( a_{3i} -y_i \\)`}</MathJax></span>
                   </td>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial \\theta_{3ij}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta_{3ij}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial a_{3i}} \\)`}</span>
-                    <span style={{ color: "var(--khr)" }}> {`\\( \\frac{\\partial a_{3i}}{\\partial \\theta_{3ij}} \\)`}</span>
-                    = <span style={{ color: "var(--khg)" }}>{`\\( (a_{3i}-y_i) \\)`}</span>
-                    <span style={{ color: "var(--khr)" }}> {`\\( (a_{2j}) \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3i}} \\)`}</MathJax></span>
+                    <span style={{ color: "var(--khr)" }}> <MathJax inline>{`\\( \\frac{\\partial a_{3i}}{\\partial \\theta_{3ij}} \\)`}</MathJax></span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (a_{3i}-y_i) \\)`}</MathJax></span>
+                    <span style={{ color: "var(--khr)" }}> <MathJax inline>{`\\( (a_{2j}) \\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial a_{3}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial a_{3}}{a_{2i}}\\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( \\theta_{3i}) \\)`}</span>{`\\( \\)`}
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{3}}{a_{2i}}\\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\theta_{3i}) \\)`}</MathJax></span>
                   </td>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial a_{2i}}{\\partial z_{2i}} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y \\cdot \\theta_{3i}) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\sigma'(z_{2i}) \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{2i}}{\\partial z_{2i}} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3i}) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\sigma'(z_{2i}) \\)`}</MathJax></span>
                   </td>
                 </tr>
               </tbody>
               <tbody className="">
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial \\theta^{2ij}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta^{2ij}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap" >
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial z_{2i}}{\\partial \\theta^{2ij}} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y \\cdot \\theta_{3i} \\cdot \\sigma'(z_{2i})) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( a_{1j} )\\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{2i}}{\\partial \\theta^{2ij}} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3i} \\cdot \\sigma'(z_{2i})) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( a_{1j} )\\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\(\\frac{\\partial L}{\\partial a_{1i}} \\)`}
+                    <MathJax inline>{`\\(\\frac{\\partial L}{\\partial a_{1i}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial z_{2}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial z_{2}}{\\partial a_{1i}} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2})) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( \\theta_{2i} ) \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{2}}{\\partial a_{1i}} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2})) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\theta_{2i} ) \\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial a_{1i}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial a_{1i}}{\\partial z_{1i}} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} ) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( \\sigma'(z_{1i}) )\\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{1i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{1i}}{\\partial z_{1i}} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} ) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\sigma'(z_{1i}) )\\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial \\theta_{1ij}} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta_{1ij}} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial z_{1i}}{\\partial \\theta_{1ij}} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} \\cdot \\sigma'(z_{1i}) ) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( x_{j} )\\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{1i}}{\\partial \\theta_{1ij}} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} \\cdot \\sigma'(z_{1i}) ) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( x_{j} )\\)`}</MathJax></span>
                   </td>
                 </tr>
               </tbody>
@@ -257,9 +277,11 @@ export default function BackProp() {
               One Hot Encoding
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                y = [ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               Where the index of the 1 is the label of the image.<br />
@@ -270,17 +292,19 @@ export default function BackProp() {
               Cross Entropy Loss
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                L(a_i, y) = - \\Sigma y_i \\cdot log( a_i ) = -log( a_* )
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               Where:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li>\( y_i \) is the one hot vector encoding of the correct label</li>
-              <li>\( a_i \) is the models array of probability estimations, the last layer of the MLP</li>
-              <li>\( a_* \) is the estimate at the correct label</li>
+              <li><MathJax inline>{`\\( y_i \\)`}</MathJax> is the one hot vector encoding of the correct label</li>
+              <li><MathJax inline>{`\\( a_i \\)`}</MathJax> is the models array of probability estimations, the last layer of the MLP</li>
+              <li><MathJax inline>{`\\( a_* \\)`}</MathJax> is the estimate at the correct label</li>
             </ul>
             <p className="mb-4">
               This rewards the model for picking the correct image, but does not directly penalize it for picking the wrong ones.
@@ -293,9 +317,11 @@ export default function BackProp() {
               Softmax Activation
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                \\sigma(z_i) = \\frac{e^{z_i}}{ \\Sigma_{j=1}^n e^{z_j} }
               \\]`}
+              </MathJax>
             </div>
 
             <p className="mb-4">
@@ -306,28 +332,34 @@ export default function BackProp() {
               When these two are combined, it yields a simpler equation for the final two layers of the classifier.
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                L( \\sigma ( z_i) , y ) = -log( \\sigma ( z_* ) ) = -z_* + log( \\Sigma e^{z_i} )
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                \\frac{\\partial L}{\\partial z_i} = -y_i + \\sigma( z_i )
               \\]`}
+              </MathJax>
             </div>
 
             Combining this with a 1D convolutional neural network for signal processing yields the network equation:
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                L \\circ \\sigma \\circ p \\circ c( \\theta_1 )  ( x ) = -y_* + log( \\Sigma e^{z_i} )
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               Where:
             </p>
             <ul className="list-disc pl-6 mb-4">
-              <li>\( p \) is average pooling with stride 2</li>
-              <li>\( c \) is a 1D 0-pad convolution with a kernel size of 3</li>
-              <li>\( \theta_1 \) are the weights for the convolution (size 3)</li>
-              <li>\( x \) is input of size 4</li>
+              <li><MathJax inline>{`\\( p \\)`}</MathJax> is average pooling with stride 2</li>
+              <li><MathJax inline>{`\\( c \\)`}</MathJax> is a 1D 0-pad convolution with a kernel size of 3</li>
+              <li><MathJax inline>{`\\( \\theta_1 \\)`}</MathJax> are the weights for the convolution (size 3)</li>
+              <li><MathJax inline>{`\\( x \\)`}</MathJax> is input of size 4</li>
             </ul>
 
             <p className="mb-4">
@@ -341,58 +373,65 @@ export default function BackProp() {
               Forward Pass
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                c_i = x_{i-1} \\theta_0 + x_i \\theta_1 + x_{i+1} \\theta_2
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                p_i = \\frac{c_{2i} + c_{2i+1}}{2}
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                \\sigma_i = \\frac{e^{p_i}}{e^{p_0} + e^{p_1}}
               \\]`}
+              </MathJax>
+              <MathJax>
               {`\\[\\Large
                 L = -z_* + log( e^{p_0} + e^{p_1} )
               \\]`}
+              </MathJax>
             </div>
 
             <table className="eq">
-
               <tbody className="">
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial p_1 } \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial p_1 } \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( -y_i + \\sigma(p_i)  \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( -y_i + \\sigma(p_i)  \\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial c_i} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial c_i} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial p_i} \\)`}</span>
-                    <span style={{ color: "var(--khr)" }}> {`\\( \\frac{\\partial p_i}{\\partial c_i2} \\)`}</span>
-                    = <span style={{ color: "var(--khg)" }}>{`\\( (-y_i + \\sigma(p_i)) \\)`}</span>
-                    <span style={{ color: "var(--khr)" }}> {`\\( (\\frac{1}{2} )  \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial p_i} \\)`}</MathJax></span>
+                    <span style={{ color: "var(--khr)" }}> <MathJax inline>{`\\( \\frac{\\partial p_i}{\\partial c_i2} \\)`}</MathJax></span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (-y_i + \\sigma(p_i)) \\)`}</MathJax></span>
+                    <span style={{ color: "var(--khr)" }}> <MathJax inline>{`\\( (\\frac{1}{2} )  \\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial \\theta_i } \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta_i } \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial c } \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial c}{ \\partial \\theta_i }\\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (-y+\\sigma(p)/2) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( ( x_{i-1} + x_i + x_{i+1} ) \\)`}</span>{`\\( \\)`}
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial c } \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial c}{ \\partial \\theta_i }\\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (-y+\\sigma(p)/2) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( x_{i-1} + x_i + x_{i+1} ) \\)`}</MathJax></span>
                   </td>
                 </tr>
                 <tr>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
-                    {`\\( \\frac{\\partial L}{\\partial x_i} \\)`}
+                    <MathJax inline>{`\\( \\frac{\\partial L}{\\partial x_i} \\)`}</MathJax>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    = <span style={{ color: "var(--khg)" }}>{`\\( \\frac{\\partial L}{\\partial c} \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\frac{\\partial c}{\\partial x_i} \\)`}</span> =
-                    <span style={{ color: "var(--khg)" }}>{`\\( (-y+\\sigma(p)/2) \\)`}</span><span style={{ color: "var(--khr)" }}>{`\\( \\theta \\)`}</span>
+                    = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial c} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial c}{\\partial x_i} \\)`}</MathJax></span> =
+                    <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (-y+\\sigma(p)/2) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\theta \\)`}</MathJax></span>
                   </td>
                 </tr>
               </tbody>

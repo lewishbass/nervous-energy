@@ -6,6 +6,7 @@ import CircleAnimation from '@/components/backgrounds/CircleAnimmation';
 //import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 import XGWeightDemo from './XGWeightDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
+import { MathJax } from 'better-react-mathjax';
 
 export default function XGWeightInit() {
   //  useEffect(() => {
@@ -89,12 +90,14 @@ export default function XGWeightInit() {
               with <em>tanh</em> activation is
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                   W \\sim N \\bigg( 0, \\frac{1}{n_{l}} \\bigg)
                 \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
-              where \(n_l\) is the number of inputs in layer \(l\)
+              where <MathJax inline>{`\\(n_l\\)`}</MathJax> is the number of inputs in layer <MathJax inline>{`\\(l\\)`}</MathJax>
             </p>
 
           </div>
@@ -105,110 +108,138 @@ export default function XGWeightInit() {
               For the Xavier/Glorot initialization, the goal is to keep the variance of the activation and gradient of each layer the same:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(y) = Var(x)
+                \\text{Var}(y) = \\text{Var}(x)
               \\]`}
+              </MathJax>
             </div>
             and:
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(dy) = Var(dx)
+                \\text{Var}(dy) = \\text{Var}(dx)
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               A single dense layer with the <em>tanh</em> activation function can be written as:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                 y = tanh(Wx)
               \\]`}
+              </MathJax>
             </div>
 
             <p className="mb-4">
-              We assume that the input \(x\) is zero-centered and has unit variance:
+              We assume that the input <MathJax inline>{`\\(x\\)`}</MathJax> is zero-centered and has unit variance:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(x) = 1, E[x] = 0
+                \\text{Var}(x) = 1, E[x] = 0
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               For the case that the network has a linear response function, ant the bias are incorporated into the input vector.
             </p>
             <p className="mb-4">
-              Considering each neuron and observation independently, with the weight vector \( w \) and observation \( x \) the output variance is:
+              Considering each neuron and observation independently, with the weight vector <MathJax inline>{`\\( w \\)`}</MathJax> and observation <MathJax inline>{`\\( x \\)`}</MathJax> the output variance is:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(y) = Var(wx) = Var( \\Sigma_{i} w_i x_i )
+                \\text{Var}(y) = \\text{Var}(wx) = \\text{Var}( \\Sigma_{i} w_i x_i )
               \\]`}
+              </MathJax>
             </div>
-            Since the weights adn inputs are <b className="tc1">independently distributed</b>, the variance of the sum is the sum of the variances:
+            Since the weights and inputs are <b className="tc1">independently distributed</b>, the variance of the sum is the sum of the variances:
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var( \\Sigma w_i x_i ) = \\Sigma Var(w_i x_i)
+                \\text{Var}( \\Sigma w_i x_i ) = \\Sigma \\text{Var}(w_i x_i)
               \\]`}
+              </MathJax>
             </div>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                \\Sigma Var(w_i x_i) = \\Sigma E[w_i^2 x_i^2]-E[w_i x_i]^2
+                \\Sigma \\text{Var}(w_i x_i) = \\Sigma E[w_i^2 x_i^2]-E[w_i x_i]^2
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
-              \( w_i \) and \( x_i \) are <b className="tc1">independent</b> and zero-centered, so their expectations are separable and zero:
+              <MathJax inline>{`\\( w_i \\)`}</MathJax> and <MathJax inline>{`\\( x_i \\)`}</MathJax> are <b className="tc1">independent</b> and zero-centered, so their expectations are separable and zero:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
                 E[w_i x_i]^2 = E[w_i]^2 E[x_i]^2 = 0
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
-              \( x^2 \) and \( w^2 \) are also <b className="tc1">independent</b>:
+              <MathJax inline>{`\\( x^2 \\)`}</MathJax> and <MathJax inline>{`\\( w^2 \\)`}</MathJax> are also <b className="tc1">independent</b>:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                E[w_i^2 x_i^2] = E[w_i^2] E[x_i^2] = Var(w_i) Var(x_i)
+                E[w_i^2 x_i^2] = E[w_i^2] E[x_i^2] = \\text{Var}(w_i) \\text{Var}(x_i)
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               Putting it back together:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(y) = \\Sigma Var(w_i) Var(x_i) = n_l Var(w) Var(x)
+                \\text{Var}(y) = \\Sigma \\text{Var}(w_i) \\text{Var}(x_i) = n_l \\text{Var}(w) \\text{Var}(x)
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
-              Setting \(Var(x)\) and \(Var(y)\) equal to each other:
+              Setting <MathJax inline>{`\\(\\text{Var}(x)\\)`}</MathJax> and <MathJax inline>{`\\(\\text{Var}(y)\\)`}</MathJax> equal to each other:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(y) = Var(x)
+                \\text{Var}(y) = \\text{Var}(x)
               \\]`}
+              </MathJax>
             </div>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(W) = \\frac{Var(y)}{n_lVar(x)} = \\frac{1}{n_l}
+                \\text{Var}(W) = \\frac{\\text{Var}(y)}{n_l\\text{Var}(x)} = \\frac{1}{n_l}
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               The same can be done for the gradient resulting in the layer-wise initialization:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(W) = \\frac{1}{n_{out}}
+                \\text{Var}(W) = \\frac{1}{n_{out}}
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
               where the compromise is to use the average of the input and output:
             </p>
             <div className="eq">
+              <MathJax>
               {`\\[\\Large
-                Var(W) = \\frac{1}{n_{in} + n_{out}}
+                \\text{Var}(W) = \\frac{1}{n_{in} + n_{out}}
               \\]`}
+              </MathJax>
             </div>
             <p className="mb-4">
-              The /( tanh /) activation function does not have the same properties, but it <b className='tc1'>behaves</b> similar to linearly near the origin, so its effects are negligible.
+              The <MathJax inline>{`\\( tanh \\)`}</MathJax> activation function does not have the same properties, but it <b className='tc1'>behaves</b> similar to linearly near the origin, so its effects are negligible.
             </p>
 
 
