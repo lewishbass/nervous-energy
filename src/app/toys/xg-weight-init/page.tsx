@@ -2,20 +2,20 @@
 
 import Link from 'next/link';
 import CircleAnimation from '@/components/backgrounds/CircleAnimmation';
-import { useEffect } from 'react';
-import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
+//import { useEffect } from 'react';
+//import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 import XGWeightDemo from './XGWeightDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 
 export default function XGWeightInit() {
-  useEffect(() => {
-
-    // @ts-expect-error typescript doesn't know about mathjax
-    if (typeof window !== 'undefined' && window.MathJax) {
-      // @ts-expect-error typescript doesn't know mathjax
-      window.MathJax.typeset();
-    }
-  }, []);// add [] dependency to run only once
+  //  useEffect(() => {
+  //
+  //    // @ts-expect-error typescript doesn't know about mathjax
+  //    if (typeof window !== 'undefined' && window.MathJax) {
+  //      // @ts-expect-error typescript doesn't know mathjax
+  //      window.MathJax.typeset();
+  //    }
+  //  }, []);// add [] dependency to run only once
 
   return (
     <div className="relative min-h-screen">
