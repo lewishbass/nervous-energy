@@ -11,6 +11,7 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 	ReferenceLine, ResponsiveContainer, Legend, ReferenceDot, Label
 } from 'recharts';
+import '@/styles/sliders.css'; // Import the external slider styles
 
 const OneStepDemo: React.FC = () => {
 	// State for parameters
@@ -125,74 +126,6 @@ const OneStepDemo: React.FC = () => {
 	return (
 		<div className="space-y-6" style={{ userSelect: 'none' }}>
 			<style jsx>{`
-				/* Custom styling for range inputs */
-				input[type=range] {
-					-webkit-appearance: none;
-					appearance: none;
-					background: transparent;
-					cursor: pointer;
-					width: 100%;
-					margin: 8px 0;
-				}
-
-				/* Track styling */
-				input[type=range]::-webkit-slider-runnable-track {
-					height: 16px;
-					background: #e0e0e0;
-					border-radius: 8px;
-					padding-left:2px;
-					padding-right:2px;
-				}
-
-				input[type=range]::-moz-range-track {
-					height: 16px;
-					background: #e0e0e0;
-					border-radius: 8px;
-					padding-left:2px;
-					padding-right:2px;
-				}
-
-				/* Thumb styling */
-				input[type=range]::-webkit-slider-thumb {
-					-webkit-appearance: none;
-					appearance: none;
-					margin-top: 01px;
-					background-color: #8884d8;
-					height: 14px;
-					width: 14px;
-					border-radius: 50%;
-					border: none;
-					box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-					transition: background-color 0.2s, transform 0.2s;
-				}
-
-				input[type=range]::-moz-range-thumb {
-					background-color: #8884d8;
-					height: 14px;
-					width: 14px;
-					border-radius: 50%;
-					border: none;
-					box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-					transition: background-color 0.2s, transform 0.2s;
-				}
-
-				/* Focus and hover effects */
-				input[type=range]:focus {
-					outline: none;
-				}
-
-				input[type=range]:hover::-webkit-slider-thumb,
-				input[type=range]:focus::-webkit-slider-thumb {
-					background-color: #6c67c7;
-					transform: scale(1.1);
-				}
-
-				input[type=range]:hover::-moz-range-thumb,
-				input[type=range]:focus::-moz-range-thumb {
-					background-color: #6c67c7;
-					transform: scale(1.1);
-				}
-
 				/* Toggle switch styling */
 				.switch {
 					position: relative;
@@ -239,8 +172,6 @@ const OneStepDemo: React.FC = () => {
 					transform: translateX(32px);
 				}
 			`}</style>
-
-
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div className="flex items-center">
