@@ -10,14 +10,8 @@ import { ResponsiveContainer, XAxis, YAxis, ComposedChart, Line } from 'recharts
 
 // TODO
 // - fix error when slicing noise
-// - get training to actually stop
 // - render limits on separate background canvas
-// - testing data
-// - get on the fly parameter changes to effect model
-// - epoch counter
-
-
-
+// - testing data split
 
 // Types
 type ActivationFunction = 'relu' | 'sigmoid' | 'tanh' | 'linear';
@@ -32,11 +26,13 @@ type TrainingHistory = {
 
 const BackPropDemo = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Training control states
   const [learningRate, setLearningRate] = useState(0.01);
   const [l2Regularization, setL2Regularization] = useState(0.0001);
   const [running, setRunning] = useState(false);
+  const runningRef = useRef(running);
 
   const maxLayers = 5; // Max 5 hidden layers
   const maxNodes = 6; // nodes are 2^n, so 2^6 = 64 nodes max
@@ -48,15 +44,17 @@ const BackPropDemo = () => {
 
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [refreshModel, setRefreshModel] = useState(true);
-  let isTraining = false;
-  let isLooping = false;
 
+  const [renderResolution, setRenderResolution] = useState(10);
+  const renderResolutionRef = useRef(renderResolution);
+  const resolutionRenderTimer = useRef<number | null>(null);
 
   const [modelLoss, setModelLoss] = useState<number | null>(null);
   const [modelAccuracy, setModelAccuracy] = useState<number | null>(null);
   const [modelIterations, setModelIterations] = useState<number | null>(null);
 
   const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
+  const trainingHistoryRef = useRef(trainingHistory);
 
 
   const maxDataPoints = 1000;
@@ -66,6 +64,10 @@ const BackPropDemo = () => {
   const [classCount, setClassCount] = useState(2);
   const [distribution, setDistribution] = useState<DistributionPattern>('xor');
   const [dataNoise, setDataNoise] = useState(0.1);
+
+  const dataPointsRef = useRef(dataPoints);
+  const classCountRef = useRef(classCount);
+  const dataNoiseRef = useRef(dataNoise);
 
   // Data storage states - always maintain maxDataPoints
   const [data, setData] = useState<tf.Tensor2D | null>(null);
@@ -94,10 +96,9 @@ const BackPropDemo = () => {
 
   // Function to generate data based on the selected distribution pattern
   const generateData = () => {
-
+    runningRef.current = false;
     // Clean up existing tensors to prevent memory leaks
     if (data) data.dispose();
-    if (noise) noise.dispose();
     if (labels) labels.dispose();
 
     const numPoints = maxDataPoints;
@@ -265,6 +266,7 @@ const BackPropDemo = () => {
       dataShape: shuffledData.shape,
       labelsShape: yLabels.shape
     });
+    runningRef.current = running;
 
 
   };
@@ -307,9 +309,12 @@ const BackPropDemo = () => {
     //console.log(label);
 
       ctx.beginPath();
-      ctx.arc(x, y, 3, 0, 2 * Math.PI);
+      ctx.arc(x, y, 5, 0, 2 * Math.PI);
       ctx.fillStyle = `hsl(${labels[i] * 360 / classCount}, 70%, 50%)`;
       ctx.fill();
+      ctx.strokeStyle = `hsl(${labels[i] * 360 / classCount}, 70%, 40%)`;
+      ctx.lineWidth = 3;
+      ctx.stroke();
     }
 
   };
@@ -321,38 +326,17 @@ const BackPropDemo = () => {
     }
     setRunning(!running);
   };
+  useEffect(() => {
+    runningRef.current = running;
+    dataPointsRef.current = dataPoints;
+    classCountRef.current = classCount;
+    dataNoiseRef.current = dataNoise;
+  }, [running, dataPoints, classCount, dataNoise]);
 
   // when network parameters are updated, set refreshModel to true
   useEffect(() => {
     setRefreshModel(true);
-  }, [layerCount, nodesPerLayer, weightInitializer, activation]);
-
-
-  // regularization, learning rate
-  useEffect(() => {
-
-
-    if (!model) return;
-
-    model.layers.forEach((layer) => {
-      const denseLayer = layer;
-      if (!(denseLayer instanceof tf.layers.dense)) return;
-      if (denseLayer.kernelRegularizer) {
-        denseLayer.kernelRegularizer.dispose();
-        denseLayer.kernelRegularizer = tf.regularizers.l2({ l2: l2Regularization });
-      }
-    });
-
-    // Recompile the model to apply the changes
-    model.compile({
-      optimizer: tf.train.adam(learningRate),
-      loss: 'categoricalCrossentropy',
-      metrics: ['accuracy'],
-    });
-
-    console.log(`Updated model learning rate to ${learningRate}, and regularization to ${l2Regularization}`);
-  }, [model, learningRate, l2Regularization]);
-
+  }, [layerCount, nodesPerLayer, weightInitializer, activation, learningRate, l2Regularization]);
 
 
   // Handle changing the number of nodes in a specific layer
@@ -368,10 +352,10 @@ const BackPropDemo = () => {
   const buildModel = () => {
     // reset training history
     setTrainingHistory([]);
+    trainingHistoryRef.current = []
 
     // stop other models training
     setRunning(false);
-    isTraining = false;
 
     // Clean up existing model to prevent memory leaks
     if (model) model.dispose();
@@ -429,11 +413,14 @@ const BackPropDemo = () => {
 
 
   const trainModel = async () => {
-    if (!model || !data || !labels) return;
-    if (isTraining) return;
+    if (!model || !data || !labels) {
+      console.error("Model or data not available");
+      setRunning(false);
+      return;
+    }
     try {
       // Create slices of data based on dataPoints setting
-      const inputData = tf.tidy(() => data!.slice([0, 0], [dataPoints, 2]));
+      const inputData = tf.tidy(() => data!.slice([0, 0], [dataPointsRef.current, 2]));
 
       // Fix for the labels slicing - get shape first to handle it properly
       const outputLabels = tf.tidy(() => {
@@ -442,30 +429,35 @@ const BackPropDemo = () => {
 
         if (labelShape.length === 2) {
           // If labels is already 2D with shape [numPoints, classes]
-          return labels!.slice([0, 0], [dataPoints, labelShape[1]]);
+          return labels!.slice([0, 0], [dataPointsRef.current, labelShape[1]]);
         } else {
           // If labels has a different shape, reshape or handle accordingly
           console.warn("Labels have unexpected shape:", labelShape);
           // Just use first dataPoints rows and all columns
-          return labels!.slice([0, 0], [dataPoints, -1]);
+          return labels!.slice([0, 0], [dataPointsRef.current, -1]);
         }
       });
 
       // Add noise to input data if available
       const noisyInputData = tf.tidy(() => {
-        if (noise && dataNoise > 0 && false) {
-          console.log("noisyInputData:", dataPoints, noise.shape);
-          const noiseSlice = noise.slice([0, 0], [dataPoints, 2]);
-          console.log("noiseSlice:", noiseSlice.shape);
-          return inputData.add(noiseSlice.mul(tf.scalar(dataNoise)));
+        if (noise && dataNoiseRef.current > 0) {
+          if (!noise.shape) return;
+          //console.log("noisyInputData:", dataPointsRef.current, noise.shape);
+          const noiseSlice = noise.slice([0, 0], [dataPointsRef.current, 2]);
+          //console.log("noiseSlice:", noiseSlice.shape);
+          return inputData.add(noiseSlice.mul(tf.scalar(dataNoiseRef.current)));
         }
         return inputData;
       });
 
       // Log shapes for debugging
 
-      // Train for one epoch
-      const result = await model.fit(noisyInputData, outputLabels, {
+      // Train for one 
+      if (!noisyInputData || !outputLabels) {
+        console.error("Data or labels not available");
+        setRunning(false);
+      }
+      const result = await model.fit(noisyInputData as tf.Tensor2D, outputLabels, {
         epochs: 1,
         batchSize: 32,
         shuffle: true,
@@ -477,92 +469,105 @@ const BackPropDemo = () => {
       const accuracy = result.history.acc[0] as number;
 
       // Update history and state
-      const iterations = trainingHistory.length > 0
-        ? trainingHistory[trainingHistory.length - 1].epoch + 1
+      const iterations = trainingHistoryRef.current.length > 0
+        ? trainingHistoryRef.current[trainingHistoryRef.current.length - 1].epoch + 1
         : 0;
 
-      setTrainingHistory(prev => [
-        ...prev,
-        { loss, accuracy, epoch: iterations }
-      ]);
+      trainingHistoryRef.current = [...trainingHistoryRef.current, {
+        loss: loss,
+        accuracy: accuracy,
+        epoch: iterations
+      }];
+      setTrainingHistory(trainingHistoryRef.current);
 
       setModelLoss(loss);
       setModelAccuracy(accuracy);
       setModelIterations(iterations);
 
       // Clean up tensors
-      inputData.dispose();
-      outputLabels.dispose();
-      noisyInputData.dispose();
+      if (inputData) inputData.dispose();
+      if (outputLabels) outputLabels.dispose();
+      if (noisyInputData) noisyInputData.dispose();
     } catch (error) {
       console.error("Training error:", error);
       setRunning(false);
-      isTraining = false;
     } finally {
-      isTraining = false;
-
     }
   }
 
+  useEffect(() => {
+    renderResolutionRef.current = renderResolution;
+    if (model && !resolutionRenderTimer.current) {
+      renderDecisionBoundaries(model);
+      resolutionRenderTimer.current = window.setTimeout(() => {
+        resolutionRenderTimer.current = null;
+        renderDecisionBoundaries(model);
+      }, 1000);
+    }
+  }, [renderResolution]);
+
+  // Function to render decision boundaries on the background canvas
+  const renderDecisionBoundaries = (model: tf.Sequential) => {
+    if (!backCanvasRef || !backCanvasRef.current || !model) return;
+
+    tf.tidy(() => {
+    // Get a grid of points to visualize decision boundaries
+      const gridSize = renderResolutionRef.current;
+      const gridPoints = [];
+      for (let x = -1; x <= 1; x += 2 / gridSize) {
+        for (let y = -1; y <= 1; y += 2 / gridSize) {
+          gridPoints.push([x, y]);
+        }
+      }
+
+      const gridTensor = tf.tensor2d(gridPoints);
+      const predictions = model.predict(gridTensor) as tf.Tensor;
+      const predictedClasses = predictions.argMax(1);
+      const predictionIntensities = predictions.max(1);
+
+      // Draw decision boundaries on canvas
+      if (!backCanvasRef.current) return;
+      const ctx = backCanvasRef.current.getContext('2d');
+      if (ctx) {
+        const pointR = ctx.canvas.width / gridSize / 2;
+        // Clear background
+        ctx.clearRect(0, 0, backCanvasRef.current.width, backCanvasRef.current.height);
+        for (let i = 0; i < gridPoints.length; i++) {
+          const x = (gridPoints[i][0] + 1) * 250;
+          const y = (1 - gridPoints[i][1]) * 250;
+          const classIdx = predictedClasses.dataSync()[i];
+          const classIntensity = predictionIntensities.dataSync()[i];
+          ctx.fillStyle = `hsla(${classIdx * 360 / classCount}, 70%, 50%, ${classIntensity * 0.5})`;
+          ctx.fillRect(x - pointR, y - pointR, pointR * 2, pointR * 2);
+        }
+      }
+
+      gridTensor.dispose();
+      predictions.dispose();
+      predictedClasses.dispose();
+    });
+  };
+
   const loop = async () => {
-    if (running && model && !isTraining) {
-      isTraining = true;
+    if (runningRef.current && model) {
       await trainModel();
 
       // After model is trained, predict and update visualization
       if (data && model) {
-        tf.tidy(() => {
-          // Get a grid of points to visualize decision boundaries
-          const gridSize = 50;
-          const gridPoints = [];
-          for (let x = -1; x <= 1; x += 2 / gridSize) {
-            for (let y = -1; y <= 1; y += 2 / gridSize) {
-              gridPoints.push([x, y]);
-            }
-          }
-
-          const gridTensor = tf.tensor2d(gridPoints);
-          const predictions = model.predict(gridTensor) as tf.Tensor;
-          const predictedClasses = predictions.argMax(1);
-
-          // Draw decision boundaries on canvas
-          if (canvasRef.current) {
-            const ctx = canvasRef.current.getContext('2d');
-            if (ctx) {
-              // Draw background first
-              for (let i = 0; i < gridPoints.length; i++) {
-                const x = (gridPoints[i][0] + 1) * 250;
-                const y = (1 - gridPoints[i][1]) * 250;
-                const classIdx = predictedClasses.dataSync()[i];
-
-                ctx.fillStyle = `hsla(${classIdx * 360 / classCount}, 70%, 50%, 0.2)`;
-                ctx.fillRect(x - 2, y - 2, 4, 4);
-              }
-
-              // Draw data points on top
-              //updateDisplay(dataDisplay, noiseDisplay, classLabels, dataNoise, dataPoints);
-            }
-          }
-
-          gridTensor.dispose();
-          predictions.dispose();
-          predictedClasses.dispose();
-        });
+        // Render the decision boundaries using the extracted function
+        renderDecisionBoundaries(model);
       }
     }
 
-    if (running && isLooping) {
-      console.log("requesting animation frame", running, isLooping);
+    if (runningRef.current) {
       requestAnimationFrame(loop);
     }
   };
+
   // Run training loop when running is true
   useEffect(() => {
     if (running) {
-      isLooping = true;
       loop();
-    } else {
-      isLooping = false;
     }
   }, [running]);
 
@@ -570,7 +575,7 @@ const BackPropDemo = () => {
     <div className="p-0 rounded-lg shadow-lg m-0" style={{ userSelect: 'none' }}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 aspect-square">
         {/* Canvas Section (Top Left) */}
-        <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-2 flex items-center justify-center relative">
+        <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-2 flex items-center justify-center relative flex-col">
           {/* Background image */}
           <div className="aspect-square relative z-10">
             <div className="absolute inset-0 z-0 overflow-hidden invert dark:invert-0">
@@ -587,10 +592,30 @@ const BackPropDemo = () => {
               />
             </div>
             <canvas
+              ref={backCanvasRef}
+              width={500}
+              height={500}
+              className="w-full h-full object-contain absolute inset-0 z-5"
+            />
+            <canvas
               ref={canvasRef}
               width={500}
               height={500}
               className="w-full h-full object-contain relative z-10"
+            />
+          </div>
+          <div className="w-full mt-0 p-4">
+            <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
+              Resolution: {renderResolution}
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="1"
+              value={renderResolution}
+              onChange={(e) => setRenderResolution(parseInt(e.target.value))}
+              className="w-full"
             />
           </div>
         </div>
@@ -861,9 +886,9 @@ const BackPropDemo = () => {
           {/* Training Stats moved into the data section */}
           <div className="mt-6">
             <h3 className="font-semibold mb-2 text-slate-700 dark:text-slate-300">Training Stats:</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <div className="grid grid-cols-3 gap-2 text-sm text-slate-600 dark:text-slate-400">
               <div style={{ color: "var(--khb)" }}>Loss: <span className="font-mono">{modelLoss !== null ? modelLoss.toFixed(4) : '0.0000'}</span></div>
-              <div style={{ color: "var(--kho)" }}>Accuracy: <span className="font-mono">{modelAccuracy !== null ? `${(modelAccuracy * 100).toFixed(1)}%` : '0.0%'}</span></div>
+              <div style={{ color: "var(--kho)" }}>Acc: <span className="font-mono">{modelAccuracy !== null ? `${(modelAccuracy * 100).toFixed(1)}%` : '0.0%'}</span></div>
               <div>Epoch: <span className="font-mono">{modelIterations !== null ? modelIterations : '0'}</span></div>
             </div>
           </div>
