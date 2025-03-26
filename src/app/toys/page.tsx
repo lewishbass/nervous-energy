@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { toys } from '@/data/toys';
 import { useEffect, useState } from 'react';
 import { JSX } from 'react';
@@ -96,12 +95,9 @@ export default function Toys() {
 					const rotation = getRandomRotation();
 
 					return (
-						<motion.div
+						<div
 							key={index}
-							whileHover={{ scale: 1.03 }}
-							whileTap={{ scale: 0.98 }}
-							transition={{ duration: 0.2 }}
-							className="bg2 rounded-lg shadow-lg overflow-hidden cursor-pointer relative"
+							className="bg2 rounded-lg shadow-lg overflow-hidden cursor-pointer relative group"
 						>
 							<Image
 								src="/KH_figures.svg"
@@ -123,6 +119,7 @@ export default function Toys() {
 											alt={toy.title}
 											fill
 											style={{ objectFit: 'cover' }}
+											className="transition-transform duration-300 group-hover:scale-105"
 										/>
 									</div>
 									<h2 className="text-xl font-semibold mb-2 tc1">{toy.title}</h2>
@@ -132,14 +129,14 @@ export default function Toys() {
 											{toy.hasPage ? 'Available' : 'Coming Soon'}
 										</span>
 										{toy.hasPage && (
-											<span className="text-blue-500 dark:text-blue-400">
+											<span className="text-blue-500 dark:text-blue-400 group-hover:animate-[wiggle_0.25s_ease_1]">
 												Try it →
 											</span>
 										)}
 									</div>
 								</div>
 							</Link>
-						</motion.div>
+						</div>
 					);
 				})}
 			</div>
