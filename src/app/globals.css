@@ -315,7 +315,7 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   width: fit-content;
-  max-width: 800px;
+  max-width: 80vw;
   margin-bottom: 40px;
   font-size: 1.2rem;
 }
@@ -338,6 +338,7 @@ body {
   flex-direction: column;
   width: fit-content;
   min-width: 50%;
+  max-width: 100%;
   margin: 30px auto;
   padding:20px;
   outline: 4px solid rgba(0, 0, 0, 0.1);
@@ -402,3 +403,8 @@ body {
   border-color: #a0d8ff80;
   text-decoration: none;
 }
+
+/*.MathJax, .mjx-chtml, .mjx-svg {
+  font-size: 90% !important; 
+
+}/**/

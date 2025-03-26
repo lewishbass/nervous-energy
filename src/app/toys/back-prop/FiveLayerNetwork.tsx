@@ -18,7 +18,7 @@ interface LayerData {
 }
 
 const FiveLayerNetwork: React.FC = () => {
-	const containerRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<SVGSVGElement>(null);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -26,10 +26,14 @@ const FiveLayerNetwork: React.FC = () => {
 		// Clear any previous SVG
 		d3.select(containerRef.current).select('svg').remove();
 
+		const width=650;
+		const height=400;
+
 		const svg = d3.select(containerRef.current)
-			.append("svg")
-			.attr("width", 800)
-			.attr("height", 400);
+					.attr('width', width)
+					.attr('height', height)
+					.attr('viewBox', `0 0 ${width} ${height}`)
+					.attr('style', 'max-width: 100%; height: auto;');
 
 		// Network configuration
 		const layers: LayerData[] = [
@@ -60,7 +64,7 @@ const FiveLayerNetwork: React.FC = () => {
 
 		// Calculate positions
 		layers.forEach((layer, i) => {
-			const x = 100 + i * config.layerSpacing;
+			const x = 25 + i * config.layerSpacing;
 			layer.x = x;
 
 			// Center the nodes vertically
@@ -150,10 +154,9 @@ const FiveLayerNetwork: React.FC = () => {
 	}, []);
 
 	return (
-		<div
-			ref={containerRef}
-			className="w-full h-[400px] bg-white/5 rounded-2xl mx-auto my-6"
-		></div>
+		<div className="network-graph">
+      <svg ref={containerRef}  width="100%" height="400" className="mx-auto"></svg>
+    </div>
 	);
 };
 

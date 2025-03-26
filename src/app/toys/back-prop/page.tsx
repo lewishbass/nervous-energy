@@ -357,7 +357,7 @@ export default function BackProp() {
               Here is what this network looks like:
             </p>
 
-            <div className="invert-0 dark:invert-100">
+            <div className="invert-0 dark:invert-100 bg-white/5 rounded-2xl mx-[-10]">
               <FiveLayerNetwork />
             </div>
             <p className="mb-[-24] text-center w-full text-[1.5em] underline underline-offset-4">
