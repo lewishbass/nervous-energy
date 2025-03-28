@@ -275,7 +275,7 @@ export default function Books() {
               {/* Full-size Book Cover */}
               <div className="book-cover">
                 <Image
-                  src={`/${book.cover_file}`}
+                  src={`./${book.cover_file}`}
                   alt={`Cover of ${book.title}`}
                   className="object-cover w-full h-full"
                   fill
@@ -334,6 +334,7 @@ export default function Books() {
                     </div>
 
                     {/* Download button */}
+                    <div className='flex flex-row' >
                     {isLoggedIn && <div>
                       <a
                         href={`/${book.book_file}`}
@@ -343,7 +344,18 @@ export default function Books() {
                       >
                         Download EPUB
                       </a>
-                    </div>}
+                      </div>
+                      }
+                      <a
+                        href={`${book.kobo_link}`}
+                        target="_blank"
+                        download
+                        className="book-download-button ml-auto"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Shop
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>
