@@ -47,7 +47,7 @@ export default function Books() {
 
   useEffect(() => {
     // Initialize books from the imported data
-    let cleanedBooks: Book[] = bookData.map((book: Book) => ({
+    const cleanedBooks: Book[] = bookData.map((book: Book) => ({
       author: book.author || 'N/A',
       title: book.title || 'N/A',
       year: Number(book.year),
@@ -82,8 +82,8 @@ export default function Books() {
   useEffect(() => {
     // Sort books when sortBy or sortOrder changes
     const sortedBooks = [...dataRef.current].sort((a, b) => {
-      let valueA = a[sortBy as keyof Book];
-      let valueB = b[sortBy as keyof Book];
+      const valueA = a[sortBy as keyof Book];
+      const valueB = b[sortBy as keyof Book];
 
       // Handle undefined values
       if (valueA === undefined) return sortOrder === 'asc' ? -1 : 1;
