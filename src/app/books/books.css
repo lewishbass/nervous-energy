@@ -95,7 +95,7 @@
 }
 
 .book-rating {
-  background-color: rgba(217, 119, 6, 0.8);
+  background-color: var(--kho);
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 0.375rem;
@@ -126,12 +126,11 @@
 /* Book Download Button */
 .book-download-button {
   display: inline-block;
-  background-color: #2563eb;
+  background-color: var(--khb);
   color: white;
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
-  margin-top: 1rem;
   transition: background-color 0.2s ease;
 }
 
@@ -166,4 +165,13 @@
 
 .book-overlay-expanded::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+/* Shop Toggle Animation */
+.shop-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.shop-toggle-icon:hover {
+ 
 }

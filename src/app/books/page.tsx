@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // books/page.tsx tailwind, nodejs,
 // loads book information from book_info.json
@@ -7,11 +7,12 @@
 // the card is selectable, when selected, stays expanded, and can navigate to other cards using arrow keys
 // books and covers stored in public folder
 
-import Image from 'next/image';
-import { useState, useEffect, useRef, KeyboardEvent } from 'react';
-import bookData from './book_info.json';
-import './books.css';
-import { useAuth } from '@/context/AuthContext';
+import Image from "next/image";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import bookData from "./book_info.json";
+import "./books.css";
+import { useAuth } from "@/context/AuthContext";
+import { FaBook, FaTablet, FaDownload } from "react-icons/fa"; // Import icons for shop types
 
 interface Book {
   paragraph1: string;
@@ -37,10 +38,11 @@ interface Book {
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<string>('title');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<string>("title");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [gridColumns, setGridColumns] = useState<number>(3); // Default to 3 columns
   const bookRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [shopType, setShopType] = useState<"kobo" | "thriftbooks">("kobo"); // Default to Kobo
 
   const dataRef = useRef<Book[]>([]); // Store the original data
 
@@ -49,26 +51,26 @@ export default function Books() {
   useEffect(() => {
     // Initialize books from the imported data
     const cleanedBooks: Book[] = bookData.map((book: Book) => ({
-      author: book.author || 'N/A',
-      title: book.title || 'N/A',
+      author: book.author || "N/A",
+      title: book.title || "N/A",
       year: Number(book.year),
       wordcount: Number(book.wordcount),
       good_score: Number(book.good_score),
       n_good_ratings: Number(book.n_good_ratings),
-      sold: book.sold || 'N/A',
-      ISBN: book.ISBN || 'N/A',
+      sold: book.sold || "N/A",
+      ISBN: book.ISBN || "N/A",
       book_series: book.book_series || undefined,
       reading_order: book.reading_order || undefined,
-      trivia: book.trivia || 'N/A',
-      paragraph1: book.paragraph1 || 'N/A',
-      paragraph2: book.paragraph2 || 'N/A',
-      genre: book.genre || 'N/A',
-      cover_file: book.cover_file || 'N/A',
-      book_file: book.book_file || 'N/A',
+      trivia: book.trivia || "N/A",
+      paragraph1: book.paragraph1 || "N/A",
+      paragraph2: book.paragraph2 || "N/A",
+      genre: book.genre || "N/A",
+      cover_file: book.cover_file || "N/A",
+      book_file: book.book_file || "N/A",
       kobo_link: book.kobo_link || undefined,
       thriftbooks_link: book.thriftbooks_link || undefined,
     }));
-    console.log('Cleaned books:', cleanedBooks);
+    console.log("Cleaned books:", cleanedBooks);
 
     setBooks(cleanedBooks);
     dataRef.current = cleanedBooks; // Store the original data
@@ -77,7 +79,6 @@ export default function Books() {
   useEffect(() => {
     // print book list when changed
     // dataRef.current = [...books]
-
   }, [books]);
 
   useEffect(() => {
@@ -87,20 +88,20 @@ export default function Books() {
       const valueB = b[sortBy as keyof Book];
 
       // Handle undefined values
-      if (valueA === undefined) return sortOrder === 'asc' ? -1 : 1;
-      if (valueB === undefined) return sortOrder === 'asc' ? 1 : -1;
+      if (valueA === undefined) return sortOrder === "asc" ? -1 : 1;
+      if (valueB === undefined) return sortOrder === "asc" ? 1 : -1;
 
       // Handle different data types
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        return sortOrder === 'asc'
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return sortOrder === "asc"
           ? valueA.localeCompare(valueB)
           : valueB.localeCompare(valueA);
-      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-        return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+      } else if (typeof valueA === "number" && typeof valueB === "number") {
+        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
       }
 
       // Convert to string for mixed types
-      return sortOrder === 'asc'
+      return sortOrder === "asc"
         ? String(valueA).localeCompare(String(valueB))
         : String(valueB).localeCompare(String(valueA));
     });
@@ -109,7 +110,10 @@ export default function Books() {
     setBooks(sortedBooks);
 
     console.log(`Sorted books by ${sortBy} in ${sortOrder} order`);
-    console.log('Sorted book titles:', sortedBooks.map((book: Book) => book.title).join('\n'));
+    console.log(
+      "Sorted book titles:",
+      sortedBooks.map((book: Book) => book.title).join("\n")
+    );
   }, [sortBy, sortOrder]);
 
   useEffect(() => {
@@ -129,19 +133,19 @@ export default function Books() {
     updateGridColumns();
 
     // Add event listener for window resize
-    window.addEventListener('resize', updateGridColumns);
+    window.addEventListener("resize", updateGridColumns);
 
     // Clean up
-    return () => window.removeEventListener('resize', updateGridColumns);
+    return () => window.removeEventListener("resize", updateGridColumns);
   }, []);
 
   const handleSort = (criteria: string) => {
     if (sortBy === criteria) {
       // Toggle sort order if clicking the same criteria
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(criteria);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
@@ -153,17 +157,20 @@ export default function Books() {
     if (selectedBook === null) return;
 
     switch (e.key) {
-      case 'ArrowRight':
+      case "ArrowRight":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
           // Move right, but stay in the same row
           const currentRow = Math.floor(prev / gridColumns);
-          const lastIndexInRow = Math.min((currentRow + 1) * gridColumns - 1, books.length - 1);
+          const lastIndexInRow = Math.min(
+            (currentRow + 1) * gridColumns - 1,
+            books.length - 1
+          );
           return prev < lastIndexInRow ? prev + 1 : prev;
         });
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
@@ -173,7 +180,7 @@ export default function Books() {
           return prev > firstIndexInRow ? prev - 1 : prev;
         });
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
@@ -182,7 +189,7 @@ export default function Books() {
           return newIndex < books.length ? newIndex : prev;
         });
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
@@ -191,7 +198,7 @@ export default function Books() {
           return newIndex >= 0 ? newIndex : prev;
         });
         break;
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         setSelectedBook(null);
         break;
@@ -202,61 +209,71 @@ export default function Books() {
     // Scroll selected book into view when changed
     if (selectedBook !== null && bookRefs.current[selectedBook]) {
       bookRefs.current[selectedBook]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
+        behavior: "smooth",
+        block: "center",
       });
     }
   }, [selectedBook]);
+
+  const toggleShopType = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShopType(shopType === "kobo" ? "thriftbooks" : "kobo");
+  };
 
   return (
     <div
       className="p-6 max-w-6xl mx-auto focus:outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      style={{ outline: 'none' }}
+      style={{ outline: "none" }}
     >
-
-
       <h1 className="text-4xl font-bold mb-6 tc1">Books</h1>
 
       {/* Sorting Controls */}
       <div className="mb-6 p-4 bg2 rounded-lg shadow flex flex-wrap gap-2 relative">
         <span className="tc1 font-medium mr-2 my-auto">Sort by:</span>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'title' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('title')}
+          className={`px-3 py-1 rounded-md ${sortBy === "title" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("title")}
         >
-          Title {sortBy === 'title' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Title {sortBy === "title" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'author' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('author')}
+          className={`px-3 py-1 rounded-md ${sortBy === "author" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("author")}
         >
-          Author {sortBy === 'author' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Author {sortBy === "author" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'book_series' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('book_series')}
+          className={`px-3 py-1 rounded-md ${sortBy === "book_series" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("book_series")}
         >
-          Series {sortBy === 'book_series' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Series {sortBy === "book_series" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'good_score' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('good_score')}
+          className={`px-3 py-1 rounded-md ${sortBy === "good_score" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("good_score")}
         >
-          Rating {sortBy === 'good_score' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Rating {sortBy === "good_score" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'wordcount' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('wordcount')}
+          className={`px-3 py-1 rounded-md ${sortBy === "wordcount" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("wordcount")}
         >
-          Word Count {sortBy === 'wordcount' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Word Count{" "}
+          {sortBy === "wordcount" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === 'year' ? 'bg-blue-600 text-white' : 'bg3 tc1'}`}
-          onClick={() => handleSort('year')}
+          className={`px-3 py-1 rounded-md ${sortBy === "year" ? "bg-blue-600 text-white" : "bg3 tc1"
+            }`}
+          onClick={() => handleSort("year")}
         >
-          Year {sortBy === 'year' && (sortOrder === 'asc' ? '↑' : '↓')}
+          Year {sortBy === "year" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
       </div>
 
@@ -267,8 +284,10 @@ export default function Books() {
           return (
             <div
               key={index}
-              ref={(el) => { if (el) bookRefs.current[index] = el; }}
-              className={`book-card ${isSelected ? 'selected' : ''}`}
+              ref={(el) => {
+                if (el) bookRefs.current[index] = el;
+              }}
+              className={`book-card ${isSelected ? "selected" : ""}`}
               onClick={() => handleBookClick(index)}
               tabIndex={0}
             >
@@ -285,7 +304,12 @@ export default function Books() {
               </div>
 
               {/* Overlay with Book Info */}
-              <div className={`book-overlay ${isSelected ? 'book-overlay-expanded' : 'book-overlay-collapsed'}`}>
+              <div
+                className={`book-overlay ${isSelected
+                  ? "book-overlay-expanded"
+                  : "book-overlay-collapsed"
+                  }`}
+              >
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="book-title tc1">{book.title}</h2>
                   {book.good_score && (
@@ -296,7 +320,9 @@ export default function Books() {
                 </div>
 
                 <p className="book-author tc2">By {book.author}</p>
-                <p className="book-metadata tc3">{book.genre} • {book.year}</p>
+                <p className="book-metadata tc3">
+                  {book.genre} • {book.year}
+                </p>
 
                 {/* Always visible description */}
                 <p className="book-description tc2">{book.paragraph1}</p>
@@ -309,52 +335,89 @@ export default function Books() {
                     <div className="book-detail-section">
                       {book.book_series && (
                         <div>
-                          <span className="book-detail-label tc2">Series: </span>
-                          <span className="book-detail-value tc3">{book.book_series}</span>
-                          {book.reading_order && <span className="book-detail-value tc3"> (#{book.reading_order})</span>}
+                          <span className="book-detail-label tc2">
+                            Series:{" "}
+                          </span>
+                          <span className="book-detail-value tc3">
+                            {book.book_series}
+                          </span>
+                          {book.reading_order && (
+                            <span className="book-detail-value tc3">
+                              {" "}
+                              (#{book.reading_order})
+                            </span>
+                          )}
                         </div>
                       )}
                       <div>
                         <span className="book-detail-label tc2">Words: </span>
-                        <span className="book-detail-value tc3">{book.wordcount.toLocaleString()}</span>
+                        <span className="book-detail-value tc3">
+                          {book.wordcount.toLocaleString()}
+                        </span>
                       </div>
                       <div>
                         <span className="book-detail-label tc2">ISBN: </span>
-                        <span className="book-detail-value tc3">{book.ISBN}</span>
+                        <span className="book-detail-value tc3">
+                          {book.ISBN}
+                        </span>
                       </div>
                       <div>
                         <span className="book-detail-label tc2">Ratings: </span>
-                        <span className="book-detail-value tc3">{book.n_good_ratings.toLocaleString()}</span>
+                        <span className="book-detail-value tc3">
+                          {book.n_good_ratings.toLocaleString()}
+                        </span>
                       </div>
                     </div>
 
                     <div className="book-trivia">
                       <span className="book-detail-label tc1">Trivia: </span>
-                      <span className="book-detail-value tc2">{book.trivia}</span>
+                      <span className="book-detail-value tc2">
+                        {book.trivia}
+                      </span>
                     </div>
 
                     {/* Download button */}
-                    <div className='flex flex-row' >
-                    {isLoggedIn && <div>
-                      <a
-                        href={`/${book.book_file}`}
-                        download
-                        className="book-download-button"
-                        onClick={(e) => e.stopPropagation()}
+                    <div className="flex flex-row mt-6 items-center">
+                      {isLoggedIn && (
+                        <div>
+                          <a
+                            href={`/${book.book_file}`}
+                            download
+                            className="book-download-button"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <FaDownload className="mr-2 inline" /> EPUB
+                          </a>
+                        </div>
+                      )}
+
+                      <div
+                        className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
+                        style={{
+                          backgroundColor: "var(--khg)",
+                          borderRadius: "0.375rem",
+                        }}
                       >
-                        Download EPUB
-                      </a>
+                        <div
+                          className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                          style={{
+                            backgroundColor: "var(--khp)",
+                          }}
+                          onClick={toggleShopType}
+                        >
+                          <FaTablet className="absolute text-white transition-opacity duration-100" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.03s" : "" }} />
+                          <FaBook className="absolute text-white transition-opacity duration-100" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.03s" : "" }} />
+                        </div>
+                        <a
+                          href={book[`${shopType}_link`] || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Shop
+                        </a>
                       </div>
-                      }
-                      <a
-                        href={`${book.kobo_link}`}
-                        target="_blank"
-                        download
-                        className="book-download-button ml-auto"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Shop
-                      </a>
                     </div>
                   </div>
                 )}

@@ -126,7 +126,7 @@ function RootLayoutContent({
 
         {/* Content wrapper */}
         <div 
-          className={`min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 ${
+          className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 ${
             isMenuOpen ? 'translate-x-[-300px]' : ''
           }`} 
           style={{ boxShadow: isDark ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)' , borderRight: isDark ? '1px solid #fff2' : '1px solid #0004' }}
