@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import bookData from './book_info.json';
 import './books.css';
+import { useAuth } from '@/context/AuthContext';
 
 interface Book {
   paragraph1: string;
@@ -43,7 +44,7 @@ export default function Books() {
 
   const dataRef = useRef<Book[]>([]); // Store the original data
 
-
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     // Initialize books from the imported data
@@ -333,7 +334,7 @@ export default function Books() {
                     </div>
 
                     {/* Download button */}
-                    <div>
+                    {isLoggedIn && <div>
                       <a
                         href={`/${book.book_file}`}
                         download
@@ -342,7 +343,7 @@ export default function Books() {
                       >
                         Download EPUB
                       </a>
-                    </div>
+                    </div>}
                   </div>
                 )}
               </div>

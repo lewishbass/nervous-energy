@@ -6,3 +6,11 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[edge_functions]]
+  pattern = "/*"
+  excludedPattern = [
+    "/public/books/covers/*",
+    "/books/covers/*",
+  ]
+  function = "*"

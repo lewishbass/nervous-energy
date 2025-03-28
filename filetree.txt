@@ -1,0 +1,152 @@
+├── netlify
+│   ├── functions
+│   │   ├── auth.ts
+│   │   ├── conv.ts
+│   │   ├── profile.ts
+│   │   ├── social.ts
+│   │   └── version.ts
+│   ├── lib
+│   │   ├── backendutils.ts
+│   │   └── mongodb.ts
+│   └── models
+│       ├── Conversation.ts
+│       └── User.ts
+├── public
+│   ├── books
+│   │   ├── covers
+│   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.jpeg
+│   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.jpeg
+│   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.jpeg
+│   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.jpeg
+│   │   │   ├── Consider Phlebas - Iain M. Banks_cover.jpeg
+│   │   │   ├── Excession - Iain M. Banks_cover.jpg
+│   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.jpeg
+│   │   │   ├── Inversions - Iain M. Banks_cover.jpg
+│   │   │   ├── Look to Windward - Iain M. Banks_cover.jpg
+│   │   │   ├── Matter - Iain M. Banks_cover.jpeg
+│   │   │   ├── Player of Games, The - Iain M. Banks_cover.jpg
+│   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.jpeg
+│   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.jpeg
+│   │   │   ├── Robot_Series_0_3_The_Complete_Robot.jpg
+│   │   │   ├── Robot_Series_0_4_Robot_Dreams.jpg
+│   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.jpg
+│   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.jpg
+│   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.jpeg
+│   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.jpeg
+│   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.jpeg
+│   │   │   ├── State of the Art, The - Iain M. Banks_cover.jpg
+│   │   │   ├── Surface Detail - Iain M. Banks_cover.jpg
+│   │   │   └── Use of Weapons - Iain M. Banks_cover.jpg
+│   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld.epub
+│   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers.epub
+│   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne.epub
+│   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children.epub
+│   │   ├── Consider Phlebas - Iain M. Banks.epub
+│   │   ├── Excession - Iain M. Banks.epub
+│   │   ├── Hydrogen Sonata, The - Iain M. Banks.epub
+│   │   ├── Inversions - Iain M. Banks.epub
+│   │   ├── logo192.png
+│   │   ├── Look to Windward - Iain M. Banks.epub
+│   │   ├── Matter - Iain M. Banks.epub
+│   │   ├── Player of Games, The - Iain M. Banks.epub
+│   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_0_3_The_Complete_Robot.epub
+│   │   ├── Robot_Series_0_4_Robot_Dreams.epub
+│   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov.epub
+│   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov.epub
+│   │   ├── State of the Art, The - Iain M. Banks.epub
+│   │   ├── Surface Detail - Iain M. Banks.epub
+│   │   └── Use of Weapons - Iain M. Banks.epub
+│   ├── file.svg
+│   ├── filter.svg
+│   ├── globe.svg
+│   ├── grid.svg
+│   ├── KH_back.svg
+│   ├── KH_figures.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   ├── VT.svg
+│   └── window.svg
+├── src
+│   ├── app
+│   │   ├── books
+│   │   │   ├── book_info_type.json
+│   │   │   ├── book_info.json
+│   │   │   ├── books.css
+│   │   │   └── page.tsx
+│   │   ├── events
+│   │   │   └── page.tsx
+│   │   ├── friends
+│   │   │   └── page.tsx
+│   │   ├── home
+│   │   │   └── page.tsx
+│   │   ├── shop
+│   │   │   └── page.tsx
+│   │   ├── toys
+│   │   │   ├── back-prop
+│   │   │   │   ├── BackPropDemo.tsx
+│   │   │   │   ├── FiveLayerNetwork.tsx
+│   │   │   │   ├── NetworkGraph.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── one-step-learning-rate
+│   │   │   │   ├── OneStepDemo.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── video-classification
+│   │   │   │   └── page.tsx
+│   │   │   ├── xg-weight-init
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── VerticalHistogram.tsx
+│   │   │   │   └── XGWeightDemo.tsx
+│   │   │   └── page.tsx
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── metadata.ts
+│   │   └── page.tsx
+│   ├── components
+│   │   ├── backgrounds
+│   │   │   ├── CircleAnimmation.tsx
+│   │   │   ├── SquareAnimation.tsx
+│   │   │   └── TriangleAnimation.tsx
+│   │   ├── generics
+│   │   │   ├── DateEdit.tsx
+│   │   │   ├── GenericEdit.tsx
+│   │   │   ├── ParagraphEdit.tsx
+│   │   │   ├── StringEdit.tsx
+│   │   │   └── SubmitIcon.tsx
+│   │   ├── AuthModal.tsx
+│   │   ├── ColorProgressBar.tsx
+│   │   ├── DragCard.tsx
+│   │   ├── HeadMetadata.tsx
+│   │   ├── Menu.tsx
+│   │   ├── MessageModal.tsx
+│   │   ├── ModalTemplate.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── NotificationModal.tsx
+│   │   ├── ProfileModal.tsx
+│   │   └── SearchExpand.tsx
+│   ├── context
+│   │   └── AuthContext.tsx
+│   ├── data
+│   │   └── toys.ts
+│   ├── hooks
+│   │   └── useClickAway.ts
+│   ├── scripts
+│   │   └── sourceButtons.tsx
+│   └── styles
+│       ├── buttons.css
+│       └── sliders.css
+├── eslint.config.mjs
+├── filetree.txt
+├── LICENSE.md
+├── netlify.toml
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── README.md
+├── robots.txt
+├── tsconfig.json
