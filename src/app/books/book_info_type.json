@@ -1,0 +1,18 @@
+{
+      "paragraph1": "A short paragraph containing a brief description of the book.",
+      "paragraph2": "A longer description, that mentions characters, plot and settings.",
+      "author": "Author name, first last",
+      "year": "Publish year",
+      "title": "Book title",
+      "ISBN": "000-0000000000",
+      "wordcount": "Word c",
+      "genre": "Main Book Genre",
+      "sold": "Estimation of copies sold",
+      "good_score": "Goodreads score",
+      "n_good_ratings": "number of ratings on Goodreads",
+      "trivia": "Short fun fact about the book",
+      "cover_file":"Cover file location",
+      "book_file":"Book file location",
+      "book_series": "Book series name",
+      "reading_order": "Book point in series"
+}

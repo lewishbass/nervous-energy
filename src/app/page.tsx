@@ -96,21 +96,21 @@ export default function Home() {
 					  userSelect: "none",
 				  }}
         />
-			  <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
 				  <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Interests</h2>
 				  <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">TODO</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 					  <span className="font-bold">Name: </span> Description
 				  </p>
 			  </DragCard>
-			  <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
 				  <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Projects</h2>
 				  <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">TODO</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 					  <span className="font-bold">Name: </span> Description
 				  </p>
 			  </DragCard>
-			  <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
 				  <Image
 					  src="/VT.svg"
 					  alt="Home Sweet Home"
@@ -131,7 +131,7 @@ export default function Home() {
 					  <span className="font-bold">Virginia Tech: </span> (BS) Mathematics
 				  </p>
 			  </DragCard>
-			  <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg1 p-6 rounded-3xl">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">
           <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Experience</h2>
           <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Work</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
@@ -176,7 +176,7 @@ export default function Home() {
 				  </p>
         </DragCard>
 
-        <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg1 p-6 rounded-3xl">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">
           <h2 className="text-4xl font-bold mb-2 ml-10">Hello!</h2>
           <p className="text-xl  w-auto max-w-[100%]">My name is Lewis Bass.</p>
           <p className="text-xl leading-relaxed w-auto w-auto">I&#39;m a 2rd year Masters Student at Virginia Tech specializing in</p>

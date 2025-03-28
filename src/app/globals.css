@@ -273,6 +273,23 @@ body {
   animation: fade-in 1s ease;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.scale-101 {
+  transform: scale(1.01);
+}
+
+.scale-102 {
+  transform: scale(1.02);
+}
+
 @keyframes hwipe-in{
   0%{
     clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);

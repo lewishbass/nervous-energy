@@ -4,35 +4,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import '@/styles/sliders.css';
 import '@/styles/buttons.css';
 import * as tf from '@tensorflow/tfjs';
-import Image from 'next/image';
-
-import { ResponsiveContainer, XAxis, YAxis, ComposedChart, Line } from 'recharts';
-
-// TODO
-// - fix error when slicing noise
-// - render limits on separate background canvas
-// - testing data split
+import { label } from 'framer-motion/client';
 
 // Types
 type ActivationFunction = 'relu' | 'sigmoid' | 'tanh' | 'linear';
 type DistributionPattern = 'xor' | 'circle' | 'spiral' | 'linear';
-type InitializerType = 'glorotNormal' | 'heNormal' | 'leCunNormal';
-
-type TrainingHistory = {
-  loss: number;
-  accuracy: number;
-  epoch: number;
-}
 
 const BackPropDemo = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const backCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Training control states
   const [learningRate, setLearningRate] = useState(0.01);
   const [l2Regularization, setL2Regularization] = useState(0.0001);
   const [running, setRunning] = useState(false);
-  const runningRef = useRef(running);
 
   const maxLayers = 5; // Max 5 hidden layers
   const maxNodes = 6; // nodes are 2^n, so 2^6 = 64 nodes max
@@ -40,22 +24,6 @@ const BackPropDemo = () => {
   const [layerCount, setLayerCount] = useState(2);
   const [nodesPerLayer, setNodesPerLayer] = useState(Array(maxLayers).fill(1)); // Max layers, default max nodes
   const [activation, setActivation] = useState<ActivationFunction>('relu');
-  const [weightInitializer, setWeightInitializer] = useState<InitializerType>('heNormal');
-
-  const [model, setModel] = useState<tf.Sequential | null>(null);
-  const [refreshModel, setRefreshModel] = useState(true);
-
-  const [renderResolution, setRenderResolution] = useState(10);
-  const renderResolutionRef = useRef(renderResolution);
-  const resolutionRenderTimer = useRef<number | null>(null);
-
-  const [modelLoss, setModelLoss] = useState<number | null>(null);
-  const [modelAccuracy, setModelAccuracy] = useState<number | null>(null);
-  const [modelIterations, setModelIterations] = useState<number | null>(null);
-
-  const [trainingHistory, setTrainingHistory] = useState<TrainingHistory[]>([]);
-  const trainingHistoryRef = useRef(trainingHistory);
-
 
   const maxDataPoints = 1000;
   const maxClasses = 5;
@@ -65,41 +33,19 @@ const BackPropDemo = () => {
   const [distribution, setDistribution] = useState<DistributionPattern>('xor');
   const [dataNoise, setDataNoise] = useState(0.1);
 
-  const dataPointsRef = useRef(dataPoints);
-  const classCountRef = useRef(classCount);
-  const dataNoiseRef = useRef(dataNoise);
-
   // Data storage states - always maintain maxDataPoints
   const [data, setData] = useState<tf.Tensor2D | null>(null);
   const [noise, setNoise] = useState<tf.Tensor2D | null>(null);
   const [labels, setLabels] = useState<tf.Tensor2D | null>(null);
-
-  // Native data for display
-  const [classLabels, setClassLabels] = useState<Array<number> | null>(null);
-  const [dataDisplay, setDataDisplay] = useState<Array<Array<number>> | null>(null);
-  const [noiseDisplay, setNoiseDisplay] = useState<Array<Array<number>> | null>(null);
-
-
-  /*const shortenHistory = (history: TrainingHistory[], everyn: number) => {
-    console.log("everyn:", everyn);
-    const shortenedHistory = []
-    let lastEpoch = -1000;
-    for (let i = 0; i < history.length; i++) {
-      if (history[i].epoch - lastEpoch >= everyn) {
-        shortenedHistory.push({ ...history[i] });
-        lastEpoch = history[i].epoch;
-      }
-    }
-    console.log("Shortened history:", shortenedHistory.length);
-    return shortenedHistory;
-  };*/
+  const [classLabels, setClassLabels] = useState<tf.Tensor1D | null>(null);
 
   // Function to generate data based on the selected distribution pattern
   const generateData = () => {
-    runningRef.current = false;
     // Clean up existing tensors to prevent memory leaks
     if (data) data.dispose();
+    if (noise) noise.dispose();
     if (labels) labels.dispose();
+    if (classLabels) classLabels.dispose();
 
     const numPoints = maxDataPoints;
     let xData: tf.Tensor2D;
@@ -107,7 +53,8 @@ const BackPropDemo = () => {
     let noiseData: tf.Tensor2D;
     let yClass: tf.Tensor1D;
 
-
+    // Generate random noise based on user-defined noise level
+    noiseData = tf.randomNormal([numPoints, 2], 0, 1);
 
     // Generate random data in the range [-1, 1] for both x1 and x2
     xData = tf.randomUniform([numPoints, 2], -1, 1);
@@ -172,7 +119,7 @@ const BackPropDemo = () => {
           const classIndices = indices.mod(tf.scalar(classCount)).cast('int32');
 
           // Radius increases with t
-          const r = t.mul(tf.scalar(0.9)).add(tf.scalar(0.05));
+          const r = t.mul(tf.scalar(0.9)).add(tf.scalar(0.1));
 
           // Different starting angle for each class
           const theta = t.mul(tf.scalar(3 * Math.PI))
@@ -217,56 +164,34 @@ const BackPropDemo = () => {
           return tf.randomUniform([numPoints], 0, classCount, 'int32');
         });
     }
-
-    // shuffle the data
-    const indices = tf.util.createShuffledIndices(numPoints);
-    const indicesTensor = tf.tensor1d(Array.from(indices), 'int32');
-    const shuffledData = tf.gather(xData, indicesTensor);
-    const shuffledLabels = tf.gather(yClass, indicesTensor);
-    indicesTensor.dispose(); // Clean up the tensor to prevent memory leaks
-    xData.dispose();
-    yClass.dispose();
-
-
     // @ts-expect-error: Tidy function not defined in types
-    yLabels = tf.oneHot(shuffledLabels, maxClasses);
-    // remove extra dimension
-    yLabels = yLabels.squeeze();
+    yLabels = tf.oneHot(yClass, classCount);
 
-    // Log the shape of labels for debugging
-    console.log("Labels shape:", yLabels.shape);
+    // Add noise to the data if specified
+    // const noisyData = tf.add(xData, noiseData);
 
     // Set the state with the new data
-    setData(shuffledData);
+    setData(xData);
+    setNoise(noiseData);
     setLabels(yLabels);
+    setClassLabels(yClass);
 
-    shuffledLabels.array().then((labelArr) => {
-      setClassLabels(labelArr);
-    });
-    shuffledData.array().then((dataArr) => {
-      setDataDisplay(dataArr);
-    });
-
-    // Generate random noise based on user-defined noise level
-    if (!noise || noise.shape[0] !== maxDataPoints || noise.shape[1] !== 2) {
-      console.log("Generating new noise data");
-      if (noise) noise.dispose();
-      noiseData = tf.randomNormal([maxDataPoints, 2], 0, 1);
-      setNoise(noiseData);
-      noiseData.array().then((noiseArr) => {
-        setNoiseDisplay(noiseArr);
+    xData.array().then((dataArr) => {
+      yLabels.array().then((labelArr) => {
+        console.log("Label Length: ", labelArr[0].length);
+        for (let i = 0; i < labelArr[0].length; i++) {
+          console.log(labelArr[0][i]);
+        }
       });
-    }
-
+    });
 
     console.log("Data generated:", {
       distribution,
       classCount,
       noiseLevel: dataNoise,
-      dataShape: shuffledData.shape,
+      dataShape: xData.shape,
       labelsShape: yLabels.shape
     });
-    runningRef.current = running;
 
 
   };
@@ -277,8 +202,8 @@ const BackPropDemo = () => {
   }, [distribution, classCount]);
 
   useEffect(() => {
-    updateDisplay(dataDisplay, noiseDisplay, classLabels, dataNoise, dataPoints);
-  }, [classLabels, dataDisplay, noiseDisplay, dataNoise, dataPoints]);
+    updateDisplay(data, noise, classLabels, dataNoise);
+  }, [data, noise, classLabels, dataNoise, dataPoints]);
 
   // Clean up tensors on component unmount
   useEffect(() => {
@@ -286,58 +211,76 @@ const BackPropDemo = () => {
       if (data) data.dispose();
       if (noise) noise.dispose();
       if (labels) labels.dispose();
+      if (classLabels) classLabels.dispose();
     };
   }, []);
 
-  const updateDisplay = (data: Array<Array<number>> | null = null, noise: Array<Array<number>> | null = null, labels: Array<number> | null = null, noiseInt: number | null = null, dataPoints: number | null = null) => {
-  // draws datapoints canvas
+  const updateDisplay = (data: tf.Tensor2D | null = null, noise: tf.Tensor2D | null = null, labels: tf.Tensor1D | null = null, noiseInt: number | null = null) => {
+    // draws datapoints canvas
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
 
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
     if (!data || !labels || !noise) return;
     if (!noiseInt) noiseInt = 0;
-    if (!dataPoints) dataPoints = data.length;
 
+    tf.add(data, noise.mul(tf.scalar(noiseInt))).array().then((dataArr) => {
+      labels.array().then((labelArr) => {
+        for (let i = 0; i < dataPoints; i++) {
+          const x = (dataArr[i][0] + 1) * 250;
+          const y = (1 - dataArr[i][1]) * 250;
+          //console.log(label);
 
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-    for (let i = 0; i < dataPoints; i++) {
-      const x = (data[i][0] + noise[i][0] * noiseInt + 1) * 250;
-      const y = (1 - data[i][1] - noise[i][1] * noiseInt) * 250;
-    //console.log(label);
-
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = `hsl(${labels[i] * 360 / classCount}, 70%, 50%)`;
-      ctx.fill();
-      ctx.strokeStyle = `hsl(${labels[i] * 360 / classCount}, 70%, 40%)`;
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    }
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fillStyle = `hsl(${labelArr[i] * 360 / classCount}, 70%, 50%)`;
+          ctx.fill();
+        }
+      });
+    });
 
   };
+
+  // Placeholder for actual visualization logic
+  useEffect(() => {
+    updateDisplay();
+    return;
+
+    if (!canvasRef.current) return;
+    const ctx = canvasRef.current.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    
+    // Draw placeholder visualization
+    ctx.fillStyle = 'rgba(80, 100, 240, 0.6)';
+    ctx.fillRect(50, 50, 100, 100);
+    
+    ctx.fillStyle = 'rgba(240, 80, 100, 0.6)';
+    ctx.fillRect(150, 150, 100, 100);
+    
+    // Draw connections between layers
+    ctx.strokeStyle = '#2a2a2a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(150, 100);
+    ctx.lineTo(400, 200);
+    ctx.stroke();
+    
+    // Draw text labels
+    ctx.fillStyle = '#333';
+    ctx.font = '16px Arial';
+    ctx.fillText('Input Layer', 100, 40);
+    ctx.fillText('Hidden Layer', 350, 140);
+    
+  }, [canvasRef, learningRate, layerCount, running]);
 
   const toggleTraining = () => {
-    // Build model if it doesn't exist or needs refresh
-    if (!model) {
-      buildModel();
-    }
     setRunning(!running);
   };
-  useEffect(() => {
-    runningRef.current = running;
-    dataPointsRef.current = dataPoints;
-    classCountRef.current = classCount;
-    dataNoiseRef.current = dataNoise;
-  }, [running, dataPoints, classCount, dataNoise]);
-
-  // when network parameters are updated, set refreshModel to true
-  useEffect(() => {
-    setRefreshModel(true);
-  }, [layerCount, nodesPerLayer, weightInitializer, activation, learningRate, l2Regularization]);
-
 
   // Handle changing the number of nodes in a specific layer
   const handleNodeChange = (layerIndex: number, value: number) => {
@@ -346,373 +289,80 @@ const BackPropDemo = () => {
     setNodesPerLayer(newNodesPerLayer);
   };
 
-  //activation function
-
-
-  const buildModel = () => {
-    // reset training history
-    setTrainingHistory([]);
-    trainingHistoryRef.current = []
-
-    // stop other models training
-    setRunning(false);
-
-    // Clean up existing model to prevent memory leaks
-    if (model) model.dispose();
-
-    // Create a new sequential model
-    const newModel = tf.sequential();
-
-    // Weight initializer
-    let kernelInitializer = tf.initializers.glorotNormal({ seed: 42 });
-    switch (weightInitializer) {
-      case 'heNormal':
-        kernelInitializer = tf.initializers.heNormal({ seed: 42 });
-        break;
-      case 'leCunNormal':
-        kernelInitializer = tf.initializers.leCunNormal({ seed: 42 });
-        break;
-    }
-
-    // Add the input layer
-    newModel.add(tf.layers.dense({
-      units: nodesPerLayer[0],
-      inputShape: [2],
-      activation: activation,
-      kernelRegularizer: tf.regularizers.l2({ l2: l2Regularization }),
-      kernelInitializer: kernelInitializer,
-    }));
-
-    // Add the hidden layers
-    for (let i = 1; i < layerCount; i++) {
-      newModel.add(tf.layers.dense({
-        units: nodesPerLayer[i],
-        activation: activation,
-        kernelRegularizer: tf.regularizers.l2({ l2: l2Regularization }),
-      }));
-    }
-
-    // Add the output layer
-    newModel.add(tf.layers.dense({
-      units: maxClasses,
-      activation: 'softmax',
-      kernelRegularizer: tf.regularizers.l2({ l2: l2Regularization }),
-    }));
-
-    // compile the model
-    newModel.compile({
-      optimizer: tf.train.adam(learningRate),
-      loss: 'categoricalCrossentropy',
-      metrics: ['accuracy'],
-    });
-
-    setModel(newModel);
-    setRefreshModel(false);
-
-  };
-
-
-  const trainModel = async () => {
-    if (!model || !data || !labels) {
-      console.error("Model or data not available");
-      setRunning(false);
-      return;
-    }
-    try {
-      // Create slices of data based on dataPoints setting
-      const inputData = tf.tidy(() => data!.slice([0, 0], [dataPointsRef.current, 2]));
-
-      // Fix for the labels slicing - get shape first to handle it properly
-      const outputLabels = tf.tidy(() => {
-        // Check the shape of labels to avoid dimension errors
-        const labelShape = labels!.shape;
-
-        if (labelShape.length === 2) {
-          // If labels is already 2D with shape [numPoints, classes]
-          return labels!.slice([0, 0], [dataPointsRef.current, labelShape[1]]);
-        } else {
-          // If labels has a different shape, reshape or handle accordingly
-          console.warn("Labels have unexpected shape:", labelShape);
-          // Just use first dataPoints rows and all columns
-          return labels!.slice([0, 0], [dataPointsRef.current, -1]);
-        }
-      });
-
-      // Add noise to input data if available
-      const noisyInputData = tf.tidy(() => {
-        if (noise && dataNoiseRef.current > 0) {
-          if (!noise.shape) return;
-          //console.log("noisyInputData:", dataPointsRef.current, noise.shape);
-          const noiseSlice = noise.slice([0, 0], [dataPointsRef.current, 2]);
-          //console.log("noiseSlice:", noiseSlice.shape);
-          return inputData.add(noiseSlice.mul(tf.scalar(dataNoiseRef.current)));
-        }
-        return inputData;
-      });
-
-      // Log shapes for debugging
-
-      // Train for one 
-      if (!noisyInputData || !outputLabels) {
-        console.error("Data or labels not available");
-        setRunning(false);
-      }
-      const result = await model.fit(noisyInputData as tf.Tensor2D, outputLabels, {
-        epochs: 1,
-        batchSize: 32,
-        shuffle: true,
-        validationSplit: 0.1
-      });
-
-      // Update stats
-      const loss = result.history.loss[0] as number;
-      const accuracy = result.history.acc[0] as number;
-
-      // Update history and state
-      const iterations = trainingHistoryRef.current.length > 0
-        ? trainingHistoryRef.current[trainingHistoryRef.current.length - 1].epoch + 1
-        : 0;
-
-      trainingHistoryRef.current = [...trainingHistoryRef.current, {
-        loss: loss,
-        accuracy: accuracy,
-        epoch: iterations
-      }];
-      setTrainingHistory(trainingHistoryRef.current);
-
-      setModelLoss(loss);
-      setModelAccuracy(accuracy);
-      setModelIterations(iterations);
-
-      // Clean up tensors
-      if (inputData) inputData.dispose();
-      if (outputLabels) outputLabels.dispose();
-      if (noisyInputData) noisyInputData.dispose();
-    } catch (error) {
-      console.error("Training error:", error);
-      setRunning(false);
-    } finally {
-    }
-  }
-
-  useEffect(() => {
-    renderResolutionRef.current = renderResolution;
-    if (model && !resolutionRenderTimer.current) {
-      renderDecisionBoundaries(model);
-      resolutionRenderTimer.current = window.setTimeout(() => {
-        resolutionRenderTimer.current = null;
-        renderDecisionBoundaries(model);
-      }, 1000);
-    }
-  }, [renderResolution]);
-
-  // Function to render decision boundaries on the background canvas
-  const renderDecisionBoundaries = (model: tf.Sequential) => {
-    if (!backCanvasRef || !backCanvasRef.current || !model) return;
-
-    tf.tidy(() => {
-    // Get a grid of points to visualize decision boundaries
-      const gridSize = renderResolutionRef.current;
-      const gridPoints = [];
-      for (let x = -1; x <= 1; x += 2 / gridSize) {
-        for (let y = -1; y <= 1; y += 2 / gridSize) {
-          gridPoints.push([x, y]);
-        }
-      }
-
-      const gridTensor = tf.tensor2d(gridPoints);
-      const predictions = model.predict(gridTensor) as tf.Tensor;
-      const predictedClasses = predictions.argMax(1);
-      const predictionIntensities = predictions.max(1);
-
-      // Draw decision boundaries on canvas
-      if (!backCanvasRef.current) return;
-      const ctx = backCanvasRef.current.getContext('2d');
-      if (ctx) {
-        const pointR = ctx.canvas.width / gridSize / 2;
-        // Clear background
-        ctx.clearRect(0, 0, backCanvasRef.current.width, backCanvasRef.current.height);
-        for (let i = 0; i < gridPoints.length; i++) {
-          const x = (gridPoints[i][0] + 1) * 250;
-          const y = (1 - gridPoints[i][1]) * 250;
-          const classIdx = predictedClasses.dataSync()[i];
-          const classIntensity = predictionIntensities.dataSync()[i];
-          ctx.fillStyle = `hsla(${classIdx * 360 / classCount}, 70%, 50%, ${classIntensity * 0.5})`;
-          ctx.fillRect(x - pointR, y - pointR, pointR * 2, pointR * 2);
-        }
-      }
-
-      gridTensor.dispose();
-      predictions.dispose();
-      predictedClasses.dispose();
-    });
-  };
-
-  const loop = async () => {
-    if (runningRef.current && model) {
-      await trainModel();
-
-      // After model is trained, predict and update visualization
-      if (data && model) {
-        // Render the decision boundaries using the extracted function
-        renderDecisionBoundaries(model);
-      }
-    }
-
-    if (runningRef.current) {
-      requestAnimationFrame(loop);
-    }
-  };
-
-  // Run training loop when running is true
-  useEffect(() => {
-    if (running) {
-      loop();
-    }
-  }, [running]);
-
   return (
     <div className="p-0 rounded-lg shadow-lg m-0" style={{ userSelect: 'none' }}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 aspect-square">
         {/* Canvas Section (Top Left) */}
-        <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-2 flex items-center justify-center relative flex-col">
-          {/* Background image */}
-          <div className="aspect-square relative z-10">
-            <div className="absolute inset-0 z-0 overflow-hidden invert dark:invert-0">
-              <Image
-                src="/grid.svg"
-                alt="coordinate grid"
-                className="absolute inset-0 w-full h-full object-cover mix-blend-soft-light opacity-10 dark:opacity-10 select-none pointer-events-none"
-                width={100}
-                height={100}
-                style={{
-                  userSelect: "none",
-                  transformOrigin: "center center", // Ensure rotation happens from the center
-                }}
-              />
-            </div>
-            <canvas
-              ref={backCanvasRef}
-              width={500}
-              height={500}
-              className="w-full h-full object-contain absolute inset-0 z-5"
-            />
-            <canvas
-              ref={canvasRef}
-              width={500}
-              height={500}
-              className="w-full h-full object-contain relative z-10"
-            />
-          </div>
-          <div className="w-full mt-0 p-4">
-            <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-              Resolution: {renderResolution}
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              step="1"
-              value={renderResolution}
-              onChange={(e) => setRenderResolution(parseInt(e.target.value))}
-              className="w-full"
-            />
-          </div>
+        <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-2 flex items-center justify-center">
+          <canvas 
+            ref={canvasRef}
+            width={500}
+            height={500}
+            className="w-full h-full object-contain"
+          />
         </div>
-
-        {/* Data Configuration Section + Stats (Bottom Right) */}
+        
+        {/* Training Controls Section (Top Right) */}
         <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-4">
-          <h3 className="font-semibold mb-4 text-slate-700 dark:text-slate-300">Data Configuration</h3>
+          <h3 className="font-semibold mb-4 text-slate-700 dark:text-slate-300">Training Controls</h3>
 
           <div className="space-y-2">
             <div>
               <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                Data Points: {dataPoints}
+                Learning Rate: {learningRate.toFixed(4)}
               </label>
               <input
-                type="range"
-                min="10"
-                max={maxDataPoints}
-                step="10"
-                value={dataPoints}
-                onChange={(e) => setDataPoints(parseInt(e.target.value))}
+                type="range" 
+                min="0.0001"
+                max="0.1"
+                step="0.0001"
+                value={learningRate}
+                onChange={(e) => setLearningRate(parseFloat(e.target.value))}
                 className="w-full"
               />
             </div>
 
             <div>
               <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                Classes: {classCount}
+                L2 Regularization: {l2Regularization.toFixed(6)}
               </label>
               <input
                 type="range"
-                min="2"
-                max={maxClasses}
-                step="1"
-                value={classCount}
-                onChange={(e) => setClassCount(parseInt(e.target.value))}
+                min="0"
+                max="0.01"
+                step="0.0001"
+                value={l2Regularization}
+                onChange={(e) => setL2Regularization(parseFloat(e.target.value))}
                 className="w-full"
               />
             </div>
 
-            <div>
-              <label className='block mb-2 text-sm text-slate-600 dark:text-slate-400'>
-                Data Noise: {dataNoise}
-              </label>
-              <input
-                type='range'
-                min='0'
-                max='0.5'
-                step='0.01'
-                value={dataNoise}
-                onChange={(e) => setDataNoise(parseFloat(e.target.value))}
-                className='w-full'
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                Distribution Pattern:
-              </label>
-              <div className="button-group ">
-                <button
-                  onClick={() => setDistribution('xor')}
-                  className={`control-button ${distribution === 'xor' ? 'button-active' : 'button-secondary'}`}
-                >
-                  XOR
-                </button>
-                <button
-                  onClick={() => setDistribution('circle')}
-                  className={`control-button ${distribution === 'circle' ? 'button-active' : 'button-secondary'}`}
-                >
-                  Circle
-                </button>
-                <button
-                  onClick={() => setDistribution('spiral')}
-                  className={`control-button ${distribution === 'spiral' ? 'button-active' : 'button-secondary'}`}
-                >
-                  Spiral
-                </button>
-                <button
-                  onClick={() => setDistribution('linear')}
-                  className={`control-button ${distribution === 'linear' ? 'button-active' : 'button-secondary'}`}
-                >
-                  Linear
-                </button>
-              </div>
-            </div>
             <button
-              onClick={generateData}
-              className={`w-full py-2 pb-3 px-4 rounded-md transition-colors overflow-hidden bg-purple-600 hover:bg-purple-700 text-white`}
+              onClick={toggleTraining}
+              className={`w-full py-2 pb-3 px-4 rounded-md transition-colors overflow-hidden ${running ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
+                } text-white`}
             >
               <div className="relative h-6">
-                <div className="absolute inset-0">
-                  Shuffle Data
+                <div className="absolute inset-0 "
+                  style={{ transform: running ? 'translateY(0)' : 'translateY(-100%)', opacity: running ? 1 : 0, transition: "opacity 0.5s ease, transform 0.5s ease" }}>
+                  Stop Training
+                </div>
+                <div className="absolute inset-0 "
+                  style={{ transform: running ? 'translateY(100%)' : 'translateY(0)', opacity: running ? 0 : 1, transition: "opacity 0.5s ease, transform 0.5s ease" }}>
+                  Start Training
                 </div>
               </div>
             </button>
-
-
+          </div>
+          {/* Training Stats moved into the data section */}
+          <div className="mt-6">
+            <h3 className="font-semibold mb-2 text-slate-700 dark:text-slate-300">Training Stats:</h3>
+            <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-400">
+              <div>Loss: <span className="font-mono">0.0324</span></div>
+              <div>Accuracy: <span className="font-mono">96.8%</span></div>
+              <div>Iterations: <span className="font-mono">0</span></div>
+              <div>Gradient Norm: <span className="font-mono">0.0021</span></div>
+            </div>
           </div>
         </div>
 
@@ -793,140 +443,103 @@ const BackPropDemo = () => {
                 </button>
               </div>
             </div>
-            <div>
-              <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                Weight Initializer:
-              </label>
-              <div className="button-group">
-                <button
-                  onClick={() => setWeightInitializer('glorotNormal')}
-                  className={`control-button ${weightInitializer === 'glorotNormal' ? 'button-active' : 'button-secondary'}`}
-                >
-                  Glorot
-                </button>
-                <button
-                  onClick={() => setWeightInitializer('heNormal')}
-                  className={`control-button ${weightInitializer === 'heNormal' ? 'button-active' : 'button-secondary'}`}
-                >
-                  He
-                </button>
-                <button
-                  onClick={() => setWeightInitializer('leCunNormal')}
-                  className={`control-button ${weightInitializer === 'leCunNormal' ? 'button-active' : 'button-secondary'}`}
-                >
-                  LeCun
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
-
-
-        {/* Training Controls Section (Top Right) */}
+        {/* Data Configuration Section + Stats (Bottom Right) */}
         <div className="bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 p-4">
-          <h3 className="font-semibold mb-4 text-slate-700 dark:text-slate-300">Training Controls</h3>
+          <h3 className="font-semibold mb-4 text-slate-700 dark:text-slate-300">Data Configuration</h3>
 
           <div className="space-y-2">
             <div>
               <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                Learning Rate: {learningRate.toFixed(4)}
+                Data Points: {dataPoints}
               </label>
               <input
                 type="range"
-                min="0.0001"
-                max="0.1"
-                step="0.0001"
-                value={learningRate}
-                onChange={(e) => setLearningRate(parseFloat(e.target.value))}
+                min="10"
+                max={maxDataPoints}
+                step="10" 
+                value={dataPoints}
+                onChange={(e) => setDataPoints(parseInt(e.target.value))}
                 className="w-full"
               />
             </div>
 
             <div>
               <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
-                L2 Regularization: {l2Regularization.toFixed(4)}
+                Classes: {classCount}
               </label>
               <input
                 type="range"
-                min="0"
-                max="0.01"
-                step="0.0001"
-                value={l2Regularization}
-                onChange={(e) => setL2Regularization(parseFloat(e.target.value))}
+                min="2"
+                max={maxClasses}
+                step="1"
+                value={classCount}
+                onChange={(e) => setClassCount(parseInt(e.target.value))}
                 className="w-full"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={toggleTraining}
-                className={`w-full py-2 pb-3 px-4 rounded-md transition-colors overflow-hidden ${running ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
-              >
-                <div className="relative h-6">
-                  <div className="absolute inset-0"
-                    style={{ transform: running ? 'translateY(0)' : 'translateY(-100%)', opacity: running ? 1 : 0, transition: "opacity 0.5s ease, transform 0.5s ease" }}>
-                    Stop Training
-                  </div>
-                  <div className="absolute inset-0 "
-                    style={{ transform: running ? 'translateY(100%)' : 'translateY(0%)', opacity: !running ? 1 : 0, transition: "opacity 0.5s ease, transform 0.5s ease" }}>
-                    Start Training
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={buildModel}
-                className={`w-full py-2 pb-3 px-4 rounded-md transition-colors text-white ${refreshModel ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
-              >
-                Reset Model
-              </button>
+            <div>
+              <label className='block mb-2 text-sm text-slate-600 dark:text-slate-400'>
+                Data Noise: {dataNoise}
+              </label>
+              <input
+                type='range'
+                min='0'
+                max='0.5'
+                step='0.01'
+                value={dataNoise}
+                onChange={(e) => setDataNoise(parseFloat(e.target.value))}
+                className='w-full'
+              />
             </div>
-          </div>
-          {/* Training Stats moved into the data section */}
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2 text-slate-700 dark:text-slate-300">Training Stats:</h3>
-            <div className="grid grid-cols-3 gap-2 text-sm text-slate-600 dark:text-slate-400">
-              <div style={{ color: "var(--khb)" }}>Loss: <span className="font-mono">{modelLoss !== null ? modelLoss.toFixed(4) : '0.0000'}</span></div>
-              <div style={{ color: "var(--kho)" }}>Acc: <span className="font-mono">{modelAccuracy !== null ? `${(modelAccuracy * 100).toFixed(1)}%` : '0.0%'}</span></div>
-              <div>Epoch: <span className="font-mono">{modelIterations !== null ? modelIterations : '0'}</span></div>
-            </div>
-          </div>
 
-          {/* Loss history chart */}
-          {trainingHistory.length > 1 && <ResponsiveContainer height={100} width="100%" >
-            <ComposedChart
-              data={trainingHistory}
-              margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+            <div>
+              <label className="block mb-2 text-sm text-slate-600 dark:text-slate-400">
+                Distribution Pattern:
+              </label>
+              <div className="button-group ">
+                <button
+                  onClick={() => setDistribution('xor')}
+                  className={`control-button ${distribution === 'xor' ? 'button-active' : 'button-secondary'}`}
+                >
+                  XOR
+                </button>
+                <button
+                  onClick={() => setDistribution('circle')}
+                  className={`control-button ${distribution === 'circle' ? 'button-active' : 'button-secondary'}`}
+                >
+                  Circle
+                </button>
+                <button
+                  onClick={() => setDistribution('spiral')}
+                  className={`control-button ${distribution === 'spiral' ? 'button-active' : 'button-secondary'}`}
+                >
+                  Spiral
+                </button>
+                <button
+                  onClick={() => setDistribution('linear')}
+                  className={`control-button ${distribution === 'linear' ? 'button-active' : 'button-secondary'}`}
+                >
+                  Linear
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={generateData}
+              className={`w-full py-2 pb-3 px-4 rounded-md transition-colors overflow-hidden bg-purple-600 hover:bg-purple-700 text-white`}
             >
-              <XAxis dataKey="epoch" hide xAxisId="epoch" />
-              <YAxis dataKey="loss" hide />
-              <YAxis dataKey="accuracy" hide yAxisId="accuracy" />
-              <Line
-                type="monotone"
-                dataKey="loss"
-                stroke="var(--khb)"
-                strokeWidth={1}
-                dot={false}
-                isAnimationActive={false}
-                name="Loss"
-                xAxisId="epoch"
-              />
-              <Line
-                type="monotone"
-                dataKey="accuracy"
-                stroke="var(--kho)"
-                strokeWidth={1}
-                dot={false}
-                isAnimationActive={false}
-                name="Accuracy"
-                yAxisId="accuracy"
-                xAxisId="epoch"
-              />
-            </ComposedChart>
-          </ResponsiveContainer>}
+              <div className="relative h-6">
+                <div className="absolute inset-0">
+                  Shuffle Data
+                </div>
+              </div>
+            </button>
 
 
+          </div>
         </div>
       </div>
     </div>
