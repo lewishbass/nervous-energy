@@ -4,7 +4,7 @@ import './globals.css';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
 import Menu from '@/components/Menu';
-import MessageModal from '@/components/MessageModal';
+import MessageModal from '@/components/messages/MessageModal';
 import ProfileModal from '@/components/ProfileModal';
 import AuthModal from '@/components/AuthModal';
 import NotificationModal from '@/components/NotificationModal';

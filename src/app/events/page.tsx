@@ -1,5 +1,4 @@
 "use client";
-import { useState } from 'react';
 import WeatherWidget from '@/components/WeatherWidget';
 
 interface Event {

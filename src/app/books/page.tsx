@@ -310,7 +310,7 @@ export default function Books() {
                   : "book-overlay-collapsed"
                   }`}
               >
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-start mb-[-6]">
                   <h2 className="book-title tc1">{book.title}</h2>
                   {book.good_score && (
                     <span className="book-rating">
@@ -320,6 +320,12 @@ export default function Books() {
                 </div>
 
                 <p className="book-author tc2">By {book.author}</p>
+                {book.book_series && (
+                  <p className="book-series tc3">
+                    {book.book_series}
+                    {book.reading_order && <span> (#{book.reading_order})</span>}
+                  </p>
+                )}
                 <p className="book-metadata tc3">
                   {book.genre} • {book.year}
                 </p>
@@ -333,22 +339,6 @@ export default function Books() {
                     <p className="book-description tc2">{book.paragraph2}</p>
 
                     <div className="book-detail-section">
-                      {book.book_series && (
-                        <div>
-                          <span className="book-detail-label tc2">
-                            Series:{" "}
-                          </span>
-                          <span className="book-detail-value tc3">
-                            {book.book_series}
-                          </span>
-                          {book.reading_order && (
-                            <span className="book-detail-value tc3">
-                              {" "}
-                              (#{book.reading_order})
-                            </span>
-                          )}
-                        </div>
-                      )}
                       <div>
                         <span className="book-detail-label tc2">Words: </span>
                         <span className="book-detail-value tc3">

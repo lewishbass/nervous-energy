@@ -21,6 +21,7 @@ interface AuthContextType {
   username: string;
   token: string | null;
   user: User | null;
+  userId: string | undefined;
   isLoading: boolean;
   error: string | null;
   login: (username: string, password: string) => Promise<boolean>;
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [username, setUsername] = useState('');
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUsername(username);
       setToken(data.token);
       setUser(data.user);
+      setUserId(data.user.id);
 
       // Store in localStorage
       localStorage.setItem('authToken', data.token);
@@ -233,6 +236,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       username,
       token,
       user,
+      userId,
       isLoading,
       error,
       login,

@@ -51,6 +51,12 @@ export const handler: Handler = async (event) => {
     if (path === 'user-exists'){
       return await handleUserExists(requestBody);
     }
+    if (path === 'change-password') {
+      return await handlePasswordChange(requestBody);
+    }
+    if (path === 'delete-account') {
+      return await handleAccountDeletion(requestBody);
+    }
     return {
       statusCode: 404,
       body: JSON.stringify({ error: 'Path not found' }),
@@ -253,4 +259,99 @@ async function handleRegistration(requestBody: any) {
       body: JSON.stringify({ error: 'Failed to register user' }),
     };
   }
+}
+
+async function handlePasswordChange(requestBody: any) {
+  const { userId, currentPassword, newPassword } = requestBody;
+
+  // Validate required fields
+  if (!userId || !currentPassword || !newPassword) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'User ID, current password, and new password are required' }),
+    };
+  }
+
+  // Find user by ID
+  const user = await User.findOne({ id: userId });
+
+  if (!user) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'User not found' }),
+    };
+  }
+
+  // Verify current password
+  const passwordMatch = await require('bcrypt').compare(currentPassword, user.password);
+
+  if (!passwordMatch) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'Current password is incorrect' }),
+    };
+  }
+
+  // Update password
+  user.password = newPassword; // Will be hashed by pre-save hook
+  await user.save();
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      success: true,
+      message: 'Password updated successfully'
+    }),
+  };
+}
+
+async function handleAccountDeletion(requestBody: any) {
+  const { userId, password } = requestBody;
+
+  // Validate required fields
+  if (!userId || !password) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'User ID and password are required' }),
+    };
+  }
+
+  // Find user by ID
+  const user = await User.findOne({ id: userId });
+
+  if (!user) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'User not found' }),
+    };
+  }
+
+  // Verify password
+  const passwordMatch = await require('bcrypt').compare(password, user.password);
+
+  if (!passwordMatch) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: 'Password is incorrect' }),
+    };
+  }
+
+  // Delete user account
+  await User.deleteOne({ id: userId });
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      success: true,
+      message: 'Account deleted successfully'
+    }),
+  };
 }

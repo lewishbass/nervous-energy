@@ -119,12 +119,14 @@
 │   │   │   ├── ParagraphEdit.tsx
 │   │   │   ├── StringEdit.tsx
 │   │   │   └── SubmitIcon.tsx
+│   │   ├── messages
+│   │   │   ├── MessageBubble.tsx
+│   │   │   └── MessageModal.tsx
 │   │   ├── AuthModal.tsx
 │   │   ├── ColorProgressBar.tsx
 │   │   ├── DragCard.tsx
 │   │   ├── HeadMetadata.tsx
 │   │   ├── Menu.tsx
-│   │   ├── MessageModal.tsx
 │   │   ├── ModalTemplate.tsx
 │   │   ├── Navbar.tsx
 │   │   ├── NotificationModal.tsx
