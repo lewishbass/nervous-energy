@@ -29,7 +29,7 @@ async function connectMongoDB() {
   if (cached.conn) {
     // Check if the connection is still valid
     if (cached.conn.connection.readyState === 1) {
-      console.log('Using existing MongoDB connection (connected)');
+      //console.log('Using existing MongoDB connection (connected)');
       return cached.conn;
     } else {
       console.log(`Connection is in state: ${mongoose.connection.readyState}, reconnecting...`);

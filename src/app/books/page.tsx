@@ -405,8 +405,8 @@ export default function Books() {
                           }}
                           onClick={toggleShopType}
                         >
-                          <FaTablet className="absolute text-white transition-opacity duration-100" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.03s" : "" }} />
-                          <FaBook className="absolute text-white transition-opacity duration-100" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.03s" : "" }} />
+                          <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
+                          <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
                         </div>
                         <a
                           href={book[`${shopType}_link`] || "#"}
