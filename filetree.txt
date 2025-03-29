@@ -1,3 +1,5 @@
+├── docs
+│   └── conversation-api.md
 ├── netlify
 │   ├── functions
 │   │   ├── auth.ts
@@ -127,7 +129,8 @@
 │   │   ├── Navbar.tsx
 │   │   ├── NotificationModal.tsx
 │   │   ├── ProfileModal.tsx
-│   │   └── SearchExpand.tsx
+│   │   ├── SearchExpand.tsx
+│   │   └── WeatherWidget.tsx
 │   ├── context
 │   │   └── AuthContext.tsx
 │   ├── data

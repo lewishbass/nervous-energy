@@ -357,8 +357,6 @@ const handleSendMessage = async (requestBody: any) => {
       }),
       false
     );
-    
-    await participant.save();
   }
   
   return {
