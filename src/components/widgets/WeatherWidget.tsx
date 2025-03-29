@@ -365,7 +365,7 @@ export default function WeatherWidget({ className = "" }: WeatherWidgetProps): J
       className={`p-4 rounded-lg shadow relative overflow-hidden ${className}`}
       style={{
 				background: `${dayCycleGradient}, linear-gradient( 45deg , var(--fallback-bg2, black), var(--fallback-bg, black))`,
-				minHeight: '250px',
+        minHeight: 'fit-content',
 				transition: 'background 0.5s ease-in-out',
       }}
     >
@@ -445,7 +445,7 @@ export default function WeatherWidget({ className = "" }: WeatherWidgetProps): J
           </div>
 
           {/* Weather Icons Row */}
-          <div className="flex justify-between mb-4 mt-16 relative z-10 mt-30">
+              <div className="flex justify-between mb-4 mt-16 relative z-10 mt-30">
             {weatherIcons.map((icon, index) => (
               <div key={index} className="flex flex-col items-center text-white">
                 <div className="text-black dark:text-white bg-white/40 dark:bg-black/20 rounded-full lg:p-1 sm:p-0">{icon}</div>
