@@ -1,5 +1,5 @@
 "use client";
-import WeatherWidget from '@/components/WeatherWidget';
+import WeatherWidget from '@/components/widgets/WeatherWidget';
 
 interface Event {
   name: string;

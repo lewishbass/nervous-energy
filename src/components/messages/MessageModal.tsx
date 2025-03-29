@@ -2,7 +2,7 @@
 // node.js, react, typescript, tailwindcss
 
 import React, { useState } from 'react';
-import ModalTemplate from '../ModalTemplate';
+import ModalTemplate from '../modals/ModalTemplate';
 import MessageBubble from './MessageBubble';
 import { IoSend } from 'react-icons/io5'; // Import the send icon
 

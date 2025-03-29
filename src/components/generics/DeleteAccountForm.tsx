@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ColorProgressBar from '../ColorProgressBar';
 
 interface DeleteAccountFormProps {
   userId: string | undefined;
@@ -72,7 +73,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({
           className={`w-full py-2 rounded-lg transition-all duration-300 ${
             showDeleteConfirm 
               ? 'bt2 tc2 hover:opacity-90' 
-              : 'bg-red-500 text-white hover:bg-red-600'
+            : 'bg-red-500 text-white hover:bg-red-700 cursor-pointer'
           }`}
           onClick={() => {
             if (showDeleteConfirm) {
@@ -94,7 +95,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({
       </div>
 
       <div className={`bg2 p-4 rounded-lg transition-all duration-300 ${
-        showDeleteConfirm ? 'opacity-100' : 'opacity-50 pointer-events-none'
+        showDeleteConfirm ? 'opacity-100' : 'opacity-20 pointer-events-none scale-[0.98]'
       }`}>
         <h4 className="text-lg font-semibold tc1 mb-2">Are you sure you want to delete your account?</h4>
         <p className="text-sm tc3 mb-4">This action cannot be undone. All your data will be permanently removed.</p>
@@ -108,15 +109,23 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({
             type="text"
             value={deleteUsername}
             onChange={(e) => setDeleteUsername(e.target.value)}
-            className={`w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3`}
+            className={`w-full p-2 bg3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 tc3 mb-3`}
             placeholder="Your username"
             autoComplete="username"
             disabled={!showDeleteConfirm}
             required
           />
           
-          <p className="text-xs text-red-500 mt-1" style={{ opacity: (deleteUsername && !usernameMatches)?1:0}}>Username does not match</p>
-          
+          <div>
+            <ColorProgressBar
+              max={username?.length || 1}
+              current={Array.from(deleteUsername).filter((char, index) => char === username?.[index]).length}
+              disappear={true}
+              className="w-full mt-[-4px]"
+              constantColor={"#00ff00"}
+            />
+          </div>
+
         </div>
 
         <div className="mb-3">
@@ -143,7 +152,7 @@ const DeleteAccountForm: React.FC<DeleteAccountFormProps> = ({
         
         <button
           className={`w-full py-2 rounded-lg ${
-            showDeleteConfirm && usernameMatches ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-300 text-gray-500'
+            showDeleteConfirm && usernameMatches ? 'bg-red-500 text-white hover:bg-red-700 cursor-pointer' : 'bg-gray-500/50 text-white'
           } transition-colors duration-300`}
           onClick={handleDeleteAccount}
           disabled={!showDeleteConfirm || !usernameMatches || !deletePassword || isLoading}

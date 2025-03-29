@@ -114,7 +114,9 @@
 │   │   │   ├── SquareAnimation.tsx
 │   │   │   └── TriangleAnimation.tsx
 │   │   ├── generics
+│   │   │   ├── ChangePasswordForm.tsx
 │   │   │   ├── DateEdit.tsx
+│   │   │   ├── DeleteAccountForm.tsx
 │   │   │   ├── GenericEdit.tsx
 │   │   │   ├── ParagraphEdit.tsx
 │   │   │   ├── StringEdit.tsx

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import ModalTemplate from './ModalTemplate';
+import ModalTemplate from './modals/ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import { FaCheck, FaTimes, FaCog } from 'react-icons/fa';
 import ColorProgressBar from './ColorProgressBar';

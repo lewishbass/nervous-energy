@@ -6,9 +6,9 @@
 import React, { useEffect, useState } from 'react';
 import ModalTemplate from './ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
-import GenericEdit from './generics/GenericEdit';
-import ChangePasswordForm from './generics/ChangePasswordForm';
-import DeleteAccountForm from './generics/DeleteAccountForm';
+import GenericEdit from '../generics/GenericEdit';
+import ChangePasswordForm from '../generics/ChangePasswordForm';
+import DeleteAccountForm from '../generics/DeleteAccountForm';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 
