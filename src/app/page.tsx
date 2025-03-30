@@ -102,14 +102,42 @@ export default function Home() {
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 					  <span className="font-bold">Name: </span> Description
 				  </p>
-			  </DragCard>
+				</DragCard>
+
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+					<Image
+						src="/images/pets/me_c.jpg"
+						alt="ME!"
+						className="object-cover pointer-events-none"
+						fill
+						style={{
+							objectFit: 'cover',
+							objectPosition: 'center top',
+							userSelect: "none",
+						}} />
+				</DragCard>
+
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
 				  <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Projects</h2>
 				  <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">TODO</h3>
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 					  <span className="font-bold">Name: </span> Description
 				  </p>
-			  </DragCard>
+				</DragCard>
+
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+					<Image
+						src="/images/pets/scottie_c.jpg"
+						alt="Scottie Q"
+						className="object-cover pointer-events-none"
+						fill
+						style={{
+							objectFit: 'cover',
+							objectPosition: 'center top',
+							userSelect: "none",
+						}} />
+				</DragCard>
+
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
 				  <Image
 					  src="/VT.svg"
@@ -130,7 +158,21 @@ export default function Home() {
 				  <p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 					  <span className="font-bold">Virginia Tech: </span> (BS) Mathematics
 				  </p>
-			  </DragCard>
+				</DragCard>
+
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+					<Image
+						src="/images/pets/kuiper_c.jpg"
+						alt="Kuiper"
+						className="object-cover pointer-events-none"
+						fill
+						style={{
+							objectFit: 'cover',
+							objectPosition: 'center top',
+							userSelect: "none",
+						}} />
+				</DragCard>
+
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">
           <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Experience</h2>
           <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Work</h3>
@@ -147,6 +189,18 @@ export default function Home() {
 				  </p>
         </DragCard>
 
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+					<Image
+						src="/images/pets/aster_c.jpg"
+						alt="Asteroid"
+						className="object-cover pointer-events-none"
+						fill
+						style={{
+							objectFit: 'cover',
+							objectPosition: 'center top',
+							userSelect: "none",
+						}} />
+				</DragCard>
 
         <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg1 p-6 rounded-3xl">
           <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Skills</h2>
@@ -174,7 +228,19 @@ export default function Home() {
 					  <span className="wg flex items-center nowrap"><SiCplusplus className="text-2xl text-blue-500 mr-1" /> C++</span>
 					  <span className="wg flex items-center nowrap"><SiDocker className="text-2xl text-blue-500 mr-1" /> Docker</span>
 				  </p>
-        </DragCard>
+				</DragCard>
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+					<Image
+						src="/images/pets/nutmeg_c.jpg"
+						alt="Nutmeg"
+						className="object-cover pointer-events-none"
+						fill
+						style={{
+							objectFit: 'cover',
+							objectPosition: 'center top',
+							userSelect: "none",
+						}} />
+				</DragCard>
 
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">
           <h2 className="text-4xl font-bold mb-2 ml-10">Hello!</h2>
