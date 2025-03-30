@@ -141,7 +141,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 			style={style}
 			initial={{ height: 'auto' }}
 			animate={{
-				height: isFullscreen ? '80vh' : isExpanded ? 'auto' : isHovered ? '145px' : '120px',
+				height: isFullscreen ? '800px' : isExpanded ? 'auto' : isHovered ? '145px' : '120px',
 				transition: { duration: 0.3 }
 			}}
 			onClick={handleClick}
@@ -253,7 +253,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 				<>
 					{isFullscreen ? (
 						<div
-							className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm opacity-100 flex items-center gap-2 cursor-pointer hover:bg-black/90 z-20 select-none"
+							className="absolute bottom-3 right-3 bg-black/50 text-white px-3 py-1 rounded-full text-sm opacity-100 flex items-center gap-2 cursor-pointer hover:bg-black/70 z-20 select-none"
 							style={{ transition: 'background-color 0.3s ease-in-out' }}
 							onClick={(e) => {
 								e.stopPropagation();
