@@ -137,7 +137,7 @@ export default function SearchExpand({
       const timer = setTimeout(fetchResults, 300);
       return () => clearTimeout(timer);
     }
-  }, [searchTerm, isExpanded, searchDictionary, searchRoute]);
+  }, [searchTerm, isExpanded, searchDictionary, searchRoute, isLoggedIn]);
   
   // Store search in local storage and navigate
   const handleResultClick = (result: SearchResult) => {

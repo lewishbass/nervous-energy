@@ -7,16 +7,13 @@
 // - style: style object
 // - className: className string
 // - children: ReactNode
-// - image: background image location
-
-// states
-// - idle: default state, displays title, summary background and expand karat in the top right corner
-// - hover: widget expands slightly vertically and the karat wiggles
-// - click: widget expands fully to the height of the children while summary fades out, delays 0.1s then the children fade in, on blur returns to idle state
+// - image: background image location or array of image locations
+// - onDownload: optional function to download images
 
 import React, { useState, ReactNode, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaDownload } from 'react-icons/fa6';
 
 interface InfoCardProps {
 	title: string;
@@ -24,7 +21,7 @@ interface InfoCardProps {
 	style?: React.CSSProperties;
 	className?: string;
 	children: ReactNode;
-	image?: string;
+	image?: string | string[];
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -36,14 +33,47 @@ const InfoCard: React.FC<InfoCardProps> = ({
 	image,
 }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
+	const [isFullscreen, setIsFullscreen] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
-
+	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [isFaded, setIsFaded] = useState(false);
+
 	const fadedTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+	const imageTransitionRef = React.useRef<NodeJS.Timeout | null>(null);
+
+	// Convert image prop to array for easier handling
+	const images = Array.isArray(image) ? image : image ? [image] : [];
+	const hasMultipleImages = images.length > 1;
+
+	// Image rotation effect
+	useEffect(() => {
+		if (images.length <= 1) return;
+
+		const rotateImage = () => {
+			setCurrentImageIndex(prev => (prev + 1) % images.length);
+		};
+
+		imageTransitionRef.current = setTimeout(rotateImage, 15000);
+
+		return () => {
+			if (imageTransitionRef.current) {
+				clearTimeout(imageTransitionRef.current);
+			}
+		};
+	}, [currentImageIndex, images.length]);
+
+	const next_image = () => {
+		if (images.length <= 1) return;
+		if (imageTransitionRef.current) {
+			clearTimeout(imageTransitionRef.current);
+		}
+		setCurrentImageIndex((prev) => (prev + 1) % images.length);
+	}
 
 	useEffect(() => {
 		if (!isExpanded) {
 			setIsFaded(false);
+			setIsFullscreen(false);
 			return;
 		}
 		if (fadedTimerRef.current) {
@@ -55,12 +85,49 @@ const InfoCard: React.FC<InfoCardProps> = ({
 	}, [isExpanded]);
 
 	const handleClick = () => {
-		setIsExpanded(!isExpanded);
+		if (isExpanded && hasMultipleImages) {
+			// If already expanded and has multiple images, toggle fullscreen mode
+			setIsFullscreen(!isFullscreen);
+		} else {
+		// Otherwise toggle expanded state
+			setIsExpanded(!isExpanded);
+		}
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			setIsExpanded(!isExpanded);
+		}
+	};
+	const downloadImages = async (images: string[]) => {
+		try {
+			// Import JSZip dynamically
+			const JSZip = (await import('jszip')).default;
+			const zip = new JSZip();
+			const folderName = images[0].split('/').slice(0, -1).pop() || 'cave-photos';
+
+			// Add each image to the zip
+			const fetchPromises = images.map(async (image) => {
+				const response = await fetch(image);
+				const blob = await response.blob();
+				const filename = image.split('/').pop() || 'image';
+				zip.file(filename, blob);
+			});
+
+			await Promise.all(fetchPromises);
+
+			// Generate and download the zip
+			const content = await zip.generateAsync({ type: 'blob' });
+			const link = document.createElement('a');
+			link.href = URL.createObjectURL(content);
+			link.download = `${folderName}.zip`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(link.href);
+		} catch (error) {
+			console.error('Failed to download images:', error);
+			alert('Failed to download images. Please try again later.');
 		}
 	};
 
@@ -70,7 +137,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 			style={style}
 			initial={{ height: 'auto' }}
 			animate={{
-				height: isExpanded ? 'auto' : isHovered ? '130px' : '120px',
+				height: isFullscreen ? '80vh' : isExpanded ? 'auto' : isHovered ? '145px' : '120px',
 				transition: { duration: 0.3 }
 			}}
 			onClick={handleClick}
@@ -87,18 +154,41 @@ const InfoCard: React.FC<InfoCardProps> = ({
 			role="button"
 			aria-expanded={isExpanded}
 		>
-			{image && (
-				<div className="absolute inset-0 z-0 opacity-20">
-					<Image
-						src={image}
-						alt={title}
-						fill
-						style={{ objectFit: 'cover', objectPosition: 'center top', filter: isExpanded? 'blur(4px)' : 'blur(0px)', transition: 'filter 0.4s 0.3s ease-in-out' }}
-					/>
-				</div>
+			{images.length > 0 && (
+				<>
+					<AnimatePresence>
+						<motion.div
+							key={currentImageIndex}
+							className="absolute inset-0 z-0"
+							initial={{ opacity: 0, transform: 'scale(1.05)' }}
+							animate={{
+								opacity: isFullscreen ? 1 : 0.3,
+								transform: 'scale(1)'
+							}}
+							exit={{ opacity: 0 }}
+							transition={{
+								duration: 1.5,
+								exit: { delay: 1 }
+							}}
+						>
+							<Image
+								src={images[currentImageIndex]}
+								alt={title}
+								fill
+								style={{
+									objectFit: 'cover',
+									objectPosition: 'center top',
+									filter: isFullscreen ? 'blur(0px)' : isExpanded ? 'blur(4px)' : 'blur(0px)',
+									transition: 'filter 0.4s ease-in-out'
+								}}
+							/>
+						</motion.div>
+					</AnimatePresence>
+				</>
 			)}
 
-			<div className="relative z-10 p-6 pt-3 h-full flex flex-col">
+			<div className={`relative z-10 p-6 pt-3 h-full flex flex-col ${isFullscreen ? 'opacity-0' : 'opacity-100'}`}
+				style={{ transition: 'opacity 0.3s ease-in-out' }}>
 				<div className="absolute top-1 right-1 z-20 flex items-center justify-center w-8 h-8 rounded-full">
 					<motion.div
 						animate={{
@@ -154,6 +244,40 @@ const InfoCard: React.FC<InfoCardProps> = ({
 					)}
 				</AnimatePresence>
 			</div>
+
+			{hasMultipleImages && isExpanded && (
+				<>
+					{isFullscreen ? (
+						<div
+							className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1 rounded-full text-sm opacity-100 flex items-center gap-2 cursor-pointer hover:bg-black/90 z-20 select-none"
+							style={{ transition: 'background-color 0.3s ease-in-out' }}
+							onClick={(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+								console.log('Download clicked');
+								downloadImages(images);
+							}}
+						>
+							<FaDownload /> Download
+						</div>
+					) : (
+						<div
+							className="absolute bottom-3 right-3 bg-black/50 text-white px-3 py-1 rounded-full text-sm opacity-60"
+							style={{ transition: 'opacity 0.3s ease-in-out' }}
+						>
+							Click for gallery view
+						</div>
+					)}
+				</>
+			)}
+
+			{isFullscreen && (
+				<div className="absolute bottom-3 left-3 bg-black/50 text-white px-3 py-1 rounded-full cursor-pointer z-20 text-sm"
+					onClick={(e) => { e.preventDefault(); e.stopPropagation(); next_image(); }}>
+					{currentImageIndex + 1} / {images.length}
+				</div>
+			)
+			}
 		</motion.div>
 	);
 };
