@@ -131,7 +131,7 @@ export default function Events(): JSX.Element {
               The approach was pretty scary, shuffling along a slippery a cliff face, clinging on to an old rope, with a <b className="tc1">HUGE</b> drop into the New River below.
             </p>
             <p>
-              Fait had their first time leading a trip as a full member of the VPI cave club and did an amazing job, we did&apos;t eve get lost twice.
+              Fait had their first time leading a trip as a full member of the VPI cave club and did an amazing job, we did&apos;t even get lost twice.
             </p>
             <p>
               The waterfall chamber was made out of some beautiful knobby black stone. Once we all had our photo-op we turned off all the lights and listened to the waterfall for a while.

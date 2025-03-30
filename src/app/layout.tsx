@@ -152,6 +152,9 @@ function RootLayoutContent({
             onClose={() => setIsNotificationModalOpen(false)}
           />
         </div>
+        <a href="https://github.com/lewishbass/nervous-energy/issues/new" target="_black" className="fixed z-100 left-0 bottom-0 text-center p-1 dark:bg-black/20 bg-white/20 text-xs tc1 opacity-30 select-none cursor-pointer hover:opacity-100 transition-opacity duration-300">
+          Report Issue
+        </a>
       </body>
     </html>
   );
