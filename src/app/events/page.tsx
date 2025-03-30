@@ -20,11 +20,11 @@ export default function Events(): JSX.Element {
 
   // Cave images for the New River Cave card
   const newRiverCaveImages = [
-    '/images/caving/new river 3-4-24/cave5.jpg',
-    '/images/caving/new river 3-4-24/cave4.jpg',
-    '/images/caving/new river 3-4-24/cave3.jpg',
-    '/images/caving/new river 3-4-24/cave2.jpg',
-    '/images/caving/new river 3-4-24/cave1.jpg',
+    '/images/caving/new river 5-4-24/cave5.jpg',
+    '/images/caving/new river 5-4-24/cave4.jpg',
+    '/images/caving/new river 5-4-24/cave3.jpg',
+    '/images/caving/new river 5-4-24/cave2.jpg',
+    '/images/caving/new river 5-4-24/cave1.jpg',
   ];
 
   return (
@@ -118,7 +118,7 @@ export default function Events(): JSX.Element {
 
         <InfoCard
           title="New River Cave Expedition"
-          summary="March 4, 2024, made it to the waterfall"
+          summary="May 4, 2024, made it to the waterfall"
           image={newRiverCaveImages}
           className="w-full"
           style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}

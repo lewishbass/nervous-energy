@@ -71,18 +71,22 @@ const InfoCard: React.FC<InfoCardProps> = ({
 	}
 
 	useEffect(() => {
+		if (fadedTimerRef.current) {
+			clearTimeout(fadedTimerRef.current);
+		}
 		if (!isExpanded) {
 			setIsFaded(false);
 			setIsFullscreen(false);
 			return;
 		}
-		if (fadedTimerRef.current) {
-			clearTimeout(fadedTimerRef.current);
+		if (isFullscreen) {
+			setIsFaded(false);
+			return;
 		}
 		fadedTimerRef.current = setTimeout(() => {
 			setIsFaded(true);
 		}, 400); // Delay before fading out the summary
-	}, [isExpanded]);
+	}, [isExpanded, isFullscreen]);
 
 	const handleClick = () => {
 		if (isExpanded && hasMultipleImages) {
@@ -254,7 +258,6 @@ const InfoCard: React.FC<InfoCardProps> = ({
 							onClick={(e) => {
 								e.stopPropagation();
 								e.preventDefault();
-								console.log('Download clicked');
 								downloadImages(images);
 							}}
 						>
@@ -272,7 +275,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 			)}
 
 			{isFullscreen && (
-				<div className="absolute bottom-3 left-3 bg-black/50 text-white px-3 py-1 rounded-full cursor-pointer z-20 text-sm"
+				<div className="absolute bottom-3 left-3 bg-black/50 text-white px-3 py-1 rounded-full cursor-pointer z-20 text-sm select-none"
 					onClick={(e) => { e.preventDefault(); e.stopPropagation(); next_image(); }}>
 					{currentImageIndex + 1} / {images.length}
 				</div>
