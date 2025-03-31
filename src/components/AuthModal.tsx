@@ -216,7 +216,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   }, [registerPassword,]);
 
   return (
-    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register" contentLoading={false}>
+    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register" contentLoading={false} modalWidth='900px'>
 
       <div className={'mb-[-1.4em] mt-[-0.7em] p-2 rounded items-center ' + (validationError ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-400 dark:text-yellow-200' : '') + (error ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100' : '')}
         style={{ height: (error || validationError) ? '2.4em' : '0px', opacity: (error || validationError) ? 1 : 0, overflow: 'hidden', transition: 'height 0.5s ease-in-out, opacity 0.5s ease-in-out, background-color 0.5s ease-in-out' }}>

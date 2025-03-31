@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import CreateMessageModal from './CreateMessageModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGear } from 'react-icons/fa6';
+import { IoClose } from 'react-icons/io5';
 
 // API endpoint
 const CONVERSATION_API = '/.netlify/functions/conv';
@@ -68,9 +69,11 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
   const isFetchingConversationsRef = useRef(false);
 
   const [createMessageModalOpen, setCreateMessageModalOpen] = useState(false);
+  const [sendButtonState, setSendButtonState] = useState<'valid' | 'invalid' | 'sending'>('valid');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
+
 
   const closeCreateMessageModal = () => {
     setCreateMessageModalOpen(false);
@@ -116,13 +119,27 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  useEffect(() => {
+    // Reset selected conversation if it doesn't exist in the list    
+    if (conversations.length == 0) setSelectedConversationId(null);
+    else if (!conversations.some(conv => conv.id === selectedConversationId))
+      setSelectedConversationId(null)
+  }, [conversations, selectedConversationId]);
+
+
+
   // Fetch user's conversations when modal opens and poll every 3 seconds for updates
   useEffect(() => {
+    setMessages([]); // Clear messages when modal opens
+    setIsLoadingMessages(true); // Set loading state for messages
+
     if (isOpen && username && token) {
       // Initial fetch
       // SefefetchCon lling for the updates check instead of fetching everything
       fetchConversations();
-      if (selectedConversationId) fetchMessages(selectedConversationId);
+      if (selectedConversationId) {
+        fetchMessages(selectedConversationId);
+      }
       const updateCheckInterval = setInterval(() => {
         if (!isFetchingConversationsRef.current) {
           checkForUpdates();
@@ -147,8 +164,9 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
   };
 
   const fetchConversations = async () => {
+    console.log("Fetching conversations...");
     if (!username || !token) return;
-
+    console.log("Fetching conversations for user:", username);
     //setIsLoading(true);
     setIsFetchingConversations(true);
 
@@ -254,6 +272,14 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
             });
             setParticipants(updatedLookup);
           }
+          // set this conversation newMessages to false
+          setConversations(prev =>
+            prev.map(conv =>
+              conv.id === conversationId
+                ? { ...conv, userInfo: { ...conv.userInfo, newMessages: false } }
+                : conv
+            )
+          );
         }
       } else {
         console.error('Failed to fetch messages:', data.error);
@@ -270,7 +296,8 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
 
   const sendMessage = async () => {
     if (!username || !token || !selectedConversationId || !newMessageContent.trim()) return;
-
+    if (sendButtonState === 'sending') return; // Prevent multiple sends
+    setSendButtonState('sending');
     try {
       const response = await fetch(CONVERSATION_API, {
         method: 'POST',
@@ -321,6 +348,9 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Error sending message:', error);
+    }
+    finally {
+      setSendButtonState('valid');
     }
   };
 
@@ -444,6 +474,46 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
     setReplyingTo(null);
   };
 
+  // Add the delete conversation handler
+  const handleDeleteConversation = async (e: React.MouseEvent, conversationId: string) => {
+    e.stopPropagation(); // Prevent selecting the conversation when clicking delete
+
+    if (!username || !token) return;
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'editConversation',
+          username,
+          token,
+          conversationId,
+          deleteConv: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Remove the conversation from the UI
+        setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+
+        // If the deleted conversation was selected, clear the selection
+        if (selectedConversationId === conversationId) {
+          setSelectedConversationId(null);
+          setMessages([]);
+        }
+      } else {
+        console.error('Failed to delete conversation:', data.error);
+      }
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+    }
+  };
+
   // Determine the name to display for a user ID
   const getUserDisplayName = (userId: string) => {
     return participants[userId] || userId;
@@ -492,6 +562,49 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
+
+  const SendButton = () => {
+    return (
+      <AnimatePresence mode="wait">
+        {sendButtonState === "valid" ? (
+          <motion.div
+            key="sendIcon"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <IoSend size={24} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="loadingSpinner"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                width: "20px",
+                height: "20px",
+                border: "4px solid #ffffff",
+                borderTop: "2px solid transparent",
+                borderRadius: "50%"
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={isLoading && conversations.length === 0}>
       <CreateMessageModal isOpen={createMessageModalOpen} onClose={closeCreateMessageModal} />
@@ -509,23 +622,24 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Conversation List */}
-
+          {/* Conversation List - Modified to add delete button */}
           <div className="overflow-y-auto flex-1 space-y-2 p-2 overflow-x-hidden">
             {conversations.length === 0 && !isLoading ? (
               <div className="text-center p-4 tc3 text-nowrap">No conversations yet</div>
             ) : (
-                conversations.map((conversation, index) => (
+                conversations.map((conversation) => (
                 <div
                     key={conversation.id}
                     className={` relative min-w-10 min-h-10 overflow-hidden p-3 rounded-lg cursor-pointer ${selectedConversationId === conversation.id
                       ? 'bg3'
                       : conversation.userInfo?.newMessages
-                        ? 'bg3 opacity-80'
-                        : 'bg2'
+                        ? 'bg2 opacity-80'
+                        : 'bg2 opacity-50'
                     }`}
-                    onClick={() => setSelectedConversationId(conversation.id + index)}
+                    onClick={() => { setSelectedConversationId(conversation.id); scrollToBottom(); }}
                 >
+
+
                     <AnimatePresence >
                       <motion.div
                         initial={{ opacity: 0, translateX: -20 }}
@@ -537,10 +651,24 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
                         transition={{ duration: 0.3 }}>
 
                         <div className="flex justify-between overflow-hidden text-nowrap">
+                          {conversation.userInfo?.newMessages && <>
+                            <div className="absolute top-1/2 -translate-y-1/2 right-2 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                            <div className="absolute top-1/2 -translate-y-1/2 right-2 w-3 h-3 bg-red-500 rounded-full" />
+                          </>}
                           <span className="font-semibold tc1">{getConversationName(conversation)}</span>
-                          <span className="text-sm opacity-75 tc2">
+                          <div className="flex text-sm opacity-75 tc2">
+
                             {conversation.lastMessage ? formatConversationDate(conversation.lastMessage.timestamp) : ''}
-                          </span>
+                            {/* Add the delete button */}
+                            <button
+                              className="w-5 h-5 rounded-full 
+                                flex items-center justify-center text-gray-600 z-10 opacity-70 hover:opacity-100 cursor-pointer"
+                              onClick={(e) => handleDeleteConversation(e, conversation.id)}
+                              aria-label="Delete conversation"
+                            >
+                              <IoClose size={16} />
+                            </button>
+                          </div>
                         </div>
                         <p className="text-sm truncate tc3">
                           {conversation.lastMessage ?
@@ -663,15 +791,24 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
                     value={newMessageContent}
                     onChange={(e) => setNewMessageContent(e.target.value)}
                     onKeyDown={handleKeyDown}
+                    disabled={sendButtonState === 'sending'}
+                    style={{
+                      filter: sendButtonState === 'sending' ? 'contrast(0.1)' : 'none',
+                      transition: 'filter 0.3s ease',
+                    }}
                   />
                 </div>
                 <button
-                  className="p-3 rounded-full text-white hover:bg-blue-600 transition-colors flex items-center justify-center shadow-md"
-                  style={{ backgroundColor: 'var(--khb)' }}
+                  className="p-3 rounded-full text-white hover:bg-blue-600 transition-colors flex items-center justify-center shadow-md cursor-pointer w-12"
+                  style={{
+                    backgroundColor: 'var(--khb)',
+                    opacity: newMessageContent.trim() ? 1 : 0.75,
+                    transition: 'opacity 0.3s ease',
+                  }}
                   onClick={sendMessage}
                   disabled={!newMessageContent.trim()}
                 >
-                  <IoSend size={22} />
+                  {SendButton()}
                 </button>
               </div>
             </>

@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       setTimeout(() => setError(null), 3000);
     }
-  });
+  }, [error]);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
@@ -121,8 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return false;
     }
-    setIsLoading(false);
-    return false;
   };
 
   const register = async (username: string, password: string, profile: Partial<UserProfile> = {}): Promise<boolean> => {
@@ -168,8 +166,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       return false;
     }
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {
@@ -184,8 +180,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('userData');
   };
 
-  const verifyToken = async () => {
+  const verifyToken = async (username?: string, token?: string) => {
     if (!token) return false;
+    if (!username) return false;
 
     try {
       const response = await fetch('/.netlify/functions/profile', {
@@ -200,36 +197,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       });
       if (!response.ok) {
-        logout();
+        return false;
       }
 
       return true;
     } catch (err) {
       console.error('Error verifying token:', err);
-      logout();
       return false;
     }
   }
 
+
   // Check for existing auth on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUserData = localStorage.getItem('userData');
-    verifyToken();
-    if (storedToken && storedUserData) {
-      try {
-        const userData = JSON.parse(storedUserData) as User;
-        setIsLoggedIn(true);
-        setUsername(userData.username);
-        setToken(storedToken);
-        setUser(userData);
-        setUserId(userData.id);
-      } catch (err) {
-        console.error('Error restoring authentication state:', err);
-        logout(); // Clear potentially corrupted auth data
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem('authToken');
+      const storedUserData = localStorage.getItem('userData');
+      if (storedToken && storedUserData) {
+        try {
+          const userData = JSON.parse(storedUserData) as User;
+          const isValid = await verifyToken(userData.username, storedToken);
+          if (!isValid) {
+            throw new Error('Invalid token or username');
+          }
+          setIsLoggedIn(true);
+          setUsername(userData.username);
+          setToken(storedToken);
+          setUser(userData);
+          setUserId(userData.id);
+        } catch (err) {
+          console.error('Error loading auth data:', err);
+          logout(); // Clear potentially corrupted auth data
+        }
       }
-    }
+    };
+    checkAuth();
   }, []);
+
+
+
+  useEffect(() => {
+    if (token && username) {
+      // Set up periodic token verification
+      const verifyInterval = setInterval(async () => {
+        const isValid = await verifyToken(username, token);
+        if (!isValid) {
+          logout();
+        }
+      }, 60 * 1000); // Every 5 minutes
+
+      return () => clearInterval(verifyInterval);
+    }
+  }, [token, username]);
 
   return (
     <AuthContext.Provider value={{

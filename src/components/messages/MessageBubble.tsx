@@ -86,17 +86,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
     >
       {/* Reply reference */}
       {message.replyToMessage && (
-        <div className={`text-xs rounded-lg p-1 mb-1 max-w-[80%] ${message.isMine ? 'ml-auto bg-blue-50' : 'bg-gray-50'}`}>
+        <div className={`text-xs rounded-lg p-1 mb-1 max-w-[80%] tc3 pl-4 ${message.isMine ? 'ml-auto bg-blue-50 dark:bg-slate-900' : 'bg3'}`}>
           <span className="font-medium">{message.replyToMessage.sender}</span>: {message.replyToMessage.content}
         </div>
       )}
 
-      <div className={`p-3 rounded-lg max-w-[80%] ${message.isMine
-          ? 'ml-auto bg-blue-100 text-blue-900'
+      <div className={`relative p-3 rounded-lg max-w-[80%] ${message.isMine
+        ? 'ml-auto bg-blue-100 dark:bg-slate-900 text-blue-200'
           : 'bg2 tc1'
         }`}>
         <div className="flex justify-between items-center mb-1">
-          <span className="font-medium">{message.sender}</span>
+          <span className="font-medium tc3">{message.sender}</span>
           <div className="flex items-center text-xs opacity-75 ml-2">
             {message.edited && <span className="mr-1">(edited)</span>}
             <span>{message.time}</span>
@@ -132,10 +132,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             </div>
           </div>
         ) : (
-          <p className={message.deleted ? "italic text-gray-500" : ""}>{message.content}</p>
+            <p className={message.deleted ? "italic text-gray-500" : "tc1"}>{message.content}</p>
         )}
 
         {/* Reactions display */}
+        <div className="absolute -bottom-2 left-4 flex justify-between items-center mt-2">
         {Object.keys(groupedReactions).length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">
             {Object.entries(groupedReactions).map(([emoji, count]) => (
@@ -145,68 +146,71 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
             ))}
           </div>
         )}
-      </div>
-      
-      {/* Options that appear on hover */}
-      {isHovered && !isEditing && (
-        <div className="absolute -top-8 right-0 flex space-x-1 bg2 p-1 rounded-md shadow-md z-10">
-          {/* Reply button */}
-          <button
-            className="hover:bg-gray-200 p-1 rounded"
-            onClick={() => onReply && onReply()}
-            title="Reply to message"
-          >
-            ↩️
-          </button>
-
-          <div className="relative">
-            <button 
+        </div>
+        {/* Options that appear on hover */}
+        {isHovered && !isEditing && (
+          <div className={"absolute -bottom-4 flex space-x-1 bg3 p-1 rounded-md shadow-md z-10 right-0"}>
+            {/* Reply button */}
+            <button
               className="hover:bg-gray-200 p-1 rounded"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              title="React with emoji"
+              onClick={() => onReply && onReply()}
+              title="Reply to message"
             >
-              😀
+              ↩️
             </button>
-            
-            {showEmojiPicker && (
-              <div className="absolute top-full mt-1 right-0 bg2 p-1 rounded-md shadow-md flex space-x-1 z-10">
-                {quickEmojis.map(emoji => (
-                  <button
-                    key={emoji}
-                    className="hover:bg-gray-200 p-1 rounded"
-                    onClick={() => {
-                      onReact?.(message.id, emoji);
-                      setShowEmojiPicker(false);
-                    }}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
+
+            <div className="relative">
+              <button
+                className="hover:bg-gray-200 p-1 rounded"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                title="React with emoji"
+              >
+                😀
+              </button>
+
+              {showEmojiPicker && (
+                <div className="absolute top-full mt-1 right-0 bg2 p-1 rounded-md shadow-md flex space-x-1 z-10">
+                  {quickEmojis.map(emoji => (
+                    <button
+                      key={emoji}
+                      className="hover:bg-gray-200 p-1 rounded"
+                      onClick={() => {
+                        onReact?.(message.id, emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {message.isMine && !message.deleted && (
+              <>
+                <button
+                  className="hover:bg-gray-200 p-1 rounded"
+                  onClick={handleEditClick}
+                  title="Edit message"
+                >
+                  ✏️
+                </button>
+                <button
+                  className="hover:bg-gray-200 p-1 rounded text-red-500"
+                  onClick={() => onDelete && onDelete(message.id)}
+                  title="Delete message"
+                >
+                  🗑️
+                </button>
+              </>
             )}
           </div>
-          
-          {message.isMine && !message.deleted && (
-            <>
-              <button 
-                className="hover:bg-gray-200 p-1 rounded"
-                onClick={handleEditClick}
-                title="Edit message"
-              >
-                ✏️
-              </button>
-              <button 
-                className="hover:bg-gray-200 p-1 rounded text-red-500"
-                onClick={() => onDelete && onDelete(message.id)}
-                title="Delete message"
-              >
-                🗑️
-              </button>
-            </>
-          )}
-        </div>
-      )}
+        )}
+      </div>
+
     </div>
+
+
   );
 };
 

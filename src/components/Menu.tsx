@@ -56,6 +56,7 @@ export default function Menu({
 
   useEffect(() => {
     if (isLoggedIn) {
+      checkNotification(); // Initial check on mount
       const intervalId = setInterval(checkNotification, 10000); // Check every 10 seconds
 
       return () => clearInterval(intervalId); // Clean up interval on unmount
@@ -76,12 +77,15 @@ export default function Menu({
       });
       if (response.ok) {
         const data = await response.json();
-        if (data.newChats) {
+        if (data.updatedChats) {
           if (!newChats) {
             console.log('New chat!');
-            setNewChats(true);
           }
+          setNewChats(true);
+        } else {
+          setNewChats(false);
         }
+
 
         if (data.newNotifications) {
           if (!newNotifications) {
@@ -148,12 +152,19 @@ export default function Menu({
 
           {/* Other Action Buttons */}
           <button
-            className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg"
+            className="min-w-12 h-12 rounded-full flex items-center justify-center bt2 transition-colors wg relative"
             onClick={(e) => {
               e.preventDefault();
               openMessageModal();
+              setNewChats(false);
             }}
           >
+            {(newChats) && (
+              <>
+                <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full" />
+              </>
+            )}
             <FaEnvelope className="w-5 h-5" />
           </button>
           <button

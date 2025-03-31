@@ -144,7 +144,7 @@ async function handleLogin(requestBody: any) {
       username: user.username 
     },
     JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: '5 days' }
   );
 
   // Return success with token

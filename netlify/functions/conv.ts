@@ -121,7 +121,7 @@ const handleCreateConversation = async (requestBody: any) => {
     userId: u.id,
     lastReadMessageId: null,
     joinedAt: new Date(),
-    role: u.id === user.id ? 'admin' : 'member',
+    role: u.id === (user.id || convType == 'direct') ? 'admin' : 'member',
     isActive: true,
   }));
   
@@ -147,6 +147,7 @@ const handleCreateConversation = async (requestBody: any) => {
   // Add to the creator's chats
   if (!user.data.chats) user.data.chats = [];
   user.data.chats.push(conversationData);
+  user.data.updatedChats = true;
   await user.save();
   
   // Add to other participants' chats and notify them
@@ -186,7 +187,7 @@ const handleCreateConversation = async (requestBody: any) => {
 };
 
 const handleEditConversation = async (requestBody: any) => {
-  const { username, token, conversationId, name, isEncrypted, pinned } = requestBody;
+  const { username, token, conversationId, name, isEncrypted, pinned, deleteConv } = requestBody;
   
   // Validate required fields
   if (!username || !token || !conversationId) {
@@ -231,7 +232,35 @@ const handleEditConversation = async (requestBody: any) => {
   if (name !== undefined) conversation.name = name;
   if (isEncrypted !== undefined) conversation.isEncrypted = isEncrypted;
   if (pinned !== undefined) conversation.pinned = pinned;
-  
+
+  if (deleteConv && deleteConv == true) {
+    // Soft delete the conversation
+    conversation.participants.forEach((p: any) => {
+      p.isActive = false;
+    });
+    await conversation.save();
+
+    // Remove from all participants' chat lists
+    const participantIds = conversation.participants.map((p: any) => p.userId);
+    const participants = await User.find({ id: { $in: participantIds } });
+
+    for (const participant of participants) {
+      participant.data.chats = participant.data.chats.filter(
+        (chat: any) => chat.chatId !== conversationId
+      );
+      participant.data.updatedChats = true;
+      await participant.save();
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        message: 'Conversation deleted successfully'
+      }),
+    };
+  }
+
   await conversation.save();
   
   // Update the conversation name in all participants' chat lists
@@ -268,6 +297,7 @@ const handleEditConversation = async (requestBody: any) => {
 const handleSendMessage = async (requestBody: any) => {
   const { username, token, conversationId, content, metadata, replyTo } = requestBody;
   
+
   // Validate required fields
   if (!username || !token || !conversationId || !content) {
     return {
@@ -603,6 +633,15 @@ const handleGetMessages = async (requestBody: any) => {
     .sort({ timestamp: -1 })
     .limit(limit);
   
+  // Mark user new messages to false
+
+  const userChat = user.data.chats.find((chat: any) => chat.chatId === conversationId);
+  if (userChat) {
+    userChat.newMessages = false;
+  }
+  await user.save();
+
+
   return {
     statusCode: 200,
     body: JSON.stringify({ 
