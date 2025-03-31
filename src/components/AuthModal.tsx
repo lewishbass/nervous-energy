@@ -132,6 +132,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setValidationError('');
     setSuccessMessage('');
+    console.log('Registering:', registerUsername, registerPassword, registerConfirmPassword);
 
 
     if (!registerUsername || !registerPassword) {
@@ -146,6 +147,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
 
     if (validatePassword(registerPassword) !== true) {
+      //setValidationError('Password must be at least 8 characters long and contian a mix of letters, numbers, and special characters');
       return;
     }
 
@@ -157,9 +159,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
       setSuccessMessage('Registration successful! Welcome!');
       // Clear form after successful registration
-      setRegisterUsername('');
-      setRegisterPassword('');
-      setRegisterConfirmPassword('');
+      //setRegisterUsername('');
+      //setRegisterPassword('');
+      //setRegisterConfirmPassword('');
 
       // Close modal after a short delay to show the success message
       setTimeout(() => {
@@ -206,12 +208,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
       return false;
     } else if (validationError?.includes("Password must")) {
       setValidationError('');
-      return true;
     }
+    return true;
   }
   useEffect(() => {
     validatePassword(registerPassword);
-  }, [registerPassword]);
+  }, [registerPassword,]);
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Login or Register" contentLoading={false}>

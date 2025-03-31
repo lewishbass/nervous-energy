@@ -104,7 +104,7 @@ export default function Home() {
 				  </p>
 				</DragCard>
 
-				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300]  h-[400] bg1 p-6 rounded-3xl overflow-hidden">
 					<Image
 						src="/images/pets/me_c.jpg"
 						alt="ME!"
@@ -115,6 +115,9 @@ export default function Home() {
 							objectPosition: 'center top',
 							userSelect: "none",
 						}} />
+					<div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-content opacity-50 bg-black px-2 py-1 rounded-full text-white text-center">
+						ME!
+					</div>
 				</DragCard>
 
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
@@ -125,7 +128,7 @@ export default function Home() {
 				  </p>
 				</DragCard>
 
-				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300]  h-[400] bg1 p-6 rounded-3xl overflow-hidden">
 					<Image
 						src="/images/pets/scottie_c.jpg"
 						alt="Scottie Q"
@@ -136,6 +139,9 @@ export default function Home() {
 							objectPosition: 'center top',
 							userSelect: "none",
 						}} />
+					<div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-content opacity-50 bg-black px-2 py-1 rounded-full text-white text-center">
+						Scottie
+					</div>
 				</DragCard>
 
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white/80 dark:bg-black/40 p-6 rounded-3xl relative overflow-hidden">
@@ -160,7 +166,7 @@ export default function Home() {
 				  </p>
 				</DragCard>
 
-				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300]  h-[400] bg1 p-6 rounded-3xl overflow-hidden">
 					<Image
 						src="/images/pets/kuiper_c.jpg"
 						alt="Kuiper"
@@ -171,6 +177,9 @@ export default function Home() {
 							objectPosition: 'center top',
 							userSelect: "none",
 						}} />
+					<div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-content opacity-50 bg-black px-2 py-1 rounded-full text-white text-center">
+						Kuiper
+					</div>
 				</DragCard>
 
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">
@@ -189,7 +198,7 @@ export default function Home() {
 				  </p>
         </DragCard>
 
-				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300]  h-[400] bg1 p-6 rounded-3xl overflow-hidden">
 					<Image
 						src="/images/pets/aster_c.jpg"
 						alt="Asteroid"
@@ -200,6 +209,9 @@ export default function Home() {
 							objectPosition: 'center top',
 							userSelect: "none",
 						}} />
+					<div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-content opacity-50 bg-black px-2 py-1 rounded-full text-white text-center">
+						Asteroid
+					</div>
 				</DragCard>
 
         <DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[500] bg1 p-6 rounded-3xl">
@@ -229,7 +241,7 @@ export default function Home() {
 					  <span className="wg flex items-center nowrap"><SiDocker className="text-2xl text-blue-500 mr-1" /> Docker</span>
 				  </p>
 				</DragCard>
-				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400]  h-[500] bg1 p-6 rounded-3xl overflow-hidden">
+				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300]  h-[400] bg1 p-6 rounded-3xl overflow-hidden">
 					<Image
 						src="/images/pets/nutmeg_c.jpg"
 						alt="Nutmeg"
@@ -240,6 +252,9 @@ export default function Home() {
 							objectPosition: 'center top',
 							userSelect: "none",
 						}} />
+					<div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-content opacity-50 bg-black px-2 py-1 rounded-full text-white text-center">
+						Nutmeg
+					</div>
 				</DragCard>
 
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg1 p-6 rounded-3xl">

@@ -7,6 +7,7 @@ interface ModalTemplateProps {
   children: ReactNode;
   title?: string;
   contentLoading?: boolean;
+  modalWidth?: string;
 }
 
 const ModalTemplate: React.FC<ModalTemplateProps> = ({
@@ -15,6 +16,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   children,
   title,
   contentLoading = true,
+  modalWidth = '80%',
 }) => {
   // Animation states
   const [isLoading, setIsLoading] = useState(true);
@@ -86,6 +88,8 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
             onMouseDown={(e) => {
               const target = e.target as HTMLElement;
               if (target.classList.contains('modal-closer')) {
+                e.preventDefault();
+                e.stopPropagation();
               resetModal();
               }
             }}
@@ -97,7 +101,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
               className="bg1 rounded-lg shadow-md overflow-hidden"
               initial={{ width: '200px', height: '120px' }}
               animate={{
-                width: animationPhase === 'initial' ? '200px' : '80%',
+                width: animationPhase === 'initial' ? '200px' : modalWidth,
                 height: animationPhase === 'initial' || animationPhase === 'widthExpanding' ? '120px' : 'auto',
               }}
               exit={{ opacity: 0 }}

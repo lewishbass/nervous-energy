@@ -223,6 +223,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUsername(userData.username);
         setToken(storedToken);
         setUser(userData);
+        setUserId(userData.id);
       } catch (err) {
         console.error('Error restoring authentication state:', err);
         logout(); // Clear potentially corrupted auth data

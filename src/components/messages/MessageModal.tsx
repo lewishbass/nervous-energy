@@ -1,33 +1,50 @@
-// MessageModal.tsx
-// node.js, react, typescript, tailwindcss
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ModalTemplate from '../modals/ModalTemplate';
 import MessageBubble from './MessageBubble';
-import { IoSend } from 'react-icons/io5'; // Import the send icon
+import { IoSend } from 'react-icons/io5';
+import { useAuth } from '@/context/AuthContext';
+import CreateMessageModal from './CreateMessageModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaGear } from 'react-icons/fa6';
 
-// Mock data for conversations
-const MOCK_CONVERSATIONS = [
-  { id: 1, sender: 'Jane Smith', preview: 'Hey, did you get my last email about the...', time: '10:30 AM', unread: true },
-  { id: 2, sender: 'John Doe', preview: 'The meeting has been rescheduled to...', time: 'Yesterday', unread: false },
-  { id: 3, sender: 'John Doe', preview: 'The meeting has been rescheduled to...', time: 'Yesterday', unread: false },
-  { id: 4, sender: 'John Doe', preview: 'The meeting has been rescheduled to...', time: 'Yesterday', unread: false },
-  { id: 5, sender: 'Alice Johnson', preview: 'Could you review the document I sent...', time: 'Aug 10', unread: false },
-];
+// API endpoint
+const CONVERSATION_API = '/.netlify/functions/conv';
 
-// Mock data for messages
-const MOCK_MESSAGES = {
-  1: [
-    { id: 1, sender: 'Jane Smith', content: 'Hey, did you get my last email about the project?', time: '10:28 AM', isMine: false },
-    { id: 2, sender: 'Me', content: 'Not yet, can you summarize it?', time: '10:30 AM', isMine: true },
-    { id: 3, sender: 'Jane Smith', content: 'Sure, I was thinking we should move the deadline.', time: '10:32 AM', isMine: false },
-  ],
-  2: [
-    { id: 1, sender: 'John Doe', content: 'The meeting has been rescheduled to tomorrow.', time: '9:00 AM', isMine: false },
-    { id: 2, sender: 'Me', content: 'Thanks for letting me know.', time: '9:05 AM', isMine: true },
-  ],
-  // mock data for other conversations would go here
-};
+// Types for our data structures
+interface Conversation {
+  id: string;
+  name: string;
+  convType: string;  // Changed from 'type' to 'convType'
+  lastMessage?: {
+    content: string;
+    senderId: string;
+    timestamp: Date;
+  };
+  participants: {
+    userId: string;
+    role: string;
+    isActive: boolean;
+  }[];
+  userInfo?: {
+    newMessages: boolean;
+  };
+}
+
+interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  timestamp: Date | string;
+  replyTo?: string;
+  edited?: boolean;
+  deleted?: boolean;
+  reactions?: {
+    userId: string;
+    emoji: string;
+    timestamp: Date;
+  }[];
+}
 
 interface MessageModalProps {
   isOpen: boolean;
@@ -35,34 +52,457 @@ interface MessageModalProps {
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
+  const { username, token, userId } = useAuth();
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
-  const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [participants, setParticipants] = useState<{ [key: string]: string }>({});
+  const [newMessageContent, setNewMessageContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(true);
+  const [isUpdatingMessages, setIsUpdatingMessages] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [isFetchingConversations, setIsFetchingConversations] = useState(false);
+  const isFetchingConversationsRef = useRef(false);
 
-  const handleEditMessage = (id: number, content: string) => {
-    // In a real app, you would implement actual editing functionality
-    alert(`Editing message ${id}: ${content}`);
+  const [createMessageModalOpen, setCreateMessageModalOpen] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
+
+  const closeCreateMessageModal = () => {
+    setCreateMessageModalOpen(false);
+  }
+
+  useEffect(() => {
+    isFetchingConversationsRef.current = isFetchingConversations;
+  }, [isFetchingConversations]);
+
+  useEffect(() => {
+    console.log("Message error: ", error);
+  }, [error]);
+
+  // Function to check if there are updates available
+  const checkForUpdates = async () => {
+
+    if (!username) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getIsUpdated',
+          username
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.updatedChats) {
+        console.log("Conversations updated, fetching new data...");
+        // If there are updates, fetch the conversations
+        fetchConversations();
+        if (selectedConversationId) {
+          fetchMessages(selectedConversationId);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for updates:', error);
+    }
   };
 
-  const handleDeleteMessage = (id: number) => {
-    // In a real app, you would implement actual deletion
-    alert(`Deleting message ${id}`);
+  // Fetch user's conversations when modal opens and poll every 3 seconds for updates
+  useEffect(() => {
+    if (isOpen && username && token) {
+      // Initial fetch
+      // SefefetchCon lling for the updates check instead of fetching everything
+      fetchConversations();
+      if (selectedConversationId) fetchMessages(selectedConversationId);
+      const updateCheckInterval = setInterval(() => {
+        if (!isFetchingConversationsRef.current) {
+          checkForUpdates();
+        }
+      }, 1000); // Check for updates every 3 seconds
+
+      // Cleanup on unmount or when modal closes
+      return () => {
+        clearInterval(updateCheckInterval);
+      };
+    }
+  }, [isOpen, username, token, selectedConversationId]);
+
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleReactToMessage = (id: number, emoji: string) => {
-    // In a real app, you would save the reaction
-    alert(`Reacted with ${emoji} to message ${id}`);
+  const fetchConversations = async () => {
+    if (!username || !token) return;
+
+    //setIsLoading(true);
+    setIsFetchingConversations(true);
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getUserConversations',
+          username,
+          token,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setConversations(data.conversations);
+
+        // If there's at least one conversation and none is selected, select the first one
+        if (data.conversations.length > 0 && !selectedConversationId) {
+          setSelectedConversationId(data.conversations[0].id);
+        }
+      } else {
+        setError(data.error || 'Failed to fetch conversations');
+      }
+    } catch (error) {
+      setError('Error connecting to server');
+      console.error('Error fetching conversations:', error);
+    } finally {
+      setIsLoading(false);
+      setIsFetchingConversations(false);
+    }
+  };
+
+  const fetchMessages = async (conversationId: string) => {
+    console.log("Fetching messages for conversation ID:", conversationId);
+    if (!username || !token) return;
+    if (!conversationId || conversationId === '') return;
+
+    setIsUpdatingMessages(true);
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getMessages',
+          username,
+          token,
+          conversationId,
+          limit: 50, // Adjust as needed
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setMessages(data.messages);
+
+        // Build participant lookup dictionary for display names
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation) {
+          // Initially use user IDs as placeholder names
+          const participantLookup: { [key: string]: string } = {};
+          conversation.participants.forEach(p => {
+            participantLookup[p.userId] = p.userId; // Initially use ID as name
+          });
+
+          // Extract all participant user IDs
+          const participantIds = conversation.participants.map(p => p.userId);
+
+          // Fetch user profiles to get display names
+          const profileResponse = await fetch('/.netlify/functions/profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              action: 'get',
+              username,
+              token,
+              toFetch: participantIds,
+              isId: true
+            }),
+          });
+
+          const profileData = await profileResponse.json();
+
+          // Update participant lookup with actual names
+          if (Array.isArray(profileData)) {
+            const updatedLookup = { ...participantLookup };
+            profileData.forEach(user => {
+              if (user.id && user.username) {
+                updatedLookup[user.id] = user.profile?.firstName
+                  ? `${user.profile.firstName} ${user.profile.lastName || ''}`
+                  : user.username;
+              }
+            });
+            setParticipants(updatedLookup);
+          }
+        }
+      } else {
+        console.error('Failed to fetch messages:', data.error);
+        console.log('Response:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setIsLoadingMessages(false);
+      setIsUpdatingMessages(false);
+    }
+  };
+
+
+  const sendMessage = async () => {
+    if (!username || !token || !selectedConversationId || !newMessageContent.trim()) return;
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'sendMessage',
+          username,
+          token,
+          conversationId: selectedConversationId,
+          content: newMessageContent.trim(),
+          replyTo: replyingTo ? replyingTo.id : undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Add the new message to the current messages
+        setMessages(prevMessages => [...prevMessages, {
+          ...data.message,
+          // Convert server timestamp string to Date object
+          timestamp: new Date(data.message.timestamp)
+        }]);
+
+        // Clear the input and reset replyingTo
+        setNewMessageContent('');
+        setReplyingTo(null);
+
+        // Update the conversation's last message
+        setConversations(prev =>
+          prev.map(conv =>
+            conv.id === selectedConversationId
+              ? {
+                ...conv,
+                lastMessage: {
+                  content: newMessageContent.trim(),
+                  senderId: userId || '',
+                  timestamp: new Date()
+                }
+              }
+              : conv
+          )
+        );
+      } else {
+        console.error('Failed to send message:', data.error);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  const handleEditMessage = async (id: string, content: string) => {
+    if (!username || !token) return;
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'editMessage',
+          username,
+          token,
+          messageId: id,
+          content,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update the message in the UI
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === id
+              ? { ...msg, content, edited: true }
+              : msg
+          )
+        );
+      } else {
+        console.error('Failed to edit message:', data.error);
+      }
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!username || !token) return;
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'deleteMessage',
+          username,
+          token,
+          messageId: id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update the message in the UI
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === id
+              ? { ...msg, content: "[This message has been deleted]", deleted: true }
+              : msg
+          )
+        );
+      } else {
+        console.error('Failed to delete message:', data.error);
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
+  };
+
+  const handleReactToMessage = async (id: string, emoji: string) => {
+    if (!username || !token) return;
+
+    try {
+      const response = await fetch(CONVERSATION_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'addReaction',
+          username,
+          token,
+          messageId: id,
+          emoji,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update the message reactions in the UI
+        setMessages(prev =>
+          prev.map(msg =>
+            msg.id === id
+              ? { ...msg, reactions: data.reactions }
+              : msg
+          )
+        );
+      } else {
+        console.error('Failed to add reaction:', data.error);
+      }
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+    }
+  };
+
+  const handleReplyToMessage = (message: Message) => {
+    setReplyingTo(message);
+    // Focus the input field
+    messageInputRef.current?.focus();
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  // Determine the name to display for a user ID
+  const getUserDisplayName = (userId: string) => {
+    return participants[userId] || userId;
+  };
+
+  // Format date for displaying in the UI
+  const formatMessageDate = (timestamp: Date | string) => {
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Format date for conversation list
+  const formatConversationDate = (timestamp: Date | string) => {
+    if (!timestamp) return '';
+
+    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const dayInMs = 86400000;
+
+    if (diff < dayInMs) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diff < 7 * dayInMs) {
+      return date.toLocaleDateString([], { weekday: 'short' });
+    } else {
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  };
+
+  const getConversationName = (conversation: Conversation) => {
+    if (conversation.name) return conversation.name;
+
+    // For direct conversations without a name, use the other participant's ID
+    if (conversation.convType === 'direct') {  // Changed from 'type' to 'convType'
+      const otherParticipant = conversation.participants.find(p => p.userId !== userId);
+      return otherParticipant ? getUserDisplayName(otherParticipant.userId) : 'Conversation';
+    }
+
+    return 'Group Conversation';
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   return (
-    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={false}>
+    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={isLoading && conversations.length === 0}>
+      <CreateMessageModal isOpen={createMessageModalOpen} onClose={closeCreateMessageModal} />
       <div className="flex h-[60vh]">
         {/* Left Panel - Conversation List */}
-        <div className={`${isLeftPanelCollapsed ? 'w-12' : 'w-1/3'} transition-all duration-300 border-r border-gray-200 flex flex-col`}>
+        <div className={`${isLeftPanelCollapsed ? 'w-15' : 'w-1/3'} transition-all duration-600 border-r border-gray-200 flex flex-col`}>
           {/* Panel Header */}
           <div className="p-2 flex justify-between items-center">
-            {!isLeftPanelCollapsed && <h3 className="tc2 font-medium">Conversations</h3>}
+            {!isLeftPanelCollapsed && <h3 className="tc2 font-medium overflow-hidden">Conversations</h3>}
             <button
-              className="p-1 rounded hover:bg-gray-100 tc1"
+              className="p-1 rounded hover:bg-gray-300/40  tc1 ml-auto w-8 h-8 rounded-full flex items-center justify-center"
               onClick={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
             >
               {isLeftPanelCollapsed ? '→' : '←'}
@@ -70,55 +510,69 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           {/* Conversation List */}
-          {!isLeftPanelCollapsed ? (
-            <div className="overflow-y-auto flex-1 space-y-2 p-2">
-              {MOCK_CONVERSATIONS.map((conversation) => (
+
+          <div className="overflow-y-auto flex-1 space-y-2 p-2 overflow-x-hidden">
+            {conversations.length === 0 && !isLoading ? (
+              <div className="text-center p-4 tc3 text-nowrap">No conversations yet</div>
+            ) : (
+                conversations.map((conversation, index) => (
                 <div
-                  key={conversation.id}
-                  className={`p-3 rounded-lg cursor-pointer ${selectedConversationId === conversation.id ? 'bg3' : conversation.unread ? 'bg3 opacity-80' : 'bg2'
+                    key={conversation.id}
+                    className={` relative min-w-10 min-h-10 overflow-hidden p-3 rounded-lg cursor-pointer ${selectedConversationId === conversation.id
+                      ? 'bg3'
+                      : conversation.userInfo?.newMessages
+                        ? 'bg3 opacity-80'
+                        : 'bg2'
                     }`}
-                  onClick={() => setSelectedConversationId(conversation.id)}
+                    onClick={() => setSelectedConversationId(conversation.id + index)}
                 >
-                  <div className="flex justify-between">
-                    <span className="font-semibold tc1">{conversation.sender}</span>
-                    <span className="text-sm opacity-75 tc2">{conversation.time}</span>
+                    <AnimatePresence >
+                      <motion.div
+                        initial={{ opacity: 0, translateX: -20 }}
+                        animate={{
+                          opacity: isLeftPanelCollapsed ? 0 : 1,
+                          translateX: isLeftPanelCollapsed ? -20 : 0,
+                          maxHeight: isLeftPanelCollapsed ? 0 : '100px',
+                        }}
+                        transition={{ duration: 0.3 }}>
+
+                        <div className="flex justify-between overflow-hidden text-nowrap">
+                          <span className="font-semibold tc1">{getConversationName(conversation)}</span>
+                          <span className="text-sm opacity-75 tc2">
+                            {conversation.lastMessage ? formatConversationDate(conversation.lastMessage.timestamp) : ''}
+                          </span>
+                        </div>
+                        <p className="text-sm truncate tc3">
+                          {conversation.lastMessage ?
+                            (conversation.lastMessage.senderId === userId ? 'You: ' : '') + conversation.lastMessage.content
+                            : 'No messages yet'}
+                        </p>
+                      </motion.div>
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      <motion.div
+                        className="absolute top-5 left-5 -translate-x-1/2 -translate-y-1/2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: !isLeftPanelCollapsed ? 0 : 1 }}
+                        transition={{ duration: 0.3 }}>
+                        <span className="font-semibold tc1">{getConversationName(conversation).charAt(0)}</span>
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
-                  <p className="text-sm truncate tc3">{conversation.preview}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-y-auto flex-1 py-2">
-              {MOCK_CONVERSATIONS.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  className={`mx-auto w-8 h-8 rounded-full mb-2 flex items-center justify-center cursor-pointer ${selectedConversationId === conversation.id ? 'bg3' : conversation.unread ? 'bg3 opacity-80' : 'bg2'
-                    }`}
-                  onClick={() => setSelectedConversationId(conversation.id)}
-                >
-                  <span className="font-semibold tc1">{conversation.sender.charAt(0)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+                ))
+            )}
+          </div>
+
 
           {/* New Message Button */}
           <div className="p-2">
-            {isLeftPanelCollapsed ? (
-              <button
-                className="w-8 h-8 rounded-full bg2 shadow-md flex items-center justify-center mx-auto tc1"
-                onClick={() => alert('New Message button clicked!')}
-              >
-                +
-              </button>
-            ) : (
-              <button
-                className="w-full px-4 py-3 rounded-full text-lg bg2 tc1 shadow-md flex items-center justify-center cursor-pointer ml-[-6]"
-                onClick={() => alert('New Message button clicked!')}
-              >
-                New Message
-              </button>
-            )}
+
+            <button
+              className="w-full px-3 py-1 w-10 h-10 rounded-full text-3xl bg2 tc1 shadow-md flex items-center justify-center cursor-pointer"
+              onClick={() => setCreateMessageModalOpen(true)}
+            >
+              {isLeftPanelCollapsed ? "+" : <span className="text-lg text-nowrap overflow-hidden">New Message</span>}
+            </button>
           </div>
         </div>
 
@@ -127,38 +581,95 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
           {selectedConversationId ? (
             <>
               {/* Chat Header */}
-              <div className="py-3 px-4 ">
-                <h3 className="tc1 font-medium">
-                  {MOCK_CONVERSATIONS.find(c => c.id === selectedConversationId)?.sender}
-                </h3>
+              <div className="py-3 px-4 bg2">
+                <div className="flex items-center">
+                  <h3 className="tc1 font-medium">
+                    {getConversationName(conversations.find(c => c.id === selectedConversationId) || { id: '', name: '', convType: '', participants: [] })}
+                  </h3>
+                  {isUpdatingMessages ? (
+                    <div className="ml-2 animate-spin">
+                      <FaGear size={20} className="text-gray-500 w-5 h-5" />
+                    </div>
+                  ) :
+                    (<div className="ml-2 w-5 h-5" />)}
+                </div>
               </div>
 
               {/* Chat Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {// @ts-expect-error funky typing
-                  MOCK_MESSAGES[selectedConversationId]?.map((message) => (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      onEdit={handleEditMessage}
-                      onDelete={handleDeleteMessage}
-                      onReact={handleReactToMessage}
-                    />
-                  ))}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 mini-scroll">
+                {isLoadingMessages ? (
+                  <div className="text-center p-4 tc3">Loading messages...</div>
+                ) : messages.length === 0 ? (
+                  <div className="text-center p-4 tc3">No messages yet. Start the conversation!</div>
+                ) : (
+                  messages.map((message) => {
+                    // Find referenced message if this is a reply
+                    const referencedMessage = message.replyTo
+                      ? messages.find(m => m.id === message.replyTo)
+                      : null;
+                    return (
+                      <MessageBubble
+                        key={message.id}
+                        message={{
+                          id: message.id,
+                          sender: getUserDisplayName(message.senderId),
+                          content: message.content,
+                          time: formatMessageDate(message.timestamp),
+                          isMine: message.senderId === userId,
+                          replyToMessage: referencedMessage ? {
+                            id: referencedMessage.id,
+                            sender: getUserDisplayName(referencedMessage.senderId),
+                            content: referencedMessage.content,
+                          } : undefined,
+                          edited: message.edited,
+                          deleted: message.deleted,
+                          reactions: message.reactions
+                        }}
+                        onEdit={(id, content) => handleEditMessage(id, content)}
+                        onDelete={(id) => handleDeleteMessage(id)}
+                        onReact={(id, emoji) => handleReactToMessage(id, emoji)}
+                        onReply={() => handleReplyToMessage(message)}
+                      />
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
+              {/* Reply Preview (if replying) */}
+              {replyingTo && (
+                <div className="p-2 bg2 border-t border-gray-200 flex justify-between items-center">
+                  <div className="flex flex-col">
+                    <span className="text-xs tc3">Replying to {getUserDisplayName(replyingTo.senderId)}</span>
+                    <span className="text-sm tc2 truncate">{replyingTo.content}</span>
+                  </div>
+                  <button
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={cancelReply}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
               {/* Message Input */}
-              <div className="p-3 flex flex-row w-full ">
+              <div className="p-3 flex flex-row w-full">
                 <div className="flex flex-grow items-center bg2 rounded-full shadow-md px-4 py-1 mr-3">
                   <input
+                    ref={messageInputRef}
                     type="text"
                     className="flex-1 p-2 bg-transparent border-none focus:outline-none focus:ring-0 text-gray-700 tc1"
                     placeholder="Type a message..."
+                    value={newMessageContent}
+                    onChange={(e) => setNewMessageContent(e.target.value)}
+                    onKeyDown={handleKeyDown}
                   />
                 </div>
                 <button
                   className="p-3 rounded-full text-white hover:bg-blue-600 transition-colors flex items-center justify-center shadow-md"
                   style={{ backgroundColor: 'var(--khb)' }}
+                  onClick={sendMessage}
+                  disabled={!newMessageContent.trim()}
                 >
                   <IoSend size={22} />
                 </button>

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import UserModel from './User';
 
 // Message schema
 const MessageSchema = new mongoose.Schema({
@@ -56,7 +57,16 @@ const MessageSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  replyTo: {
+    type: String,
+    ref: 'Message',
+    default: null,
+  },
 });
+
+// Add indexes for better query performance
+MessageSchema.index({ conversationId: 1, timestamp: -1 });
+MessageSchema.index({ senderId: 1 });
 
 // Conversation Schema
 const ConversationSchema = new mongoose.Schema({
@@ -70,7 +80,7 @@ const ConversationSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  type: {
+  convType: {
     type: String,
     enum: ['direct', 'group', 'channel'],
     default: 'direct',
@@ -117,14 +127,98 @@ const ConversationSchema = new mongoose.Schema({
     of: mongoose.Schema.Types.Mixed,
     default: {},
   },
-  isEncrypted: {
-    type: Boolean,
-    default: false,
-  },
-  pinned: {
-    type: Boolean,
-    default: false,
-  },
+});
+
+// Add indexes for better query performance
+ConversationSchema.index({ participants: 1 });
+ConversationSchema.index({ 'participants.userId': 1 });
+ConversationSchema.index({ lastActive: -1 });
+
+ConversationSchema.pre('save', async function (next) {
+  const conversation = this;
+
+  // Only proceed if lastMessage was modified
+  if (conversation.isModified('lastMessage')) {
+    try {
+      // Get all active participants except the sender
+      const participantsToUpdate = conversation.participants
+        .filter(p => p.userId !== conversation.lastMessage?.senderId);
+
+      if (participantsToUpdate.length > 0) {
+        // Update newMessages flag for all participants
+        await UserModel.updateMany(
+          {
+            id: { $in: participantsToUpdate.map(p => p.userId) },
+            'data.chats.chatId': conversation.id
+          },
+          {
+            $set: {
+              'data.chats.$.newMessages': true,
+              'data.updatedChats': true
+            }
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Error in conversation pre-save hook:', error);
+    }
+  }
+
+  next();
+});
+
+// Add pre-delete hook to remove conversation from users' chat lists
+ConversationSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+  try {
+    const conversation = this;
+    const participantIds = conversation.participants.map(p => p.userId);
+
+    // Remove this conversation from all participants' chat lists
+    await UserModel.updateMany(
+      { id: { $in: participantIds } },
+      {
+        $pull: { 'data.chats': { chatId: conversation.id } },
+        $set: { 'data.updatedChats': true }
+      }
+    );
+
+    next();
+  } catch (error) {
+    console.error('Error in conversation pre-delete hook:', error);
+    // @ts-expect-error next is not a function
+    next(error);
+  }
+});
+
+// Also handle deleteMany operations
+ConversationSchema.pre('deleteMany', async function (next) {
+  try {
+    // Get the filter used in the deleteMany operation
+    const filter = this.getFilter();
+
+    // Find all conversations that match the filter
+    const conversations = await mongoose.model('Conversation').find(filter, { id: 1, 'participants.userId': 1 });
+
+    // For each conversation, update the users
+    for (const conversation of conversations) {
+      // @ts-expect-error type matches
+      const participantIds = conversation.participants.map(p => p.userId);
+
+      await UserModel.updateMany(
+        { id: { $in: participantIds } },
+        {
+          $pull: { 'data.chats': { chatId: conversation.id } },
+          $set: { 'data.updatedChats': true }
+        }
+      );
+    }
+
+    next();
+  } catch (error) {
+    console.error('Error in conversation pre-deleteMany hook:', error);
+    // @ts-expect-error next is not a function
+    next(error);
+  }
 });
 
 const ConversationModel = mongoose.models.Conversation || mongoose.model('Conversation', ConversationSchema);

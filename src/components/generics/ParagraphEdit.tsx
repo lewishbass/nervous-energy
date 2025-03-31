@@ -90,7 +90,7 @@ const ParagraphEdit: React.FC<ParagraphEditProps> = ({
             }}
             onKeyDown={handleKeyDown}
             onBlur={() => setIsEditing(false)}
-            className="max-h-[100%] min-h-[100%] absolute top-0 left-0 w-full px-2 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="max-h-[100%] min-h-[100%] absolute top-0 left-0 w-full px-2 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 z-10"
             style={{ 
                 resize: "none", 
                 overflow: "hidden",

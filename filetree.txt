@@ -63,6 +63,28 @@
 │   │   ├── State of the Art, The - Iain M. Banks.epub
 │   │   ├── Surface Detail - Iain M. Banks.epub
 │   │   └── Use of Weapons - Iain M. Banks.epub
+│   ├── images
+│   │   ├── caving
+│   │   │   ├── james 2-8-25
+│   │   │   │   ├── cave1.jpg
+│   │   │   │   ├── cave2.jpg
+│   │   │   │   ├── cave3.jpg
+│   │   │   │   ├── cave4.jpg
+│   │   │   │   └── cave5.jpg
+│   │   │   └── new river 5-4-24
+│   │   │       ├── cave1.jpg
+│   │   │       ├── cave2.jpg
+│   │   │       ├── cave3.jpg
+│   │   │       ├── cave4.jpg
+│   │   │       └── cave5.jpg
+│   │   ├── pets
+│   │   │   ├── aster_c.jpg
+│   │   │   ├── kuiper_c.jpg
+│   │   │   ├── me_c.jpg
+│   │   │   ├── nutmeg_c.jpg
+│   │   │   └── scottie_c.jpg
+│   │   ├── CEED.svg
+│   │   └── gilbert.jpg
 │   ├── file.svg
 │   ├── filter.svg
 │   ├── globe.svg
@@ -122,19 +144,23 @@
 │   │   │   ├── StringEdit.tsx
 │   │   │   └── SubmitIcon.tsx
 │   │   ├── messages
+│   │   │   ├── CreateMessageModal.tsx
 │   │   │   ├── MessageBubble.tsx
 │   │   │   └── MessageModal.tsx
+│   │   ├── modals
+│   │   │   ├── ModalTemplate.tsx
+│   │   │   ├── NotificationModal.tsx
+│   │   │   └── ProfileModal.tsx
+│   │   ├── widgets
+│   │   │   ├── InfoCard.tsx
+│   │   │   └── WeatherWidget.tsx
 │   │   ├── AuthModal.tsx
 │   │   ├── ColorProgressBar.tsx
 │   │   ├── DragCard.tsx
 │   │   ├── HeadMetadata.tsx
 │   │   ├── Menu.tsx
-│   │   ├── ModalTemplate.tsx
 │   │   ├── Navbar.tsx
-│   │   ├── NotificationModal.tsx
-│   │   ├── ProfileModal.tsx
-│   │   ├── SearchExpand.tsx
-│   │   └── WeatherWidget.tsx
+│   │   └── SearchExpand.tsx
 │   ├── context
 │   │   └── AuthContext.tsx
 │   ├── data
@@ -150,6 +176,7 @@
 ├── filetree.txt
 ├── LICENSE.md
 ├── netlify.toml
+├── next-sitemap.config.js
 ├── next.config.ts
 ├── package-lock.json
 ├── package.json

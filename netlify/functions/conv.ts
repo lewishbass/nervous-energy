@@ -3,6 +3,7 @@ import connectMongoDB from '../lib/mongodb';
 import { validateUser, sendNotification } from '../lib/backendutils';
 import User from '../models/User';
 import { ConversationModel, MessageModel } from '../models/Conversation';
+import { v4 as uuidv4 } from 'uuid';
 
 export const handler: Handler = async (event) => {
   console.log('conversation handler called');
@@ -84,7 +85,7 @@ export const handler: Handler = async (event) => {
 };
 
 const handleCreateConversation = async (requestBody: any) => {
-  const { username, token, participants, name, type = 'direct' } = requestBody;
+  const { username, token, participants, name, convType = 'direct' } = requestBody;
   
   // Validate required fields
   if (!username || !token || !participants || !Array.isArray(participants)) {
@@ -116,19 +117,20 @@ const handleCreateConversation = async (requestBody: any) => {
   }
   
   // Create formatted participants array with required structure
-  const formattedParticipants = users.map(user => ({
-    userId: user.id,
+  const formattedParticipants = users.map(u => ({
+    userId: u.id,
     lastReadMessageId: null,
     joinedAt: new Date(),
-    role: user.id === user.id ? 'admin' : 'member',
+    role: u.id === user.id ? 'admin' : 'member',
     isActive: true,
   }));
   
   // Create the conversation
   const conversation = new ConversationModel({
-    name: name || (type === 'direct' ? '' : 'New Group Conversation'),
-    type,
+    name: name || (convType === 'direct' ? '' : 'New Group Conversation'),
+    convType: convType,
     participants: formattedParticipants,
+    id: uuidv4(),
   });
   
   await conversation.save();
@@ -137,7 +139,7 @@ const handleCreateConversation = async (requestBody: any) => {
   const conversationData = {
     chatId: conversation.id,
     chatName: conversation.name,
-    chatType: conversation.type,
+    chatType: conversation.convType,
     chatMembers: allParticipants,
     newMessages: false,
   };
@@ -159,7 +161,7 @@ const handleCreateConversation = async (requestBody: any) => {
     await sendNotification(
       user,
       participantUser,
-      `${username} added you to a ${type === 'direct' ? 'conversation' : 'group'}`,
+      `${username} added you to a ${convType === 'direct' ? 'conversation' : 'group'}`,
       'newConversation',
       JSON.stringify({ conversationId: conversation.id }),
       false
@@ -175,7 +177,7 @@ const handleCreateConversation = async (requestBody: any) => {
       conversation: {
         id: conversation.id,
         name: conversation.name,
-        type: conversation.type,
+        convType: conversation.convType,
         participants: conversation.participants,
         createdAt: conversation.createdAt
       }
@@ -264,7 +266,7 @@ const handleEditConversation = async (requestBody: any) => {
 };
 
 const handleSendMessage = async (requestBody: any) => {
-  const { username, token, conversationId, content, metadata } = requestBody;
+  const { username, token, conversationId, content, metadata, replyTo } = requestBody;
   
   // Validate required fields
   if (!username || !token || !conversationId || !content) {
@@ -305,12 +307,31 @@ const handleSendMessage = async (requestBody: any) => {
     };
   }
   
+  // If replyTo is provided, validate the referenced message exists and belongs to this conversation
+  if (replyTo) {
+    const referencedMessage = await MessageModel.findOne({ id: replyTo });
+    if (!referencedMessage) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: 'Referenced message not found' }),
+      };
+    }
+
+    if (referencedMessage.conversationId !== conversationId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Referenced message does not belong to this conversation' }),
+      };
+    }
+  }
+
   // Create and save the message
   const message = new MessageModel({
     conversationId,
     senderId: user.id,
     content,
     metadata: metadata || {},
+    replyTo: replyTo || null,
   });
   
   await message.save();
@@ -353,7 +374,8 @@ const handleSendMessage = async (requestBody: any) => {
       JSON.stringify({ 
         conversationId,
         messageId: message.id,
-        preview: content.slice(0, 50) + (content.length > 50 ? '...' : '')
+        preview: content.slice(0, 50) + (content.length > 50 ? '...' : ''),
+        isReply: !!replyTo
       }),
       false
     );
@@ -368,7 +390,8 @@ const handleSendMessage = async (requestBody: any) => {
         conversationId: message.conversationId,
         senderId: message.senderId,
         content: message.content,
-        timestamp: message.timestamp
+        timestamp: message.timestamp,
+        replyTo: message.replyTo
       }
     }),
   };
@@ -516,9 +539,10 @@ const handleGetMessages = async (requestBody: any) => {
   
   // Validate required fields
   if (!username || !token || !conversationId) {
+    const missingFields = ['username', 'token', 'conversationId'].filter(field => !requestBody[field]);
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Required fields missing' }),
+      body: JSON.stringify({ error: 'Required fields missing: ' + missingFields.join(', ') }),
     };
   }
   
@@ -684,7 +708,7 @@ const handleGetUserConversations = async (requestBody: any) => {
     {
       id: 1,
       name: 1,
-      type: 1,
+      convType: 1,
       lastActive: 1,
       'lastMessage.content': 1,
       'lastMessage.senderId': 1,
@@ -710,9 +734,9 @@ const handleGetUserConversations = async (requestBody: any) => {
       conversations: conversations.map(conv => ({
         id: conv.id,
         name: conv.name,
-        type: conv.type,
+        convType: conv.convType,
         lastActive: conv.lastActive,
-          lastMessage: conv.lastMessage,
+        lastMessage: conv.lastMessage,
         // @ts-expect-error because i said so
         participants: conv.participants.map(p => ({
           userId: p.userId,
@@ -812,7 +836,7 @@ const handleAddParticipants = async (requestBody: any) => {
   const conversationData = {
     chatId: conversation.id,
     chatName: conversation.name,
-    chatType: conversation.type,
+    chatType: conversation.convType,
     chatMembers: [...currentParticipantIds, ...newParticipantIds],
     newMessages: true,
   };
@@ -826,7 +850,7 @@ const handleAddParticipants = async (requestBody: any) => {
     await sendNotification(
       user,
       newUser,
-      `${username} added you to ${conversation.type === 'direct' ? 'a conversation' : 'group ' + (conversation.name || 'chat')}`,
+      `${username} added you to ${conversation.convType === 'direct' ? 'a conversation' : 'group ' + (conversation.name || 'chat')}`,
       'addedToConversation',
       JSON.stringify({ conversationId: conversation.id }),
       false
@@ -928,7 +952,7 @@ const handleRemoveParticipant = async (requestBody: any) => {
       await sendNotification(
         user,
         participant,
-        `${username} removed you from ${conversation.type === 'direct' ? 'a conversation' : 'group ' + (conversation.name || 'chat')}`,
+        `${username} removed you from ${conversation.convType === 'direct' ? 'a conversation' : 'group ' + (conversation.name || 'chat')}`,
         'removedFromConversation',
         JSON.stringify({ conversationId: conversation.id }),
         false
