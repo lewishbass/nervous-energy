@@ -37,10 +37,19 @@ export const toys: Toy[] = [
         reqAuth: false
     },
     {
+        title: 'Image Captioning',
+        description: "Generating image captions with with RNNs",
+        link: '/toys/image-captioning',
+        hasPage: true,
+        keywords: 'image captioning rnn lstm attention mechanism computer vision',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    },
+    {
         title: 'Video Classification',
         description: 'Classify videos using deep learning models',
         link: '/toys/video-classification',
-        hasPage: true,
+        hasPage: false,
         keywords: 'deep learning computer vision real-time object recognition',
         imagePath: '/KH_back.svg',
         reqAuth: false

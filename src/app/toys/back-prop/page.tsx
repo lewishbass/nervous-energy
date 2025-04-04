@@ -187,13 +187,13 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3i} } \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( a_{3i} -y_i \\)`}</MathJax></span>
                   </td>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta_{3ij}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3i}} \\)`}</MathJax></span>
                     <span style={{ color: "var(--khr)" }}> <MathJax inline>{`\\( \\frac{\\partial a_{3i}}{\\partial \\theta_{3ij}} \\)`}</MathJax></span>
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (a_{3i}-y_i) \\)`}</MathJax></span>
@@ -204,14 +204,14 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{3}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{3}}{a_{2i}}\\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\theta_{3i}) \\)`}</MathJax></span>
                   </td>
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{2i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{2i}}{\\partial z_{2i}} \\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3i}) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\sigma'(z_{2i}) \\)`}</MathJax></span>
                   </td>
@@ -222,7 +222,7 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta^{2ij}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap" >
+                  <td className="px-0 py-4 whitespace-nowrap" >
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{2i}}{\\partial \\theta^{2ij}} \\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3i} \\cdot \\sigma'(z_{2i})) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( a_{1j} )\\)`}</MathJax></span>
                   </td>
@@ -231,7 +231,7 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\(\\frac{\\partial L}{\\partial a_{1i}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{2}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{2}}{\\partial a_{1i}} \\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2})) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\theta_{2i} ) \\)`}</MathJax></span>
                   </td>
@@ -240,7 +240,7 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial a_{1i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial a_{1i}}{\\partial z_{1i}} \\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} ) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( \\sigma'(z_{1i}) )\\)`}</MathJax></span>
                   </td>
@@ -249,7 +249,7 @@ export default function BackProp() {
                   <td className="px-2 py-4 whitespace-nowrap" style={{ color: "var(--khb)" }}>
                     <MathJax inline>{`\\( \\frac{\\partial L}{\\partial \\theta_{1ij}} \\)`}</MathJax>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-0 py-4 whitespace-nowrap">
                     = <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( \\frac{\\partial L}{\\partial z_{1i}} \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( \\frac{\\partial z_{1i}}{\\partial \\theta_{1ij}} \\)`}</MathJax></span> =
                     <span style={{ color: "var(--khg)" }}><MathJax inline>{`\\( (y \\cdot \\theta_{3} \\cdot \\sigma'(z_{2}) \\cdot \\theta_{2i} \\cdot \\sigma'(z_{1i}) ) \\)`}</MathJax></span><span style={{ color: "var(--khr)" }}><MathJax inline>{`\\( ( x_{j} )\\)`}</MathJax></span>
                   </td>

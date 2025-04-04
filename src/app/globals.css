@@ -348,6 +348,8 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
 }
 
+
+
 .eq{
   display: flex;
   justify-content: center;
@@ -363,8 +365,23 @@ body {
   background-color: #f9f9f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  font-size: 1rem; /* Base font size */
+  overflow: hidden;
 }
 
+@media (max-width: 1024px) {
+  .eq {
+    font-size: 0.8rem;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .eq {
+    font-size: 0.4rem;
+    min-width: 80%;
+  }
+}
 .eq:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 4px rgba(0, 0, 0, 0.3);
@@ -453,4 +470,27 @@ body {
 
 .mini-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes slowpulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes wobble {
+  0% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  100% { transform: rotate(-5deg); }
+}
+.slowpulse {
+  animation: slowpulse 8s ease infinite;
+}
+.slowwobble {
+  animation: wobble 20s ease infinite;
 }

@@ -274,7 +274,7 @@ const BackPropDemo = () => {
   useEffect(() => {
     generateData();
     console.log("Data generated");
-  }, [distribution, classCount, generateData]);
+  }, [distribution, classCount]);
 
   useEffect(() => {
     updateDisplay(dataDisplay, noiseDisplay, classLabels, dataNoise, dataPoints);
