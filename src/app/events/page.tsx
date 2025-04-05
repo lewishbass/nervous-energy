@@ -49,7 +49,7 @@ export default function Events(): JSX.Element {
 
   // Tab styles
   const tabStyle = {
-    base: "px-6 py-3 cursor-pointer transition-all mx-1 font-medium relative user-select-none overflow-hidden",
+    base: "px-[3%] py-3 cursor-pointer transition-all mx-1 font-medium relative user-select-none overflow-hidden",
     active: "text-blue-600 dark:text-blue-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t-full after:animate-tabSlideIn after:transition-transform after:duration-300",
     inactive: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/40 hover:text-gray-900 dark:hover:text-gray-100 rounded-t-lg after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t-full after:scale-x-0 after:transition-transform after:duration-300"
   };
@@ -65,8 +65,8 @@ export default function Events(): JSX.Element {
           className={`${tabStyle.base} ${activeTab === 'weather' ? tabStyle.active : tabStyle.inactive}`}
         >
           <span className="wg flex items-center">
-            <MdOutlineSatelliteAlt className="w-5 h-5 mr-2" />
-            Weather
+            <MdOutlineSatelliteAlt className="min-w-5 min-h-5 mx-auto sm:mr-2" />
+            <span className="hidden sm:inline">Weather</span>
           </span>
         </button>
         <button
@@ -74,8 +74,8 @@ export default function Events(): JSX.Element {
           className={`${tabStyle.base} ${activeTab === 'upcoming' ? tabStyle.active : tabStyle.inactive}`}
         >
           <span className="wg flex items-center">
-            <FaRegCalendarAlt className="w-5 h-5 mr-2" />
-            Upcoming
+            <FaRegCalendarAlt className="min-w-5 min-h-5 mx-auto sm:mr-2" />
+            <span className="hidden sm:inline">Upcoming</span>
           </span>
         </button>
         <button
@@ -83,8 +83,8 @@ export default function Events(): JSX.Element {
           className={`${tabStyle.base} ${activeTab === 'previous' ? tabStyle.active : tabStyle.inactive}`}
         >
           <span className="rotate flex items-center">
-            <FaHistory className="w-5 h-5 mr-2" />
-            Previous
+            <FaHistory className="min-w-5 min-h-5 mx-auto sm:mr-2" />
+            <span className="hidden sm:inline">Previous</span>
           </span>
         </button>
         {/*<button

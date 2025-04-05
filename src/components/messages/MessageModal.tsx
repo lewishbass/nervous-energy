@@ -50,11 +50,12 @@ interface Message {
 interface MessageModalProps {
   isOpen: boolean;
   onClose: () => void;
+  modalWidth?: string;
 }
 
-const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
+const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth = "80%" }) => {
   const { username, token, userId } = useAuth();
-  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(true);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -606,11 +607,11 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={isLoading && conversations.length === 0}>
+    <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={isLoading && conversations.length === 0} modalWidth={modalWidth}>
       <CreateMessageModal isOpen={createMessageModalOpen} onClose={closeCreateMessageModal} />
       <div className="flex h-[60vh]">
         {/* Left Panel - Conversation List */}
-        <div className={`${isLeftPanelCollapsed ? 'w-15' : 'w-1/3'} transition-all duration-600 border-r border-gray-200 flex flex-col`}>
+        <div className={`${isLeftPanelCollapsed ? 'min-w-15 w-15' : 'min-w-1/3 w-[200px]'} transition-all duration-600 border-r border-gray-200 flex flex-col`}>
           {/* Panel Header */}
           <div className="p-2 flex justify-between items-center">
             {!isLeftPanelCollapsed && <h3 className="tc2 font-medium overflow-hidden">Conversations</h3>}
@@ -786,7 +787,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) => {
                   <input
                     ref={messageInputRef}
                     type="text"
-                    className="flex-1 p-2 bg-transparent border-none focus:outline-none focus:ring-0 text-gray-700 tc1"
+                    className="flex-1 p-2 bg-transparent border-none focus:outline-none focus:ring-0 text-gray-700 tc1 w-10"
                     placeholder="Type a message..."
                     value={newMessageContent}
                     onChange={(e) => setNewMessageContent(e.target.value)}

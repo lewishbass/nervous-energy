@@ -138,10 +138,12 @@ function RootLayoutContent({
           <MessageModal 
             isOpen={isMessageModalOpen}
             onClose={() => setIsMessageModalOpen(false)}
+            modalWidth='800px'
           />
           <ProfileModal
             isOpen={isProfileModalOpen}
             onClose={() => setIsProfileModalOpen(false)}
+            modalWidth='800px'
           />
           <AuthModal
             isOpen={isAuthModalOpen}

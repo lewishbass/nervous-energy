@@ -43,7 +43,23 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
   const [editContent, setEditContent] = useState(message.content);
 
   // Common emojis for quick reactions
-  const quickEmojis = ['👍', '❤️', '😂', '😮', '😢', '👏'];
+  const quickEmojis = [
+    '👍', '👎', '🤣', '😭',
+    '❤️', '🙏', '🔥', '💀',
+    '💩', '👀', '👁️', '💋',
+    '💯', '🎉', '💥', '🎆',
+    '😘', '🥰', '😮', '😢', '🤔', '🤯', '🤩', '🥳',
+    '😎', '😴', '🤤', '🤐', '🤢', '🤡', '🙄', '🥺',
+    '👏', '🖕', '👉', '👌', '🤏', '✌', '👋', '🤘',
+
+    '👻', '👽', '🤖', '🎃',
+    '🙈', '🙉', '🙊', '🐒',
+    '🐱', '🐮', '🐸', '🐦',
+    '🐛', '🦋', '🐣', '🐓',
+    '🐝', '🐞', '🐬', '🐙',
+    '🎂', '🍿', '🍷', '🍜',
+    '💃', '🏕', '🚨', '🍻',
+  ];
 
   const handleEditClick = () => {
     if (message.deleted) return;
@@ -136,14 +152,30 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
         )}
 
         {/* Reactions display */}
-        <div className="absolute -bottom-2 left-4 flex justify-between items-center mt-2">
+        <div className="flex justify-between items-center mt-2">
         {Object.keys(groupedReactions).length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">
-            {Object.entries(groupedReactions).map(([emoji, count]) => (
-              <span key={emoji} className="text-xs bg-white bg-opacity-60 rounded-full px-1.5 py-0.5 flex items-center">
-                {emoji} {count > 1 && <span className="ml-1 text-gray-700">{count}</span>}
-              </span>
-            ))}
+              {Object.entries(groupedReactions).map(([emoji, count]) => {
+                // Determine the image source based on the emoji
+                if (!emoji) return null;
+                const codePoint = emoji.codePointAt(0);
+                if (!codePoint) return null;
+                const imgSrc = `https://fonts.gstatic.com/s/e/notoemoji/latest/${codePoint.toString(16)}/512.gif`;
+                const imgSrcWebp = `https://fonts.gstatic.com/s/e/notoemoji/latest/${codePoint.toString(16)}/512.webp`;
+
+                return (
+                  <span key={emoji} className="text-md bg-white/70 dark:bg-white/10 rounded-lg px-1.5 py-0.5 flex items-center cursor-pointer outline-0 hover:outline-2 outline-black/50 dark:outline-gray-300"
+                    style={{ transition: "outline 0.05s ease" }}
+                    onClick={() => onReact?.(message.id, emoji)}>
+                    <picture>
+                      {/*@ts-expect-error typing is valid */}
+                      <source srcset={imgSrcWebp} type="image/webp" />
+                      <img src={imgSrc} alt={emoji} width="25" height="25" />
+                    </picture>
+                    {count > 1 && <span className="ml-1 text-gray-700">{count}</span>}
+                  </span>
+                );
+              })}
           </div>
         )}
         </div>
@@ -165,23 +197,28 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 title="React with emoji"
               >
-                😀
+                <picture>
+                  <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f600/512.gif" alt="😀" width="20" height="20" />
+                </picture>
               </button>
 
               {showEmojiPicker && (
-                <div className="absolute top-full mt-1 right-0 bg2 p-1 rounded-md shadow-md flex space-x-1 z-10">
-                  {quickEmojis.map(emoji => (
+                <div className="absolute top-full mt-1 right-0 bg2 p-1 rounded-md shadow-md gap-0 z-10 max-h-50 overflow-y-scroll mini-scroll snap-none scroll-smooth inline-grid grid-cols-4 w-30">
+                  {quickEmojis.map(emoji => {
+                    // Determine the image source based on the emoji
+                    return (
                     <button
                       key={emoji}
-                      className="hover:bg-gray-200 p-1 rounded"
+                        className="hover:bg-gray-300 p-0 rounded flex items-center justify-center text-2xl"
                       onClick={() => {
                         onReact?.(message.id, emoji);
                         setShowEmojiPicker(false);
                       }}
                     >
-                      {emoji}
+                        {emoji}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

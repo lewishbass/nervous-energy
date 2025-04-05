@@ -15,6 +15,7 @@ const PROFILE_ROUTE = '/.netlify/functions/profile';
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  modalWidth?: string;
 }
 
 // Define user profile interface based on backend data structure
@@ -38,7 +39,7 @@ interface UserProfile {
   };
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth = "80%" }) => {
   // Replace dummy data with state for real user data
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -129,7 +130,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
   }
 
   return (
-    <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile" contentLoading={isLoading}>
+    <ModalTemplate isOpen={isOpen} onClose={onClose} title="My Profile" contentLoading={isLoading} modalWidth={modalWidth}>
       <div className="space-y-6">
         {/* Profile Header with Avatar */}
         <div className="flex items-center space-x-4">
@@ -269,7 +270,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Account Management Forms - Side by side with animation */}
-        <div className={`overflow-hidden transition-all duration-1000 ease-in-out ${isEditing ? 'max-h-200 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <div className={`overflow-hidden transition-all duration-1000 ease-in-out ${isEditing ? 'max-h-220 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="flex flex-col md:flex-row gap-4 border-t-2 border-gray-200">
             {/* Password Change Form */}
             <div className="flex-1 transition-all duration-1000 ease-in-out transform origin-top p-3">
