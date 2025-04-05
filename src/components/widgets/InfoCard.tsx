@@ -22,6 +22,7 @@ interface InfoCardProps {
 	className?: string;
 	children: ReactNode;
 	image?: string | string[];
+	doBlur?: boolean;
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -31,6 +32,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 	className = '',
 	children,
 	image,
+	doBlur = true
 }) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [isFullscreen, setIsFullscreen] = useState(false);
@@ -149,7 +151,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 			onMouseLeave={() => setIsHovered(false)}
 			onBlur={(e) => {
 				// Only collapse if focus is moving outside the component
-				if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+				if (doBlur && !e.currentTarget.contains(e.relatedTarget as Node)) {
 					setIsExpanded(false);
 				}
 			}}

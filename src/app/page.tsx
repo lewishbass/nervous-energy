@@ -83,7 +83,7 @@ export default function Home() {
 						<Image
 							width={700}
 							height={500}
-							alt="Logo"
+							alt="Nervous Energy"
 							src="/FullLogo.svg"
 							style={{
 								filter: "drop-shadow(5px 5px 4px #0008)",

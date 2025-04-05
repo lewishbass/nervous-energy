@@ -87,11 +87,15 @@
 │   │   └── gilbert.jpg
 │   ├── file.svg
 │   ├── filter.svg
+│   ├── FullLogo.svg
 │   ├── globe.svg
 │   ├── grid.svg
 │   ├── KH_back.svg
 │   ├── KH_figures.svg
 │   ├── next.svg
+│   ├── robots.txt
+│   ├── sitemap-0.xml
+│   ├── sitemap.xml
 │   ├── vercel.svg
 │   ├── VT.svg
 │   └── window.svg
@@ -116,6 +120,8 @@
 │   │   │   │   ├── FiveLayerNetwork.tsx
 │   │   │   │   ├── NetworkGraph.tsx
 │   │   │   │   └── page.tsx
+│   │   │   ├── image-captioning
+│   │   │   │   └── page.tsx
 │   │   │   ├── one-step-learning-rate
 │   │   │   │   ├── OneStepDemo.tsx
 │   │   │   │   └── page.tsx
@@ -128,11 +134,11 @@
 │   │   │   └── page.tsx
 │   │   ├── favicon.ico
 │   │   ├── globals.css
-│   │   ├── metadata.ts
 │   │   └── page.tsx
 │   ├── components
 │   │   ├── backgrounds
 │   │   │   ├── CircleAnimmation.tsx
+│   │   │   ├── LineAnimation.tsx
 │   │   │   ├── SquareAnimation.tsx
 │   │   │   └── TriangleAnimation.tsx
 │   │   ├── generics

@@ -402,7 +402,7 @@ export default function WeatherWidget({ className = "" }: WeatherWidgetProps): J
                 />
                 <YAxis
                   hide={true}
-                  domain={['dataMin - 2', 'dataMax + 2']}
+                      domain={['dataMin - 13', 'dataMax + 2']}
                   axisLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} />
@@ -416,7 +416,7 @@ export default function WeatherWidget({ className = "" }: WeatherWidgetProps): J
                 />
                 {/* Current time reference line */}
                 <ReferenceLine x={new Date().getHours() + (new Date().getMinutes() / 60.0)} stroke="#fff" strokeWidth={2} />
-                <ReferenceLine x={4} stroke="#f0f" strokeWidth={2}
+                    <ReferenceLine x={4.5} stroke="#f0f" strokeWidth={2}
                   strokeDasharray="8 4" />
                 {/* Sunrise reference line */}
                 {weatherData && weatherData.daily && weatherData.daily.sunrise && (
@@ -450,7 +450,7 @@ export default function WeatherWidget({ className = "" }: WeatherWidgetProps): J
               <div key={index} className="flex flex-col items-center text-white">
                 <div className="text-black dark:text-white bg-white/40 dark:bg-black/20 rounded-full lg:p-1 sm:p-0">{icon}</div>
                 <span className="text-xs mt-1">
-                  {index * 2}:00
+                  {index * 2}
                 </span>
               </div>
             ))}
