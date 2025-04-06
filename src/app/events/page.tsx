@@ -2,6 +2,7 @@
 
 "use client";
 import WeatherWidget from '@/components/widgets/WeatherWidget';
+import StockWidget from '@/components/widgets/StockWidget';
 import InfoCard from '@/components/widgets/InfoCard';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -103,6 +104,7 @@ export default function Events(): JSX.Element {
         <div>
           <h2 className="text-2xl font-bold mb-4 tc1">Current Weather</h2>
           <WeatherWidget className="mb-6" />
+          <StockWidget className="mb-6" />
         </div>
       )}
 
