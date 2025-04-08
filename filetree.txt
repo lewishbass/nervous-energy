@@ -4,6 +4,7 @@
 │   ├── functions
 │   │   ├── auth.ts
 │   │   ├── conv.ts
+│   │   ├── keys.ts
 │   │   ├── profile.ts
 │   │   ├── social.ts
 │   │   └── version.ts
@@ -71,12 +72,13 @@
 │   │   │   │   ├── cave3.jpg
 │   │   │   │   ├── cave4.jpg
 │   │   │   │   └── cave5.jpg
-│   │   │   └── new river 5-4-24
-│   │   │       ├── cave1.jpg
-│   │   │       ├── cave2.jpg
-│   │   │       ├── cave3.jpg
-│   │   │       ├── cave4.jpg
-│   │   │       └── cave5.jpg
+│   │   │   ├── new river 5-4-24
+│   │   │   │   ├── cave1.jpg
+│   │   │   │   ├── cave2.jpg
+│   │   │   │   ├── cave3.jpg
+│   │   │   │   ├── cave4.jpg
+│   │   │   │   └── cave5.jpg
+│   │   │   └── cave-shirt.jpg
 │   │   ├── pets
 │   │   │   ├── aster_c.jpg
 │   │   │   ├── kuiper_c.jpg
@@ -159,6 +161,7 @@
 │   │   │   └── ProfileModal.tsx
 │   │   ├── widgets
 │   │   │   ├── InfoCard.tsx
+│   │   │   ├── StockWidget.tsx
 │   │   │   └── WeatherWidget.tsx
 │   │   ├── AuthModal.tsx
 │   │   ├── ColorProgressBar.tsx

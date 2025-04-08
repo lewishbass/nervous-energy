@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { cache, useEffect, useRef, useState } from 'react';
 
 interface LineAnimationProps {
   spacing?: number; // Spacing between lines
@@ -13,6 +13,7 @@ interface Line {
   y1: number;
   x2: number;
   y2: number;
+  depth: number;
   length: number;
   color: string;
   animationDuration: number;
@@ -60,15 +61,18 @@ const LineAnimation: React.FC<LineAnimationProps> = ({
 				seedOffset_y += 10;
 				const seedOffset = seedOffset_x + seedOffset_y;
 				if(seededRandom(0, 1, seed + seedOffset) < 0.5) continue;
-				const color = `rgba(${seededRandom(50, 255, seed + seedOffset + 1)}, ${seededRandom(50, 255, seed + seedOffset + 1)}, ${seededRandom(50, 255, seed + seedOffset + 1)}, 1)`;
 				const theta = seededRandom(0, 360, seed + seedOffset + 2);
         const length = seededRandom(20, 80, seed + seedOffset + 3);
+        const depth = seededRandom(0, 3, seed + seedOffset + 4);
+        const luminance = 255/(1+depth*depth);//seededRandom(50, 255, seed + seedOffset + 1)/(1+depth);
+				const color = `rgba(${luminance}, ${luminance}, ${luminance}, 1)`;
 				newLines.push({
           x1:  Math.cos(theta) * lineRadius + x,
           x2: -Math.cos(theta) * lineRadius + x,
           y1:  Math.sin(theta) * lineRadius + y,
           y2: -Math.sin(theta) * lineRadius + y,
           length: length,
+          depth,
 					color,
 					animationDuration: seededRandom(4, 16, seed + seedOffset + 6),
 					animationDelay: seededRandom(0, 20, seed + seedOffset + 7),
@@ -76,7 +80,8 @@ const LineAnimation: React.FC<LineAnimationProps> = ({
 				});
 			}
 		}
-
+    // sort lines by depth
+    newLines.sort((a, b) => b.depth - a.depth);
 
 		console.log("Lines generated: ", newLines.length);
 		setLines(newLines);
@@ -136,13 +141,14 @@ const LineAnimation: React.FC<LineAnimationProps> = ({
               y1={line.y1}
               x2={line.x2}
               y2={line.y2}
+              z={1-line.depth}
               fill={'none'}
               stroke={line.color}
-              strokeWidth={strokeWidth}
+              strokeWidth={strokeWidth/(1+line.depth)}
               strokeDasharray={lineLength}
               strokeDashoffset={lineLength}
               style={{
-                animation: `dash ${5 + 30 / line.length ** 0.5}s ease-in-out forwards`,
+                animation: `dash ${(5 + 30 / line.length ** 0.5)*(1+line.depth)}s ease-in-out forwards`,
                 animationDelay: `${30 / line.length**0.5}s`,
                 strokeLinejoin: "round",
                 strokeLinecap: "round"

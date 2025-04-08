@@ -40,7 +40,7 @@ export const toys: Toy[] = [
         title: 'Image Captioning',
         description: "Generating image captions with with RNNs",
         link: '/toys/image-captioning',
-        hasPage: true,
+        hasPage: false,
         keywords: 'image captioning rnn lstm attention mechanism computer vision',
         imagePath: '/KH_back.svg',
         reqAuth: false
