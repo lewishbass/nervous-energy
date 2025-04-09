@@ -1,4 +1,4 @@
-import React, { cache, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface LineAnimationProps {
   spacing?: number; // Spacing between lines
