@@ -13,6 +13,7 @@ import bookData from "./book_info.json";
 import "./books.css";
 import { useAuth } from "@/context/AuthContext";
 import { FaBook, FaTablet, FaDownload } from "react-icons/fa"; // Import icons for shop types
+import { AnimatePresence, motion } from "framer-motion";
 
 interface Book {
   paragraph1: string;
@@ -153,6 +154,8 @@ export default function Books() {
     setSelectedBook(selectedBook === index ? null : index);
   };
 
+
+
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (selectedBook === null) return;
 
@@ -213,6 +216,7 @@ export default function Books() {
         block: "center",
       });
     }
+
   }, [selectedBook]);
 
   const toggleShopType = (e: React.MouseEvent) => {
@@ -334,83 +338,92 @@ export default function Books() {
                 <p className="book-description tc2">{book.paragraph1}</p>
 
                 {/* Expanded content */}
-                {isSelected && (
-                  <div className="mt-4 space-y-3 animate-fadeIn">
-                    <p className="book-description tc2">{book.paragraph2}</p>
+                <AnimatePresence>
+                  {isSelected && (
+                    <motion.div
+                      key="expanded-content"
+                      initial={{ opacity: 0, }}
+                      animate={{ opacity: 1, }}
+                      exit={{ opacity: 0, }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-4 space-y-3"
+                    >
+                      <p className="book-description tc2">{book.paragraph2}</p>
 
-                    <div className="book-detail-section">
-                      <div>
-                        <span className="book-detail-label tc2">Words: </span>
-                        <span className="book-detail-value tc3">
-                          {book.wordcount.toLocaleString()}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="book-detail-label tc2">ISBN: </span>
-                        <span className="book-detail-value tc3">
-                          {book.ISBN}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="book-detail-label tc2">Ratings: </span>
-                        <span className="book-detail-value tc3">
-                          {book.n_good_ratings.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="book-trivia">
-                      <span className="book-detail-label tc1">Trivia: </span>
-                      <span className="book-detail-value tc2">
-                        {book.trivia}
-                      </span>
-                    </div>
-
-                    {/* Download button */}
-                    <div className="flex flex-row mt-6 items-center">
-                      {isLoggedIn && (
+                      <div className="book-detail-section">
                         <div>
+                          <span className="book-detail-label tc2">Words: </span>
+                          <span className="book-detail-value tc3">
+                            {book.wordcount.toLocaleString()}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="book-detail-label tc2">ISBN: </span>
+                          <span className="book-detail-value tc3">
+                            {book.ISBN}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="book-detail-label tc2">Ratings: </span>
+                          <span className="book-detail-value tc3">
+                            {book.n_good_ratings.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="book-trivia">
+                        <span className="book-detail-label tc1">Trivia: </span>
+                        <span className="book-detail-value tc2">
+                          {book.trivia}
+                        </span>
+                      </div>
+
+                      {/* Download button */}
+                      <div className="flex flex-row mt-6 items-center">
+                        {isLoggedIn && (
+                          <div>
+                            <a
+                              href={`/${book.book_file}`}
+                              download
+                              className="book-download-button"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <FaDownload className="mr-2 inline" /> EPUB
+                            </a>
+                          </div>
+                        )}
+
+                        <div
+                          className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
+                          style={{
+                            backgroundColor: "var(--khg)",
+                            borderRadius: "0.375rem",
+                          }}
+                        >
+                          <div
+                            className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                            style={{
+                              backgroundColor: "var(--khp)",
+                            }}
+                            onClick={toggleShopType}
+                          >
+                            <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
+                            <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
+                          </div>
                           <a
-                            href={`/${book.book_file}`}
-                            download
-                            className="book-download-button"
+                            href={book[`${shopType}_link`] || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <FaDownload className="mr-2 inline" /> EPUB
+                            Shop
                           </a>
                         </div>
-                      )}
-
-                      <div
-                        className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
-                        style={{
-                          backgroundColor: "var(--khg)",
-                          borderRadius: "0.375rem",
-                        }}
-                      >
-                        <div
-                          className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
-                          style={{
-                            backgroundColor: "var(--khp)",
-                          }}
-                          onClick={toggleShopType}
-                        >
-                          <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
-                          <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
-                        </div>
-                        <a
-                          href={book[`${shopType}_link`] || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Shop
-                        </a>
                       </div>
-                    </div>
-                  </div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           );

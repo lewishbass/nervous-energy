@@ -24,7 +24,7 @@ const shopProducts: ShopData = {
         'Weatherproof',
         'Strong Adhesive'
       ],
-      image: '/images/CEED.svg',
+      image: '/images/store/nervous-sticker-shot.png',
       stockStatus: 'Coming Soon'
     },
     {
@@ -48,7 +48,7 @@ const shopProducts: ShopData = {
         'Weatherproof',
         'Strong Adhesive'
       ],
-      image: '/VT.svg',
+      image: '/images/store/WM-sticker-shot.png',
       stockStatus: 'Coming Soon'
     },
     {
