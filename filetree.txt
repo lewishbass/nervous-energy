@@ -85,6 +85,9 @@
 │   │   │   ├── me_c.jpg
 │   │   │   ├── nutmeg_c.jpg
 │   │   │   └── scottie_c.jpg
+│   │   ├── store
+│   │   │   ├── nervous-sticker-shot.png
+│   │   │   └── WM-sticker-shot.png
 │   │   ├── CEED.svg
 │   │   └── gilbert.jpg
 │   ├── file.svg
@@ -115,7 +118,9 @@
 │   │   ├── home
 │   │   │   └── page.tsx
 │   │   ├── shop
-│   │   │   └── page.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── shop.css
+│   │   │   └── ShopCard.tsx
 │   │   ├── toys
 │   │   │   ├── back-prop
 │   │   │   │   ├── BackPropDemo.tsx
@@ -127,6 +132,9 @@
 │   │   │   ├── one-step-learning-rate
 │   │   │   │   ├── OneStepDemo.tsx
 │   │   │   │   └── page.tsx
+│   │   │   ├── stars
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── StarsGameComponent.tsx
 │   │   │   ├── video-classification
 │   │   │   │   └── page.tsx
 │   │   │   ├── xg-weight-init
@@ -173,6 +181,7 @@
 │   ├── context
 │   │   └── AuthContext.tsx
 │   ├── data
+│   │   ├── shopProducts.ts
 │   │   └── toys.ts
 │   ├── hooks
 │   │   └── useClickAway.ts

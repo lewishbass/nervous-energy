@@ -201,7 +201,7 @@ body {
   fill-opacity: 0;
   stroke-opacity: 0;
   stroke-dashoffset: 500;
-  animation: dash-move 10s linear forwards;
+  animation: dash-move 5s linear forwards;
   stroke-linecap: round;
   stroke-width: 5px;
 }

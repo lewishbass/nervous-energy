@@ -597,7 +597,7 @@ export default function StockWidget({ className = "" }: StockWidgetProps): JSX.E
 					</div>
 
 					{/* Disclaimer */}
-					<p className="text-white/50 text-xs mt-4 italic text-center relative z-10">
+				<p className="text-white/50 text-xs mt-4 italic text-center relative z-10 pointer-events-none">
 								Data shown is for demonstration purposes only.
 								Please use a reputable source for real-time stock data.
 					</p>

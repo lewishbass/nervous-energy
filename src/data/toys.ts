@@ -10,6 +10,15 @@ export interface Toy {
 
 export const toys: Toy[] = [
     {
+        title: 'Stars',
+        description: 'Like soduku, but less class and more dopamine',
+        link: '/toys/stars',
+        hasPage: false,
+        keywords: 'TypeScript Node.js Tailwind stars template',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    },
+    {
         title: 'One Step Learning Rate',
         description: 'Explaining one step learning rates for quadratic loss',
         link: '/toys/one-step-learning-rate',

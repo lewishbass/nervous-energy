@@ -90,8 +90,8 @@ export default function Home() {
 							}}
 							className="slowpulse"
 						/>
-				  </h1>
-			  </div>
+					</h1>
+				</div>
 		  </section>
 
       {/* About Section */}
@@ -105,7 +105,10 @@ export default function Home() {
 				  style={{
 					  userSelect: "none",
 				  }}
-        />
+				/>
+				<p className="absolute top-3 left-1/2 transform -translate-x-1/2 text-center text-xl tc2 w-full opacity-50">
+					This website is a work in progress please use the <b className="tc1">Report Issue</b> button in the bottom left to help me find bugs, suggest improvements or request features.
+				</p>
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
 				  <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Interests</h2>
 				  <h3 className="text-2xl font-bold mb-2 ml-10 mt-2">TODO</h3>
