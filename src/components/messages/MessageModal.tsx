@@ -60,6 +60,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [participants, setParticipants] = useState<{ [key: string]: string }>({});
+  const [otherConvoParticipants, setOtherConvoParticipants] = useState<{ [key: string]: string }>({});
   const [newMessageContent, setNewMessageContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
@@ -189,13 +190,59 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
       if (response.ok && data.success) {
         setConversations(data.conversations);
 
+
         // If there's at least one conversation and none is selected, select the first one
         if (data.conversations.length > 0 && !selectedConversationId) {
           setSelectedConversationId(data.conversations[0].id);
         }
       } else {
         setError(data.error || 'Failed to fetch conversations');
+        console.error('Failed to fetch conversations:', data.error);
+        throw new Error(data.error || 'Failed to fetch conversations');
       }
+
+
+      // load usernames of other participants
+      const otherParticipantIds: string[] = [];
+      data.conversations.forEach((conversation: Conversation) => {
+        conversation.participants.forEach((participant) => {
+          if (participant.userId !== userId && !otherParticipantIds.includes(participant.userId)) {
+            otherParticipantIds.push(participant.userId);
+          }
+        });
+      });
+      // fetch usernames from backend
+      const profileResponse = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'get',
+          username,
+          token,
+          toFetch: otherParticipantIds,
+          isId: true
+        }),
+      });
+
+      const profileData = await profileResponse.json();
+
+      // Update participant lookup with actual names
+      if (Array.isArray(profileData)) {
+        const updatedLookup = { ...otherConvoParticipants };
+        profileData.forEach(user => {
+          if (user.id && user.username) {
+            updatedLookup[user.id] = user.profile?.firstName
+              ? `${user.profile.firstName} ${user.profile.lastName || ''}`
+              : user.username;
+          }
+        });
+        setOtherConvoParticipants(updatedLookup);
+        console.log(updatedLookup);
+      }
+
+
     } catch (error) {
       setError('Error connecting to server');
       console.error('Error fetching conversations:', error);
@@ -203,6 +250,8 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
       setIsLoading(false);
       setIsFetchingConversations(false);
     }
+
+
   };
 
   const fetchMessages = async (conversationId: string) => {
@@ -517,7 +566,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
 
   // Determine the name to display for a user ID
   const getUserDisplayName = (userId: string) => {
-    return participants[userId] || userId;
+    return participants[userId] || otherConvoParticipants[userId] || userId;
   };
 
   // Format date for displaying in the UI
