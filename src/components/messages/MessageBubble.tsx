@@ -168,8 +168,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
                     style={{ transition: "outline 0.05s ease" }}
                     onClick={() => onReact?.(message.id, emoji)}>
                     <picture>
-                      {/*@ts-expect-error typing is valid */}
-                      <source srcset={imgSrcWebp} type="image/webp" />
+                      <source srcSet={imgSrcWebp} type="image/webp" />
                       <img src={imgSrc} alt={emoji} width="25" height="25" />
                     </picture>
                     {count > 1 && <span className="ml-1 text-gray-700">{count}</span>}

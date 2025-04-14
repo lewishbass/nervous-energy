@@ -86,7 +86,8 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [ ]simple multiplayer game, maybe space duel
 - [+]add shop content
 - [ ]popup context
-- [ ]message group chat names for direct messages
+- [+]message group chat names for direct messages
+- [ ]figure out coustom rendered preview when link is sent
 
 ## License
 [MIT License](LICENSE) - See LICENSE file for details

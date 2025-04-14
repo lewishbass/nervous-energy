@@ -706,6 +706,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
                             <div className="absolute top-1/2 -translate-y-1/2 right-2 w-3 h-3 bg-red-500 rounded-full" />
                           </>}
                           <span className="font-semibold tc1">{getConversationName(conversation)}</span>
+
                           <div className="flex text-sm opacity-75 tc2">
 
                             {conversation.lastMessage ? formatConversationDate(conversation.lastMessage.timestamp) : ''}
@@ -763,6 +764,17 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
                 <div className="flex items-center">
                   <h3 className="tc1 font-medium">
                     {getConversationName(conversations.find(c => c.id === selectedConversationId) || { id: '', name: '', convType: '', participants: [] })}
+                    : <span className="ml-3" />
+                    {
+                      (conversations.find(c => c.id === selectedConversationId) || { participants: [] }).participants.map((participant, index) => {
+
+                        return <span key={participant.userId} className="tc3 opacity-50">
+                          {getUserDisplayName(participant.userId)}
+                          {index < (conversations.find(c => c.id === selectedConversationId) || { participants: [] }).participants.length - 1 ? ', ' : ''}
+                        </span>
+
+                      }) || []
+                    }
                   </h3>
                   {isUpdatingMessages ? (
                     <div className="ml-2 animate-spin">
