@@ -41,6 +41,22 @@ export default function Events(): JSX.Element {
     '/images/caving/new river 5-4-24/cave1.jpg',
   ];
 
+  const linxCaveImages = [
+    '/images/caving/linx-4-10-25/cave13.jpg',
+    '/images/caving/linx-4-10-25/cave12.jpg',
+    '/images/caving/linx-4-10-25/cave11.jpg',
+    '/images/caving/linx-4-10-25/cave10.jpg',
+    '/images/caving/linx-4-10-25/cave9.jpg',
+    '/images/caving/linx-4-10-25/cave8.jpg',
+    '/images/caving/linx-4-10-25/cave7.jpg',
+    '/images/caving/linx-4-10-25/cave6.jpg',
+    '/images/caving/linx-4-10-25/cave5.jpg',
+    '/images/caving/linx-4-10-25/cave4.jpg',
+    '/images/caving/linx-4-10-25/cave3.jpg',
+    '/images/caving/linx-4-10-25/cave2.jpg',
+    '/images/caving/linx-4-10-25/cave1.jpg',
+  ]
+
   // Bird images
   const birdImages = [
     '/images/birds/cardinal.jpg',
@@ -113,10 +129,9 @@ export default function Events(): JSX.Element {
         <div>
           <h2 className="text-2xl font-bold mb-4 tc1">Upcoming Events</h2>
           <div className="grid gap-4 mb-8">
-
             <InfoCard
-              title="Thursday Links Cave"
-              summary="Apr 10, 2025, going to links cave"
+              title="Thursday Links Trip"
+              summary="Every week at Linx, as soon as the semester ends"
               image={'images/caving/cave-shirt.jpg'}
               className="w-full"
               style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}
@@ -229,6 +244,25 @@ export default function Events(): JSX.Element {
         <div>
           <h2 className="text-2xl font-bold mb-4 tc1">Previous Events</h2>
           <div className="grid gap-4">
+            <InfoCard
+              title="Thursday Links Trip"
+              summary="Apr 10, 2025, George led his first trip to Links cave"
+              image={linxCaveImages}
+              className="w-full"
+              style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}
+            >
+              <div className="relative tc2 max-w-[95%] space-y-4 mb-6">
+                <p>
+                  Going to Links cave on a trip led by George.
+                </p>
+                <p>
+                  Gonna be a big group, we&apos;ll see who actually shows up.<br />
+                  <b>George</b>, Case, Fin, Sean, Katie, Sam, Payton and Me <br />
+                  Lots of fun canyoning, lots of big spiders, two bats and a salamander.<br />
+                </p>
+
+              </div>
+            </InfoCard>
             <InfoCard
               title="James Cave Expedition"
               summary="Feb 8, 2025, took Annabel caving for the first time"

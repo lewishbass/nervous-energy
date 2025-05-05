@@ -107,7 +107,11 @@ export default function Home() {
 				  }}
 				/>
 				<p className="absolute top-3 left-1/2 transform -translate-x-1/2 text-center text-xl tc2 w-full opacity-50">
-					This website is a work in progress please use the <b className="tc1">Report Issue</b> button in the bottom left to help me find bugs, suggest improvements or request features.
+					This website is a work in progress please use the
+					<a href="https://github.com/lewishbass/nervous-energy/issues/new" target="_black" className="mx-2 tc1 cursor-pointer hover:underline">
+						Report Issue
+					</a>
+					button in the bottom left to help me find bugs, suggest improvements or request features.
 				</p>
 				<DragCard className="top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500] bg-white dark:bg-black p-6 rounded-3xl relative overflow-hidden">
 				  <h2 className="text-4xl font-bold mb-2 ml-10 mt-2">Interests</h2>

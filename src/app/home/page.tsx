@@ -21,6 +21,17 @@ export default function Home() {
                 <p className="font-medium tc2">Upcoming Event</p>
                 <p className="text-sm tc3">1 day ago</p>
               </div>
+              <div className="border-b dark:border-gray-700 pb-2">
+                <p className="font-medium tc2">Tunes</p>
+                <iframe
+                  style={{ borderRadius: "12px" }}
+                  src="https://open.spotify.com/embed/track/2B15LmC8Pp8IjVsYnt4dvE?utm_source=generator&autoplay=1&hide_cover=1"
+                  width="100%"
+                  height="80"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy">
+                </iframe>
+              </div>
             </div>
           </section>
         </div>
