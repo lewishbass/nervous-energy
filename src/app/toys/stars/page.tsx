@@ -34,6 +34,7 @@ export default function StarsPage() {
 		});
 	};
 
+	// Load state from localStorage on component mount
 	useEffect(() => {
 		// Load state from localStorage on component mount
 		const storedBlockHelp = localStorage.getItem('blockHelp');
@@ -181,6 +182,7 @@ export default function StarsPage() {
 		}
 	}, [demo1Playing]);
 
+	// start demo 2 animation
 	useEffect(() => {
 		if (demo2Playing) {
 			playDemo2Animation();
@@ -233,7 +235,7 @@ export default function StarsPage() {
 						<div className="max-w-[30vw] ">
 						<StarsGameComponent
 							ref={gameRef}
-							size={6}
+							size={8}
 							autoBlock={blockHelp || false}
 							autoStar={starHelp || false}
 								showError={showHints || false}
@@ -346,7 +348,7 @@ export default function StarsPage() {
 							\\]`}
 						</MathJax>
 					</div>*/}
-					<p className="mb-4">
+					{/*<p className="mb-4">
 						The squares in these groups can then be marked off as blocked.
 						Similarly, when every square in a group except one is blocked, the last square must be a star.
 						By iteratively blocking squares and placing stars, a position can be generated that is the parent of all valid solutions.
@@ -393,7 +395,7 @@ export default function StarsPage() {
 						<MathJax>
 							{`\\[ \\Large \\quad \\eta_* \\text{st:} \\quad w_t+ \\eta_* \\frac{dL}{dw}(w_t) = w_* \\]`}
 						</MathJax>
-					</div>
+					</div>*/}
 					that allows you to reach the global extreme in one step?
 				</div>
 			</div>

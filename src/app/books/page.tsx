@@ -317,7 +317,7 @@ export default function Books() {
                 <div className="flex justify-between items-start mb-[-6]">
                   <h2 className="book-title tc1">{book.title}</h2>
                   {book.good_score && (
-                    <span className="book-rating">
+                    <span className="book-rating w-content whitespace-nowrap">
                       ★ {book.good_score.toFixed(1)}
                     </span>
                   )}

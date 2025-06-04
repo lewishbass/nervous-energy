@@ -12,7 +12,7 @@ export const toys: Toy[] = [
     {
         title: 'Stars',
         description: 'Like soduku, but less class and more dopamine',
-        link: '/toys/stars',
+        link: '',///toys/stars',
         hasPage: false,
         keywords: 'TypeScript Node.js Tailwind stars template',
         imagePath: '/KH_back.svg',

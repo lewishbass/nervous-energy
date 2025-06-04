@@ -3,7 +3,7 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 type CellState = 'empty' | 'star' | 'blocked';
-type CellError = 'underfull' | 'empty' | 'filled' | 'oneleft' | 'overfull'; 
+type CellError = 'underfull' | 'empty' | 'filled' | 'oneleft' | 'overfull';
 
 // Define a ref type for external components to use
 export interface StarsGameRef {
@@ -20,8 +20,8 @@ interface GameProps {
   enable?: boolean;
   autoBlock?: boolean;
   autoStar?: boolean;
-	showError?: boolean;
-	showMessages?: boolean;
+  showError?: boolean;
+  showMessages?: boolean;
 }
 
 const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
@@ -30,18 +30,18 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
   enable = true,
   autoBlock = true,
   autoStar = false,
-	showError = true,
-	showMessages = false,
+  showError = true,
+  showMessages = false,
 }, ref) => {
   // Initialize empty board
   const initializeBoard = (): CellState[][] => {
     return Array(size).fill(null).map(() => Array(size).fill('empty'));
   };
 
-	const initializePuzzle = (): number[][] => {
-		if (customBoard) {
-			return [...customBoard];	
-		}
+  const initializePuzzle = (): number[][] => {
+    if (customBoard) {
+      return [...customBoard];
+    }
     const b = Array(size).fill(null).map(() => Array(size).fill(0));
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size; j++) {
@@ -71,19 +71,19 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
     generateNewPuzzle
   }), [board, boxIndex]);
 
-  const [verticalLines, setVerticalLines] = useState<boolean[][]>(Array(size).fill(Array(size-1).fill(false)));
-  const [horizontalLines, setHorizontalLines] = useState<boolean[][]>(Array(size-1).fill(Array(size).fill(false)));
+  const [verticalLines, setVerticalLines] = useState<boolean[][]>(Array(size).fill(Array(size - 1).fill(false)));
+  const [horizontalLines, setHorizontalLines] = useState<boolean[][]>(Array(size - 1).fill(Array(size).fill(false)));
 
   // Set the lines to draw the boxes
   useEffect(() => {
-    const vertical_lines = Array(size).fill(null).map(() => Array(size-1).fill(false));
-    const horizontal_lines = Array(size-1).fill(null).map(() => Array(size).fill(false));
+    const vertical_lines = Array(size).fill(null).map(() => Array(size - 1).fill(false));
+    const horizontal_lines = Array(size - 1).fill(null).map(() => Array(size).fill(false));
     for (let i = 0; i < size; i++) {
       for (let j = 0; j < size - 1; j++) {
-        if (i < boxIndex.length && j+1 < boxIndex[i].length && boxIndex[i][j] != boxIndex[i][j+1]){
+        if (i < boxIndex.length && j + 1 < boxIndex[i].length && boxIndex[i][j] != boxIndex[i][j + 1]) {
           vertical_lines[i][j] = true;
         }
-        if(j+1 < boxIndex.length && i < boxIndex[j].length && boxIndex[j][i] != boxIndex[j+1][i]){
+        if (j + 1 < boxIndex.length && i < boxIndex[j].length && boxIndex[j][i] != boxIndex[j + 1][i]) {
           horizontal_lines[j][i] = true;
         }
       }
@@ -112,11 +112,11 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
   };
   const getErrorColor = (index: CellError): string => {
     const colors = {
-      'underfull' : 'outline-yellow-200 dark:outline-yellow-500',
-      'oneleft' : 'outline-blue-200 dark:outline-blue-500',
-      'empty' : 'outline-[#0000] dark:outline-[#fff0]',//'outline-gray-200 dark:outline-gray-500',
-      'filled' : 'outline-green-200 dark:outline-green-500',
-      'overfull' : 'outline-red-200 dark:outline-red-500',
+      'underfull': 'outline-yellow-200 dark:outline-yellow-500',
+      'oneleft': 'outline-blue-200 dark:outline-blue-500',
+      'empty': 'outline-[#0000] dark:outline-[#fff0]',//'outline-gray-200 dark:outline-gray-500',
+      'filled': 'outline-green-200 dark:outline-green-500',
+      'overfull': 'outline-red-200 dark:outline-red-500',
     };
     return colors[index] || 'outline-gray-200 dark:outline-gray-500/25';
   };
@@ -132,15 +132,21 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
       newBoard[row][col] = reverse ? 'blocked' : 'empty';
     }
     let squareError = firstOrderCheck(newBoard, boxIndex);
-    let newBoardFilled = fillFirstOrder(newBoard, boxIndex, squareError);
+    let newBoardFilled = fillFirstOrder(newBoard, boxIndex, squareError, autoBlock, autoStar);
 
-    for (let i = 0; i < 20; i++){
+    for (let i = 0; i < 20; i++) {
       squareError = firstOrderCheck(newBoardFilled, boxIndex);
-      newBoardFilled = fillFirstOrder(newBoardFilled, boxIndex, squareError);
+      newBoardFilled = fillFirstOrder(newBoardFilled, boxIndex, squareError, autoBlock, autoStar);
     }
 
     setBoard(newBoardFilled);
     validateBoard(newBoard);
+    const solutions = solvePuzzle(newBoardFilled, boxIndex);
+    console.log("Number of solutions found:", solutions.length);
+    //if (solutions.length !== 0) {
+    //  setBoard(solutions[0]); // Set the first solution as the board
+    //  validateBoard(solutions[0]);
+    //}
   };
 
   // Check if the board is valid and complete
@@ -205,7 +211,7 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
       boxStars.some(count => count !== 1)) {
       complete = false;
     }
-    
+
     setErrorSquare(firstOrderCheck(currentBoard, boxIndex));
 
     setIsValid(valid);
@@ -220,12 +226,89 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
     setIsValid(true);
     setMessage('');
     setErrorSquare(Array(size).fill(Array(size).fill('empty')));
+    //const solutions = solvePuzzle(initializeBoard(), boxIndex);
+    //if (solutions.length > 0) {
+    //  const r = Math.floor(Math.random() * solutions.length);
+    //console.log("using solution", r, "of", solutions.length);
+    //  setBoard(solutions[r]); // Set the first solution as the board
+    //  validateBoard(solutions[r]);
+    //}
   };
+
+  const genUnrefinedPuzzle = (size: number): number[][] => {
+    const newPuzzle = Array(size).fill(null).map(() => Array(size).fill(-1));
+    let emptyCells = size * size;
+    for (let i = 0; i < size; i++) {
+      const x = Math.floor(Math.random() * size);
+      const y = Math.floor(Math.random() * size);
+      if (newPuzzle[x][y] === -1) {
+        newPuzzle[x][y] = i;
+        emptyCells--;
+      } else {
+        i--; // If the cell is already filled, try again
+      }
+    }
+
+    while (emptyCells > 0) {
+      const x = Math.floor(Math.random() * size);
+      const y = Math.floor(Math.random() * size);
+      if (newPuzzle[x][y] === -1) {
+        const c = Math.floor(Math.random() * 4);
+        const dx = (c % 2 === 0) ? (c - 1) : 0; // -1 or 1
+        const dy = (c % 2 === 1) ? (c - 2) : 0; // -1 or 1
+        if (x + dx < 0 || x + dx >= size || y + dy < 0 || y + dy >= size) continue; // Out of bounds
+        newPuzzle[x][y] = newPuzzle[x + dx][y + dy]; // Fill with a random number from an adjacent cell
+        if (newPuzzle[x][y] !== -1) {
+          emptyCells--;
+        }
+      }
+    }
+
+    return newPuzzle;
+
+  }
+
+  const refinePuzzle = (puzzle: number[][]): number[][] => {
+    const newPuzzle = puzzle.map(row => row.slice());
+    let nSolutions = solvePuzzle(initializeBoard(), newPuzzle).length;
+    for (let i = 0; i < 100; i++) {
+      const x = Math.floor(Math.random() * size);
+      const y = Math.floor(Math.random() * size);
+
+      const oldValue = newPuzzle[x][y];
+      
+      const c = Math.floor(Math.random() * 4);
+      const dx = (c % 2 === 0) ? (c - 1) : 0; // -1 or 1
+      const dy = (c % 2 === 1) ? (c - 2) : 0; // -1 or 1
+      if (x + dx < 0 || x + dx >= size || y + dy < 0 || y + dy >= size) continue; // Out of bounds
+      if(newPuzzle[x][y] === newPuzzle[x + dx][y + dy]) continue; // Don't change to the same value
+
+      newPuzzle[x][y] = newPuzzle[x + dx][y + dy]; // Fill with a random number from an adjacent cell
+      const pSolutions = solvePuzzle(initializeBoard(), newPuzzle).length;
+      if (pSolutions < nSolutions && pSolutions > 0) {
+        nSolutions = pSolutions;
+      }else{
+        newPuzzle[x][y] = oldValue; // Revert if it doesn't reduce the number of solutions
+      }
+      
+    }
+    return newPuzzle;
+  }
 
   // Generate a new random puzzle
   const generateNewPuzzle = () => {
+
+    let newPuzzle = genUnrefinedPuzzle(size);
+    while (solvePuzzle(initializeBoard(), newPuzzle).length <= 0) {
+      newPuzzle = genUnrefinedPuzzle(size);
+    }
+    console.log("n solutions found:", solvePuzzle(initializeBoard(), newPuzzle).length);
+    newPuzzle = refinePuzzle(newPuzzle);
+    console.log("n solutions found after refinement:", solvePuzzle(initializeBoard(), newPuzzle).length);
+
     setBoard(initializeBoard());
-    setBoxIndex(initializePuzzle());
+    //setBoxIndex(initializePuzzle());
+    setBoxIndex(newPuzzle);
     setIsComplete(false);
     setIsValid(true);
     setMessage('');
@@ -236,45 +319,45 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
   useEffect(() => {
     generateNewPuzzle();
   }, [size]);
-  
-  const firstOrderCheck = (board: CellState[][], puzzle: number[][]):CellError[][] => {
+
+  const firstOrderCheck = (board: CellState[][], puzzle: number[][]): CellError[][] => {
     const groups: number[][][] = [];
-    
+
     // box groups
     for (let i = 0; i < size; i++) {
       groups.push([]);
     }
-    for (let x = 0; x < size; x++){
-      for (let y = 0; y < size; y++){
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
         groups[puzzle[x][y]].push([x, y]);
       }
     }
 
     // column groups
-    for (let x = 0; x < size; x++){
+    for (let x = 0; x < size; x++) {
       groups.push([]);
-      for (let y = 0; y < size; y++){
-        groups[groups.length-1].push([x, y]);
+      for (let y = 0; y < size; y++) {
+        groups[groups.length - 1].push([x, y]);
       }
     }
 
     // row groups
-    for (let y = 0; y < size; y++){
+    for (let y = 0; y < size; y++) {
       groups.push([]);
-      for (let x = 0; x < size; x++){
-        groups[groups.length-1].push([x, y]);
+      for (let x = 0; x < size; x++) {
+        groups[groups.length - 1].push([x, y]);
       }
     }
 
     // star groups
-    for (let x = 0; x < size; x++){
-      for (let y = 0; y < size; y++){
-        if(board[x][y] == 'star'){
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
+        if (board[x][y] == 'star') {
           groups.push([]);
-          for(let dx = -1; dx <= 1; dx++){
-            for(let dy = -1; dy <= 1; dy++){
-              if(x+dx < 0 || x+dx >= size || y+dy < 0 || y+dy >= size) continue;
-              groups[groups.length-1].push([x+dx, y+dy]);
+          for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+              if (x + dx < 0 || x + dx >= size || y + dy < 0 || y + dy >= size) continue;
+              groups[groups.length - 1].push([x + dx, y + dy]);
             }
           }
         }
@@ -285,31 +368,31 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
     const space: number[][] = Array(size).fill(null).map(() => Array(size).fill(size));
     const returnValue: CellError[][] = Array(size).fill(null).map(() => Array(size).fill(0)); // return code -1, 0, 1, 2 for underfull, none, full and overfull
     //check group
-    for (let i = 0; i < groups.length; i++){
+    for (let i = 0; i < groups.length; i++) {
       const group = groups[i];
       let stars = 0;
       let free_space = 0;
-      for (let j = 0; j < group.length; j++){
+      for (let j = 0; j < group.length; j++) {
         const x = group[j][0];
         const y = group[j][1];
-        if(board[x][y] == 'star'){
+        if (board[x][y] == 'star') {
           stars++;
         }
-        if (board[x][y] == 'empty'){
+        if (board[x][y] == 'empty') {
           free_space++;
         }
       }
-      for (let j = 0; j < group.length; j++){
+      for (let j = 0; j < group.length; j++) {
         const x = group[j][0];
         const y = group[j][1];
-        
+
         maxStars[x][y] = Math.max(maxStars[x][y], stars);
         minStars[x][y] = Math.min(minStars[x][y], stars);
         space[x][y] = (stars == 0) ? Math.min(space[x][y], free_space) : space[x][y];
 
       }
-      
-      
+
+
     }
     for (let x = 0; x < size; x++) {
       for (let y = 0; y < size; y++) {
@@ -320,20 +403,20 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
         if (maxStars[x][y] > 1) returnValue[x][y] = 'overfull';
         if (space[x][y] == 0) returnValue[x][y] = 'underfull';
         if (space[x][y] == 1 && board[x][y] == 'empty' && maxStars[x][y] == 0) returnValue[x][y] = 'oneleft';
-        
+
       }
     }
     return returnValue;
   } //returns matrix of none, full and overfull 0, 1, 2
 
-  const fillFirstOrder = (board: CellState[][], puzzle: number[][], errors: CellError[][]): CellState[][] => {
-    const newBoard = [...board];
-    for (let x = 0; x < size; x++){
-      for (let y = 0; y < size; y++){
-        if(errors[x][y] == 'filled' && board[x][y] == 'empty' && autoBlock){
+  const fillFirstOrder = (board: CellState[][], puzzle: number[][], errors: CellError[][], autoBlockT: boolean = true, autoStarT: boolean = true): CellState[][] => {
+    const newBoard = board.map(row => row.slice());
+    for (let x = 0; x < size; x++) {
+      for (let y = 0; y < size; y++) {
+        if (errors[x][y] == 'filled' && board[x][y] == 'empty' && autoBlockT) {
           newBoard[x][y] = 'blocked';
         }
-        if(errors[x][y] == 'oneleft' && autoStar){
+        if (errors[x][y] == 'oneleft' && autoStarT) {
           newBoard[x][y] = 'star';
         }
       }
@@ -341,14 +424,54 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
     return newBoard;
 
   }
-  
+
+
+  // returns all possible solutions to the puzzle
+  const solvePuzzle = (inboard: CellState[][], puzzle: number[][]): CellState[][][] => {
+    let board = inboard.map(row => row.slice());
+    for(let i = 0; i < 20; i++) {
+      const errors = firstOrderCheck(board, puzzle);
+      const newBoard = fillFirstOrder(board, puzzle, errors);
+      board = newBoard;
+    }
+
+    const finalErrors = firstOrderCheck(board, puzzle);
+    if (finalErrors.flat().every(error => error === 'filled')) {
+      //console.log(finalErrors.flat());
+      return [board]; // Puzzle solved
+    }
+    if (finalErrors.flat().some(error => error === 'overfull' || error === 'underfull')) {
+      return []; // Puzzle unsolvable
+    }
+    const emptyCells = [] as [number, number][];
+    finalErrors.forEach((row, rowIndex) => {
+      row.forEach((error, colIndex) => {
+        if (error === 'empty' && board[rowIndex][colIndex] === 'empty') {
+          emptyCells.push([rowIndex, colIndex]);
+        }
+      });
+    });
+
+    const results = [] as CellState[][][];
+
+    emptyCells.forEach(([row, col]) => {
+      const newBoard = board.map(r => r.slice());
+      newBoard[row][col] = 'star'; // Try placing a star
+      results.push(...solvePuzzle(newBoard, puzzle)); // Recur with the new board
+      board[row][col] = 'blocked'; // dont try this again
+    });
+
+    return results;
+
+  }
+
   return (
     <div className="flex flex-col items-center gap-4" style={{ pointerEvents: enable ? 'auto' : 'none' }}>
-			{showMessages && <div className={`mb-4 p-2 rounded h-[2.5em] ${message ? '' : 'opacity-0'} ${isValid ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'} ${isComplete ? 'animate-pulse' : ''}`}
-				style={{ transition: 'opacity 0.2s ease' }}>
-				{message}
-			</div>}
-      
+      {showMessages && <div className={`mb-4 p-2 rounded h-[2.5em] ${message ? '' : 'opacity-0'} ${isValid ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'} ${isComplete ? 'animate-pulse' : ''}`}
+        style={{ transition: 'opacity 0.2s ease' }}>
+        {message}
+      </div>}
+
       <div
         className="relative grid gap-0 bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden border-black dark:border-white"
         style={{
@@ -371,7 +494,7 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
                 cursor-pointer transition-all
                 ${getBoxColor(getBoxIndex(rowIndex, colIndex))}
                 ${getErrorColor(errorSquare[rowIndex][colIndex])}
-                ${showError ? 'outline-16 -outline-offset-16' :'outline-0 -outline-offset-0'}
+                ${showError ? 'outline-4 -outline-offset-4' : 'outline-0 -outline-offset-0'}
                  
                 hover:opacity-80
               `}
@@ -379,31 +502,31 @@ const StarsGameComponent = forwardRef<StarsGameRef, GameProps>(({
                 transition: 'all 0.5s ease',
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full" viewBox="-6 -6 36 36" style={{filter: 'drop-shadow(1px 1px 2px #0004)'}}>
-                <path style={{transition: 'all 0.15s ease', transformOrigin: '12px 12px'}} transform={ cell != 'star' ? 'scale(0.5)':'' } opacity={cell == 'star' ? 1 : 0} fill="#fd0" stroke="#fd0" strokeWidth={4} strokeLinecap="round" strokeLinejoin='round' d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z" />
-                <path style={{transition: 'all 0.15s ease', transformOrigin: '12px 12px'}} transform={ cell != 'blocked' ? 'scale(0.5)':'' } opacity={cell == 'blocked' ? 1 : 0} strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} stroke="red" d="M6 18L18 6M6 6l12 12" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-full w-full" viewBox="-6 -6 36 36" style={{ filter: 'drop-shadow(1px 1px 2px #0004)' }}>
+                <path style={{ transition: 'all 0.15s ease', transformOrigin: '12px 12px' }} transform={cell != 'star' ? 'scale(0.5)' : ''} opacity={cell == 'star' ? 1 : 0} fill="#fd0" stroke="#fd0" strokeWidth={4} strokeLinecap="round" strokeLinejoin='round' d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z" />
+                <path style={{ transition: 'all 0.15s ease', transformOrigin: '12px 12px' }} transform={cell != 'blocked' ? 'scale(0.5)' : ''} opacity={cell == 'blocked' ? 1 : 0} strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} stroke="red" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
           ))
         ))}
         {/* grid bordering boxes */}
         <div className="absolute w-full h-full pointer-events-none">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="absolute h-full w-full text-black dark:text-white pointer-events-none" 
-            viewBox={`0 0 ${size} ${size}`} 
-            stroke="currentColor" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="absolute h-full w-full text-black dark:text-white pointer-events-none"
+            viewBox={`0 0 ${size} ${size}`}
+            stroke="currentColor"
             preserveAspectRatio="none"
             style={{ top: 0, left: 0, right: 0, bottom: 0 }}
           >
             {verticalLines.map((col, rowIndex) => (
               col.map((line, colIndex) => (
-                line && <line key={`${rowIndex}-${colIndex+1}`} x1={colIndex+1} y1={rowIndex} x2={colIndex+1} y2={rowIndex + 1} strokeWidth={0.05} strokeLinecap='round'/>
+                line && <line key={`${rowIndex}-${colIndex + 1}`} x1={colIndex + 1} y1={rowIndex} x2={colIndex + 1} y2={rowIndex + 1} strokeWidth={0.05} strokeLinecap='round' />
               ))
             ))}
             {horizontalLines.map((row, rowIndex) => (
               row.map((line, colIndex) => (
-                line && <line key={`${rowIndex+1}-${colIndex}`} x1={colIndex} y1={rowIndex+1} x2={colIndex + 1} y2={rowIndex+1} strokeWidth={0.05} strokeLinecap='round'/>
+                line && <line key={`${rowIndex + 1}-${colIndex}`} x1={colIndex} y1={rowIndex + 1} x2={colIndex + 1} y2={rowIndex + 1} strokeWidth={0.05} strokeLinecap='round' />
               ))
             ))}
           </svg>
