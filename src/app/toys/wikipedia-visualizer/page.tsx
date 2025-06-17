@@ -136,7 +136,7 @@ export default function WikipediaVisualizerPage() {
 						<p className="text-gray-700 w-[55%] mt-2">
 							Statistics and a preview of a single article displayed here<br />
 							including the number of edits, word count, and last edit date.<br />
-							You can also view the article's content and its edit history.
+							You can also view the article&apos;s content and its edit history.
 						</p>
 						</>
 					}
