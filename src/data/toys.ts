@@ -12,8 +12,8 @@ export const toys: Toy[] = [
     {
         title: 'Stars',
         description: 'Like soduku, but less class and more dopamine',
-        link: '',///toys/stars',
-        hasPage: false,
+        link: '/toys/stars',
+        hasPage: true,
         keywords: 'TypeScript Node.js Tailwind stars template',
         imagePath: '/KH_back.svg',
         reqAuth: false
@@ -24,6 +24,15 @@ export const toys: Toy[] = [
         link: '/toys/one-step-learning-rate',
         hasPage: true,
         keywords: 'learning rate optimization scheduler cyclical lr training neural network',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    },
+    {
+        title: "Wikipedia Visuzlizer",
+        description: "Visualize Wikipedia Connections",
+        link: '/toys/wikipedia-visualizer',
+        hasPage: true,
+        keywords: 'Wikipedia visualization graph network connections data exploration',
         imagePath: '/KH_back.svg',
         reqAuth: false
     },
