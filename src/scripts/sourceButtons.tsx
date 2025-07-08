@@ -41,10 +41,10 @@ export const DownloadButton: React.FC<SourceButtonProps> = ({ relativePath, file
   return (
     <button
       onClick={() => handleDownloadSource(relativePath, fileName)}
-      className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-y-[3px] transition-all duration-200 shadow-md"
+      className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-y-[3px] transition-all duration-200 shadow-md select-none"
       style={{ background: "var(--kho)" }}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-1 ml-1 -m-3" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 16l-5-5h3V4h4v7h3l-5 5zm5 4H7v-2h10v2z" />
       </svg>
       Download Source
@@ -60,7 +60,7 @@ export const GitHubButton: React.FC<SourceButtonProps> = ({ relativePath }) => {
       href={githubPath}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-y-[-4px] transition-all duration-200 shadow-md"
+      className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-y-[-4px] transition-all duration-200 shadow-md select-none"
       style={{ background: "var(--khb)" }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">

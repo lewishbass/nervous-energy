@@ -77,7 +77,7 @@ export const handler: Handler = async (event) => {
 async function handleUserExists(requestBody: any) {
   const { username } = requestBody;
   const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
-  var username_suggestion = null;
+  var username_suggestion: string | null = null;
   if(existingUser){
     for (let i = 1; i < 100; i++) {
       const suggestedUsername = `${username}${i}`;
