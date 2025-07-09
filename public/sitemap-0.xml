@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://nervous-energy.netlify.app/toys/image-captioning</loc><lastmod>2025-07-08T02:41:39.918Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/stars</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/video-classification</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/one-step-learning-rate</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/wikipedia-visualizer</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/books</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/home</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/friends</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/xg-weight-init</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/shop</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/events</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://nervous-energy.netlify.app/toys/back-prop</loc><lastmod>2025-07-08T02:41:39.919Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/shop</loc><lastmod>2025-07-09T19:08:07.294Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/image-captioning</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/friends</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/papers/latent-reasoning</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/papers</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/stars</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/video-classification</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/events</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/books</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/one-step-learning-rate</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/back-prop</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/home</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/wikipedia-visualizer</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nervous-energy.netlify.app/toys/xg-weight-init</loc><lastmod>2025-07-09T19:08:07.295Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

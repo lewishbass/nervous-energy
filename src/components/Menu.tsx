@@ -10,7 +10,8 @@ import {
   FaUsers,
   FaSun,
   FaMoon,
-  FaPuzzlePiece
+  FaPuzzlePiece,
+  FaMicroscope
 } from 'react-icons/fa';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -130,6 +131,7 @@ export default function Menu({
     { name: 'Shop', link: '/shop', keyword: 'store purchase', description: 'Visit our online shop', requireAuth: false },
     { name: 'Friends', link: '/friends', keyword: 'social network', description: 'Connect with friends', requireAuth: true },
     { name: 'Toys', link: '/toys', keyword: 'interactive demo ml machine learning', description: 'Explore interactive machine learning demos', requireAuth: false },
+    { name: 'Papers', link: '/papers', keyword: 'research articles', description: 'My papers and reviews', requireAuth: false },
     // Add toy entries dynamically from the centralized toys data
     ...toys.map(toy => ({
       name: toy.title,
@@ -185,6 +187,7 @@ export default function Menu({
             { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
             { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
+            { href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
             <Link
