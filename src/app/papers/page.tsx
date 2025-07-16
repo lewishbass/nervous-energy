@@ -130,7 +130,7 @@ export default function Toys() {
 										</span>
 										{toy.hasPage && (
 											<span className="text-blue-500 dark:text-blue-400 group-hover:animate-[wiggle_0.25s_ease_1]">
-												Try it →
+												Read it →
 											</span>
 										)}
 									</div>
