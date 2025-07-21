@@ -294,7 +294,7 @@ export default function SlurmPage() {
 													</ul>
 												) : (
 													<p className="tc2">
-														<span dangerouslySetInnerHTML={{ __html: (typeof value === 'string' ? marked.parse(value) : String(value)) }} />
+														{SanitizedString(value)}
 													</p>
 												)
 											}
