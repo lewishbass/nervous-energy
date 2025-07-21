@@ -11,77 +11,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-
-// Star background component with parallax effect
-const StarBackground = () => {
-	const [stars, setStars] = useState<JSX.Element[]>([]);
-
-	useEffect(() => {
-		// Add keyframe animation to the document
-		const style = document.createElement('style');
-		style.innerHTML = `
-      @keyframes starMove {
-        from { transform: translateX(0); }
-        to { transform: translateX(-100vw); }
-      }
-    `;
-		document.head.appendChild(style);
-
-		// Generate stars
-		const newStars = [];
-		const starCount = 600;
-
-		for (let i = 0; i < starCount; i++) {
-			const size = Math.random() * 2 + 1; // 1-3px
-			const top = Math.random() * 100; // 0-100%
-			const opacity = Math.random() * 0.5 + 0.2; // 0.2-0.7
-			const duration = Math.random() * 30 + 40; // 40-70s
-			const delay = -Math.random() * 150; // 0-15s
-
-			newStars.push(
-				<div
-					key={i}
-					className="absolute rounded-full invert dark:invert-0"
-					style={{
-						width: `${size}px`,
-						height: `${size}px`,
-						top: `${top}%`,
-						right: `-${size}px`,
-						backgroundColor: `rgba(255, 255, 255, ${opacity})`,
-						animation: `starMove ${duration}s linear ${delay}s infinite`,
-					}}
-				/>
-			);
-		}
-
-		setStars(newStars);
-
-		// Cleanup
-		return () => {
-			document.head.removeChild(style);
-		};
-	}, []);
-
-	return (
-		<div className="fixed inset-0 overflow-hidden pointer-events-none">
-			{stars}
-		</div>
-	);
-};
-
-const Enumber = (num: number) => {
-	if (num === 0) return '0.00';
-	const place = Math.floor(Math.log10(Math.abs(num)));
-	return place >= 3 || place <= -3 ? (
-		(num/Math.pow(10, place)).toFixed(1) + 'e' + place.toFixed(0)
-	) : (
-		place < 0 ? (
-			num.toFixed(2)
-		) : (
-			num.toFixed(2-place)
-		)
-	)
-}
+import { data } from '@tensorflow/tfjs';
+import GenericGraph from './GenericGraph';
+import { DataPoint, ChartType } from './GenericGraph';
+import Enumber from '../../scripts/enumber';
 
 const SanitizedString = (str: any) => {
 	const input_type = typeof str;
@@ -90,13 +23,13 @@ const SanitizedString = (str: any) => {
 	else if (input_type === 'object') sanitizedStr = JSON.stringify(str, null, 2);
 	else if (input_type === 'number') sanitizedStr = Enumber(str);
 
-	
+
 	return <MathJax>
 		<ReactMarkdown
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeKatex]}>
-          {sanitizedStr}
-        </ReactMarkdown>
+			remarkPlugins={[remarkGfm, remarkMath]}
+			rehypePlugins={[rehypeKatex]}>
+			{sanitizedStr}
+		</ReactMarkdown>
 	</MathJax>
 }
 
@@ -108,7 +41,14 @@ export default function SlurmPage() {
 	// socket data is a map from field value to either a value or list of values
 	const [database, setDatabase] = useState<Record<string, any>>({});
 	const [activeSource, setActiveSource] = useState<string | null>(null);
+	const [activeTab, setActiveTab] = useState<'updates' | 'database' | 'graphs' | 'console'>('graphs');
 
+	// activate first source if available
+	useEffect(() => {
+		if (Object.keys(database).length > 0 && activeSource === null) {
+			setActiveSource(Object.keys(database)[0]);
+		}
+	}, [database, activeSource]);
 
 	useEffect(() => {
 		// Create socket connection to the /client namespace
@@ -128,14 +68,15 @@ export default function SlurmPage() {
 		});
 
 		clientSocket.on('stored_states', (data: Record<string, any>) => {
-			const updated = database;
-			Object.entries(data).forEach(([sourceId, sourceData]) => {
-				if (!(sourceId in updated)) {
-					updated[sourceId] = {};
-				}
-				updated[sourceId] = sourceData;
-			});
-			setDatabase(prev => ({ ...prev, ...updated }));
+			setDatabase(prev => ({
+				...prev,
+				...Object.fromEntries(
+					Object.entries(data).map(([sourceId, sourceData]) => [
+						sourceId,
+						{ ...prev[sourceId], ...sourceData }
+					])
+				)
+			}));
 			console.log('Initial stored states received:', data);
 		});
 
@@ -154,26 +95,31 @@ export default function SlurmPage() {
 				newUpdate.push(`${sourceId} - ${key}: ${value}`);
 			});
 			setUpdates(prev => [...newUpdate, ...prev.slice(0, 99)]); // Keep only last 100 updates
-			// add deltas to data, and change static values
 
-			const updated = database;
-			if (!(sourceId in updated)) {
-				updated[sourceId] = {};
-			}
-			Object.entries(deltas).forEach(([key, value]) => {
-				if (!Array.isArray(updated[sourceId][key])) {
-					updated[sourceId][key] = [];
-				}
-				value.forEach((v: any) => {
-					updated[sourceId][key].push(v);
-				});
-			});
-			Object.entries(statics).forEach(([key, value]) => {
-				updated[sourceId][key] = value;
-			});
-			console.log('Updated database:', updated);
-			setDatabase(updated);
+			// Properly update database with immutable updates
+			setDatabase(prev => {
+				const currentSource = prev[sourceId] || {};
 
+				// Handle deltas (append to arrays)
+				const updatedDeltas = Object.fromEntries(
+					Object.entries(deltas).map(([key, value]) => {
+						const currentArray = Array.isArray(currentSource[key]) ? currentSource[key] : [];
+						return [key, [...currentArray, ...value]];
+					})
+				);
+
+				// Handle statics (replace values)
+				const updatedStatics = { ...statics };
+
+				return {
+					...prev,
+					[sourceId]: {
+						...currentSource,
+						...updatedDeltas,
+						...updatedStatics
+					}
+				};
+			});
 		});
 
 		// Handle connection errors
@@ -214,7 +160,7 @@ export default function SlurmPage() {
 				className='invert dark:invert-0'
 			/>
 			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards" }}>
-				<StarBackground />
+
 			</div>
 
 			<div className="relative z-10">
@@ -251,7 +197,7 @@ export default function SlurmPage() {
 					</div>
 				)*/}
 
-					{
+				{
 					Object.entries(database).length === 0 ? (
 						<div className="bg2 rounded-lg shadow-lg p-8 text-center">
 							<p className="tc2 text-lg">
@@ -261,52 +207,188 @@ export default function SlurmPage() {
 							</p>
 						</div>
 					) : (
-					<div className="flex flex-row gap-4">
-						<ul className="bg2 rounded-lg shadow-lg p-4 space-y-2 max-h-[80vh] h-[80vh] overflow-y-auto mini-scroll w-50">
-							{
-								database && Object.entries(database).map(([sourceId, sourceData]) => (
-									<li key={sourceId} className="p-4 bg3 rounded-lg shadow select-none cursor-pointer">
-										<h2
-											className="text-xl font-semibold tc2 truncate"
-											style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-											onClick={() => setActiveSource(activeSource === sourceId ? null : sourceId)}
-										>
-											{sourceId}
-										</h2>
-									</li>
-								))
-										
-							}
-							</ul>
-							<div className="flex-grow bg2 rounded-lg shadow-lg p-4">
-								<h2 className="tc1 font-semibold text-2xl mb-4">{activeSource}</h2>
-								<div className='flex flex-row flex-wrap gap-4'>
+						<div className="flex flex-row gap-4">
+							{/* Source List */}
+							<ul className="bg2 rounded-lg shadow-lg p-4 space-y-2 max-h-[80vh] h-[80vh] overflow-y-auto mini-scroll w-50 min-w-30">
 								{
-									activeSource && database[activeSource] && Object.entries(database[activeSource]).map(([field, value]) => (
-										<div key={field} className="bg-gray-500/20 rounded-lg p-2 w-40">
-											<h3 className="text-lg font-semibold tc2">{field}</h3>
-											{
-												Array.isArray(value) ? (
-													<ul className="list pl-1 max-h-30 h-30 w-full overflow-y-auto mini-scroll overflow-x-hidden">
-														{value.map((item, index) => (
-															<li key={index} className="tc2 w-full">{SanitizedString(item)}</li>
-														))}
-													</ul>
-												) : (
-													<p className="tc2">
-														{SanitizedString(value)}
-													</p>
-												)
-											}
-										</div>
+									database && Object.entries(database).map(([sourceId, sourceData]) => (
+										<li key={sourceId} className="p-4 bg3 rounded-lg shadow select-none cursor-pointer">
+											<h2
+												className="text-xl font-semibold tc2 truncate"
+												style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+												onClick={() => setActiveSource(activeSource === sourceId ? null : sourceId)}
+											>
+												{(sourceData.name || sourceId).replace(/_/g, ' ')}
+											</h2>
+										</li>
 									))
+
 								}
+							</ul>
+							{/* Main Content */}
+							<div className="flex-grow bg2 rounded-lg shadow-lg p-4 max-w-[80%] max-h-[80vh] overflow-y-auto mini-scroll">
+								<div className="w-full mb-4 flex flex-row border-b-2 border-gray-300 px-4 overflow-hidden">
+									<h2 className="tc1 font-semibold text-2xl max-w-[50%] overflow-hidden text-ellipsis mb-1 mr-auto">
+										{!activeSource
+											? 'Select Source'
+											: (database[activeSource]?.name || activeSource)}
+									</h2>
+									{[...(activeSource && database[activeSource] && database[activeSource]["graphs"] ? ['graphs'] : []), ...(activeSource && database[activeSource] && database[activeSource]["console"] ? ['console'] : []), 'updates', 'database'].map(tab => (
+										<div
+											className="rounded-t-lg p-2 mx-2 cursor-pointer hover:opacity-100 opacity-80 transition-all duration-300 hover:translate-y-1 active:translate-y-0 translate-y-2"
+											style={{ backgroundColor: activeTab !== tab ? '#8884' : '#888B' }}
+											onClick={() => setActiveTab(tab as 'updates' | 'database' | 'graphs')}
+										>
+											<span className="tc2 m-auto">
+												{tab.charAt(0).toUpperCase() + tab.slice(1)}
+											</span>
+										</div>
+									))}
+
 								</div>
+								{/* Updates Tab */ activeTab === 'updates' && (
+									<div
+										className="bg2 rounded-lg shadow-lg p-4 h-75 max-h-75 overflow-y-auto mini-scroll"
+										ref={el => {
+											if (el) el.scrollTop = el.scrollHeight;
+										}}
+									>
+										{updates.length === 0 ? (
+											<p className="tc2 text-lg">No updates received yet.</p>
+										) : (
+											updates.map((update, index) => (
+												<p key={index} className="tc2">{update}</p>
+											))
+										)}
+									</div>
+								)}
+
+
+								{/* Database Tab */ activeTab === 'database' && activeSource && database[activeSource] &&
+									<div className='flex flex-row flex-wrap gap-4'>
+										{
+											activeSource && database[activeSource] && Object.entries(database[activeSource]).map(([field, value]) => (
+												<div key={field} className="bg-gray-500/20 rounded-lg p-2 w-40">
+													<h3 className="text-lg font-semibold tc2">{field}</h3>
+													{
+														Array.isArray(value) ? (
+															<ul className="list pl-1 max-h-30 h-30 w-full overflow-y-auto mini-scroll overflow-x-hidden" ref={el => {
+																if (el) el.scrollTop = el.scrollHeight;
+															}}>
+																{value.map((item, index) => (
+																	<li key={index} className="tc2 w-full">{SanitizedString(item)}</li>
+																))}
+															</ul>
+														) : (
+															<p className="tc2">
+																{SanitizedString(value)}
+															</p>
+														)
+													}
+												</div>
+											))
+										}
+
+									</div>
+								}
+								{/* Graphs Tab */ activeTab === 'graphs' && activeSource && database[activeSource] && database[activeSource]["graphs"] &&
+									<div className="w-full flex flex-row gap-2 overflow-x-auto flex-wrap justify-start overflow-y-hidden">
+										{database[activeSource]["graphs"].map((graphSpec: any, index: number) => {
+
+											// Handle both single key (string) and multiple keys (array)
+											const keys = Array.isArray(graphSpec.key) ? graphSpec.key : [graphSpec.key];
+											
+											// Check if any of the keys have valid data
+											// @ts-expect-error
+											const hasValidData = keys.some(key => key && database[activeSource][key]);
+											if (!hasValidData) {
+												return <div key={index} className="flex-shrink-1 w-full h-[20vh] bg3 rounded-lg p-2 pb-4 flex items-center justify-center"><span>No Data</span></div>;
+											}
+
+											// Convert data to the format expected by GenericGraph
+											let formattedData: DataPoint[] = [];
+											let labels: string[] = [];
+											
+											if (keys.length === 1) {
+												// Single series
+												const graphData = database[activeSource][keys[0]];
+												if (Array.isArray(graphData)) {
+													formattedData = graphData.map((value, idx) => ({
+														x: idx,
+														y: typeof value === 'number' ? value : parseFloat(value) || 0
+													}));
+												} else if (typeof graphData === 'number') {
+													formattedData = [{ x: 0, y: graphData }];
+												}
+												labels = [graphSpec.display_name || keys[0]];
+											} else {
+												// Multiple series - need to merge data points by index
+												const allDataSeries = keys.map((key:string) => {
+													const data = database[activeSource][key];
+													if (Array.isArray(data)) {
+														return data.map(value => typeof value === 'number' ? value : parseFloat(value) || 0);
+													} else if (typeof data === 'number') {
+														return [data];
+													}
+													return [];
+												});
+												
+												// Find the maximum length across all series
+												const maxLength: number = Math.max(...allDataSeries.map((series: number[]) => series.length));
+												
+												// Create combined data points
+												formattedData = Array.from({ length: maxLength }, (_, idx) => {
+													const dataPoint: any = { x: idx };
+													keys.forEach((key: string, seriesIdx: number) => {
+														dataPoint[`y${seriesIdx}`] = allDataSeries[seriesIdx][idx] || null;
+													});
+													return dataPoint;
+												});
+												
+												labels = keys.map((key: string, idx: number) => graphSpec.labels && graphSpec.labels[idx] || key);
+											}
+
+											return (
+												<div key={index} className="flex-shrink-1 w-full h-[20vh] bg3 rounded-lg p-2 pb-4">
+													<GenericGraph
+														type={graphSpec.type || 'scatter'}
+														title={graphSpec.display_name || keys.join(', ')}
+														data={formattedData}
+														xlabel={graphSpec.xlabel || 'Index'}
+														ylabel={graphSpec.ylabel || keys[0]}
+														units={graphSpec.unit || ''}
+														labels={labels}
+														keys={keys.length > 1 ? keys.map((_:string, idx:string) => `y${idx}`) : undefined}
+														isLiveData={true}
+														maxDataPoints={200}
+													/>
+												</div>
+											);
+										})}
+									</div>
+								}
+								{/* Console Tab */ activeTab === 'console' && activeSource && database[activeSource] && database[activeSource]["console"] &&
+									<ul
+										className="h-[70vh] overflow-y-auto mini-scroll bg2 rounded-lg shadow-lg p-4"
+										ref={el => {
+											if (el) el.scrollTop = el.scrollHeight;
+										}}
+									>
+									{
+										database[activeSource]["console"].map((consoleLine: string, index: number) => (
+											<li key={index} className="tc2">
+												{SanitizedString(consoleLine)}
+											</li>
+										))
+									}
+									</ul>
+
+									}
 							</div>
-					</div>
+						</div>
 					)
 				}
-				</div>
+			</div>
 		</div>
 	);
 }
