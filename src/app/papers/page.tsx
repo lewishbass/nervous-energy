@@ -1,5 +1,6 @@
 'use client';
 
+//toys/page.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 import { papers } from '@/data/papers';
