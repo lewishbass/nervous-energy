@@ -275,7 +275,7 @@ export default function SlurmPage() {
 															<ul className="list pl-1 max-h-30 h-30 w-full overflow-y-auto mini-scroll overflow-x-hidden" ref={el => {
 																if (el) el.scrollTop = el.scrollHeight;
 															}}>
-																{value.map((item, index) => (
+																{value.slice(-50).map((item, index) => (
 																	<li key={index} className="tc2 w-full">{SanitizedString(item)}</li>
 																))}
 															</ul>
