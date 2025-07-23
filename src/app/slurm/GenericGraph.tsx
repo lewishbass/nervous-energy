@@ -36,7 +36,8 @@ interface GenericGraphProps {
 	ylabel?: string;
 	maxDataPoints?: number; // Limit for sliding window
 	isLiveData?: boolean; // Flag to optimize for live updates
-	keys?: string[]; // For multi-series data (y0, y1, y2, etc.)
+  keys?: string[]; // For multi-series data (y0, y1, y2, etc.)
+  index?: number; // Optional index for multi-series data
 }
 
 const GenericGraph: React.FC<GenericGraphProps> = ({
@@ -50,7 +51,8 @@ const GenericGraph: React.FC<GenericGraphProps> = ({
 	ylabel = 'Y',
 	maxDataPoints = 1000,
 	isLiveData = false,
-	keys = undefined
+  keys = undefined,
+  index = -1,
 }) => {
   // Memoize chart data processing with sliding window for live data
   const processedData = useMemo(() => {
@@ -93,15 +95,16 @@ const GenericGraph: React.FC<GenericGraphProps> = ({
 	// Generate multiple random colors for multi-series
 	function getRandomColors(count: number) {
 		return Array.from({ length: count }, (_, i) => {
-			const hue = (i* 360 / count) % 360;
+      const hue = ((i + (index * Math.PI % 1)) * 360 / count) % 360;
 			return `hsl(${hue}, 75%, 62%)`;
 		});
 	}
 
-  const defaultColor = (colors[0] && typeof colors[0] === 'string') ? colors[0] : getRandomColor();
   const seriesCount = keys ? keys.length : 1;
-  const seriesColors = colors.length >= seriesCount && colors[0] && typeof colors[0] === 'string'
-    ? colors.slice(0, seriesCount).map(c => c || getRandomColor())
+  const cleanedColors = Array.isArray(colors) ? colors : [colors];
+  const defaultColor = (cleanedColors[0] && typeof cleanedColors[0] === 'string') ? cleanedColors[0] : getRandomColor();
+  const seriesColors = cleanedColors.length >= seriesCount && cleanedColors[0] && typeof cleanedColors[0] === 'string'
+    ? cleanedColors.slice(0, seriesCount).map(c => c || getRandomColor())
     : getRandomColors(seriesCount);
 
   // Memoize chart components to prevent unnecessary re-renders

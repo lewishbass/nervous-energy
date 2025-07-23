@@ -361,6 +361,8 @@ export default function SlurmPage() {
 														keys={keys.length > 1 ? keys.map((_:string, idx:string) => `y${idx}`) : undefined}
 														isLiveData={true}
 														maxDataPoints={200}
+														index={index}
+														colors={graphSpec.color}
 													/>
 												</div>
 											);
