@@ -3,7 +3,7 @@
 // slurm/page.tsx
 // recieves updates from slurm middleman server and displays the data
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { JSX } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { MathJax } from 'better-react-mathjax';
@@ -15,6 +15,8 @@ import { data } from '@tensorflow/tfjs';
 import GenericGraph from './GenericGraph';
 import { DataPoint, ChartType } from './GenericGraph';
 import Enumber from '../../scripts/enumber';
+import '../../styles/sliders.css';
+
 
 const SanitizedString = (str: any) => {
 	const input_type = typeof str;
@@ -42,6 +44,9 @@ export default function SlurmPage() {
 	const [database, setDatabase] = useState<Record<string, any>>({});
 	const [activeSource, setActiveSource] = useState<string | null>(null);
 	const [activeTab, setActiveTab] = useState<'updates' | 'database' | 'graphs' | 'console'>('graphs');
+
+	const [consoleSpacing, setConsoleSpacing] = useState(0);
+	const consoleSpacingTimer = useRef<NodeJS.Timeout | null>(null);
 
 	// activate first source if available
 	useEffect(() => {
@@ -245,11 +250,32 @@ export default function SlurmPage() {
 							{/* Main Content */}
 							<div className="flex-grow bg2 rounded-lg shadow-lg p-4 max-w-[80%] max-h-[80vh] overflow-y-auto mini-scroll">
 								<div className="w-full mb-4 flex flex-row border-b-2 border-gray-300 px-4 overflow-hidden">
-									<h2 className="tc1 font-semibold text-2xl max-w-[50%] overflow-hidden text-ellipsis mb-1 mr-auto">
+									<h2 className="tc1 font-semibold text-2xl max-w-[50%] overflow-hidden text-ellipsis mb-1 mr-auto truncate">
 										{!activeSource
 											? 'Select Source'
 											: (database[activeSource]?.name || activeSource)}
 									</h2>
+									{activeTab === 'console' && (
+											<input
+												id="console-slider"
+												type="range"
+												min={0}
+												max={100}
+												step={1}
+												defaultValue={50}
+												className="slider max-w-30"
+												onChange={e => {
+													if (consoleSpacingTimer.current) {
+														clearTimeout(consoleSpacingTimer.current);
+													}
+													const newSpacing = parseInt(e.target.value, 10);
+													consoleSpacingTimer.current = setTimeout(() => {
+														setConsoleSpacing(newSpacing);
+													}, 200);
+												
+												}}
+											/>
+									)}
 									{[...(activeSource && database[activeSource] && database[activeSource]["graphs"] ? ['graphs'] : []), ...(activeSource && database[activeSource] && database[activeSource]["console"] ? ['console'] : []), 'updates', 'database'].map(tab => (
 										<div
 											className="rounded-t-lg p-2 mx-2 cursor-pointer hover:opacity-100 opacity-80 transition-all duration-300 hover:translate-y-1 active:translate-y-0 translate-y-2"
@@ -395,7 +421,7 @@ export default function SlurmPage() {
 									>
 									{
 										database[activeSource]["console"].map((consoleLine: string, index: number) => (
-											<li key={index} className="tc2">
+											<li key={index} className="tc2" style={{ marginBottom: `${consoleSpacing}px` }}>
 												{SanitizedString(consoleLine)}
 											</li>
 										))
