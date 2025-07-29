@@ -212,7 +212,7 @@ export default function SlurmPage() {
 							<ul className="bg2 rounded-lg shadow-lg p-4 space-y-2 max-h-[80vh] h-[80vh] overflow-y-auto mini-scroll w-50 min-w-30">
 								{
 									database && Object.entries(database).map(([sourceId, sourceData]) => (
-										<li key={sourceId} className="p-4 bg3 rounded-lg shadow select-none cursor-pointer">
+										<li key={sourceId} className="p-4 bg3 rounded-lg shadow select-none cursor-pointer flex flex-row flex-no-wrap items-center">
 											<h2
 												className="text-xl font-semibold tc2 truncate"
 												style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
@@ -220,6 +220,23 @@ export default function SlurmPage() {
 											>
 												{(sourceData.name || sourceId).replace(/_/g, ' ')}
 											</h2>
+											{/* close button */}
+											<button
+												className="cursor-pointer text-red-500/50 hover:text-red-700/50 ml-2"
+												onClick={(e) => {
+													e.stopPropagation();
+													setDatabase(prev => {
+														const newDb = { ...prev };
+														delete newDb[sourceId];
+														return newDb;
+													});
+													if (activeSource === sourceId) setActiveSource(null);
+												}}
+											>
+												<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M6 18L18 6M6 6l12 12" />
+												</svg>
+											</button>
 										</li>
 									))
 
@@ -302,7 +319,7 @@ export default function SlurmPage() {
 											// @ts-expect-error
 											const hasValidData = keys.some(key => key && database[activeSource][key]);
 											if (!hasValidData) {
-												return <div key={index} className="flex-shrink-1 w-full h-[20vh] bg3 rounded-lg p-2 pb-4 flex items-center justify-center"><span>No Data</span></div>;
+												return <div key={index} className="flex-shrink-1 w-full h-[20vh] bg3 rounded-lg p-2 pb-4 flex items-center justify-center tc3"><span>No Data</span></div>;
 											}
 
 											// Convert data to the format expected by GenericGraph
