@@ -23,7 +23,7 @@ const StarBackground = () => {
 
 		// Generate stars
 		const newStars = [];
-		const starCount = 600;
+		const starCount = 100;
 
 		for (let i = 0; i < starCount; i++) {
 			const size = Math.random() * 2 + 1; // 1-3px

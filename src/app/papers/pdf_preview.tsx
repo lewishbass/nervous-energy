@@ -38,7 +38,7 @@ export default function PDFPreview({ pdfPath, title }: PDFPreviewProps) {
           
           {/* PDF Container */}
           <div className={`relative right-4 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl transition-all duration-100 ${
-            isExpanded ? 'w-[600px] h-[700px]' : 'w-[400px] h-[500px]'
+            isExpanded ? 'w-[75%] h-[80%]' : 'w-[400px] h-[500px]'
           }`}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">

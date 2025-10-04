@@ -16,10 +16,11 @@ import React from 'react';
 import StringEdit from './StringEdit';
 import ParagraphEdit from './ParagraphEdit';
 import DateEdit from './DateEdit';
-//import { FaEdit } from 'react-icons/fa';
-//import SubmitIcon from './SubmitIcon';
+import LocationEdit from './LocationEdit';
 
-type GenericValue = string | number | boolean | Date | null;
+type LocationValue = { lat: number; lon: number };
+
+type GenericValue = string | number | boolean | Date | LocationValue | null;
 
 interface GenericEditProps {
    className?: string,
@@ -118,6 +119,23 @@ const GenericEdit: React.FC<GenericEditProps> = ({
                 submitField={submitField}
                 submitRoute={submitRoute}
               />
+            );
+         case 'location':
+            if (typeof value !== 'object' || value === null || !('lat' in value) || !('lon' in value)) {
+               value = { lat: 0, lon: 0 };
+            }
+            if (typeof placeholder !== 'object' || placeholder === null || !('lat' in placeholder) || !('lon' in placeholder)) {
+               placeholder = { lat: 0, lon: 0 };
+            }
+            return (
+              <div className="p-2 border-2 border-dashed border-gray-300 rounded">
+               <LocationEdit
+                 editable={editable}
+                 value={value}
+                 submitField={submitField}
+                 submitRoute={submitRoute}
+               />
+              </div>
             );
          /*case 'time':
             return (<div/>);

@@ -19,5 +19,14 @@ export const papers: Paper[] = [
         reqAuth: false
     },
 
+    {
+        title: 'VideoDirectorGPT',
+        description: 'Consistent multi-scene video generation via LLM-guided planning',
+        link: '/papers/videodirectorGPT',
+        hasPage: true,
+        keywords: 'video generation LLM planning consistency',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    }
 	];
 

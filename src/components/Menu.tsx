@@ -6,12 +6,13 @@ import {
   FaHome,
   FaBook,
   FaCalendar,
-  FaStore,
+  //FaStore,
   FaUsers,
   FaSun,
   FaMoon,
   FaPuzzlePiece,
-  FaMicroscope
+  FaMicroscope,
+  FaChalkboardTeacher
 } from 'react-icons/fa';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,6 +20,7 @@ import { useClickAway } from '@/hooks/useClickAway';
 import SearchExpand from './SearchExpand';
 import { useAuth } from '@/context/AuthContext';
 import { toys } from '@/data/toys';
+import { link } from 'fs';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 
@@ -128,7 +130,8 @@ export default function Menu({
     { name: 'Home', link: '/home', keyword: 'dashboard', description: 'Go to the dashboard', requireAuth: false },
     { name: 'Books', link: '/books', keyword: 'reading library', description: 'Explore our collection of books', requireAuth: false },
     { name: 'Events', link: '/events', keyword: 'calendar schedule', description: 'View upcoming events', requireAuth: false },
-    { name: 'Shop', link: '/shop', keyword: 'store purchase', description: 'Visit our online shop', requireAuth: false },
+    //{ name: 'Shop', link: '/shop', keyword: 'store purchase', description: 'Visit our online shop', requireAuth: false },
+    { name: 'Tutoring', link: '/tutoring', keyword: 'learning help', description: 'Sign up for tutoring', requireAuth: false },
     { name: 'Friends', link: '/friends', keyword: 'social network', description: 'Connect with friends', requireAuth: true },
     { name: 'Toys', link: '/toys', keyword: 'interactive demo ml machine learning', description: 'Explore interactive machine learning demos', requireAuth: false },
     { name: 'Papers', link: '/papers', keyword: 'research articles', description: 'My papers and reviews', requireAuth: false },
@@ -185,7 +188,8 @@ export default function Menu({
           {[{ href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
             { href: '/books', icon: FaBook, label: 'Books', requireAuth: false },
             { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
-            { href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
+            //{ href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
+            { href: '/tutoring', icon: FaChalkboardTeacher, label: 'Tutoring', requireAuth: false },
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
             { href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },

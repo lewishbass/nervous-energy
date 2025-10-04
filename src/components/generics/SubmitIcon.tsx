@@ -39,7 +39,9 @@ enum SubmitState {
   INVALID
 }
 
-type GenericValue = string | number | boolean | Date;
+type LocationValue = { lat: number; lon: number };
+
+type GenericValue = string | number | boolean | Date | LocationValue;
 
 interface SubmitIconProps {
   className?: string;
@@ -70,7 +72,7 @@ const SubmitIcon = forwardRef<SubmitIconRef, SubmitIconProps>(({
   onError
 }, ref) => {
   const [submitState, setSubmitState] = useState<SubmitState>(SubmitState.IDLE);
-  const [lastSuccessfulData, setLastSuccessfulData] = useState<string | number | boolean | Date>(data);
+  const [lastSuccessfulData, setLastSuccessfulData] = useState<GenericValue>(data);
 
   const { token, username, isLoggedIn } = useAuth();
 

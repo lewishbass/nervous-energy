@@ -24,7 +24,7 @@ const StarBackground = () => {
 
 		// Generate stars
 		const newStars = [];
-		const starCount = 600;
+		const starCount = 100;
 
 		for (let i = 0; i < starCount; i++) {
 			const size = Math.random() * 2 + 1; // 1-3px
@@ -89,7 +89,7 @@ export default function Toys() {
 			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards" }}><StarBackground /></div>
 
 
-			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Interactive ML Toys</h1>
+			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Paper Reviews</h1>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
 				{papers.map((toy, index) => {
 					// Generate a random rotation for each tile
