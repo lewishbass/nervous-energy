@@ -13,7 +13,13 @@ export default function PDFPreview({ pdfPath, title }: PDFPreviewProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const openInNewTab = () => {
-    window.open(pdfPath, '_blank');
+    if (typeof window !== 'undefined') {
+      window.open(pdfPath, '_blank');
+    }
+    else {
+      // open in new tab not supported in SSR
+      console.warn("Open in new tab not supported in server-side rendering.");
+    }
   };
 
   return (

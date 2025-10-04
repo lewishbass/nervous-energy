@@ -1,3 +1,5 @@
+/* 
+// Original LocationEdit implementation commented out to keep it available but inactive.
 import React, { useState, useRef, useEffect } from 'react';
 import { FaEdit } from 'react-icons/fa';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -136,6 +138,67 @@ const LocationEdit: React.FC<LocationEditProps> = ({
           onClick={toggleEdit}
         />
       </div>
+    </div>
+  );
+};
+*/
+
+import React from 'react';
+
+type LocationValue = { lat: number; lon: number };
+
+interface LocationEditProps {
+  editable?: boolean;
+  value: LocationValue;
+  submitField?: string;
+  submitRoute?: string;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onSuccess?: (response) => void;
+  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
+  onError?: (error) => void;
+}
+
+/**
+ * Simple placeholder used for testing.
+ * Renders a white box and accepts the same props as the real component.
+ */
+const LocationEdit: React.FC<LocationEditProps> = ({
+  editable = true,
+  value,
+  submitField,
+  submitRoute,
+  onSuccess,
+  onError,
+}) => {
+  const hasLocation = value && (value.lat !== 0 || value.lon !== 0);
+
+  return (
+    <div
+      role="presentation"
+      style={{
+        background: '#fff',
+        border: '1px solid #e5e7eb',
+        borderRadius: 6,
+        padding: 12,
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+      // keep pointer-events behavior similar to editable prop
+      aria-disabled={!editable}
+    >
+      <div style={{ fontSize: 13, color: '#111827', marginBottom: 6, fontWeight: 600 }}>
+        LocationEdit (placeholder)
+      </div>
+      <div style={{ fontSize: 13, color: '#6b7280' }}>
+        {hasLocation ? `${value.lat.toFixed(6)}, ${value.lon.toFixed(6)}` : 'No location set'}
+      </div>
+      {/* Minimal visibility of props for quick debugging */}
+      {(submitField || submitRoute) && (
+        <div style={{ marginTop: 8, fontSize: 12, color: '#9ca3af' }}>
+          {submitField && <div>submitField: {String(submitField)}</div>}
+          {submitRoute && <div>submitRoute: {String(submitRoute)}</div>}
+        </div>
+      )}
     </div>
   );
 };

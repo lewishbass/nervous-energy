@@ -4,6 +4,7 @@ import ShopCard from "./ShopCard";
 import shopProducts from "@/data/shopProducts";
 import "./shop.css";
 
+
 export default function Shop() {
   const { stickers, electronics, services } = shopProducts;
 
