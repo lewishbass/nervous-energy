@@ -42,12 +42,21 @@ export default function AuthorLink({ name, url, imageUrl }: AuthorLinkProps) {
         href={url} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="block"
+        className="block user-select-none cursor-pointer"
       >
         {content}
       </a>
     );
   }
 
-  return content;
+  return (
+    <a
+      href={`https://scholar.google.com/scholar?q=${encodeURIComponent(name)}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block user-select-none cursor-pointer"
+    >
+      {content}
+    </a>
+  );
 }

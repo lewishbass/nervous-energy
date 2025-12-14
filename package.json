@@ -15,6 +15,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-converter": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
+    "@xmldom/xmldom": "^0.8.11",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "better-react-mathjax": "^2.1.0",

@@ -6,6 +6,7 @@ import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import { MathJax } from 'better-react-mathjax';
 import PDFPreview from '@/app/papers/pdf_preview';
 import AuthorLink from '@/app/papers/author_link';
+import PaperLink from '@/components/links/paper_link';
 
 export default function VideoDirectorGPTReview() {
 
@@ -89,17 +90,74 @@ export default function VideoDirectorGPTReview() {
 						<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Abstract</h2>
 						<div className="be">
 							<p className="mb-4 tc2 text-lg">
-								[placeholder]
+								Recent text-to-video generation methods focus on producing short video clips of distinct events.
+								Meanwhile, LLMs demonstrate capability in generating layouts to control downstream visual models.
+								<span className="ml-1 italic tc1">Can we leverage the knowledge embedded in these LLMs for temporally consistent long video generation?</span>
+								<br /> <br />
+								In this paper, they propose <b className="tc1" style={{ fontVariant: "small-caps" }}>VideoDirectorGPT</b>, a novel framework for consistent multi-scene video generation that uses the knowledge of LLMs for video content planning.
+								<br /> <br />
+								Given a single text prompt, GPT-4 generates a <span className="tc1 italic">'video plan'</span> including scene descriptions, entities, backgrounds layouts and grouping.
+								<br /> <br />
+								Guided by this <span className="tc1 italic">'video plan'</span>, their video generator <b className="tc1" style={{ fontVariant: "small-caps" }}>Layout2Vid</b> can maintain spatial-temporal consistency across scenes while maintaining <b className="tc1">SOTA</b> performance in single-scene T2V generation.
 							</p>
 						</div>
 
 						<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Key Ideas</h2>
 						<div className="be">
-							<ul className="list-disc pl-6 tc2 space-y-2">
-								<li><b className="tc1">[placeholder]</b> - [placeholder]</li>
-								<li><b className="tc1">[placeholder]</b> - [placeholder]</li>
-								<li><b className="tc1">[placeholder]</b> - [placeholder]</li>
-								<li><b className="tc1">[placeholder]</b> - [placeholder]</li>
+							some text <PaperLink title="VideoGPT" url="https://videodirectorgpt.github.io/" pdfPath="/papers/VideoDirectorGPT.pdf" arxivId='2309.15091' preferredPreview='arxiv' /> more text
+							<ul className="list  tc2 space-y-2">
+								<li>
+									<b className="tc1">T2V Generation</b>
+									<ul className="list-['-'] pl-6 mt-2">
+										<li>
+											<PaperLink title="Modelscope" arxivId="2308.06571" />
+										</li>
+										<li>
+											<PaperLink title="Latent video diffusion" arxivId="2211.13221" />
+										</li>
+										<li>
+											<PaperLink title="Imagen video" arxivId="2210.02303" />
+										</li>
+										<li>
+											<PaperLink title="Make-a-video" arxivId="2209.14792" />
+										</li>
+										<li>
+											<PaperLink title="Magicvideo" arxivId="2211.11018" />
+										</li>
+									</ul>
+								</li>
+								<li><b className="tc1">Long Video Generation</b>
+									<ul className="list-['-'] pl-6 mt-2">
+										<li>
+											<PaperLink title="Align your latents" arxivId="2304.08818" />
+										</li>
+										<li>
+											<PaperLink title="NUWA-XL" arxivId="2303.12346" />
+										</li>
+										<li>
+											<PaperLink title="Phenaki" arxivId="2210.02399" />
+										</li>
+										<li>
+											<PaperLink title="Animate-a-story" arxivId="2307.06940" />
+										</li>
+									</ul>
+								</li>
+								<li><b className="tc1">LLM Guided Generation</b>
+									<ul className="list-['-'] pl-6 mt-2">
+										<li>
+											<PaperLink title="Vipergpt" arxivId="2303.08128" />
+										</li>
+										<li>
+											<PaperLink title="Visual programming" arxivId="2211.11559" />
+										</li>
+										<li>
+											<PaperLink title="Visual programming" arxivId="2305.15328" />
+										</li>
+										<li>
+											<PaperLink title="Layoutgpt" arxivId="2305.15393" />
+										</li>
+									</ul>
+								</li>
 							</ul>
 						</div>
 

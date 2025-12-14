@@ -7,6 +7,8 @@ export default function Home() {
             <h2 className="text-2xl font-semibold mb-4 tc1">Featured Content</h2>
             <p className="tc2">
               Welcome to our platform. This is where youll find the latest updates and featured content.
+              <br /><br />
+              Coming Soon...
             </p>
           </section>
           

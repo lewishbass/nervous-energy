@@ -1,7 +1,19 @@
+├── .VSCodeCounter
+│   └── 2025-04-13_16-14-32
+│       ├── details.md
+│       ├── diff-details.md
+│       ├── diff.csv
+│       ├── diff.md
+│       ├── diff.txt
+│       ├── results.csv
+│       ├── results.json
+│       ├── results.md
+│       └── results.txt
 ├── docs
 │   └── conversation-api.md
 ├── netlify
 │   ├── functions
+│   │   ├── arxive_fetch.ts
 │   │   ├── auth.ts
 │   │   ├── conv.ts
 │   │   ├── keys.ts
@@ -12,6 +24,7 @@
 │   │   ├── backendutils.ts
 │   │   └── mongodb.ts
 │   └── models
+│       ├── Article.ts
 │       ├── Conversation.ts
 │       └── User.ts
 ├── public
@@ -21,6 +34,11 @@
 │   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.jpeg
 │   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.jpeg
 │   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.jpeg
+│   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.jpg
+│   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.jpg
+│   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.jpg
+│   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.jpg
+│   │   │   ├── Cage_of_Souls_2019_cover.jpg
 │   │   │   ├── Consider Phlebas - Iain M. Banks_cover.jpeg
 │   │   │   ├── Excession - Iain M. Banks_cover.jpg
 │   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.jpeg
@@ -44,6 +62,7 @@
 │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers.epub
 │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne.epub
 │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children.epub
+│   │   ├── Cage_of_Souls_2019.epub
 │   │   ├── Consider Phlebas - Iain M. Banks.epub
 │   │   ├── Excession - Iain M. Banks.epub
 │   │   ├── Hydrogen Sonata, The - Iain M. Banks.epub
@@ -63,6 +82,10 @@
 │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov.epub
 │   │   ├── State of the Art, The - Iain M. Banks.epub
 │   │   ├── Surface Detail - Iain M. Banks.epub
+│   │   ├── Taylor_Dennis_E_-_Bobiverse_1_-_We_Are_Legion.epub
+│   │   ├── Taylor_Dennis_E_-_Bobiverse_2_-_For_We_Are_Many.epub
+│   │   ├── Taylor_Dennis_E_-_Bobiverse_3_-_All_These_Worlds.epub
+│   │   ├── Taylor_Dennis_E_-_Bobiverse_4_-_Heaven_39_s_River.epub
 │   │   └── Use of Weapons - Iain M. Banks.epub
 │   ├── images
 │   │   ├── caving
@@ -72,6 +95,20 @@
 │   │   │   │   ├── cave3.jpg
 │   │   │   │   ├── cave4.jpg
 │   │   │   │   └── cave5.jpg
+│   │   │   ├── linx-4-10-25
+│   │   │   │   ├── cave1.jpg
+│   │   │   │   ├── cave10.jpg
+│   │   │   │   ├── cave11.jpg
+│   │   │   │   ├── cave12.jpg
+│   │   │   │   ├── cave13.jpg
+│   │   │   │   ├── cave2.jpg
+│   │   │   │   ├── cave3.jpg
+│   │   │   │   ├── cave4.jpg
+│   │   │   │   ├── cave5.jpg
+│   │   │   │   ├── cave6.jpg
+│   │   │   │   ├── cave7.jpg
+│   │   │   │   ├── cave8.jpg
+│   │   │   │   └── cave9.jpg
 │   │   │   ├── new river 5-4-24
 │   │   │   │   ├── cave1.jpg
 │   │   │   │   ├── cave2.jpg
@@ -88,13 +125,21 @@
 │   │   ├── store
 │   │   │   ├── nervous-sticker-shot.png
 │   │   │   └── WM-sticker-shot.png
+│   │   ├── wiki-examples
+│   │   │   ├── bar.png
+│   │   │   ├── Global.jpg
+│   │   │   └── Local.png
 │   │   ├── CEED.svg
 │   │   └── gilbert.jpg
+│   ├── papers
+│   │   ├── A_Survey_on_Latent_Reasoning.pdf
+│   │   └── VideoDirectorGPT.pdf
 │   ├── file.svg
 │   ├── filter.svg
 │   ├── FullLogo.svg
 │   ├── globe.svg
 │   ├── grid.svg
+│   ├── idea.pdf
 │   ├── KH_back.svg
 │   ├── KH_figures.svg
 │   ├── next.svg
@@ -117,10 +162,25 @@
 │   │   │   └── page.tsx
 │   │   ├── home
 │   │   │   └── page.tsx
+│   │   ├── papers
+│   │   │   ├── latent-reasoning
+│   │   │   │   └── page.tsx
+│   │   │   ├── videodirectorGPT
+│   │   │   │   └── page.tsx
+│   │   │   ├── author_link.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── pdf_preview.tsx
+│   │   ├── resume
+│   │   │   ├── transcript
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
 │   │   ├── shop
 │   │   │   ├── page.tsx
 │   │   │   ├── shop.css
 │   │   │   └── ShopCard.tsx
+│   │   ├── slurm
+│   │   │   ├── GenericGraph.tsx
+│   │   │   └── page.tsx
 │   │   ├── toys
 │   │   │   ├── back-prop
 │   │   │   │   ├── BackPropDemo.tsx
@@ -137,11 +197,20 @@
 │   │   │   │   └── StarsGameComponent.tsx
 │   │   │   ├── video-classification
 │   │   │   │   └── page.tsx
+│   │   │   ├── wikipedia-visualizer
+│   │   │   │   ├── ClusterComparison.tsx
+│   │   │   │   ├── page.css
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── WikiGraphs.tsx
 │   │   │   ├── xg-weight-init
 │   │   │   │   ├── page.tsx
 │   │   │   │   ├── VerticalHistogram.tsx
 │   │   │   │   └── XGWeightDemo.tsx
 │   │   │   └── page.tsx
+│   │   ├── tutoring
+│   │   │   ├── AvailabilityTab.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── SignUpTab.tsx
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   └── page.tsx
@@ -156,9 +225,12 @@
 │   │   │   ├── DateEdit.tsx
 │   │   │   ├── DeleteAccountForm.tsx
 │   │   │   ├── GenericEdit.tsx
+│   │   │   ├── LocationEdit.tsx
 │   │   │   ├── ParagraphEdit.tsx
 │   │   │   ├── StringEdit.tsx
 │   │   │   └── SubmitIcon.tsx
+│   │   ├── links
+│   │   │   └── paper_link.tsx
 │   │   ├── messages
 │   │   │   ├── CreateMessageModal.tsx
 │   │   │   ├── MessageBubble.tsx
@@ -181,15 +253,20 @@
 │   ├── context
 │   │   └── AuthContext.tsx
 │   ├── data
+│   │   ├── papers.ts
 │   │   ├── shopProducts.ts
 │   │   └── toys.ts
 │   ├── hooks
 │   │   └── useClickAway.ts
 │   ├── scripts
+│   │   ├── enumber.tsx
 │   │   └── sourceButtons.tsx
 │   └── styles
 │       ├── buttons.css
-│       └── sliders.css
+│       ├── sliders.css
+│       └── toggles.css
+├── .eslintrc.json
+├── eslint.config.js
 ├── eslint.config.mjs
 ├── filetree.txt
 ├── LICENSE.md
