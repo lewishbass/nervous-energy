@@ -259,7 +259,7 @@ export default function TranscriptPage() {
 										{isExpanded && (
 											<>
 												{/* Semester Details */}
-												<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 user-select-none">
+												<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 select-none">
 													{semester.term_code && (
 														<div><span className="font-semibold tc2">Term Code:</span> {semester.term_code}</div>
 													)}
@@ -281,7 +281,7 @@ export default function TranscriptPage() {
 												</div>
 
 												{/* Course Table */}
-												<div className="overflow-x-auto user-select-none">
+												<div className="overflow-x-auto select-none">
 													<table className="w-full mb-4 text-sm">
 														<thead>
 															<tr className="border-b-2">
