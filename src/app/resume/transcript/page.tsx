@@ -53,6 +53,8 @@ export default function TranscriptPage() {
 	const [transcriptData, setTranscriptData] = useState<Semester[][] | null>(null);
 	const [fetchGrades, setFetchGrades] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
+	const [expandedSemesters, setExpandedSemesters] = useState<Set<string>>(new Set());
 
 	// load fetchgrades from local storage and load transcript data
 	useEffect(() => {
@@ -132,6 +134,31 @@ export default function TranscriptPage() {
 		}
 	};
 
+	const toggleLevel = (levelIndex: number) => {
+		setExpandedLevels(prev => {
+			const newSet = new Set(prev);
+			if (newSet.has(levelIndex)) {
+				newSet.delete(levelIndex);
+			} else {
+				newSet.add(levelIndex);
+			}
+			return newSet;
+		});
+	};
+
+	const toggleSemester = (levelIndex: number, semesterIndex: number) => {
+		const key = `${levelIndex}-${semesterIndex}`;
+		setExpandedSemesters(prev => {
+			const newSet = new Set(prev);
+			if (newSet.has(key)) {
+				newSet.delete(key);
+			} else {
+				newSet.add(key);
+			}
+			return newSet;
+		});
+	};
+
 	return (
 		<div className="relative min-h-screen">
 			{/* Background animation */}
@@ -194,105 +221,140 @@ export default function TranscriptPage() {
 					{!isLoading && !transcriptData && <div>No transcript data available.</div>}
 					{!isLoading && transcriptData && transcriptData.map((level, levelIndex) => (
 						<div key={levelIndex}>
-							<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">{level[0].academic_level}</h2>
-							{level.map((semester, semesterIndex) => (
-								<div className="be mb-6 p-4 rounded-lg" key={semesterIndex}>
-									<h3 className="text-xl font-semibold mb-2 tc1">{semester.semester_name} - {semester.institution}</h3>
+							<h2 
+								className="text-2xl font-semibold mt-8 mb-4 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+								onClick={() => toggleLevel(levelIndex)}
+							>
+								<svg 
+									className={`w-6 h-6 mr-2 transition-transform ${expandedLevels.has(levelIndex) ? 'rotate-90' : ''}`}
+									fill="none" 
+									stroke="currentColor" 
+									viewBox="0 0 24 24"
+								>
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+								</svg>
+								{level[0].academic_level}
+							</h2>
+							{expandedLevels.has(levelIndex) && level.map((semester, semesterIndex) => {
+								const semesterKey = `${levelIndex}-${semesterIndex}`;
+								const isExpanded = expandedSemesters.has(semesterKey);
+								
+								return (
+									<div className="be mb-6 p-4 rounded-lg" key={semesterIndex}>
+										<h3 
+											className="text-xl font-semibold mb-2 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+											onClick={() => toggleSemester(levelIndex, semesterIndex)}
+										>
+											<svg 
+												className={`w-5 h-5 mr-2 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+												fill="none" 
+												stroke="currentColor" 
+												viewBox="0 0 24 24"
+											>
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+											</svg>
+											{semester.semester_name} - {semester.institution}
+										</h3>
 
-									{/* Semester Details */}
-									<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3">
-										{semester.term_code && (
-											<div><span className="font-semibold tc2">Term Code:</span> {semester.term_code}</div>
-										)}
-										{semester.start_date && (
-											<div><span className="font-semibold tc2">Start:</span> {semester.start_date}</div>
-										)}
-										{semester.end_date && (
-											<div><span className="font-semibold tc2">End:</span> {semester.end_date}</div>
-										)}
-										{semester.primary_college && (
-											<div><span className="font-semibold tc2">College:</span> {semester.primary_college}</div>
-										)}
-										{semester.primary_major && (
-											<div><span className="font-semibold tc2">Major:</span> {semester.primary_major}</div>
-										)}
-										{semester.academic_standing && (
-											<div><span className="font-semibold tc2">Standing:</span> {semester.academic_standing}</div>
+										{isExpanded && (
+											<>
+												{/* Semester Details */}
+												<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 user-select-none">
+													{semester.term_code && (
+														<div><span className="font-semibold tc2">Term Code:</span> {semester.term_code}</div>
+													)}
+													{semester.start_date && (
+														<div><span className="font-semibold tc2">Start:</span> {semester.start_date}</div>
+													)}
+													{semester.end_date && (
+														<div><span className="font-semibold tc2">End:</span> {semester.end_date}</div>
+													)}
+													{semester.primary_college && (
+														<div><span className="font-semibold tc2">College:</span> {semester.primary_college}</div>
+													)}
+													{semester.primary_major && (
+														<div><span className="font-semibold tc2">Major:</span> {semester.primary_major}</div>
+													)}
+													{semester.academic_standing && (
+														<div><span className="font-semibold tc2">Standing:</span> {semester.academic_standing}</div>
+													)}
+												</div>
+
+												{/* Course Table */}
+												<div className="overflow-x-auto user-select-none">
+													<table className="w-full mb-4 text-sm">
+														<thead>
+															<tr className="border-b-2">
+																<th className="px-2 py-2 text-left w-16">Subject</th>
+																<th className="px-2 py-2 text-left w-16">Course</th>
+																<th className="px-2 py-2 text-left flex-1">Title</th>
+																{semester.classes.some(c => c.campus) && (
+																	<th className="px-2 py-2 text-left w-20">Campus</th>
+																)}
+																{semester.classes.some(c => c.level) && (
+																	<th className="px-2 py-2 text-left w-16">Level</th>
+																)}
+																{semester.classes.some(c => c.grade !== null) && (
+																	<th className="px-2 py-2 text-left w-16">Grade</th>
+																)}
+																<th className="px-2 py-2 text-center w-20">Credits</th>
+																{semester.classes.some(c => c.quality_points !== null) && (
+																	<th className="px-2 py-2 text-right w-20">Quality Pts</th>
+																)}
+															</tr>
+														</thead>
+														<tbody>
+															{semester.classes.map((course, courseIndex) => (
+																<tr key={courseIndex} className="border-b">
+																	<td className="px-2 py-2 w-16">{course.subject}</td>
+																	<td className="px-2 py-2 w-16">{course.course}</td>
+																	<td className="px-2 py-2 flex-1">{course.title}</td>
+																	{semester.classes.some(c => c.campus) && (
+																		<td className="px-2 py-2 w-20">{course.campus || ''}</td>
+																	)}
+																	{semester.classes.some(c => c.level) && (
+																		<td className="px-2 py-2 w-16">{course.level || ''}</td>
+																	)}
+																	{semester.classes.some(c => c.grade !== null) && (
+																		<td className="px-2 py-2 text-center w-16">{course.grade || ''}</td>
+																	)}
+																	<td className="px-2 py-2 text-center w-20">{course.credit_hours}</td>
+																	{semester.classes.some(c => c.quality_points !== null) && (
+																		<td className="px-2 py-2 text-center w-20">{course.quality_points !== null ? course.quality_points.toFixed(2) : ''}</td>
+																	)}
+																</tr>
+															))}
+														</tbody>
+													</table>
+												</div>
+
+												{/* Semester Summary */}
+												<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t">
+													<div><span className="font-semibold">Attempted Hours:</span> {semester.attempt_hours}</div>
+													{semester.passed_hours !== null && (
+														<div><span className="font-semibold">Passed Hours:</span> {semester.passed_hours}</div>
+													)}
+													{semester.earned_hours !== null && (
+														<div><span className="font-semibold">Earned Hours:</span> {semester.earned_hours}</div>
+													)}
+													{semester.gpa_hours !== null && (
+														<div><span className="font-semibold">GPA Hours:</span> {semester.gpa_hours}</div>
+													)}
+													{semester.quality_points !== null && (
+														<div><span className="font-semibold">Quality Points:</span> {semester.quality_points.toFixed(2)}</div>
+													)}
+													{semester.term_gpa !== null && (
+														<div><span className="font-semibold">Term GPA:</span> {semester.term_gpa.toFixed(3)}</div>
+													)}
+													{semester.cumulative_gpa !== null && (
+														<div><span className="font-semibold">Cumulative GPA:</span> {semester.cumulative_gpa.toFixed(3)}</div>
+													)}
+												</div>
+											</>
 										)}
 									</div>
-
-									{/* Course Table */}
-									<div className="overflow-x-auto">
-										<table className="w-full mb-4 text-sm">
-											<thead>
-												<tr className="border-b-2">
-													<th className="px-2 py-2 text-left w-16">Subject</th>
-													<th className="px-2 py-2 text-left w-16">Course</th>
-													<th className="px-2 py-2 text-left flex-1">Title</th>
-													{semester.classes.some(c => c.campus) && (
-														<th className="px-2 py-2 text-left w-20">Campus</th>
-													)}
-													{semester.classes.some(c => c.level) && (
-														<th className="px-2 py-2 text-left w-16">Level</th>
-													)}
-													{semester.classes.some(c => c.grade !== null) && (
-														<th className="px-2 py-2 text-center w-16">Grade</th>
-													)}
-													<th className="px-2 py-2 text-center w-20">Credits</th>
-													{semester.classes.some(c => c.quality_points !== null) && (
-														<th className="px-2 py-2 text-center w-20">Quality Pts</th>
-													)}
-												</tr>
-											</thead>
-											<tbody>
-												{semester.classes.map((course, courseIndex) => (
-													<tr key={courseIndex} className="border-b">
-														<td className="px-2 py-2 w-16">{course.subject}</td>
-														<td className="px-2 py-2 w-16">{course.course}</td>
-														<td className="px-2 py-2 flex-1">{course.title}</td>
-														{semester.classes.some(c => c.campus) && (
-															<td className="px-2 py-2 w-20">{course.campus || ''}</td>
-														)}
-														{semester.classes.some(c => c.level) && (
-															<td className="px-2 py-2 w-16">{course.level || ''}</td>
-														)}
-														{semester.classes.some(c => c.grade !== null) && (
-															<td className="px-2 py-2 text-center w-16">{course.grade || ''}</td>
-														)}
-														<td className="px-2 py-2 text-center w-20">{course.credit_hours}</td>
-														{semester.classes.some(c => c.quality_points !== null) && (
-															<td className="px-2 py-2 text-center w-20">{course.quality_points !== null ? course.quality_points.toFixed(2) : ''}</td>
-														)}
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
-
-									{/* Semester Summary */}
-									<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t">
-										<div><span className="font-semibold">Attempted Hours:</span> {semester.attempt_hours}</div>
-										{semester.passed_hours !== null && (
-											<div><span className="font-semibold">Passed Hours:</span> {semester.passed_hours}</div>
-										)}
-										{semester.earned_hours !== null && (
-											<div><span className="font-semibold">Earned Hours:</span> {semester.earned_hours}</div>
-										)}
-										{semester.gpa_hours !== null && (
-											<div><span className="font-semibold">GPA Hours:</span> {semester.gpa_hours}</div>
-										)}
-										{semester.quality_points !== null && (
-											<div><span className="font-semibold">Quality Points:</span> {semester.quality_points.toFixed(2)}</div>
-										)}
-										{semester.term_gpa !== null && (
-											<div><span className="font-semibold">Term GPA:</span> {semester.term_gpa.toFixed(3)}</div>
-										)}
-										{semester.cumulative_gpa !== null && (
-											<div><span className="font-semibold">Cumulative GPA:</span> {semester.cumulative_gpa.toFixed(3)}</div>
-										)}
-									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 					))}
 
