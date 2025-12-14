@@ -217,9 +217,9 @@ export default function TranscriptPage() {
 
 				<div className="prose dark:prose-invert max-w-none mt-8">
 					{/* Transcript Content */}
-					{isLoading && <div>Loading transcript data...</div>}
+					{isLoading && !transcriptData && <div>Loading transcript data...</div>}
 					{!isLoading && !transcriptData && <div>No transcript data available.</div>}
-					{!isLoading && transcriptData && transcriptData.map((level, levelIndex) => (
+					{transcriptData && transcriptData.map((level, levelIndex) => (
 						<div key={levelIndex}>
 							<h2 
 								className="text-2xl font-semibold mt-8 mb-4 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
