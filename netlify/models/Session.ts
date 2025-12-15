@@ -35,6 +35,10 @@ const SessionSchema = new mongoose.Schema({
 		default: Date.now,
 		immutable: true,
 	},
+	lastUpdated: {
+		type: Date,
+		default: Date.now,
+	},
 	country: {
 		type: String,
 		required: false
@@ -93,9 +97,15 @@ const SessionSchema = new mongoose.Schema({
 	},
 });
 
-SessionSchema.index({ startTime: -1 });
+SessionSchema.index({ lastUpdated: -1 });
+
+SessionSchema.pre('save', function (next) {
+	this.lastUpdated = new Date();
+	next();
+});
 
 const SessionModel = mongoose.models.Session || mongoose.model('Session', SessionSchema);
 const SessionEventModel = mongoose.models.SessionEvent || mongoose.model('SessionEvent', SessionEventSchema);
+
 
 export { SessionModel, SessionEventModel };

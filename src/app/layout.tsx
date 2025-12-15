@@ -76,19 +76,14 @@ function RootLayoutContent({
     }
   }, [isNotificationModalOpen]);
 
-  useEffect(() => {
-    analytics.track('toggle_dark_mode', { isDarkMode: isDark });
-  }, [isDark]);
-
-  useEffect(() => {
-    analytics.track('toggle_menu', { isMenuOpen });
-  }, [isMenuOpen]);
 
   const toggleMenu = () => {
+    analytics.track('toggle_menu', { isMenuOpen: !isMenuOpen });
     setIsMenuOpen(!isMenuOpen);
   };
 
   const toggleDark = () => {
+    analytics.track('toggle_dark_mode', { isDarkMode: !isDark });
     setIsDark(!isDark);
     localStorage.setItem('isDarkMode', JSON.stringify(!isDark));
   };

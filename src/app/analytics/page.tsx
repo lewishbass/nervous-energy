@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
 
+import { copyToClipboard } from '@/scripts/clipboard';
+
 const ANALYTICS_ROUTE = '/.netlify/functions/analytics';
 
 interface SessionEvent {
@@ -32,6 +34,7 @@ interface Session {
 	timezone?: string;
 	source?: string;
 	events: SessionEvent[];
+	lastUpdated?: string;
 }
 
 export default function AnalyticsPage() {
@@ -111,8 +114,47 @@ export default function AnalyticsPage() {
 		});
 	};
 
+	const deleteSession = async (sessionId: string) => {
+		// fetch remove action and delete from display on success
+		try {
+			const deleteResponse = await fetch(ANALYTICS_ROUTE, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					action: 'delete_sessions',
+					sessionIds: [sessionId],
+				}),
+			});
+			if (!deleteResponse.ok) {
+				console.error("Failed to delete session");
+				return;
+			} else {
+				// Remove from local state
+				setSessions(prev => prev.filter(session => session.sessionId !== sessionId));
+			}
+
+		} catch (error) {
+			console.error("Error deleting session:", error);
+			return;
+		}
+	}
+
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleString();
+	};
+
+	// NEW: helper for copying displayed metadata values
+	const handleCopy = (value: any) => {
+		if (value === undefined || value === null) return;
+		let text = '';
+		if (Array.isArray(value)) {
+			text = value.join('x');
+		} else {
+			text = String(value);
+		}
+		copyToClipboard(text);
 	};
 
 	return (
@@ -169,7 +211,7 @@ export default function AnalyticsPage() {
 						return (
 							<div className="be mb-6 p-4 rounded-lg" key={session.sessionId}>
 								<h3 
-									className="text-xl font-semibold mb-1 mt-1 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+									className="text-xl font-semibold mb-1 mt-1 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2"
 									onClick={() => toggleSession(session.sessionId)}
 								>
 									<svg 
@@ -180,9 +222,16 @@ export default function AnalyticsPage() {
 									>
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 									</svg>
+									<span className="inline-flex items-center">
 									Session: {session.sessionId.substring(0, 8)}...
-									<span className="ml-4 text-sm tc3 font-normal">
-										{formatDate(session.startTime)}
+									</span>
+									<span className="inline-flex items-center ml-4 text-sm tc3 font-normal">
+										{formatDate(session.startTime)} - {session.lastUpdated && formatDate(session.lastUpdated)}
+									</span>
+									<span className="inline-flex items-center ml-2 opacity-60 ml-auto hover:opacity-100 transition-opacity" onClick={(e) => deleteSession(session.sessionId)}>
+										<svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+										</svg>
 									</span>
 								</h3>
 
@@ -191,40 +240,148 @@ export default function AnalyticsPage() {
 										{/* Session Metadata */}
 										<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 select-none mt-4">
 											{session.ip && (
-												<div><span className="font-semibold tc2">IP:</span> {session.ip}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.ip)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.ip); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">IP:</span> <span className="group-hover:underline">{session.ip}</span>
+												</div>
 											)}
 											{session.country && (
-												<div><span className="font-semibold tc2">Country:</span> {session.country}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.country)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.country); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Country:</span> <span className="group-hover:underline">{session.country}</span>
+												</div>
 											)}
 											{session.city && (
-												<div><span className="font-semibold tc2">City:</span> {session.city}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.city)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.city); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">City:</span> <span className="group-hover:underline">{session.city}</span>
+												</div>
 											)}
 											{session.region && (
-												<div><span className="font-semibold tc2">Region:</span> {session.region}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.region)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.region); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Region:</span> <span className="group-hover:underline">{session.region}</span>
+												</div>
 											)}
 											{session.browser && (
-												<div><span className="font-semibold tc2">Browser:</span> {session.browser}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.browser)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.browser); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Browser:</span> <span className="group-hover:underline">{session.browser}</span>
+												</div>
 											)}
 											{session.os && (
-												<div><span className="font-semibold tc2">OS:</span> {session.os}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.os)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.os); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">OS:</span> <span className="group-hover:underline">{session.os}</span>
+												</div>
 											)}
 											{session.device && (
-												<div><span className="font-semibold tc2">Device:</span> {session.device}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.device)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.device); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Device:</span> <span className="group-hover:underline">{session.device}</span>
+												</div>
 											)}
 											{session.language && (
-												<div><span className="font-semibold tc2">Language:</span> {session.language}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.language)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.language); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Language:</span> <span className="group-hover:underline">{session.language}</span>
+												</div>
 											)}
 											{session.timezone && (
-												<div><span className="font-semibold tc2">Timezone:</span> {session.timezone}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.timezone)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.timezone); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Timezone:</span> <span className="group-hover:underline">{session.timezone}</span>
+												</div>
 											)}
 											{session.screenSize && (
-												<div><span className="font-semibold tc2">Screen:</span> {session.screenSize[0]}x{session.screenSize[1]}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.screenSize)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.screenSize); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Screen:</span> <span className="group-hover:underline">{session.screenSize[0]}x{session.screenSize[1]}</span>
+												</div>
 											)}
 											{session.viewport && (
-												<div><span className="font-semibold tc2">Viewport:</span> {session.viewport[0]}x{session.viewport[1]}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.viewport)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.viewport); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Viewport:</span> <span className="group-hover:underline">{session.viewport[0]}x{session.viewport[1]}</span>
+												</div>
 											)}
 											{session.source && (
-												<div><span className="font-semibold tc2">Source:</span> {session.source === 'direct' ? 'Direct' : session.source}</div>
+												<div
+													className="cursor-pointer group"
+													onClick={() => handleCopy(session.source === 'direct' ? 'Direct' : session.source)}
+													onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCopy(session.source === 'direct' ? 'Direct' : session.source); } }}
+													role="button"
+													tabIndex={0}
+													title="Click to copy"
+												>
+													<span className="font-semibold tc2">Source:</span> <span className="group-hover:underline">{session.source === 'direct' ? 'Direct' : session.source}</span>
+												</div>
 											)}
 										</div>
 

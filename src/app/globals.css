@@ -524,3 +524,22 @@ body {
 .rotate:hover svg{
   animation: rotate 0.5s ease 1;
 }
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(0, 10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 10px);
+  }
+}

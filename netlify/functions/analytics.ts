@@ -55,6 +55,8 @@ export const handler: Handler = async (event) => {
 		return await handleGetSessionIds(requestBody);
 	} else if (requestBody.action === 'get_session_info') {
 		return await handleGetSessionInfo(requestBody);
+	} else if (requestBody.action === 'delete_sessions') {
+		return await handleDeleteSessions(requestBody);
 	}
 
 	return {
@@ -139,7 +141,7 @@ async function handleGetSessionIds(requestBody: any) {
 	await connectMongoDB();
 
 	const sessions = await SessionModel.find({})
-		.sort({ startTime: -1 })
+		.sort({ lastUpdated: -1 })
 		.limit(limit)
 		.select('sessionId')
 		.lean();
@@ -172,4 +174,21 @@ async function handleGetSessionInfo(requestBody: any) {
 	}
 }
 
+async function handleDeleteSessions(requestBody: any) {
+	const { sessionIds } = requestBody;
+	if (!Array.isArray(sessionIds) || sessionIds.length === 0) {
+		return {
+			statusCode: 400,
+			body: JSON.stringify({ message: 'sessionIds must be a non-empty array' }),
+		};
+	}
+	await connectMongoDB();
 
+	await SessionModel.deleteMany({
+		sessionId: { $in: sessionIds }
+	});
+	return {
+		statusCode: 200,
+		body: JSON.stringify({ message: 'Sessions deleted successfully' })
+	}
+}
