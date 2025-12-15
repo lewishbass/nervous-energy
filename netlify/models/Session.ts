@@ -99,6 +99,11 @@ const SessionSchema = new mongoose.Schema({
 
 SessionSchema.index({ lastUpdated: -1 });
 
+SessionSchema.pre('findOneAndUpdate', function (next) {
+	this.set({ lastUpdated: new Date() });
+	next();
+});
+
 SessionSchema.pre('save', function (next) {
 	this.lastUpdated = new Date();
 	next();
