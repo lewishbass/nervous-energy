@@ -51,6 +51,39 @@ function RootLayoutContent({
     }
   }, [isLoggedIn, userId]);
 
+  // Track modal open/close events
+  useEffect(() => {
+    if (isMessageModalOpen) {
+      analytics.track('modal_open', { modalType: 'message' });
+    }
+  }, [isMessageModalOpen]);
+
+  useEffect(() => {
+    if (isProfileModalOpen) {
+      analytics.track('modal_open', { modalType: 'profile' });
+    }
+  }, [isProfileModalOpen]);
+
+  useEffect(() => {
+    if (isAuthModalOpen) {
+      analytics.track('modal_open', { modalType: 'auth' });
+    }
+  }, [isAuthModalOpen]);
+
+  useEffect(() => {
+    if (isNotificationModalOpen) {
+      analytics.track('modal_open', { modalType: 'notification' });
+    }
+  }, [isNotificationModalOpen]);
+
+  useEffect(() => {
+    analytics.track('toggle_dark_mode', { isDarkMode: isDark });
+  }, [isDark]);
+
+  useEffect(() => {
+    analytics.track('toggle_menu', { isMenuOpen });
+  }, [isMenuOpen]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -112,7 +145,7 @@ function RootLayoutContent({
     if (savedDarkModeState !== null) {
       setIsDark(JSON.parse(savedDarkModeState));
     }
-    if (savedMenuState !== null) {
+    if (savedMenuState !== null && savedMenuState === 'true') {
       setIsMenuOpen(JSON.parse(savedMenuState));
     }
     if (savedMessageModalState !== null) {
