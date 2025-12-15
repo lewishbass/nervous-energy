@@ -13,6 +13,11 @@ class Analytics {
 	}
 
 	private getOrCreateSessionId(): string {
+		// Check if we're in the browser
+		if (typeof window === 'undefined') {
+			return 'server-side-render';
+		}
+
 		let stored = localStorage.getItem('analytics_session_id');
 		if (stored) return stored;
 
@@ -26,6 +31,11 @@ class Analytics {
 	}
 
 	private getDeviceInfo() {
+		// Check if we're in the browser
+		if (typeof window === 'undefined') {
+			return {};
+		}
+
 		const ua = navigator.userAgent;
 
 		return {
@@ -70,6 +80,9 @@ class Analytics {
 	}
 
 	track(event: string, properties: Record<string, any> = {}) {
+		// Only track if in browser
+		if (typeof window === 'undefined') return;
+
 		// send action report
 		fetch(ANALYTICS_ROUTE, {
 			method: 'POST',
@@ -87,6 +100,9 @@ class Analytics {
 
 
 	sessionMetadata() {
+		// Only send metadata if in browser
+		if (typeof window === 'undefined') return;
+
 		let metadata = this.getDeviceInfo();
 
 		fetch(ANALYTICS_ROUTE, {
@@ -103,6 +119,9 @@ class Analytics {
 	}
 
 	pageview() {
+		// Only track pageview if in browser
+		if (typeof window === 'undefined') return;
+
 		this.track('pageview', {
 			path: window.location.pathname,
 			title: document.title
@@ -111,5 +130,19 @@ class Analytics {
 
 }
 
+// Lazy instantiation - only create instance when accessed
+let analyticsInstance: Analytics | null = null;
 
-export const analytics = new Analytics();
+export const analytics = new Proxy({} as Analytics, {
+	get(target, prop) {
+		// Create instance on first access, only in browser
+		if (!analyticsInstance && typeof window !== 'undefined') {
+			analyticsInstance = new Analytics();
+		}
+		// Return no-op for server-side
+		if (!analyticsInstance) {
+			return () => { };
+		}
+		return (analyticsInstance as any)[prop];
+	}
+});

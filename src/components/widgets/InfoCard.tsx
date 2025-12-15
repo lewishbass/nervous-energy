@@ -173,8 +173,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
 							}}
 							exit={{ opacity: 0 }}
 							transition={{
-								duration: 1.5,
-								exit: { delay: 1 }
+								duration: 1.5
 							}}
 						>
 							<Image

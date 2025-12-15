@@ -1,5 +1,4 @@
 // /resume/transcript
-// This is the transcript page
 
 'use client';
 
