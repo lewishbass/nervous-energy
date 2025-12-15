@@ -5,7 +5,7 @@
 
 import Link from 'next/link';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
-import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
+//import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 
 import { useEffect, useState } from 'react';
 
@@ -53,15 +53,37 @@ export default function TranscriptPage() {
 	const [transcriptData, setTranscriptData] = useState<Semester[][] | null>(null);
 	const [fetchGrades, setFetchGrades] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+
 	const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
 	const [expandedSemesters, setExpandedSemesters] = useState<Set<string>>(new Set());
 
-	// load fetchgrades from local storage and load transcript data
+	// load fetchgrades and expanded states from local storage and load transcript data
 	useEffect(() => {
 		const storedFetchGrades = localStorage.getItem('fetchGrades');
 		const parsedFetchGrades = storedFetchGrades ? JSON.parse(storedFetchGrades) : false;
 		setFetchGrades(parsedFetchGrades);
+
+		const storedExpandedLevels = localStorage.getItem('expandedLevels');
+		if (storedExpandedLevels) {
+			const parsedLevels: number[] = JSON.parse(storedExpandedLevels);
+			setExpandedLevels(new Set(parsedLevels));
+		}
+		const storedExpandedSemesters = localStorage.getItem('expandedSemesters');
+		if (storedExpandedSemesters) {
+			const parsedSemesters: string[] = JSON.parse(storedExpandedSemesters);
+			setExpandedSemesters(new Set(parsedSemesters));
+		}
 	}, []);
+
+	// save expanded states to local storage on change
+	useEffect(() => {
+		localStorage.setItem('expandedLevels', JSON.stringify(Array.from(expandedLevels)));
+	}, [expandedLevels]);
+
+	//save expanded semesters to local storage on change
+	useEffect(() => {
+		localStorage.setItem('expandedSemesters', JSON.stringify(Array.from(expandedSemesters)));
+	}, [expandedSemesters]);
 
 	// load grades on fetchGrades or auth change
 	useEffect(() => {
@@ -85,6 +107,7 @@ export default function TranscriptPage() {
 				levels[levels.length - 1].push(semester);
 			}
 		});
+		levels.reverse();
 		return levels;
 	}
 
@@ -242,7 +265,7 @@ export default function TranscriptPage() {
 								return (
 									<div className="be mb-6 p-4 rounded-lg" key={semesterIndex}>
 										<h3 
-											className="text-xl font-semibold mb-2 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+											className="text-xl font-semibold mb-1 mt-1 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
 											onClick={() => toggleSemester(levelIndex, semesterIndex)}
 										>
 											<svg 
@@ -281,7 +304,7 @@ export default function TranscriptPage() {
 												</div>
 
 												{/* Course Table */}
-												<div className="overflow-x-auto select-none">
+												<div className="overflow-x-auto select-none mini-scroll">
 													<table className="w-full mb-4 text-sm">
 														<thead>
 															<tr className="border-b-2">
@@ -299,7 +322,7 @@ export default function TranscriptPage() {
 																)}
 																<th className="px-2 py-2 text-center w-20">Credits</th>
 																{semester.classes.some(c => c.quality_points !== null) && (
-																	<th className="px-2 py-2 text-right w-20">Quality Pts</th>
+																	<th className="px-2 py-2 text-right w-25">Quality Pts</th>
 																)}
 															</tr>
 														</thead>
@@ -329,7 +352,7 @@ export default function TranscriptPage() {
 												</div>
 
 												{/* Semester Summary */}
-												<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t">
+												<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t select-none">
 													<div><span className="font-semibold">Attempted Hours:</span> {semester.attempt_hours}</div>
 													{semester.passed_hours !== null && (
 														<div><span className="font-semibold">Passed Hours:</span> {semester.passed_hours}</div>

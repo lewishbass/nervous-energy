@@ -2,13 +2,6 @@ import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import UserModel from './User';
 
-// add schema for managing game lobbies and P2P connections
-// since netlify serverless functions are stateless, this schema is used to manage game lobbies and P2P connections
-// each lobby is game agnostic
-// it handles establishing audio, text and game data connections, when users join and leave the lobby
-// it also acts as a validation server for connections
-//  - issues short term tokens used for P2P validation
-//  - users periodically refresh these tokens
 
 // Message schema
 const MessageSchema = new mongoose.Schema({

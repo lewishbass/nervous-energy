@@ -50,8 +50,7 @@ export default function ResumePage() {
 				<div className="mb-8 be p-4 rounded-lg">
 					<div className="flex flex-wrap gap-4 items-center justify-between">
 						<div className="flex flex-wrap gap-4 tc2">
-							<span>(703) 851-6862</span>
-							<span>•</span>
+
 							<a href="mailto:lewisbass@vt.edu" className="hover:underline tc1">lewisbass@vt.edu</a>
 							<span>•</span>
 							<a href="http://lewisbass.org" target="_blank" rel="noopener noreferrer" className="hover:underline tc1">lewisbass.org</a>

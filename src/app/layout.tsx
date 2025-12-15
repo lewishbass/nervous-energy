@@ -12,6 +12,9 @@ import HeadMetadata from '@/components/HeadMetadata';
 import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { MathJaxContext } from 'better-react-mathjax';
+import { usePathname } from 'next/navigation';
+import { analytics } from '@/context/Analytics';
+
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,8 +29,27 @@ function RootLayoutContent({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
-  
-  const { isLoggedIn } = useAuth();
+
+  const pathname = usePathname();
+  const { isLoggedIn, userId } = useAuth();
+
+  // only run once to set session metadata
+  useEffect(() => {
+    analytics.sessionMetadata();
+  }, []);
+
+  // init tracking
+  useEffect(() => {
+    // init pageview
+    analytics.pageview();
+  }, [pathname]);
+
+  // set userid to session when logged in
+  useEffect(() => {
+    if (isLoggedIn && userId) {
+      analytics.setUserId(userId);
+    }
+  }, [isLoggedIn, userId]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

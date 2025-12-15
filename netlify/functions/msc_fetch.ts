@@ -78,7 +78,6 @@ async function handleFetchTranscriptGrades(requestBody: any) {
 
 	// load transcript from local file
 	let transcriptData = transcript;
-	console.log(transcriptData);
 
 	return {
 		statusCode: 200,
