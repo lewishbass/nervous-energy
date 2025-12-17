@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/context/AuthContext'
 import '@/styles/toggles.css'; // Import the external slider styles
-
+import '@/styles/buttons.css'; // Import button styles
 
 export interface Class {
 	subject: string;
@@ -21,6 +21,7 @@ export interface Class {
 	grade: string | null;
 	credit_hours: number;
 	quality_points: number | null;
+	tag: "Mathematics" | "Computer Science" | "Computer Engineering" | "Machine Learning" | "Pathways";
 }
 
 export interface Semester {
@@ -45,6 +46,14 @@ export interface Semester {
 
 const TRANSCRIPT_ROUTE = '/.netlify/functions/msc_fetch';
 
+const TAG_OPTIONS: Array<Class['tag'] | 'All'> = [
+	'Mathematics',
+	'Computer Science',
+	'Computer Engineering',
+	'Machine Learning',
+	'Pathways'
+];
+
 export default function TranscriptPage() {
 
 	const { username, token, isLoggedIn } = useAuth();
@@ -52,6 +61,7 @@ export default function TranscriptPage() {
 	const [transcriptData, setTranscriptData] = useState<Semester[][] | null>(null);
 	const [fetchGrades, setFetchGrades] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [selectedTag, setSelectedTag] = useState<Class['tag'] | 'All'>('All');
 
 	const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
 	const [expandedSemesters, setExpandedSemesters] = useState<Set<string>>(new Set());
@@ -61,6 +71,11 @@ export default function TranscriptPage() {
 		const storedFetchGrades = localStorage.getItem('fetchGrades');
 		const parsedFetchGrades = storedFetchGrades ? JSON.parse(storedFetchGrades) : false;
 		setFetchGrades(parsedFetchGrades);
+
+		const storedSelectedTag = localStorage.getItem('selectedTranscriptTag');
+		if (storedSelectedTag) {
+			setSelectedTag(storedSelectedTag as Class['tag'] | 'All');
+		}
 
 		const storedExpandedLevels = localStorage.getItem('expandedLevels');
 		if (storedExpandedLevels) {
@@ -83,6 +98,11 @@ export default function TranscriptPage() {
 	useEffect(() => {
 		localStorage.setItem('expandedSemesters', JSON.stringify(Array.from(expandedSemesters)));
 	}, [expandedSemesters]);
+
+	// save selected tag to local storage on change
+	useEffect(() => {
+		localStorage.setItem('selectedTranscriptTag', selectedTag);
+	}, [selectedTag]);
 
 	// load grades on fetchGrades or auth change
 	useEffect(() => {
@@ -181,6 +201,67 @@ export default function TranscriptPage() {
 		});
 	};
 
+	const expandAll = () => {
+		const filteredData = getFilteredTranscriptData();
+		if (!filteredData) return;
+
+		// Expand all levels
+		const allLevelIndices = filteredData.map((_, idx) => idx);
+		setExpandedLevels(new Set(allLevelIndices));
+
+		// Expand all semesters
+		const allSemesterKeys: string[] = [];
+		filteredData.forEach((level, levelIndex) => {
+			level.forEach((_, semesterIndex) => {
+				allSemesterKeys.push(`${levelIndex}-${semesterIndex}`);
+			});
+		});
+		setExpandedSemesters(new Set(allSemesterKeys));
+	};
+
+	const collapseAll = () => {
+		setExpandedLevels(new Set());
+		setExpandedSemesters(new Set());
+	};
+
+	const filterSemesterByTag = (semester: Semester, tag: Class['tag'] | 'All'): Semester | null => {
+		if (tag === 'All') return semester;
+
+		const filteredClasses = semester.classes.filter(c => c.tag === tag);
+		if (filteredClasses.length === 0) return null;
+
+		return {
+			...semester,
+			classes: filteredClasses
+		};
+	};
+
+	const getFilteredTranscriptData = (): Semester[][] | null => {
+		if (!transcriptData) return null;
+
+		const filteredLevels = transcriptData
+			.map(level => {
+				const filteredSemesters = level
+					.map(semester => filterSemesterByTag(semester, selectedTag))
+					.filter((s): s is Semester => s !== null);
+				return filteredSemesters;
+			})
+			.filter(level => level.length > 0);
+
+		return filteredLevels;
+	};
+
+	const shortTag = (tag: Class['tag']) => {
+		switch (tag) {
+			case 'Mathematics': return 'Math';
+			case 'Computer Science': return 'CS';
+			case 'Computer Engineering': return 'CPE';
+			case 'Machine Learning': return 'ML';
+			case 'Pathways': return 'PW';
+			default: return tag;
+		}
+	};
+
 	return (
 		<div className="relative min-h-screen">
 			{/* Background animation */}
@@ -221,27 +302,78 @@ export default function TranscriptPage() {
 				<div className="mb-0 p-4 rounded-lg flex flex-row items-center">
 					<h1 className="text-4xl font-bold tc1">Lewis H. Bass</h1>
 					<p className="tc2 italic ml-4 opacity-30">Unofficial Transcript</p>
-
-				</div>
-				<div className="flex items-center">
-					<label className="toggle-switch mr-3">
-						<input
-							type="checkbox"
-							checked={fetchGrades}
-							onChange={() => setFetchGrades(!fetchGrades)}
-						/>
-						<span className="toggle-slider"></span>
-					</label>
-					<span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-						fetch grades {fetchGrades && !isLoggedIn ? (<span className="text-red-500">log in to view grades</span>) : (<></>)}
-					</span>
 				</div>
 
-				<div className="prose dark:prose-invert max-w-none mt-8">
+				{/* Sort Settings Bar */}
+				<div className=" p-2">
+					<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+						{/* Tags Filter */}
+						<div className="flex flex-col gap-2 flex-1">
+							<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+								Filter by Tag
+							</span>
+							<div className="button-group flex-wrap">
+								{TAG_OPTIONS.map(tag => (
+									<button
+										key={tag}
+										onClick={() => setSelectedTag(tag === selectedTag ? 'All' : tag)}
+										className={`control-button ${selectedTag === tag
+											? 'button-primary button-active'
+											: 'button-secondary'
+											}`}
+									>
+										{tag}
+									</button>
+								))}
+							</div>
+						</div>
+
+						{/* Expand/Collapse Controls */}
+						<div className="flex flex-col gap-2">
+							<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+								View Controls
+							</span>
+							<div className="button-group">
+								<button
+									onClick={expandAll}
+									className="control-button button-secondary"
+								>
+									Expand
+								</button>
+								<button
+									onClick={collapseAll}
+									className="control-button button-secondary"
+								>
+									Collapse
+								</button>
+							</div>
+						</div>
+
+						{/* Fetch Grades Toggle */}
+						<div className="flex flex-col gap-2">
+							<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+								Fetch Grades
+							</span>
+							<div className="flex items-center gap-0 flex-col">
+								<label className="toggle-switch">
+									<input
+										type="checkbox"
+										checked={fetchGrades}
+										onChange={() => setFetchGrades(!fetchGrades)}
+									/>
+									<span className="toggle-slider"></span>
+								</label>
+								<span className={"text-xs text-red-500 whitespace-nowrap transition-opacity " + (fetchGrades && !isLoggedIn ? '' : 'opacity-0')}>log in to view</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div className="prose dark:prose-invert max-w-none">
 					{/* Transcript Content */}
 					{isLoading && !transcriptData && <div>Loading transcript data...</div>}
 					{!isLoading && !transcriptData && <div>No transcript data available.</div>}
-					{transcriptData && transcriptData.map((level, levelIndex) => (
+					{getFilteredTranscriptData() && getFilteredTranscriptData()!.map((level, levelIndex) => (
 						<div key={levelIndex}>
 							<h2 
 								className="text-2xl font-semibold mt-8 mb-4 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
@@ -310,6 +442,7 @@ export default function TranscriptPage() {
 																<th className="px-2 py-2 text-left w-16">Subject</th>
 																<th className="px-2 py-2 text-left w-16">Course</th>
 																<th className="px-2 py-2 text-left flex-1">Title</th>
+																{/*<th className="px-2 py-2 text-left w-16">Tag</th>*/}
 																{semester.classes.some(c => c.campus) && (
 																	<th className="px-2 py-2 text-left w-20">Campus</th>
 																)}
@@ -331,6 +464,7 @@ export default function TranscriptPage() {
 																	<td className="px-2 py-2 w-16">{course.subject}</td>
 																	<td className="px-2 py-2 w-16">{course.course}</td>
 																	<td className="px-2 py-2 flex-1">{course.title}</td>
+																	{/*<td className="px-2 py-2 w-16">{shortTag(course.tag)}</td>*/}
 																	{semester.classes.some(c => c.campus) && (
 																		<td className="px-2 py-2 w-20">{course.campus || ''}</td>
 																	)}

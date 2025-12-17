@@ -456,6 +456,7 @@ body {
 
 .mini-scroll::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 .mini-scroll::-webkit-scrollbar-track {

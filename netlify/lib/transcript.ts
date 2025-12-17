@@ -7,6 +7,7 @@ export interface Class {
 	grade: string | null;
 	credit_hours: number;
 	quality_points: number | null;
+  tag: "Mathematics" | "Computer Science" | "Computer Engineering" | "Machine Learning" | "Pathways";
 }
 
 export interface Semester {
@@ -58,7 +59,8 @@ export const transcript: Semester[] =
           "title": "Precalculus I",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -88,7 +90,8 @@ export const transcript: Semester[] =
           "title": "College Compositn I",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "MTH",
@@ -98,7 +101,8 @@ export const transcript: Semester[] =
           "title": "Calcls Wth Ana Geo I",
           "grade": "B",
           "credit_hours": 5.0,
-          "quality_points": 15.0
+          "quality_points": 15.0,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -128,7 +132,8 @@ export const transcript: Semester[] =
           "title": "Calc/Analytic Geo II",
           "grade": "B",
           "credit_hours": 5.0,
-          "quality_points": 15.0
+          "quality_points": 15.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "PHY",
@@ -138,7 +143,8 @@ export const transcript: Semester[] =
           "title": "Gen Univ Physics I",
           "grade": "B",
           "credit_hours": 5.0,
-          "quality_points": 15.0
+          "quality_points": 15.0,
+          "tag": "Pathways"
         }
       ]
     },
@@ -168,7 +174,8 @@ export const transcript: Semester[] =
           "title": "Vector Calculus",
           "grade": "A",
           "credit_hours": 4.0,
-          "quality_points": 16.0
+          "quality_points": 16.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MTH",
@@ -178,7 +185,8 @@ export const transcript: Semester[] =
           "title": "Linear Algebra",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -208,7 +216,8 @@ export const transcript: Semester[] =
           "title": "General Chemistry I",
           "grade": "A",
           "credit_hours": 4.0,
-          "quality_points": 16.0
+          "quality_points": 16.0,
+          "tag": "Pathways"
         },
         {
           "subject": "CSC",
@@ -218,7 +227,8 @@ export const transcript: Semester[] =
           "title": "Computer Science II",
           "grade": "B",
           "credit_hours": 4.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Science"
         },
         {
           "subject": "CST",
@@ -228,7 +238,8 @@ export const transcript: Semester[] =
           "title": "Prin of Public Spkng",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Pathways"
         },
         {
           "subject": "EGR",
@@ -238,7 +249,8 @@ export const transcript: Semester[] =
           "title": "Intro to Engineering",
           "grade": "A",
           "credit_hours": 2.0,
-          "quality_points": 8.0
+          "quality_points": 8.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ENG",
@@ -248,7 +260,8 @@ export const transcript: Semester[] =
           "title": "Coll Composition II",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "PLS",
@@ -258,7 +271,8 @@ export const transcript: Semester[] =
           "title": "U.S. Government I",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "SDV",
@@ -268,7 +282,8 @@ export const transcript: Semester[] =
           "title": "College Success Skills",
           "grade": "C",
           "credit_hours": 1.0,
-          "quality_points": 2.0
+          "quality_points": 2.0,
+          "tag": "Pathways"
         }
       ]
     },
@@ -298,7 +313,8 @@ export const transcript: Semester[] =
           "title": "Hist & Appr of Art I",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "CHM",
@@ -308,7 +324,8 @@ export const transcript: Semester[] =
           "title": "General Chemistry II",
           "grade": "A",
           "credit_hours": 4.0,
-          "quality_points": 16.0
+          "quality_points": 16.0,
+          "tag": "Pathways"
         },
         {
           "subject": "ECO",
@@ -318,7 +335,8 @@ export const transcript: Semester[] =
           "title": "Princ of Macroecon",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "ENG",
@@ -328,7 +346,8 @@ export const transcript: Semester[] =
           "title": "Surv of Amer Lit I",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Pathways"
         },
         {
           "subject": "MTH",
@@ -338,7 +357,8 @@ export const transcript: Semester[] =
           "title": "Differential Equations",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MTH",
@@ -348,7 +368,8 @@ export const transcript: Semester[] =
           "title": "Discrete Mathematics",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "PHY",
@@ -358,7 +379,8 @@ export const transcript: Semester[] =
           "title": "Gen Univ Physics II",
           "grade": "B",
           "credit_hours": 5.0,
-          "quality_points": 15.0
+          "quality_points": 15.0,
+          "tag": "Pathways"
         }
       ]
     },
@@ -388,7 +410,8 @@ export const transcript: Semester[] =
           "title": "Introduction to ECE Concepts",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Engineering"
         }
       ]
     },
@@ -418,7 +441,8 @@ export const transcript: Semester[] =
           "title": "Circuits and Devices",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -428,7 +452,8 @@ export const transcript: Semester[] =
           "title": "Computational Engineering",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -438,7 +463,8 @@ export const transcript: Semester[] =
           "title": "Fundamentals Digital Systems",
           "grade": "D",
           "credit_hours": 3.0,
-          "quality_points": 3.0
+          "quality_points": 3.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ENGE",
@@ -448,7 +474,8 @@ export const transcript: Semester[] =
           "title": "Foundations of Engineering",
           "grade": "A-",
           "credit_hours": 2.0,
-          "quality_points": 7.4
+          "quality_points": 7.4,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "MATH",
@@ -458,7 +485,8 @@ export const transcript: Semester[] =
           "title": "Introduction to Proofs",
           "grade": "C",
           "credit_hours": 3.0,
-          "quality_points": 6.0
+          "quality_points": 6.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "PSCI",
@@ -468,7 +496,8 @@ export const transcript: Semester[] =
           "title": "US Gov & Politics",
           "grade": "B+",
           "credit_hours": 3.0,
-          "quality_points": 9.9
+          "quality_points": 9.9,
+          "tag": "Pathways"
         }
       ]
     },
@@ -498,7 +527,8 @@ export const transcript: Semester[] =
           "title": "Physical Electronics",
           "grade": "C+",
           "credit_hours": 3.0,
-          "quality_points": 6.9
+          "quality_points": 6.9,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -508,7 +538,8 @@ export const transcript: Semester[] =
           "title": "Fundamentals Digital Systems",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "MATH",
@@ -518,7 +549,8 @@ export const transcript: Semester[] =
           "title": "Linear Algebra I",
           "grade": "B-",
           "credit_hours": 3.0,
-          "quality_points": 8.1
+          "quality_points": 8.1,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -528,7 +560,8 @@ export const transcript: Semester[] =
           "title": "Intro to Numer Analysis",
           "grade": "B+",
           "credit_hours": 3.0,
-          "quality_points": 9.9
+          "quality_points": 9.9,
+          "tag": "Mathematics"
         },
         {
           "subject": "STAT",
@@ -538,7 +571,8 @@ export const transcript: Semester[] =
           "title": "Prob & Stat for EE",
           "grade": "CC",
           "credit_hours": 3.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -568,7 +602,8 @@ export const transcript: Semester[] =
           "title": "Embedded Systems",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -578,7 +613,8 @@ export const transcript: Semester[] =
           "title": "Signals and Systems",
           "grade": "B-",
           "credit_hours": 3.0,
-          "quality_points": 8.1
+          "quality_points": 8.1,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -588,7 +624,8 @@ export const transcript: Semester[] =
           "title": "Integrated Design Project",
           "grade": "B",
           "credit_hours": 2.0,
-          "quality_points": 6.0
+          "quality_points": 6.0,
+          "tag": "Computer Engineering"
         }
       ]
     },
@@ -618,7 +655,8 @@ export const transcript: Semester[] =
           "title": "Computer Org & Architecture",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -628,7 +666,8 @@ export const transcript: Semester[] =
           "title": "Data Structures and Algorithms",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Computer Science"
         },
         {
           "subject": "ECE",
@@ -638,7 +677,8 @@ export const transcript: Semester[] =
           "title": "Digital Design I",
           "grade": "B",
           "credit_hours": 4.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -648,7 +688,8 @@ export const transcript: Semester[] =
           "title": "Digital Image Processing",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "SPAN",
@@ -658,7 +699,8 @@ export const transcript: Semester[] =
           "title": "Elementary Spanish",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Pathways"
         }
       ]
     },
@@ -688,7 +730,8 @@ export const transcript: Semester[] =
           "title": "Applied Software Design",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Computer Science"
         },
         {
           "subject": "ECE",
@@ -698,7 +741,8 @@ export const transcript: Semester[] =
           "title": "Artif Intellig and Engr Appl",
           "grade": "B",
           "credit_hours": 4.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -708,7 +752,8 @@ export const transcript: Semester[] =
           "title": "Senior Design Project",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "MATH",
@@ -718,7 +763,8 @@ export const transcript: Semester[] =
           "title": "Modern Algebra",
           "grade": "B+",
           "credit_hours": 3.0,
-          "quality_points": 9.9
+          "quality_points": 9.9,
+          "tag": "Mathematics"
         },
         {
           "subject": "SPAN",
@@ -728,7 +774,8 @@ export const transcript: Semester[] =
           "title": "Elementary Spanish",
           "grade": "C+",
           "credit_hours": 3.0,
-          "quality_points": 6.9
+          "quality_points": 6.9,
+          "tag": "Pathways"
         }
       ]
     },
@@ -758,7 +805,8 @@ export const transcript: Semester[] =
           "title": "Machine Learning",
           "grade": "C-",
           "credit_hours": 3.0,
-          "quality_points": 5.1
+          "quality_points": 5.1,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -768,7 +816,8 @@ export const transcript: Semester[] =
           "title": "Intro to Computer Vision",
           "grade": "D",
           "credit_hours": 3.0,
-          "quality_points": 3.0
+          "quality_points": 3.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -778,7 +827,8 @@ export const transcript: Semester[] =
           "title": "Senior Design Project",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "MATH",
@@ -788,7 +838,8 @@ export const transcript: Semester[] =
           "title": "Calculus of Several Variables",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -798,7 +849,8 @@ export const transcript: Semester[] =
           "title": "Cryptography",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -808,7 +860,8 @@ export const transcript: Semester[] =
           "title": "SS: Introduction to Manifolds",
           "grade": "B+",
           "credit_hours": 3.0,
-          "quality_points": 9.9
+          "quality_points": 9.9,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -838,7 +891,8 @@ export const transcript: Semester[] =
           "title": "Advanced Calculus",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -848,7 +902,8 @@ export const transcript: Semester[] =
           "title": "Linear Algebra II",
           "grade": "B+",
           "credit_hours": 3.0,
-          "quality_points": 9.9
+          "quality_points": 9.9,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -858,7 +913,8 @@ export const transcript: Semester[] =
           "title": "Elementary Real Analysis",
           "grade": "C",
           "credit_hours": 3.0,
-          "quality_points": 6.0
+          "quality_points": 6.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -868,7 +924,8 @@ export const transcript: Semester[] =
           "title": "Elementary Topology",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -878,7 +935,8 @@ export const transcript: Semester[] =
           "title": "Issues in Scientific Computing",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Computer Science"
         },
         {
           "subject": "MATH",
@@ -888,7 +946,8 @@ export const transcript: Semester[] =
           "title": "Matrix Theory",
           "grade": "C-",
           "credit_hours": 3.0,
-          "quality_points": 5.1
+          "quality_points": 5.1,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -918,7 +977,8 @@ export const transcript: Semester[] =
           "title": "Multiprocessor Programming",
           "grade": "WG",
           "credit_hours": 3.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Computer Science"
         },
         {
           "subject": "ECE",
@@ -928,7 +988,8 @@ export const transcript: Semester[] =
           "title": "Seminar",
           "grade": "P",
           "credit_hours": 1.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -938,7 +999,8 @@ export const transcript: Semester[] =
           "title": "Advanced Computer Vision",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "MATH",
@@ -948,7 +1010,8 @@ export const transcript: Semester[] =
           "title": "TS: Algebraic Topology",
           "grade": "D",
           "credit_hours": 3.0,
-          "quality_points": 3.0
+          "quality_points": 3.0,
+          "tag": "Mathematics"
         },
         {
           "subject": "MATH",
@@ -958,7 +1021,8 @@ export const transcript: Semester[] =
           "title": "Numer Analy and Softw",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Mathematics"
         }
       ]
     },
@@ -988,7 +1052,8 @@ export const transcript: Semester[] =
           "title": "Theory of Algorithms",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Computer Science"
         },
         {
           "subject": "ECE",
@@ -998,7 +1063,8 @@ export const transcript: Semester[] =
           "title": "SS: Brain-inspired Comp Arch",
           "grade": "B-",
           "credit_hours": 3.0,
-          "quality_points": 8.1
+          "quality_points": 8.1,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -1008,7 +1074,8 @@ export const transcript: Semester[] =
           "title": "SS: Reinforcement Learning",
           "grade": "WG",
           "credit_hours": 3.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Machine Learning"
         }
       ]
     },
@@ -1038,7 +1105,8 @@ export const transcript: Semester[] =
           "title": "Advanced Machine Learning",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -1048,7 +1116,8 @@ export const transcript: Semester[] =
           "title": "Linear Systems Theory",
           "grade": "WG",
           "credit_hours": 3.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -1058,7 +1127,8 @@ export const transcript: Semester[] =
           "title": "Research and Thesis",
           "grade": "EQ",
           "credit_hours": 3.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Computer Engineering"
         }
       ]
     },
@@ -1088,7 +1158,8 @@ export const transcript: Semester[] =
           "title": "Natural Language Processing",
           "grade": "A",
           "credit_hours": 3.0,
-          "quality_points": 12.0
+          "quality_points": 12.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -1098,7 +1169,8 @@ export const transcript: Semester[] =
           "title": "Seminar",
           "grade": "P",
           "credit_hours": 1.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Computer Engineering"
         },
         {
           "subject": "ECE",
@@ -1108,7 +1180,8 @@ export const transcript: Semester[] =
           "title": "Deep Reinforcement Learning",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ECE",
@@ -1118,7 +1191,8 @@ export const transcript: Semester[] =
           "title": "Deep Learning",
           "grade": "B",
           "credit_hours": 3.0,
-          "quality_points": 9.0
+          "quality_points": 9.0,
+          "tag": "Machine Learning"
         },
         {
           "subject": "ENGE",
@@ -1128,7 +1202,8 @@ export const transcript: Semester[] =
           "title": "Grad Stud Succ Multicult Envir",
           "grade": "P",
           "credit_hours": 1.0,
-          "quality_points": 0.0
+          "quality_points": 0.0,
+          "tag": "Pathways"
         }
       ]
     },
@@ -1158,7 +1233,8 @@ export const transcript: Semester[] =
           "title": "Information Visualization",
           "grade": "A-",
           "credit_hours": 3.0,
-          "quality_points": 11.1
+          "quality_points": 11.1,
+          "tag": "Computer Science"
         }
       ]
     }
