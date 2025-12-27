@@ -12,7 +12,8 @@ import {
   FaMoon,
   FaPuzzlePiece,
   FaMicroscope,
-  FaChalkboardTeacher
+  FaChalkboardTeacher,
+  FaCube
 } from 'react-icons/fa';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -134,6 +135,7 @@ export default function Menu({
     { name: 'Tutoring', link: '/tutoring', keyword: 'learning help', description: 'Sign up for tutoring', requireAuth: false },
     { name: 'Friends', link: '/friends', keyword: 'social network', description: 'Connect with friends', requireAuth: true },
     { name: 'Toys', link: '/toys', keyword: 'interactive demo ml machine learning', description: 'Explore interactive machine learning demos', requireAuth: false },
+    { name: 'Minecraft', link: '/mc', keyword: 'game server mods', description: 'Join our Minecraft server', requireAuth: false },
     //{ name: 'Papers', link: '/papers', keyword: 'research articles', description: 'My papers and reviews', requireAuth: false },
     // Add toy entries dynamically from the centralized toys data
     ...toys.map(toy => ({
@@ -193,6 +195,7 @@ export default function Menu({
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
             // { href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
+            { href: '/mc', icon: FaCube, label: 'Minecraft', requireAuth: false }
           ].map((item) => (
             <Link
               key={item.href}
