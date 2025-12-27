@@ -194,15 +194,15 @@ export default function Menu({
             { href: '/tutoring', icon: FaChalkboardTeacher, label: 'Tutoring', requireAuth: false },
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
             // { href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
+            { href: '/mc', icon: FaCube, label: 'Minecraft', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
-            { href: '/mc', icon: FaCube, label: 'Minecraft', requireAuth: false }
           ].map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={onClose}
               className="flex items-center gap-5 p-3 bt1 rounded-lg transition-colors my-0 py-4 px-4 wg"
-              style={{ maxHeight: (!item.requireAuth || isLoggedIn ? '50px' : '0px'), marginBottom: (!item.requireAuth || isLoggedIn ? '10px' : '0px'), opacity: (!item.requireAuth || isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out' }}
+              style={{ pointerEvents: (!item.requireAuth || isLoggedIn ? 'auto' : 'none'), maxHeight: (!item.requireAuth || isLoggedIn ? '50px' : '0px'), marginBottom: (!item.requireAuth || isLoggedIn ? '10px' : '0px'), opacity: (!item.requireAuth || isLoggedIn ? 1 : 0), overflow: 'hidden', transition: 'max-height 1s ease-in-out, margin-bottom 1s ease-in-out, opacity 0.3s ease-in-out' }}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-lg">{item.label}</span>

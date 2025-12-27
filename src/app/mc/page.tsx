@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { copyToClipboard } from "../../scripts/clipboard";
 import { useEffect, useState } from "react";
+import LineAnimation from '@/components/backgrounds/LineAnimation';
 
 interface ServerStatus {
 	online: boolean;
@@ -139,22 +140,28 @@ export default function Minecraft() {
 
 	return (
 		<div className="p-6 max-w-6xl mx-auto mb-200">
-			{/* Background decoration */}
-			<Image
-				src="/KH_figures.svg"
-				alt="Background pattern"
-				className="fixed inset-0 w-full h-full object-cover mix-blend-soft-light opacity-5 dark:opacity-5 dark:invert select-none pointer-events-none -z-10"
-				width={100}
-				height={100}
-				style={{ userSelect: "none" }}
-			/>
+			{/* Background animation */}
+			<div className="absolute inset-0 -z-10 invert dark:invert-0">
+				<LineAnimation
+					spacing={200}
+					seed={456}
+					style={{ opacity: 0.5 }}
+				/>
+			</div>
 
 			<h1 className="text-4xl font-bold mb-6 tc1">Minecraft Server</h1>
 
 			{/* Hero Section */}
 			<section className="mb-12 relative">
-				<div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 rounded-3xl p-8 shadow-lg border border-green-500/20">
-					<div className="flex flex-col md:flex-row items-center gap-6">
+				<div className="bg1 relative bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/5 dark:to-emerald-500/5 rounded-3xl p-8 shadow-lg border border-green-500/20 overflow-hidden">
+					<Image
+						src="/KH_figures.svg"
+						alt=""
+						className="absolute inset-0 w-full h-full object-cover opacity-100 mix-blend-soft-light dark:opacity-30 dark:invert select-none pointer-events-none"
+						width={100}
+						height={100}
+					/>
+					<div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
 						<div className="flex-shrink-0">
 							<Image src="/images/mc/Grass_Block.png" alt="Grass Block" width={120} height={120} className="pixelated" />
 						</div>
@@ -167,7 +174,7 @@ export default function Minecraft() {
 									href="https://www.curseforge.com/minecraft/modpacks/nervousenergy"
 									target="_blank"
 									rel="noopener noreferrer"
-									className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:brightness-110 transition-all hover:-translate-y-0.5 shadow-lg flex items-center"
+									className="select-none px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-lg hover:brightness-110 transition-all hover:-translate-y-0.5 shadow-lg flex items-center"
 								>
 									<Image src="/images/mc/Diamond_Pickaxe.png" alt="Pickaxe" width={20} height={20} className="mr-2 pixelated" />
 									Download Modpack
@@ -188,11 +195,11 @@ export default function Minecraft() {
 			<section className="mb-12">
 				<h2 className="text-3xl font-bold mb-6 tc1 flex items-center">
 					<Image src="/images/mc/Diamond_Sword.png" alt="Sword" width={32} height={32} className="mr-3 pixelated" />
-					Server Information
+					<span className="backdrop-blur-sm rounded-lg px-2">Server Information</span>
 					<button
 						onClick={fetchStatus}
 						disabled={loading}
-						className="ml-3 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-rotate-180 duration-500 cursor-pointer"
+						className="ml-3 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-rotate-180 active:-rotate-250 duration-500 cursor-pointer"
 						title="Refresh server status"
 					>
 						<svg className="w-6 h-6 tc1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,8 +207,9 @@ export default function Minecraft() {
 						</svg>
 					</button>
 				</h2>
-				<div className="bg2 rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-					<div className="space-y-4">
+				<div className="bg1 relative rounded-3xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+					<div className="space-y-4 relative z-10">
 						<div className="flex flex-col sm:flex-row items-center gap-4">
 							<div className="sm:mr-auto"><h3 className="text-2xl font-bold tc1 mb-2">Server Address</h3></div>
 							<code className="text-xl bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg tc1 font-mono select-none cursor-pointer hover:-translate-y-0.5 active:translate-y-0.5 transition-all" onClick={() => copyToClipboard(serverIP)}>
@@ -253,21 +261,35 @@ export default function Minecraft() {
 			<section className="mb-12">
 				<h2 className="text-3xl font-bold mb-6 tc1 flex items-center">
 					<Image src="/images/mc/Tnt.png" alt="TNT" width={32} height={32} className="mr-3 pixelated" />
-					Modpack Features
+					<span className="backdrop-blur-sm rounded-lg px-2">Modpack Features</span>
 				</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{modpackFeatures.map((feature, index) => (
 						<div
 							key={index}
-							className={`bg-gradient-to-br ${feature.color} bg2 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform duration-300`}
+							className={`relative bg-gradient-to-br ${feature.color} bg2 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform duration-300 overflow-hidden`}
 						>
-							<div className="flex items-center mb-4">
-								<div className="mr-4">
-									<Image src={feature.icon} alt={feature.title} width={48} height={48} className="pixelated" style={{ filter: "drop-shadow(0 0 4px #fff3)" }} />
+							<Image
+								src="/KH_figures.svg"
+								alt=""
+								className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-soft-light dark:opacity-7 dark:invert select-none pointer-events-none scale-150"
+								style={{
+									userSelect: "none",
+									transform: `rotate(${index * 30}deg) scale(1.8)`, // Scale up by 1.5x to ensure coverage when rotated
+									transformOrigin: "center center", // Ensure rotation happens from the center
+								}}
+								width={100}
+								height={100}
+							/>
+							<div className="relative z-10">
+								<div className="flex items-center mb-4">
+									<div className="mr-4">
+										<Image src={feature.icon} alt={feature.title} width={48} height={48} className="pixelated" style={{ filter: "drop-shadow(0 0 4px #fff3)" }} />
+									</div>
+									<h3 className="text-xl font-bold tc1">{feature.title}</h3>
 								</div>
-								<h3 className="text-xl font-bold tc1">{feature.title}</h3>
+								<p className="tc2">{feature.description}</p>
 							</div>
-							<p className="tc2">{feature.description}</p>
 						</div>
 					))}
 				</div>
