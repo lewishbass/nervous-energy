@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "jszip": "^3.10.1",
     "marked": "^16.1.1",
+    "minecraft-items-react": "^0.1.2",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
     "next": "^16.0.10",

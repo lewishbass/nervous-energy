@@ -13,19 +13,23 @@
 │   └── conversation-api.md
 ├── netlify
 │   ├── functions
+│   │   ├── analytics.ts
 │   │   ├── arxive_fetch.ts
 │   │   ├── auth.ts
 │   │   ├── conv.ts
 │   │   ├── keys.ts
+│   │   ├── msc_fetch.ts
 │   │   ├── profile.ts
 │   │   ├── social.ts
 │   │   └── version.ts
 │   ├── lib
 │   │   ├── backendutils.ts
-│   │   └── mongodb.ts
+│   │   ├── mongodb.ts
+│   │   └── transcript.ts
 │   └── models
 │       ├── Article.ts
 │       ├── Conversation.ts
+│       ├── Session.ts
 │       └── User.ts
 ├── public
 │   ├── books
@@ -116,6 +120,64 @@
 │   │   │   │   ├── cave4.jpg
 │   │   │   │   └── cave5.jpg
 │   │   │   └── cave-shirt.jpg
+│   │   ├── mc
+│   │   │   ├── Acacia_Hanging_Sign.png
+│   │   │   ├── Allium.png
+│   │   │   ├── Apple.png
+│   │   │   ├── Blue_Dye.png
+│   │   │   ├── Book.png
+│   │   │   ├── Bookshelf.png
+│   │   │   ├── Carrot.png
+│   │   │   ├── Chest.png
+│   │   │   ├── Coal_Ore.png
+│   │   │   ├── Coal.png
+│   │   │   ├── Compass_30.png
+│   │   │   ├── Cooked_Beef.png
+│   │   │   ├── Cooked_Chicken.png
+│   │   │   ├── Copper_Ingot.png
+│   │   │   ├── Diamond_Axe.png
+│   │   │   ├── Diamond_Chestplate.png
+│   │   │   ├── Diamond_Pickaxe.png
+│   │   │   ├── Diamond_Sword.png
+│   │   │   ├── Diamond.png
+│   │   │   ├── Emerald.png
+│   │   │   ├── Enchanted_Book.png
+│   │   │   ├── Ender_Chest.png
+│   │   │   ├── Ender_Eye.png
+│   │   │   ├── Ender_Pearl.png
+│   │   │   ├── Filled_Map.png
+│   │   │   ├── Fishing_Rod.png
+│   │   │   ├── Glowstone_Dust.png
+│   │   │   ├── Gold_Ingot.png
+│   │   │   ├── Golden_Pickaxe.png
+│   │   │   ├── Grass_Block.png
+│   │   │   ├── Gray_Dye.png
+│   │   │   ├── Green_Dye.png
+│   │   │   ├── Gunpowder.png
+│   │   │   ├── Iron_Golem.webp
+│   │   │   ├── Iron_Ingot.png
+│   │   │   ├── Iron_Ore.png
+│   │   │   ├── Iron_Pickaxe.png
+│   │   │   ├── Lapis_Lazuli.png
+│   │   │   ├── Lava_Bucket.png
+│   │   │   ├── Leather.png
+│   │   │   ├── Light_Blue_Dye.png
+│   │   │   ├── Lime_Dye.png
+│   │   │   ├── Mace.png
+│   │   │   ├── Name_Tag.png
+│   │   │   ├── Netherite_Ingot.png
+│   │   │   ├── Netherite_Pickaxe.png
+│   │   │   ├── Pink_Dye.png
+│   │   │   ├── Pufferfish_Bucket.png
+│   │   │   ├── Red_Dye.png
+│   │   │   ├── Redstone_Torch.png
+│   │   │   ├── Redstone.png
+│   │   │   ├── Repeater.png
+│   │   │   ├── Stone_Pickaxe.png
+│   │   │   ├── Tnt.png
+│   │   │   ├── Torch.png
+│   │   │   ├── Tropical_Fish.png
+│   │   │   └── Yellow_Dye.png
 │   │   ├── pets
 │   │   │   ├── aster_c.jpg
 │   │   │   ├── kuiper_c.jpg
@@ -151,6 +213,8 @@
 │   └── window.svg
 ├── src
 │   ├── app
+│   │   ├── analytics
+│   │   │   └── page.tsx
 │   │   ├── books
 │   │   │   ├── book_info_type.json
 │   │   │   ├── book_info.json
@@ -161,6 +225,8 @@
 │   │   ├── friends
 │   │   │   └── page.tsx
 │   │   ├── home
+│   │   │   └── page.tsx
+│   │   ├── mc
 │   │   │   └── page.tsx
 │   │   ├── papers
 │   │   │   ├── latent-reasoning
@@ -251,6 +317,7 @@
 │   │   ├── Navbar.tsx
 │   │   └── SearchExpand.tsx
 │   ├── context
+│   │   ├── Analytics.tsx
 │   │   └── AuthContext.tsx
 │   ├── data
 │   │   ├── papers.ts
@@ -259,6 +326,7 @@
 │   ├── hooks
 │   │   └── useClickAway.ts
 │   ├── scripts
+│   │   ├── clipboard.tsx
 │   │   ├── enumber.tsx
 │   │   └── sourceButtons.tsx
 │   └── styles
