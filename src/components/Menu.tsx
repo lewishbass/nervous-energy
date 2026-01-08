@@ -199,7 +199,6 @@ export default function Menu({
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
             //{ href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
             { href: '/mc', icon: FaCube, label: 'Minecraft', requireAuth: false },
-            { href: '/classes', icon: FaSchool, label: 'Classes', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
             <Link

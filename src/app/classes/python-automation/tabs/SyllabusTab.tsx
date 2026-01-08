@@ -61,7 +61,7 @@ export default function SyllabusTab() {
 					</p>
 					<h3 className='font-bold tc1 text-lg mt-4'>Grading</h3>
 					<p>
-						None lmao
+						No grades will be assigned unless requested. Students will receive feedback on assignments and projects to help them improve their skills.
 					</p>
 					<h3 className="font-bold tc1 text-lg mt-4">Units</h3>
 					<ul className="mx-4">

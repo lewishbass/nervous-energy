@@ -285,7 +285,7 @@ export default function ScheduleTab() {
             onClick={() => setShowAssignmentsDue(!showAssignmentsDue)}
             className={`control-button text-xs sm:text-sm ${showAssignmentsDue ? 'button-primary button-active' : 'button-secondary'}`}
           >
-            EX Due
+            Exercises Due
           </button>
           
         </div>
@@ -314,7 +314,7 @@ export default function ScheduleTab() {
                 </th>
               ))}
               {showLectures && <th className="text-left p-2 sm:p-3 tc1 font-bold w-0 text-xs sm:text-base">Lecture</th>}
-              {showAssignmentsDue && <th className="text-left p-2 sm:p-3 tc1 font-bold text-xs sm:text-base">EX Due</th>}
+              {showAssignmentsDue && <th className="text-left p-2 sm:p-3 tc1 font-bold text-xs sm:text-base">Exercises Due</th>}
             </tr>
             <div className="absolute bg3 inset-0 -z-1"></div>
           </thead>
