@@ -33,18 +33,29 @@ const PaperLink = ({
   const loadingHook = useRef<NodeJS.Timeout | null>(null);
   const unfocusHook = useRef<NodeJS.Timeout | null>(null);
 
+  const mouseOverHook = useRef<NodeJS.Timeout | null>(null);
+  const loadedIinitedHook = useRef<boolean>(false);
+
   const handleMouseEnter = () => {
-    setIsHovered(true);
-
-    // stop unfocus timeout if it exists
-    if (unfocusHook.current) {
-      clearTimeout(unfocusHook.current);
+    if (mouseOverHook.current) {
+      clearTimeout(mouseOverHook.current);
     }
+    mouseOverHook.current = setTimeout(() => {
+      setIsHovered(true);
 
-    loadPreview();
+      // stop unfocus timeout if it exists
+      if (unfocusHook.current) {
+        clearTimeout(unfocusHook.current);
+      }
+
+      loadPreview();
+    }, 200);
   };
 
   const handleMouseLeave = () => {
+    if (mouseOverHook.current) {
+      clearTimeout(mouseOverHook.current);
+    }
     if (unfocusHook.current) {
       clearTimeout(unfocusHook.current);
     }
@@ -53,7 +64,7 @@ const PaperLink = ({
       if (loadingHook.current) {
         clearTimeout(loadingHook.current);
       }
-    }, 200);
+    }, 500);
   };
 
   const handleClick = () => {
@@ -70,7 +81,13 @@ const PaperLink = ({
 
   const loadPreview = () => {
     // if we already have preview element, don't load again
-    if (previewElement) return;
+    if (loadedIinitedHook.current) {
+      if (previewElement || previewError) {
+        setLoadingPreview(false);
+      }
+      return;
+    }
+    loadedIinitedHook.current = true;
     setLoadingPreview(true);
     setPreviewError(undefined);
     // placeholder loading preview text
@@ -192,7 +209,7 @@ const PaperLink = ({
         onMouseLeave={() => handleMouseLeave()}
       >
         {title}
-        <FaExternalLinkAlt className="inline ml-1 text-blue-600" size={13} />
+        <FaExternalLinkAlt className="inline ml-[3px] text-blue-600 mt-[-2px]" size={13} />
       </span>
       {isHovered && (
         <div

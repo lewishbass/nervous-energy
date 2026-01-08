@@ -149,7 +149,7 @@ export default function Minecraft() {
 				/>
 			</div>
 
-			<h1 className="text-4xl font-bold mb-6 tc1">Minecraft Server</h1>
+			<h1 className="text-4xl font-bold mb-6 tc1 backdrop-blur-sm rounded-lg px-2 w-fit">Minecraft Server</h1>
 
 			{/* Hero Section */}
 			<section className="mb-12 relative">

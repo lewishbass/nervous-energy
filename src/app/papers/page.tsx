@@ -4,66 +4,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { papers } from '@/data/papers';
-import { useEffect, useState } from 'react';
-import { JSX } from 'react';
+import { StarBackground } from '@/components/backgrounds/StarBackground';
 
-// Star background component with parallax effect
-const StarBackground = () => {
-	const [stars, setStars] = useState<JSX.Element[]>([]);
-
-	useEffect(() => {
-		// Add keyframe animation to the document
-		const style = document.createElement('style');
-		style.innerHTML = `
-      @keyframes starMove {
-        from { transform: translateX(0); }
-        to { transform: translateX(-100vw); }
-      }
-    `;
-		document.head.appendChild(style);
-
-		// Generate stars
-		const newStars = [];
-		const starCount = 100;
-
-		for (let i = 0; i < starCount; i++) {
-			const size = Math.random() * 2 + 1; // 1-3px
-			const top = Math.random() * 100; // 0-100%
-			const opacity = Math.random() * 0.5 + 0.2; // 0.2-0.7
-			const duration = Math.random() * 30 + 40; // 40-70s
-			const delay = -Math.random() * 150; // 0-15s
-
-			newStars.push(
-				<div
-					key={i}
-					className="absolute rounded-full invert dark:invert-0"
-					style={{
-						width: `${size}px`,
-						height: `${size}px`,
-						top: `${top}%`,
-						right: `-${size}px`,
-						backgroundColor: `rgba(255, 255, 255, ${opacity})`,
-						animation: `starMove ${duration}s linear ${delay}s infinite`,
-
-					}}
-				/>
-			);
-		}
-
-		setStars(newStars);
-
-		// Cleanup
-		return () => {
-			document.head.removeChild(style);
-		};
-	}, []);
-
-	return (
-		<div className="fixed inset-0 overflow-hidden pointer-events-none">
-			{stars}
-		</div>
-	);
-};
 // Radial Gradient Background Component
 
 export default function Toys() {

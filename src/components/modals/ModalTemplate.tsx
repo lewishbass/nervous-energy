@@ -8,6 +8,8 @@ interface ModalTemplateProps {
   title?: string;
   contentLoading?: boolean;
   modalWidth?: string;
+  transitionSpeed?: number;
+  skipLoadingAnimation?: boolean;
 }
 
 const ModalTemplate: React.FC<ModalTemplateProps> = ({
@@ -17,9 +19,11 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   title,
   contentLoading = true,
   modalWidth = '80%',
+  transitionSpeed = 1,
+  skipLoadingAnimation = false,
 }) => {
   // Animation states
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!skipLoadingAnimation);
   const [contentVisible, setContentVisible] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<'initial' | 'widthExpanding' | 'heightExpanding' | 'complete'>('initial');
   const [isClosing, setIsClosing] = useState(1);
@@ -29,7 +33,8 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
     if (isOpen) {
       // Reset states
 
-      setIsLoading(true);
+      if(!skipLoadingAnimation)setIsLoading(true);
+
       setContentVisible(false);
       setAnimationPhase('initial');
 
@@ -50,13 +55,13 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
           const contentTimer = setTimeout(() => {
             setAnimationPhase('complete');
             setContentVisible(true);
-          }, 400);
+          }, 400 * transitionSpeed);
           
           return () => clearTimeout(contentTimer);
-        }, 400);
-        
+        }, 400 * transitionSpeed);
+
         return () => clearTimeout(heightTimer);
-      }, 100);
+      }, 100 * transitionSpeed);
       
       return () => clearTimeout(loadingTimer);
     }
@@ -66,7 +71,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
     setIsClosing(0);
     setTimeout(() => {
       onClose();
-      setIsLoading(true);
+      if(!skipLoadingAnimation)setIsLoading(true);
       setAnimationPhase('initial');
       setIsClosing(1);
     }, 500);
@@ -106,8 +111,8 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
               }}
               exit={{ opacity: 0 }}
               transition={{
-                width: { duration: 0.3 },
-                height: { duration: 0.3 }
+                width: { duration: 0.3 * transitionSpeed },
+                height: { duration: 0.3 * transitionSpeed }
               }}
             >
               
@@ -134,7 +139,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: contentVisible ? 1 : 0 }}
                     transition={{
-                      opacity: { duration: 0.6 }
+                      opacity: { duration: 0.6 * transitionSpeed }
                     }}
                     exit={{ opacity: 0 }}
                     style={{ 

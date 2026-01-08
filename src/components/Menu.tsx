@@ -13,7 +13,8 @@ import {
   FaPuzzlePiece,
   FaMicroscope,
   FaChalkboardTeacher,
-  FaCube
+  FaCube,
+  FaSchool,
 } from 'react-icons/fa';
 import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -128,17 +129,19 @@ export default function Menu({
 
   // Create search dictionary combining base entries with dynamically generated toy entries
   const searchDictionary = [
-    { name: 'Home', link: '/home', keyword: 'dashboard', description: 'Go to the dashboard', requireAuth: false },
+    //{ name: 'Home', link: '/home', keyword: 'dashboard', description: 'Go to the dashboard', requireAuth: false },
     { name: 'Books', link: '/books', keyword: 'reading library', description: 'Explore our collection of books', requireAuth: false },
     { name: 'Events', link: '/events', keyword: 'calendar schedule', description: 'View upcoming events', requireAuth: false },
     //{ name: 'Shop', link: '/shop', keyword: 'store purchase', description: 'Visit our online shop', requireAuth: false },
-    { name: 'Tutoring', link: '/tutoring', keyword: 'learning help', description: 'Sign up for tutoring', requireAuth: false },
+    //{ name: 'Tutoring', link: '/tutoring', keyword: 'learning help', description: 'Sign up for tutoring', requireAuth: false },
     { name: 'Friends', link: '/friends', keyword: 'social network', description: 'Connect with friends', requireAuth: true },
     { name: 'Toys', link: '/toys', keyword: 'interactive demo ml machine learning', description: 'Explore interactive machine learning demos', requireAuth: false },
     { name: 'Minecraft', link: '/mc', keyword: 'game server mods', description: 'Join our Minecraft server', requireAuth: false },
     //{ name: 'Papers', link: '/papers', keyword: 'research articles', description: 'My papers and reviews', requireAuth: false },
+    { name: 'Classes', link: '/classes', keyword: 'courses lessons class', description: 'Browse available classes', requireAuth: false },
+    { name: 'Python Automation', link: '/classes/python-automation', keyword: 'python class automation scripting', description: 'Learn automation with Python scripting', requireAuth: false },
     // Add toy entries dynamically from the centralized toys data
-    ...toys.map(toy => ({
+    ...toys.filter(toy => toy.hasPage).map(toy => ({
       name: toy.title,
       link: toy.link,
       keyword: toy.keywords,
@@ -187,14 +190,16 @@ export default function Menu({
 
         {/* Navigation Links */}
         <nav className="space-y-4">
-          {[{ href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
+          {[//{ href: '/home', icon: FaHome, label: 'Home', requireAuth: false },
             { href: '/books', icon: FaBook, label: 'Books', requireAuth: false },
+            { href: '/classes', icon: FaSchool, label: 'Classes', requireAuth: false },
             { href: '/events', icon: FaCalendar, label: 'Events', requireAuth: false },
             //{ href: '/shop', icon: FaStore, label: 'Shop', requireAuth: false },
-            { href: '/tutoring', icon: FaChalkboardTeacher, label: 'Tutoring', requireAuth: false },
+            //{ href: '/tutoring', icon: FaChalkboardTeacher, label: 'Tutoring', requireAuth: false },
             { href: '/toys', icon: FaPuzzlePiece, label: 'Toys', requireAuth: false },
-            // { href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
+            //{ href: '/papers', icon: FaMicroscope, label: 'Papers', requireAuth: false },
             { href: '/mc', icon: FaCube, label: 'Minecraft', requireAuth: false },
+            { href: '/classes', icon: FaSchool, label: 'Classes', requireAuth: false },
             { href: '/friends', icon: FaUsers, label: 'Friends', requireAuth: true },
           ].map((item) => (
             <Link

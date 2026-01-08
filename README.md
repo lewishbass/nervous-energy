@@ -88,10 +88,14 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [ ]popup context
 - [+]message group chat names for direct messages
 - [ ]figure out custom rendered preview when link is sent
+- [ ]/home content
+- [ ]book reviews and ratings(per book page and discussions)
+- [ ]mapbox generic location edit
 
 - [+]analytics collecting
-- [ ]analytics storing
-- [ ]analytics display
+- [+]analytics storing
+- [+]analytics display
+- [ ]analytics map
 
 // add schema for managing game lobbies and P2P connections
 // since netlify serverless functions are stateless, this schema is used to manage game lobbies and P2P connections

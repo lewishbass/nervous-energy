@@ -133,7 +133,7 @@ export default function Events(): JSX.Element {
               title="Thursday Links Trip"
               summary="Every week at Linx, as soon as the semester ends"
               image={'images/caving/cave-shirt.jpg'}
-              className="w-full"
+              className="w-full hidden"
               style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}
             >
               <div className="relative tc2 max-w-[95%] space-y-4 mb-6">
@@ -190,7 +190,7 @@ export default function Events(): JSX.Element {
               title={"CEED Summer Imagination Camp"}
               summary={`Starting: 2025-06-16 at Virginia Tech`}
               image={'/images/gilbert.jpg'}
-              className="w-full"
+              className="w-full hidden"
               style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}
             >
               <div className="flex align-center space-x-4">
@@ -231,6 +231,34 @@ export default function Events(): JSX.Element {
                       transition: 'filter 0.2s ease-in-out, translate 0.2s ease-in-out',
                     }}>
                     Register
+                  </a>
+                </div>
+              </div>
+            </InfoCard>
+            <InfoCard
+              title="Python Automation Course"
+              summary="Feb 9 - Apr 22, 2026 | Mondays & Wednesdays 6-8pm"
+              image={'/images/classes/Python-Automation.svg'}
+              className="w-full"
+              style={{ boxShadow: 'inset 0 0 8px 1px #0002' }}
+            >
+              <div className="relative tc2 max-w-[95%] space-y-4 mb-6">
+                <p>
+                  Teaching a beginner-friendly Python programming course focused on automation and practical scripting skills.
+                </p>
+                <p>
+                  The course covers Python fundamentals, data structures, file I/O, error handling, and building command-line tools. Perfect for anyone looking to automate repetitive tasks or learn their first programming language.
+                </p>
+                <p>
+                  <span className="font-semibold tc1">No prior programming experience required!</span> Just bring curiosity and a laptop.
+                </p>
+                <div className="mt-4">
+                  <a
+                    href="/classes/python-automation"
+                    className="inline-block px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View Course Details
                   </a>
                 </div>
               </div>

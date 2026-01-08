@@ -9,14 +9,32 @@ import ProfileModal from '@/components/modals/ProfileModal';
 import AuthModal from '@/components/AuthModal';
 import NotificationModal from '@/components/modals/NotificationModal';
 import HeadMetadata from '@/components/HeadMetadata';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { MathJaxContext } from 'better-react-mathjax';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
 
 
 const inter = Inter({ subsets: ['latin'] });
+
+function AuthModalHandler({
+  isLoggedIn,
+  setIsAuthModalOpen
+}: {
+  isLoggedIn: boolean;
+  setIsAuthModalOpen: (value: boolean) => void
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('openAuth') === 'true' && !isLoggedIn) {
+      setIsAuthModalOpen(true);
+    }
+  }, [searchParams, isLoggedIn, setIsAuthModalOpen]);
+
+  return null;
+}
 
 function RootLayoutContent({
   children,
@@ -31,6 +49,7 @@ function RootLayoutContent({
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   const pathname = usePathname();
+
   const { isLoggedIn, userId } = useAuth();
 
   // only run once to set session metadata
@@ -157,10 +176,17 @@ function RootLayoutContent({
     }
   }, []);
 
+
   return (
     <html lang="en" className='no-sb'>
       <HeadMetadata />
       <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} >
+        <Suspense fallback={null}>
+          <AuthModalHandler
+            isLoggedIn={isLoggedIn}
+            setIsAuthModalOpen={setIsAuthModalOpen}
+          />
+        </Suspense>
         {/* Menu */}
         <div className="fixed inset-0 z-0">
           <Menu 

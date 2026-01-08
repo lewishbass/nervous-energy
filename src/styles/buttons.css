@@ -106,3 +106,122 @@
   opacity: 0;
   transform: translateX(-100%);
 }
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgb(209, 213, 219);
+  border-radius: 0.25rem;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:hover {
+  border-color: rgb(79, 70, 229);
+}
+
+input[type="checkbox"]:checked {
+  background-color: rgb(79, 70, 229);
+  border-color: rgb(79, 70, 229);
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  top: 0.15rem;
+  width: 0.4rem;
+  height: 0.65rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="checkbox"]:focus {
+  outline: 2px solid rgb(199, 210, 254);
+  outline-offset: 2px;
+}
+
+input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Radio button styling */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgb(209, 213, 219);
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+input[type="radio"]:hover {
+  border-color: rgb(79, 70, 229);
+}
+
+input[type="radio"]:checked {
+  border-color: rgb(79, 70, 229);
+}
+
+input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background-color: rgb(79, 70, 229);
+}
+
+input[type="radio"]:focus {
+  outline: 2px solid rgb(199, 210, 254);
+  outline-offset: 2px;
+}
+
+input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode styles for checkbox and radio */
+.dark input[type="checkbox"],
+.dark input[type="radio"] {
+  background-color: rgb(31, 41, 55);
+  border-color: rgb(75, 85, 99);
+}
+
+.dark input[type="checkbox"]:hover,
+.dark input[type="radio"]:hover {
+  border-color: rgb(99, 102, 241);
+}
+
+.dark input[type="checkbox"]:checked {
+  background-color: rgb(99, 102, 241);
+  border-color: rgb(99, 102, 241);
+}
+
+.dark input[type="radio"]:checked {
+  border-color: rgb(99, 102, 241);
+}
+
+.dark input[type="radio"]:checked::after {
+  background-color: rgb(99, 102, 241);
+}
+
+.dark input[type="checkbox"]:focus,
+.dark input[type="radio"]:focus {
+  outline-color: rgb(67, 56, 202);
+}

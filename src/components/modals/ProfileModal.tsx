@@ -180,15 +180,15 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="p-2 bg2 rounded-lg">
               <div className="font-bold tc1">{userData?.data.history?.length}</div>
-              <div className="text-xs tc3">Books Read</div>
+              <div className="text-xs tc3">Profile Edits</div>
             </div>
             <div className="p-2 bg2 rounded-lg">
               <div className="font-bold tc1">{userData?.data.friends?.length}</div>
               <div className="text-xs tc3">Friends</div>
             </div>
             <div className="p-2 bg2 rounded-lg">
-              <div className="font-bold tc1">4.7</div>
-              <div className="text-xs tc3">Avg Rating</div>
+              <div className="font-bold tc1">⭐</div>
+              <div className="text-xs tc3">Have Fun</div>
             </div>
           </div>
 
@@ -256,7 +256,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
               </span>
             </div>
 
-            <div>
+            {/*<div>
               <h3 className="text-sm font-semibold tc3">Favorite Genres</h3>
               <div className="flex flex-wrap gap-2 mt-1">
                 {['Sci-Fi', 'Fantasy'].map((genre, index) => (
@@ -265,7 +265,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
                   </span>
                 ))}
               </div>
-            </div>
+            </div>*/}
           </div>
         </div>
 

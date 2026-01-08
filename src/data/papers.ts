@@ -27,6 +27,15 @@ export const papers: Paper[] = [
         keywords: 'video generation LLM planning consistency',
         imagePath: '/KH_back.svg',
         reqAuth: false
+    },
+    {
+        title: 'U-Net: Convolutional Networks for Biomedical Image Segmentation',
+        description: 'First appearance of U-Net architecture for image processing tasks',
+        link: '/papers/u-net',
+        hasPage: true,
+        keywords: 'U-Net convolutional networks biomedical image segmentation',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
     }
 	];
 

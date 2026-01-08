@@ -1,0 +1,59 @@
+.references {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.references ol {
+  list-style-position: outside;
+  padding-left: 2rem;
+  counter-reset: reference-counter;
+}
+
+.references li {
+  counter-increment: reference-counter;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.references li:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.references li::marker {
+  font-weight: 600;
+  color: var(--khg, #3b82f6);
+}
+
+.references li br {
+  display: block;
+  content: "";
+  margin-top: 0.5rem;
+}
+
+/* Dark mode support */
+:global(.dark) .references li {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+:global(.dark) .references li:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .references {
+    padding: 1rem;
+  }
+  
+  .references ol {
+    padding-left: 1.5rem;
+  }
+  
+  .references li {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
