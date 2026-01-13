@@ -15,6 +15,8 @@ import SquareAnimation from '@/components/backgrounds/SquareAnimation';
 import { Square } from '@tensorflow/tfjs-core';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
 
+import { analytics } from '@/context/Analytics';
+
 function PythonAutomationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,6 +48,8 @@ function PythonAutomationContent() {
 
   // Update URL when tab changes (but not on initial mount)
   useEffect(() => {
+    analytics.track('tab_change', { tab: activeTab });
+
     if (isInitialMount.current) {
       isInitialMount.current = false;
       // Set initial URL if not already set

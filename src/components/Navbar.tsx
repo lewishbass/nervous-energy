@@ -24,15 +24,15 @@ export default function Navbar({ onMenuToggle, isMenuOpen }: NavbarProps) {
           className="w-10 h-10 flex flex-col justify-center items-center gap-1.5 z-50"
           style={{pointerEvents: isMenuOpen ? 'none' : 'auto'}}
         >
-          <span className={`w-6 h-0.5 bg4 transition-transform ${
+          <div className={`w-6 h-0.5 bg4 transition-transform ${
             isMenuOpen ? 'rotate-45 translate-y-2' : ''
-          }`}></span>
-          <span className={`w-6 h-0.5 bg4 transition-opacity ${
+            }`}></div>
+          <div className={`w-6 h-0.5 bg4 transition-opacity ${
             isMenuOpen ? 'opacity-0' : ''
-          }`}></span>
-          <span className={`w-6 h-0.5 bg4 transition-transform ${
+            }`}></div>
+          <div className={`w-6 h-0.5 bg4 transition-transform ${
             isMenuOpen ? '-rotate-45 -translate-y-2' : ''
-          }`}></span>
+            }`}></div>
         </button>
       </div>
     </nav>
