@@ -12,8 +12,9 @@ import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import bookData from "./book_info.json";
 import "./books.css";
 import { useAuth } from "@/context/AuthContext";
-import { FaBook, FaTablet, FaDownload } from "react-icons/fa"; // Import icons for shop types
+import { FaBook, FaTablet, FaDownload, FaListUl, FaSearch } from "react-icons/fa"; // Import icons for shop types
 import { AnimatePresence, motion } from "framer-motion";
+import { BsFillGridFill } from "react-icons/bs";
 
 interface Book {
   paragraph1: string;
@@ -44,10 +45,17 @@ export default function Books() {
   const [gridColumns, setGridColumns] = useState<number>(3); // Default to 3 columns
   const bookRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [shopType, setShopType] = useState<"kobo" | "thriftbooks">("kobo"); // Default to Kobo
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid"); // Add view mode state
+
+  const [inFiltered, setInFiltered] = useState<Record<string, boolean>>({});
+
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const dataRef = useRef<Book[]>([]); // Store the original data
 
   const { isLoggedIn } = useAuth();
+
+  const animationTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Initialize books from the imported data
@@ -82,6 +90,8 @@ export default function Books() {
     // dataRef.current = [...books]
   }, [books]);
 
+
+  //book sorting effect
   useEffect(() => {
     // Sort books when sortBy or sortOrder changes
     const sortedBooks = [...dataRef.current].sort((a, b) => {
@@ -116,6 +126,33 @@ export default function Books() {
       sortedBooks.map((book: Book) => book.title).join("\n")
     );
   }, [sortBy, sortOrder]);
+
+  //book filtering effect
+  useEffect(() => {
+    const filteredStatus: Record<string, boolean> = {};
+
+    dataRef.current.forEach((book) => {
+
+      const query = searchQuery.toLowerCase().trim();
+
+      if (query === "") {
+        filteredStatus[book.ISBN] = true;
+        return;
+      }
+      else if (
+        book.title.toLowerCase().includes(query) ||
+        book.author.toLowerCase().includes(query) ||
+        book.book_series?.toLowerCase().includes(query) ||
+        book.year.toString().includes(query)) {
+        filteredStatus[book.ISBN] = true;
+      }
+      else {
+        filteredStatus[book.ISBN] = false;
+      }
+
+    });
+    setInFiltered(prev => ({ ...filteredStatus }));
+  }, [searchQuery]);
 
   useEffect(() => {
     // Detect grid layout based on screen size
@@ -164,6 +201,10 @@ export default function Books() {
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
+          //list mode
+          if (viewMode === "list") {
+            return Math.min(prev + 1, books.length - 1);
+          }
           // Move right, but stay in the same row
           const currentRow = Math.floor(prev / gridColumns);
           const lastIndexInRow = Math.min(
@@ -177,6 +218,10 @@ export default function Books() {
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
+          //list mode
+          if (viewMode === "list") {
+            return Math.max(prev - 1, 0);
+          }
           // Move left, but stay in the same row
           const currentRow = Math.floor(prev / gridColumns);
           const firstIndexInRow = currentRow * gridColumns;
@@ -187,6 +232,10 @@ export default function Books() {
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
+          //list mode
+          if (viewMode === "list") {
+            return Math.min(prev + 1, books.length - 1);
+          }
           // Move down to the next row (same column)
           const newIndex = prev + gridColumns;
           return newIndex < books.length ? newIndex : prev;
@@ -196,6 +245,10 @@ export default function Books() {
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
+          //list mode
+          if (viewMode === "list") {
+            return Math.max(prev - 1, 0);
+          }
           // Move up to the previous row (same column)
           const newIndex = prev - gridColumns;
           return newIndex >= 0 ? newIndex : prev;
@@ -211,13 +264,26 @@ export default function Books() {
   useEffect(() => {
     // Scroll selected book into view when changed
     if (selectedBook !== null && bookRefs.current[selectedBook]) {
-      bookRefs.current[selectedBook]?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
+      // Add delay in list mode to allow expansion animation to complete
+      const delay = viewMode === "list" ? 100 : 0;
+      if (animationTimeout.current) {
+        clearTimeout(animationTimeout.current);
+      }
+      animationTimeout.current = setTimeout(() => {
+        bookRefs.current[selectedBook]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, delay);
+
     }
 
-  }, [selectedBook]);
+    return () => {
+      if (animationTimeout.current) {
+        clearTimeout(animationTimeout.current);
+      }
+    };
+  }, [selectedBook, viewMode]);
 
   const toggleShopType = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -234,7 +300,7 @@ export default function Books() {
       <h1 className="text-4xl font-bold mb-6 tc1">Books</h1>
 
       {/* Sorting Controls */}
-      <div className="mb-6 p-4 bg2 rounded-lg shadow flex flex-wrap gap-2 relative">
+      <div className="mb-6 p-4 bg2 rounded-lg shadow flex flex-wrap gap-2 relative items-center">
         <span className="tc1 font-medium mr-2 my-auto">Sort by:</span>
         <button
           className={`px-3 py-1 rounded-md ${sortBy === "title" ? "bg-blue-600 text-white" : "bg3 tc1"
@@ -279,156 +345,317 @@ export default function Books() {
         >
           Year {sortBy === "year" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
+
+        {/* Search Input */}
+        <div className="relative flex-1 min-w-[200px]">
+          <input
+            type="text"
+            placeholder=""
+            className="py-1 px-3 rounded-md bg3 tc1 flex-grow w-full outline-none"
+            style={{ paddingLeft: searchQuery ? "0.5rem" : "2rem", transition: "padding-left 0.3s ease" }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <FaSearch className="absolute left-2.5 top-1/2 transform -translate-y-1/2 tc1 pointer-events-none" style={{ maxWidth: searchQuery ? "0" : "1rem", opacity: searchQuery ? 0 : 0.5, transition: "all 0.3s ease" }} />
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="w-6 h-6 mr-2 ml-auto relative overflow-visible flex items-center justify-center opacity-100 hover:opacity-60 transition-opacity duration-200 tc1">
+          <BsFillGridFill
+            className={`absolute w-[100%] h-[100%] cursor-pointer transition-opacity duration-300 ${viewMode === 'list' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => setViewMode('grid')}
+          />
+          <FaListUl
+            className={`absolute w-[100%] h-[100%] cursor-pointer transition-opacity duration-300 ${viewMode === 'grid' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => setViewMode('list')}
+          />
+        </div>
       </div>
 
-      {/* Book Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-100">
-        {books.map((book, index) => {
-          const isSelected = selectedBook === index;
-          return (
-            <div
-              key={index}
-              ref={(el) => {
-                if (el) bookRefs.current[index] = el;
-              }}
-              className={`book-card ${isSelected ? "selected" : ""}`}
-              onClick={() => handleBookClick(index)}
-              tabIndex={0}
-            >
-              {/* Full-size Book Cover */}
-              <div className="book-cover">
-                <Image
-                  src={`./${book.cover_file}`}
-                  alt={`Cover of ${book.title}`}
-                  className="object-cover w-full h-full"
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority
-                />
-              </div>
-
-              {/* Overlay with Book Info */}
+      {/* Book Cards - Grid View */}
+      {viewMode === "grid" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-100">
+          {books.map((book, index) => {
+            const isSelected = selectedBook === index;
+            return (
               <div
-                className={`book-overlay ${isSelected
-                  ? "book-overlay-expanded"
-                  : "book-overlay-collapsed"
-                  }`}
+                key={index}
+                ref={(el) => {
+                  if (el) bookRefs.current[index] = el;
+                }}
+                className={`book-card ${isSelected ? "selected" : ""}`}
+                onClick={() => handleBookClick(index)}
+                tabIndex={0}
+                style={{ display: inFiltered[book.ISBN] === false ? "none" : "block" }}
               >
-                <div className="flex justify-between items-start mb-[-6]">
-                  <h2 className="book-title tc1">{book.title}</h2>
-                  {book.good_score && (
-                    <span className="book-rating w-content whitespace-nowrap">
-                      ★ {book.good_score.toFixed(1)}
-                    </span>
-                  )}
+                {/* Full-size Book Cover */}
+                <div className="book-cover">
+                  <Image
+                    src={`./${book.cover_file}`}
+                    alt={`Cover of ${book.title}`}
+                    className="object-cover w-full h-full"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                  />
                 </div>
 
-                <p className="book-author tc2">By {book.author}</p>
-                {book.book_series && (
-                  <p className="book-series tc3">
-                    {book.book_series}
-                    {book.reading_order && <span> (#{book.reading_order})</span>}
+                {/* Overlay with Book Info */}
+                <div
+                  className={`book-overlay ${isSelected
+                    ? "book-overlay-expanded"
+                    : "book-overlay-collapsed"
+                    }`}
+                >
+                  <div className="flex justify-between items-start mb-[-6]">
+                    <h2 className="book-title tc1">{book.title}</h2>
+                    {book.good_score && (
+                      <span className="book-rating w-content whitespace-nowrap">
+                        ★ {book.good_score.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="book-author tc2">By {book.author}</p>
+                  {book.book_series && (
+                    <p className="book-series tc3">
+                      {book.book_series}
+                      {book.reading_order && <span> (#{book.reading_order})</span>}
+                    </p>
+                  )}
+                  <p className="book-metadata tc3">
+                    {book.genre} • {book.year}
                   </p>
-                )}
-                <p className="book-metadata tc3">
-                  {book.genre} • {book.year}
-                </p>
 
-                {/* Always visible description */}
-                <p className="book-description tc2">{book.paragraph1}</p>
+                  {/* Always visible description */}
+                  <p className="book-description tc2">{book.paragraph1}</p>
 
-                {/* Expanded content */}
-                <AnimatePresence>
-                  {isSelected && (
-                    <motion.div
-                      key="expanded-content"
-                      initial={{ opacity: 0, }}
-                      animate={{ opacity: 1, }}
-                      exit={{ opacity: 0, }}
-                      transition={{ duration: 0.3 }}
-                      className="mt-4 space-y-3"
-                    >
-                      <p className="book-description tc2">{book.paragraph2}</p>
+                  {/* Expanded content */}
+                  <AnimatePresence>
+                    {isSelected && (
+                      <motion.div
+                        key="expanded-content"
+                        initial={{ opacity: 0, }}
+                        animate={{ opacity: 1, }}
+                        exit={{ opacity: 0, }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 space-y-3"
+                      >
+                        <p className="book-description tc2">{book.paragraph2}</p>
 
-                      <div className="book-detail-section">
-                        <div>
-                          <span className="book-detail-label tc2">Words: </span>
-                          <span className="book-detail-value tc3">
-                            {book.wordcount.toLocaleString()}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="book-detail-label tc2">ISBN: </span>
-                          <span className="book-detail-value tc3">
-                            {book.ISBN}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="book-detail-label tc2">Ratings: </span>
-                          <span className="book-detail-value tc3">
-                            {book.n_good_ratings.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="book-trivia">
-                        <span className="book-detail-label tc1">Trivia: </span>
-                        <span className="book-detail-value tc2">
-                          {book.trivia}
-                        </span>
-                      </div>
-
-                      {/* Download button */}
-                      <div className="flex flex-row mt-6 items-center">
-                        {isLoggedIn && (
+                        <div className="book-detail-section">
                           <div>
+                            <span className="book-detail-label tc2">Words: </span>
+                            <span className="book-detail-value tc3">
+                              {book.wordcount.toLocaleString()}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="book-detail-label tc2">ISBN: </span>
+                            <span className="book-detail-value tc3">
+                              {book.ISBN}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="book-detail-label tc2">Ratings: </span>
+                            <span className="book-detail-value tc3">
+                              {book.n_good_ratings.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="book-trivia">
+                          <span className="book-detail-label tc1">Trivia: </span>
+                          <span className="book-detail-value tc2">
+                            {book.trivia}
+                          </span>
+                        </div>
+
+                        {/* Download button */}
+                        <div className="flex flex-row mt-6 items-center">
+                          {isLoggedIn && (
+                            <div>
+                              <a
+                                href={`/${book.book_file}`}
+                                download
+                                className="book-download-button"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <FaDownload className="mr-2 inline" /> EPUB
+                              </a>
+                            </div>
+                          )}
+
+                          <div
+                            className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
+                            style={{
+                              backgroundColor: "var(--khg)",
+                              borderRadius: "0.375rem",
+                            }}
+                          >
+                            <div
+                              className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                              style={{
+                                backgroundColor: "var(--khp)",
+                              }}
+                              onClick={toggleShopType}
+                            >
+                              <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
+                              <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
+                            </div>
                             <a
-                              href={`/${book.book_file}`}
-                              download
-                              className="book-download-button"
+                              href={book[`${shopType}_link`] || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <FaDownload className="mr-2 inline" /> EPUB
+                              Shop
                             </a>
                           </div>
-                        )}
-
-                        <div
-                          className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
-                          style={{
-                            backgroundColor: "var(--khg)",
-                            borderRadius: "0.375rem",
-                          }}
-                        >
-                          <div
-                            className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
-                            style={{
-                              backgroundColor: "var(--khp)",
-                            }}
-                            onClick={toggleShopType}
-                          >
-                            <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
-                            <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
-                          </div>
-                          <a
-                            href={book[`${shopType}_link`] || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Shop
-                          </a>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Book List - List View */}
+      {viewMode === "list" && (
+        <div className="space-y-4 mb-100">
+          {books.map((book, index) => {
+            const isSelected = selectedBook === index;
+            return (
+              <div
+                key={index}
+                ref={(el) => {
+                  if (el) bookRefs.current[index] = el;
+                }}
+                className={`outline-none bg2 rounded-lg shadow-md overflow-hidden cursor-pointer transition-all duration-300 ${isSelected ? "ring-2 ring-blue-500" : "hover:shadow-lg"
+                  }`}
+                onClick={() => handleBookClick(index)}
+                tabIndex={0}
+                style={{ display: inFiltered[book.ISBN] === false ? "none" : "block" }}
+              >
+                <div className="flex flex-col md:flex-row">
+                  {/* Book Cover */}
+                  <div className="relative w-full md:w-48 h-64 md:h-auto flex-shrink-0">
+                    <Image
+                      src={`./${book.cover_file}`}
+                      alt={`Cover of ${book.title}`}
+                      className="object-cover w-full h-full"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 192px"
+                      priority
+                    />
+                  </div>
+
+                  {/* Book Info */}
+                  <div className="flex-1 p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <h2 className="text-2xl font-bold tc1">{book.title}</h2>
+                      {book.good_score && (
+                        <span className="bg-yellow-500 text-white px-2 py-1 rounded text-sm font-semibold whitespace-nowrap ml-2">
+                          ★ {book.good_score.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-lg tc2 mb-1">By {book.author}</p>
+                    {book.book_series && (
+                      <p className="text-sm tc3 mb-2">
+                        {book.book_series}
+                        {book.reading_order && <span> (#{book.reading_order})</span>}
+                      </p>
+                    )}
+                    <p className="text-sm tc3 mb-3">
+                      {book.genre} • {book.year} • {book.wordcount.toLocaleString()} words
+                    </p>
+
+                    <p className="tc2 mb-3">{book.paragraph1}</p>
+
+                    <AnimatePresence>
+                      {isSelected && (
+                        <motion.div
+                          key="expanded-content"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-3"
+                        >
+                          <p className="tc2">{book.paragraph2}</p>
+
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                            <div>
+                              <span className="font-semibold tc2">ISBN: </span>
+                              <span className="tc3">{book.ISBN}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold tc2">Ratings: </span>
+                              <span className="tc3">{book.n_good_ratings.toLocaleString()}</span>
+                            </div>
+                          </div>
+
+                          <div className="p-3 bg3 rounded">
+                            <span className="font-semibold tc1">Trivia: </span>
+                            <span className="tc2">{book.trivia}</span>
+                          </div>
+
+                          <div className="flex flex-row items-center gap-3 pt-2">
+                            {isLoggedIn && (
+                              <a
+                                href={`/${book.book_file}`}
+                                download
+                                className="book-download-button"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <FaDownload className="mr-2 inline" /> EPUB
+                              </a>
+                            )}
+
+                            <div
+                              className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
+                              style={{
+                                backgroundColor: "var(--khg)",
+                                borderRadius: "0.375rem",
+                              }}
+                            >
+                              <div
+                                className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                                style={{
+                                  backgroundColor: "var(--khp)",
+                                }}
+                                onClick={toggleShopType}
+                              >
+                                <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
+                                <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
+                              </div>
+                              <a
+                                href={book[`${shopType}_link`] || "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Shop
+                              </a>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
