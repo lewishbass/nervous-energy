@@ -212,8 +212,8 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
   }
 
   const handleReplySubmit = (parentID: string) => {
-    if (!replyTitle.trim() || !replyContent.trim()) {
-      setLoadingText('Title and content are required');
+    if (!replyContent.trim()) {
+      setLoadingText('Content is required');
       return;
     }
     
@@ -226,8 +226,8 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
   };
 
   const handleEditSubmit = async (threadID: string) => {
-    if (!editingTitle.trim() || !editingContent.trim()) {
-      setLoadingText('Title and content are required');
+    if (!editingContent.trim()) {
+      setLoadingText('Content is required');
       return;
     }
     
@@ -414,13 +414,15 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
                 placeholder="Discussion title..."
                 value={replyTitle}
                 onChange={(e) => setReplyTitle(e.target.value)}
-                className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+								className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+								maxLength={100}
               />
               <textarea
                 placeholder="Share your thoughts..."
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+								maxLength={2000}
                 rows={4}
               />
               <div className="flex gap-2">
@@ -523,14 +525,16 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             placeholder="Edit title..."
             value={editingTitle}
             onChange={(e) => setEditingTitle(e.target.value)}
-            className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+						className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+						maxLength={50}
           />
           <textarea
             placeholder="Edit content..."
             value={editingContent}
             onChange={(e) => setEditingContent(e.target.value)}
             className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-            rows={4}
+						rows={4}
+						maxLength={2000}
           />
           <button
             onClick={() => handleEditSubmit(threadID)}
@@ -547,14 +551,16 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             placeholder="Reply title..."
             value={replyTitle}
             onChange={(e) => setReplyTitle(e.target.value)}
-            className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+						className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+						maxLength={50}
           />
           <textarea
             placeholder="Reply content..."
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-            rows={4}
+						rows={4}
+						maxLength={2000}
           />
           <button
             onClick={() => handleReplySubmit(threadID)}

@@ -96,9 +96,9 @@ ThreadSchema.pre('save', async function(next) {
 
 	
 	// Auto-generate title from content if empty
-	if(!this.title || this.title.trim() === '') {
-		this.title = this.content.substring(0, 30) + (this.content.length > 30 ? '...' : '');
-	}
+	//if(!this.title || this.title.trim() === '') {
+	//	this.title = this.content.substring(0, 30) + (this.content.length > 30 ? '...' : '');
+	//}
 	
 	next();
 });
