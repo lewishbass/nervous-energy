@@ -4,6 +4,8 @@ import Image from "next/image";
 import { copyToClipboard } from "../../scripts/clipboard";
 import { useEffect, useState } from "react";
 import LineAnimation from '@/components/backgrounds/LineAnimation';
+import Discussion from '@/components/messages/Discussion';
+
 
 interface ServerStatus {
 	online: boolean;
@@ -22,6 +24,8 @@ interface ModDependency {
 	downloadCount: number;
 	url: string;
 }
+
+const baseThreadID = "minecraft-server-discussions";
 
 function CheckingAnimation() {
 	const [dots, setDots] = useState("");
@@ -293,6 +297,10 @@ export default function Minecraft() {
 						</div>
 					))}
 				</div>
+			</section>
+
+			<section className="backdrop-blur-lg bg-white/30 dark:bg-black/30 p-4 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg">
+				<Discussion baseThreadID={baseThreadID} baseThreadTitle="Minecraft Discussions" baseThreadContent="Discuss Minecraft and the modpack here!" />
 			</section>
 
 			{/* Modpack Dependencies Section 
