@@ -103,7 +103,7 @@ function PythonAutomationContent() {
           <li>Start Lecture Content</li>
           <li>Lecture Styles and Nav Links</li>
           <li>Start Exercise Content</li>
-          <li>Discussion Functionality</li>
+          <li>Discussion latex and codeblocks rendering</li>
 
         </ul>
         <div className="my-2 mt-6">
@@ -118,6 +118,7 @@ function PythonAutomationContent() {
           <li>Survey Exercise</li>
           <li>Redo Syllabus</li>
           <li>Link Exercises to Users</li>
+          <li>Discussion Functionality</li>
         </ul>
       </div>}
 

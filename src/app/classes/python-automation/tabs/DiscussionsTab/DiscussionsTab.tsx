@@ -394,17 +394,17 @@ export default function DiscussionsTab() {
 
     const thumbstyle = "hover:scale-110 active:scale-90 cursor-pointer transition-all duration-300 absolute w-[100%] h-[100%] ";
     
-    return (<div key={threadID} className={`relative border border-gray-300 rounded p-2 pl-6 mb-4 ml-${2} `}>
+    return (<div key={threadID} className={`relative border border-gray-300 rounded dark:border-gray-700 p-2 pl-6 mb-4 ml-${2} overflow-hidden`}>
 
       {/*collapse button*/}
-      <div className="absolute w-4 h-full top-0 left-0 bg2 border-r border-gray-300 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3"
+      <div className="absolute w-4 h-full top-0 left-0 bg2 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3"
       onClick={() => toggleThreadLoaded(threadID)}>
-      <div className="">{thread.children.length > 0 && (expanded ? '-' : '+')}</div>
+        <div className="tc3">{thread.children.length > 0 && (expanded ? '-' : '+')}</div>
       </div>
 
       <div className="flex flex-row">
         {/* vote display */}
-        <div className="flex flex-col items-center mr-4">
+        <div className="flex flex-col items-center mr-4 tc2">
           <div className="w-6 h-6 relative">
             <FaThumbsUp className={`text-blue-500 ${thumbstyle} ${thread.isUpvoted ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => voteThread(threadID, username, token, 'clear', thread.isUpvoted ? 'upvote' : thread.isDownvoted ? 'downvote' : 'clear')} />
             <FaRegThumbsUp className={`${thumbstyle} ${thread.isUpvoted ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} onClick={() => voteThread(threadID, username, token, 'upvote', thread.isUpvoted ? 'upvote' : thread.isDownvoted ? 'downvote' : 'clear')} />
@@ -416,11 +416,11 @@ export default function DiscussionsTab() {
           </div>        </div>
         {/* thread content */}
         <div className="flex-1">
-          <h3 className="text-lg font-bold mb-2">{thread.title || ''}
+          <h3 className="text-lg font-bold mb-2 tc1">{thread.title || ''}
             <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
           </h3>
-          <p className="mb-2">{thread.content}</p>
-          <div className="text-sm text-gray-600 mb-2">
+          <p className="mb-2 tc2">{thread.content}</p>
+          <div className="text-sm tc3 mb-2">
             {isLoggedIn && <span
               className="hover:underline cursor-pointer mr-1 select-none"
               onClick={() => setReplyingTo(replyingTo === threadID ? null : threadID)}
