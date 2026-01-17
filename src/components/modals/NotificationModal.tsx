@@ -353,6 +353,15 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
                           Accept Request
                         </button>
                       )}
+                      {/* Add Context to thread notifications */}
+                      {notification.notificationType === 'threadReply' && (
+                        <div className="mt-2 px-3">
+                          <p className="text-xs tc2 p-1 bg3 px-2 rounded-lg opacity-50"><span className="font-bold">{username}: </span>{JSON.parse(notification.data).parentPreview}</p>
+                          <p className="text-sm tc2 mt-1 bg3 p-2 rounded-lg"><span className="font-bold">{JSON.parse(notification.data).senderUsername}: </span>{JSON.parse(notification.data).preview}</p>
+                        </div>
+                      )}
+
+
                   </div>
                 </div>
               </div>

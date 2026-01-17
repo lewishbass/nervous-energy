@@ -6,6 +6,8 @@
 import Link from 'next/link';
 import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
+import Discussion from '@/components/messages/Discussion';
+
 
 export default function ResumePage() {
 	return (
@@ -20,7 +22,7 @@ export default function ResumePage() {
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 p-6 max-w-4xl mx-auto backdrop-blur-sm min-h-screen tc2">
+			<div className="relative z-10 p-6 max-w-4xl mx-auto backdrop-blur-sm min-h-screen tc2 pb-200">
 				{/*<div className="mb-6 flex justify-between items-center">
 					<Link
 						href="/"
@@ -235,6 +237,12 @@ export default function ResumePage() {
 
 					<div className="mb-24" />
 				</div>
+
+				<Discussion
+					baseThreadID={'resume-discussions'}
+					baseThreadTitle="Resume Discussions"
+					baseThreadContent="Give feedback on my resume here!"
+				/>
 			</div>
 		</div>
 	);

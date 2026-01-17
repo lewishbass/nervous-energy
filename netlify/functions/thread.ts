@@ -126,6 +126,13 @@ const handleCreateThread = async (body: any) => {
 		}
 	}
 
+	notifyReply(
+		parentMessageId,
+		user.id,
+		user.username,
+		content
+	);
+
 	return {
 		statusCode: 200,
 		body: JSON.stringify({ success: true, thread: newThread }),
@@ -560,4 +567,38 @@ const deleteThreadRecursively = async (threadId: string, userId: string) => {
 	});
 	// return null thread since it's deleted
 	return null;
+}
+
+const notifyReply = async (parentThreadId: string, replierId: string, replierUsername: string, message: string) => {
+
+	// Fetch the parent thread to get its creator
+	const parentThread = await ThreadModel.findOne({ id: parentThreadId });
+	if (!parentThread) {
+		console.error('Parent thread not found for notification:', parentThreadId);
+		return;
+	}
+	const parentCreatorId = parentThread.creatorId;
+
+	// fetch parent thread user
+	const parentUser = await User.findOne({ id: parentCreatorId });
+	if (!parentUser) {
+		console.error('Parent thread creator user not found for notification:', parentCreatorId);
+		return;
+	}
+
+	const sender = { id: replierId };
+
+	sendNotification(
+		sender,
+		parentUser,
+		`${replierUsername} replied to your thread`,
+		'threadReply',
+		JSON.stringify({
+			threadId: parentThreadId,
+			preview: `${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`,
+			parentPreview: `${parentThread.content.substring(0, 100)}${parentThread.content.length > 100 ? '...' : ''}`,
+			senderUsername: `${replierUsername}`,
+		}),
+	);
+
 }
