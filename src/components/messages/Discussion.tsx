@@ -3,6 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { FaArrowRotateRight, FaPlus, FaRegThumbsUp, FaThumbsUp } from "react-icons/fa6";
 import { useAuth } from '@/context/AuthContext';
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'; // Import the plugin
+
 const THREADS_ROUTE = "/.netlify/functions/thread";
 
 interface DiscussionProps {
@@ -549,7 +552,11 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           <h3 className="text-lg font-bold mb-2 tc1">{thread.title || ''}
             <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
           </h3>
-          <p className="mb-2 tc2">{thread.content}</p>
+					<p className="mb-2 tc2">
+						<ReactMarkdown remarkPlugins={[remarkGfm]}>
+							{thread.content}
+						</ReactMarkdown>
+					</p>
           <div className="text-sm tc3 mb-2">
             {isLoggedIn && <span
               className="hover:underline cursor-pointer mr-1 select-none"
