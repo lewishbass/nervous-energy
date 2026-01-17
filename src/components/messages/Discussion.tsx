@@ -351,6 +351,82 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     fetchThreadData(threadId, isLoggedIn ? username : null, isLoggedIn ? token : null);
   }
 
+	const refreshAllThreads = async () => {
+		setLoadingState('loading');
+		setLoadingText('Refreshing All Discussions...');
+
+		try {
+			// Get all currently loaded thread IDs
+			const currentThreadIds = Object.keys(threadData).filter(id => id !== baseThreadID);
+
+			// Fetch base tree with depth 1
+			const baseTreePromise = fetch(THREADS_ROUTE, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					action: 'getThreadTree',
+					rootId: baseThreadID,
+					username: isLoggedIn ? username : null,
+					token: isLoggedIn ? token : null,
+					depth: 1,
+				}),
+			});
+
+			// Fetch all currently loaded threads
+			const allThreadsPromise = currentThreadIds.length > 0
+				? fetch(THREADS_ROUTE, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						action: 'getThreads',
+						idArray: currentThreadIds,
+						username: isLoggedIn ? username : null,
+						token: isLoggedIn ? token : null,
+					}),
+				})
+				: Promise.resolve(null);
+
+			const [baseTreeResponse, allThreadsResponse] = await Promise.all([
+				baseTreePromise,
+				allThreadsPromise,
+			]);
+
+			if (!baseTreeResponse.ok) {
+				throw new Error(`Error fetching base tree: ${baseTreeResponse.statusText}`);
+			}
+
+			const baseTreeData = await baseTreeResponse.json();
+			const threadDict: Record<string, any> = {};
+
+			// Add base tree threads
+			baseTreeData.allThreads.forEach((thread: any) => {
+				threadDict[thread.id] = thread;
+			});
+
+			// Add updated threads if any were fetched
+			if (allThreadsResponse && allThreadsResponse.ok) {
+				const allThreadsData = await allThreadsResponse.json();
+				if (allThreadsData.threads) {
+					allThreadsData.threads.forEach((thread: any) => {
+						threadDict[thread.id] = thread;
+					});
+				}
+			}
+
+			setThreadData(threadDict);
+			setLoadingState('loaded');
+			setLoadingText('All Discussions Refreshed');
+		} catch (error) {
+			console.error('Error refreshing threads:', error);
+			setLoadingState('error');
+			setLoadingText((error instanceof Error) ? error.message : 'Unknown error');
+		}
+	};
+
   const toggleThreadLoaded = (threadId: string) => {
     const thread = threadData[threadId];
     if (!thread || !thread.children || thread.children.length === 0) return;
@@ -583,7 +659,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         <FaArrowRotateRight
           className="mr-2 cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform"
           title="Refresh Discussions"
-          onClick={() => fetchThreadData(baseThreadID, isLoggedIn ? username : null, isLoggedIn ? token : null, 1)}
+					onClick={refreshAllThreads}
         />
       </div>
 
