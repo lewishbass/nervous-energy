@@ -1,5 +1,6 @@
 import '@/styles/toggles.css';
 import '@/styles/buttons.css';
+import '@/styles/popups.css';
 import { useRef, useEffect, useState } from 'react';
 import { BsFillGridFill } from 'react-icons/bs';
 import { FaListUl } from 'react-icons/fa';
@@ -168,12 +169,12 @@ export default function ExercisesTab() {
 
             if (listMode === 'grid') {
               return (
-                <div className='relative lecture-card p-5 rounded-xl bg-gray-300/15 hover:bg-gray-300/25 dark:hover:bg-gray-300/20 hover:shadow-md dark:shadow-white/15 transition-all duration-200 cursor-pointer' onClick={() => { navigateToAssignment(assignment); }}>
+                <div className='relative lecture-card p-5 rounded-xl bg-gray-300/15 hover:bg-gray-300/25 dark:hover:bg-gray-300/20 hover:shadow-md dark:shadow-white/15 transition-all duration-200 cursor-pointer flex flex-col ' onClick={() => { navigateToAssignment(assignment); }}>
                   
                     <h2 className="text-xl font-semibold tc2 mb-2">{assignment.name}</h2>
                     <p className="tc3 text-sm mb-4 min-h-[4em]">{assignment.description}</p>
                     { (
-                      <p className={`text-xs font-semibold mt-auto ${statusColor}`}>{statusText}</p>
+                      <div className={`text-xs font-semibold mt-auto ${statusColor}`}>{statusText}</div>
                     )}
                   {isAuthorized && (
                     <button
@@ -181,7 +182,7 @@ export default function ExercisesTab() {
                         e.stopPropagation();
                         setViewingAssignment(assignment);
                       }}
-                      className="absolute top-2 right-2 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 transition-colors duration-200 cursor-pointer"
+                      className="absolute bottom-2 right-2 p-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-400 transition-colors duration-200 cursor-pointer"
                       title="View Admin Stats"
                     >
                       <FaChartBar className="w-4 h-4" />
@@ -196,7 +197,7 @@ export default function ExercisesTab() {
                     <h3 className="text-base font-semibold tc2 mb-0.5 truncate">{assignment.name}</h3>
                     <p className="tc3 text-xs line-clamp-1">{assignment.description}</p>
                   </div>
-                  {submissionStatuses !== null && (
+                  {(
                     <span className={`text-xs font-semibold ml-4 whitespace-nowrap ${statusColor}`}>{statusText}</span>
                   )}
                   {isAuthorized && (

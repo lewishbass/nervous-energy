@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo } from 'react';
 import '@/styles/sliders.css';
 import '@/styles/buttons.css';
+import '@/styles/popups.css';
+import { showValidationPopup, hideValidationPopup } from '@/scripts/popups';
 
 interface QuestionProps {
 	questionText: string;
@@ -12,14 +14,14 @@ interface QuestionProps {
 }
 // question component provides wrapping style, and handles loading/saving to local storage
 function QuestionComponent({ questionText, className = '', style = {}, value, setValue, children }: QuestionProps) {
-	
+
 	const dataID = useMemo(() => {
 		if (typeof window !== 'undefined') {
 			return questionText.toLowerCase().replace(/\s+/g, '-') + window.location.pathname.replace(/\/+/g, '-').replace(/[^a-z0-9\-]/g, '');
 		}
 		return questionText.toLowerCase().replace(/\s+/g, '-');
 	}, [questionText]);
-	
+
 	const storeDelay = 500; // delay in ms before storing to localStorage
 	const storeTimer = useRef<NodeJS.Timeout | null>(null);
 	const isInitialMount = useRef(true);
@@ -76,7 +78,7 @@ function QuestionComponent({ questionText, className = '', style = {}, value, se
 	}, [value, dataID]);
 
 	return (
-		<div className={`bg1 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-800 ${className}`} style={style}>
+		<div className={`bg1 rounded-lg p-6 shadow-parentsm border border-gray-200 dark:border-gray-800 ${className}`} style={style}>
 			<label className="block text-lg font-semibold tc1 mb-2">
 				{questionText}
 			</label>
@@ -97,20 +99,20 @@ interface SlideQuestionProps {
 	labels?: string[];
 }
 
-function SlideQuestionComponent({ 
-	questionText, 
-	className = '', 
-	style = {}, 
-	value, 
+function SlideQuestionComponent({
+	questionText,
+	className = '',
+	style = {},
+	value,
 	setValue,
 	min = 0,
 	max = 100,
 	step = 1,
 	labels
 }: SlideQuestionProps) {
-	
+
 	const numericValue = typeof value === 'number' ? value : Number(value) || min;
-	
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue(Number(e.target.value));
 	};
@@ -119,11 +121,11 @@ function SlideQuestionComponent({
 		<QuestionComponent questionText={questionText} className={className} style={style} value={value} setValue={setValue}>
 			<div className="space-y-2">
 				{/* Current Value Display */}
-				
-				
+
+
 				{/* Slider Input */}
 				<input
-					
+
 					type="range"
 					min={min}
 					max={max}
@@ -132,7 +134,7 @@ function SlideQuestionComponent({
 					onChange={handleChange}
 					className="w-full"
 				/>
-				
+
 				{/* Min/Max Labels */}
 				<div className="flex justify-between text-sm tc3">
 					{labels && (
@@ -167,25 +169,50 @@ function TextQuestionComponent({
 	multiline = false,
 	required = false
 }: TextQuestionProps) {
-	
+
 	const stringValue = typeof value === 'string' ? value : String(value) || '';
-	
+	const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setValue(e.target.value);
+		hideValidationPopup(e.target);
 	};
+
+	useEffect(() => {
+		const element = inputRef.current;
+		if (!element || !required) return;
+
+		const handleInvalid = (e: Event) => {
+			e.preventDefault();
+			showValidationPopup(element, 'Please fill out this field');
+		};
+
+
+
+		element.addEventListener('invalid', handleInvalid);
+
+		return () => {
+			element.removeEventListener('invalid', handleInvalid);
+		};
+	}, [required]);
 
 	return (
 		<QuestionComponent questionText={questionText} className={className} style={style} value={value} setValue={setValue}>
 			{multiline ? (
+				<div>
 				<textarea
+					ref={inputRef as React.RefObject<HTMLTextAreaElement>}
 					value={stringValue}
 					onChange={handleChange}
-					className="w-full min-h-32 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 tc1 focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition-colors"
+					className="mb-[-5px] w-full min-h-32 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 tc1 focus:outline-none focus:border-indigo-600 dark:focus:border-indigo-500 transition-colors"
 					placeholder={placeholder}
 					required={required}
 				/>
+				</div>
 			) : (
+				<div>
 				<input
+					ref={inputRef as React.RefObject<HTMLInputElement>}
 					type="text"
 					value={stringValue}
 					onChange={handleChange}
@@ -193,6 +220,7 @@ function TextQuestionComponent({
 					placeholder={placeholder}
 					required={required}
 				/>
+				</div>
 			)}
 		</QuestionComponent>
 	);
@@ -215,9 +243,9 @@ function CheckboxQuestionComponent({
 	setValue,
 	options
 }: CheckboxQuestionProps) {
-	
+
 	const arrayValue = Array.isArray(value) ? value : [];
-	
+
 	const handleCheckboxChange = (option: string) => {
 		const newValue = arrayValue.includes(option)
 			? arrayValue.filter(item => item !== option)
@@ -262,16 +290,57 @@ function RadioQuestionComponent({
 	options,
 	required = false
 }: RadioQuestionProps) {
-	
+
 	const stringValue = typeof value === 'string' ? value : String(value) || '';
-	
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	const handleRadioChange = (option: string) => {
-		setValue(option);
+		if (value === option) {
+			setValue('');
+		}
+		else {
+			setValue(option);
+		}
+
+		if (containerRef.current) {
+			const radios = containerRef.current.querySelectorAll('input[type="radio"]');
+			for (let i = 0; i < radios.length; i++) {
+				if (radios[i] instanceof HTMLInputElement) {
+					hideValidationPopup(radios[i] as HTMLInputElement);
+				}
+			}
+		}
 	};
+
+	useEffect(() => {
+		if (!containerRef.current || !required) return;
+
+		const radios = containerRef.current.querySelectorAll('input[type="radio"]');
+		const lastRadio = radios[radios.length - 1] as HTMLInputElement;
+
+		radios.forEach((radio, index) => {
+			if(index === radios.length - 1) return;
+			radio.addEventListener('invalid', (e: Event) => e.preventDefault());
+		});
+
+		if (!lastRadio) return;
+
+		const handleInvalid = (e: Event) => {
+			e.preventDefault();
+			showValidationPopup(lastRadio, 'Please select an option');
+		};
+
+
+		lastRadio.addEventListener('invalid', handleInvalid);
+
+		return () => {
+			lastRadio.removeEventListener('invalid', handleInvalid);
+		};
+	}, [required]);
 
 	return (
 		<QuestionComponent questionText={questionText} className={className} style={style} value={value} setValue={setValue}>
-			<div className="space-y-2">
+			<div ref={containerRef} className="space-y-2">
 				{options.map((option) => (
 					<label key={option} className="flex items-center space-x-3 cursor-pointer">
 						<input
@@ -279,7 +348,7 @@ function RadioQuestionComponent({
 							name={questionText}
 							value={option}
 							checked={stringValue === option}
-							onChange={() => handleRadioChange(option)}
+							onClick={() => handleRadioChange(option)}
 							required={required}
 						/>
 						<span className="tc2">{option}</span>

@@ -15,7 +15,7 @@ export default function GenericGraph({ field, submissions, onClose }: GenericGra
 			const dateCounts = new Map<string, number>();
 			submissions.forEach(sub => {
 				const date = new Date(sub.submittedAt);
-				const dateKey = date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+				const dateKey = date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', hour: '2-digit' });
 				dateCounts.set(dateKey, (dateCounts.get(dateKey) || 0) + 1);
 			});
 			return Array.from(dateCounts.entries())

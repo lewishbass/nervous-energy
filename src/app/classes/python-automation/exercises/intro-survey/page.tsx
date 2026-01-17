@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { QuestionComponent, SlideQuestionComponent, TextQuestionComponent, CheckboxQuestionComponent, RadioQuestionComponent } from './questionparts';
-import { sub } from '@tensorflow/tfjs-core';
+import { QuestionComponent, SlideQuestionComponent, TextQuestionComponent, CheckboxQuestionComponent, RadioQuestionComponent } from '../questionparts';
+
 
 const SUBMIT_ROUTE = '/.netlify/functions/classwork';
 
@@ -32,6 +32,8 @@ export default function IntroSurvey() {
 
   const clearSubmissionStateTimer = useRef<NodeJS.Timeout | null>(null);
 
+  const formRef = useRef<HTMLFormElement | null>(null);
+
   useEffect(() => {
     if(submissionState === 'idle' || submissionMessage == null) return;
     if(clearSubmissionStateTimer.current) {
@@ -51,6 +53,21 @@ export default function IntroSurvey() {
     };
 
   },[submissionState, submissionMessage]);
+
+  useEffect(() =>{
+    console.log('Setting up invalid event listener');
+    const element = formRef.current;
+    if(!element) return;
+    const handleInvalid = (e:Event) =>{
+      console.log('Form invalid event triggered');
+      setSubmissionState('error');
+      setSubmissionMessage('Please fill out all required fields before submitting the survey.');
+    }
+    element.addEventListener('invalid', handleInvalid, true);
+    return () => {
+      element.removeEventListener('invalid', handleInvalid, true);
+    };
+  },[]);
   
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,14 +114,6 @@ export default function IntroSurvey() {
     }
   };
 
-  const handleCheckboxChange = (interest: string) => {
-    setFormData(prev => ({
-      ...prev,
-      interests: prev.interests.includes(interest)
-        ? prev.interests.filter(i => i !== interest)
-        : [...prev.interests, interest]
-    }));
-  };
 
   if (!isLoggedIn) {
     return (
@@ -136,7 +145,7 @@ export default function IntroSurvey() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" ref={formRef}>
         <TextQuestionComponent
           questionText="What is your name?"
           value={formData.name}

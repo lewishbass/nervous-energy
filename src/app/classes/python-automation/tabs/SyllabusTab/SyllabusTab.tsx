@@ -1,12 +1,36 @@
-import InfoCard from '@/components/widgets/InfoCard';
 import { copyToClipboard } from '@/scripts/clipboard';
-import { units } from './ScheduleTab/ScheduleInfo';
+import { units } from '../ScheduleTab/ScheduleInfo';
 import { FaAngleDown } from 'react-icons/fa';
 import { useState } from 'react';
+import EntranceMap from './EntranceMap';
+
 
 export default function SyllabusTab() {
 
 	const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
+
+	const position: [number, number] = [37.600539, -77.567012]; // Example coordinates (Henrico County Adult Education Center)
+	const [lat, lon] = position;
+	const parkingPolygon: [number, number][] = [ // placeholder square
+		[37.599905, -77.568259],
+		[37.600332, -77.569382],
+		[37.601266, -77.568817],
+		[37.600939, -77.5679686],
+		[37.600665, -77.568138],
+		[37.600353, -77.567333],
+		[37.600584, -77.567190],
+		[37.600463, -77.566873],
+		[37.599883, -77.567226]
+	].map(coord => [coord[1], coord[0]]); // Convert to [lat, lon]
+	const entrancePath: [number, number][] = [ // placeholder path
+		[37.599832, -77.567809],
+		[37.599862, -77.568518],
+		[37.599935, -77.568577],
+		[37.600578, -77.568120],
+		[37.600243, -77.567259],
+		[37.600435, -77.567079]
+	].map(coord => [coord[1], coord[0]]); // Convert to [lat, lon]
+
 
 	return (
 		<div>
@@ -17,7 +41,7 @@ export default function SyllabusTab() {
 						<tbody>
 							<tr>
 								<td className="font-bold tc1 pr-4 align-top text-left whitespace-nowrap w-auto">Instructor:</td>
-								<td className="align-top w-full">Lewis Bass <span className='opacity-50 text-green-500'>[</span><span className="opacity-70 cursor-pointer text-blue-500 hover:text-blue-400  transition-colors" onClick={() => copyToClipboard('lewishbass@gmail.com') }>lewishbass@gmail.com</span><span className='opacity-50 text-green-500'>]</span></td>
+								<td className="align-top w-full">Lewis Bass <span className='opacity-50 text-green-500'>[</span><span className="opacity-70 cursor-pointer text-blue-500 hover:text-blue-400  transition-colors" onClick={() => copyToClipboard('lewishbass@gmail.com', 'Email Copied!')}>lewishbass@gmail.com</span><span className='opacity-50 text-green-500'>]</span></td>
 							</tr>
 							<tr>
 								<td className="font-bold tc1 pr-4 align-top text-left whitespace-nowrap w-auto">Dates:</td>
@@ -59,6 +83,14 @@ export default function SyllabusTab() {
 					<p>
 						No prior programming experience required. Basic computer literacy (preferred) and willingness to learn.
 					</p>
+					<h3 className="font-bold tc1 text-lg mt-4">Location</h3>
+					<p>
+						Henrico County Adult Education Center, Room 2xx : <span className="opacity-50 text-green-500">[</span><span className="opacity-70 cursor-pointer text-blue-500 hover:text-blue-400 transition-colors" onClick={() => copyToClipboard('1420 N Parham Rd, Henrico, VA 23229', 'Address Copied!')}>1420 N Parham Rd, Henrico, VA 23229</span><span className="opacity-50 text-green-500">]</span>
+					</p>
+					<p>
+						Entrance is through the covered parking to the right of the big NOVA sign and pool entrance.
+					</p>
+					<EntranceMap location={position} entrancePath={entrancePath} parkingPolygon={parkingPolygon} />
 					<h3 className='font-bold tc1 text-lg mt-4'>Grading</h3>
 					<p>
 						No grades will be assigned unless requested. Students will receive feedback on assignments and projects to help them improve their skills.
@@ -74,7 +106,7 @@ export default function SyllabusTab() {
 								<span className="font-semibold tc2 cursor-pointer select-none" onClick={() => setExpanded({ ...expanded, [unit.unitNumber]: !expanded[unit.unitNumber] })}>{unit.unitName}</span>
 								<p className="mx-4">{unit.unitDescription}</p>
 								{unit.topicsCovered && (
-									<ul className="list-disc list-inside mx-8 mt-1" style={{maxHeight: expanded[unit.unitNumber] ? '230px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease'}}>
+									<ul className="list-disc list-inside mx-8 mt-1" style={{ maxHeight: expanded[unit.unitNumber] ? '230px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease' }}>
 										{unit.topicsCovered.map((topic, index) => (
 											<li key={index}>{topic}</li>
 										))}
