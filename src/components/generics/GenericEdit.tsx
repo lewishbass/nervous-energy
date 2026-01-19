@@ -43,99 +43,110 @@ const GenericEdit: React.FC<GenericEditProps> = ({
    submitField,
    submitRoute,
 }) => {
-   if(options){
+   if (options) {
       console.log(options);
    }
 
    const renderSpecificEdit = () => {
       switch (type) {
          case 'string':
-            if(!value) value = "";
-            if(!placeholder) placeholder = "";
-            if(typeof value !== 'string') value = value.toString();
-            if(typeof placeholder !== 'string') placeholder = placeholder.toString();
+            if (!value) value = "";
+            if (!placeholder) placeholder = "";
+            if (typeof value !== 'string') value = value.toString();
+            if (typeof placeholder !== 'string') placeholder = placeholder.toString();
             return (
-              <StringEdit
-                editable={editable}
-                value={value}
-                placeholder={placeholder}
-                submitField={submitField}
-                submitRoute={submitRoute}
-              />
+               <StringEdit
+                  editable={editable}
+                  value={value}
+                  placeholder={placeholder}
+                  submitField={submitField}
+                  submitRoute={submitRoute}
+               />
             );
          case 'word':
-               if(!value) value = "";
-               if(!placeholder) placeholder = "";
-               if(typeof value !== 'string') value = value.toString();
-               if(typeof placeholder !== 'string') placeholder = placeholder.toString();
-               return (
-                 <StringEdit
-                   editable={editable}
-                   value={value}
-                   placeholder={placeholder}
-                   submitField={submitField}
-                   submitRoute={submitRoute}
-                   fitContent={true}
-                 />
-               );
-         case 'paragraph':
-            if(!value) value = "";
-            if(!placeholder) placeholder = "";
-            if(typeof value !== 'string') value = value.toString();
-            if(typeof placeholder !== 'string') placeholder = placeholder.toString();
+            if (!value) value = "";
+            if (!placeholder) placeholder = "";
+            if (typeof value !== 'string') value = value.toString();
+            if (typeof placeholder !== 'string') placeholder = placeholder.toString();
             return (
-              <ParagraphEdit
-                editable={editable}
-                value={value}
-                placeholder={placeholder}
-                submitField={submitField}
-                submitRoute={submitRoute}
-              />
+               <StringEdit
+                  editable={editable}
+                  value={value}
+                  placeholder={placeholder}
+                  submitField={submitField}
+                  submitRoute={submitRoute}
+                  fitContent={true}
+               />
+            );
+         case 'paragraph':
+            if (!value) value = "";
+            if (!placeholder) placeholder = "";
+            if (typeof value !== 'string') value = value.toString();
+            if (typeof placeholder !== 'string') placeholder = placeholder.toString();
+            return (
+               <ParagraphEdit
+                  editable={editable}
+                  value={value}
+                  placeholder={placeholder}
+                  submitField={submitField}
+                  submitRoute={submitRoute}
+               />
             );
          case 'date':
-            if(!(value instanceof Date)){
+            if (!(value instanceof Date)) {
                if (typeof value === 'number') {
-                value = new Date(value);
+                  value = new Date(value);
                } else if (typeof value === 'string') {
-                value = new Date(value);
+                  value = new Date(value);
                } else {
-                value = new Date();
+                  value = new Date();
                }
-             }
-             if(!(placeholder instanceof Date)){
+            }
+            if (!(placeholder instanceof Date)) {
                if (typeof placeholder === 'number') {
-                placeholder = new Date(placeholder);
+                  placeholder = new Date(placeholder);
                } else if (typeof placeholder === 'string') {
-                placeholder = new Date(placeholder);
+                  placeholder = new Date(placeholder);
                } else {
-                placeholder = new Date();
+                  placeholder = new Date();
                }
-             }
+            }
 
             return (
-              <DateEdit
-                editable={editable}
-                value={value}
-                submitField={submitField}
-                submitRoute={submitRoute}
-              />
+               <DateEdit
+                  editable={editable}
+                  value={value}
+                  submitField={submitField}
+                  submitRoute={submitRoute}
+               />
             );
          case 'location':
             if (typeof value !== 'object' || value === null || !('lat' in value) || !('lon' in value)) {
-               value = { lat: 0, lon: 0 };
+
+               if (typeof value === 'string') {
+                  const [lat, lon] = value.split(',').map(Number);
+                  if (!isNaN(lat) && !isNaN(lon)) value = { lat, lon };
+                  else value = { lat: 0, lon: 0 };
+               } else {
+                  value = { lat: 0, lon: 0 };
+               }
             }
             if (typeof placeholder !== 'object' || placeholder === null || !('lat' in placeholder) || !('lon' in placeholder)) {
-               placeholder = { lat: 0, lon: 0 };
+               if (typeof placeholder === 'string') {
+                  const [lat, lon] = placeholder.split(',').map(Number);
+                  if (!isNaN(lat) && !isNaN(lon)) placeholder = { lat, lon };
+                  else placeholder = { lat: 0, lon: 0 };
+               } else {
+                  placeholder = { lat: 0, lon: 0 };
+               }
             }
             return (
-              <div className="p-2 border-2 border-dashed border-gray-300 rounded">
                <LocationEdit
-                 editable={editable}
-                 value={value}
-                 submitField={submitField}
-                 submitRoute={submitRoute}
+                  editable={editable}
+                  value={value}
+                  submitField={submitField}
+                  submitRoute={submitRoute}
                />
-              </div>
             );
          /*case 'time':
             return (<div/>);
@@ -154,7 +165,7 @@ const GenericEdit: React.FC<GenericEditProps> = ({
 
    return (
       <div className={"w-full " + className}>
-        {renderSpecificEdit()}
+         {renderSpecificEdit()}
       </div>
    );
 

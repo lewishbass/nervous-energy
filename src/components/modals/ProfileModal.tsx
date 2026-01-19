@@ -220,7 +220,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
             <div className="text-[17px] tc2">
               <h3 className="text-sm font-semibold tc3">Location</h3>
               <GenericEdit
-                type="string"
+                type="location"
                 editable={isEditing}
                 value={userData?.profile.location || ''}
                 placeholder={'Where are you from'}

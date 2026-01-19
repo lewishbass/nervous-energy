@@ -1,155 +1,16 @@
-/* 
-// Original LocationEdit implementation commented out to keep it available but inactive.
 import React, { useState, useRef, useEffect } from 'react';
 import { FaEdit } from 'react-icons/fa';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import SubmitIcon, { SubmitIconRef } from './SubmitIcon';
 
-// Fix for default marker icons in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+import { Map, Marker, Source, Layer } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { FaAngleDown } from 'react-icons/fa';
 
 type LocationValue = { lat: number; lon: number };
 
 interface LocationEditProps {
   editable?: boolean;
-  value: LocationValue;
-  submitField?: string;
-  submitRoute?: string;
-  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
-  onSuccess?: (response) => void;
-  // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
-  onError?: (error) => void;
-}
-
-// Component to handle map clicks
-const MapClickHandler: React.FC<{ onLocationSelect: (lat: number, lon: number) => void }> = ({ onLocationSelect }) => {
-  useMapEvents({
-    click: (e) => {
-      onLocationSelect(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-};
-
-const LocationEdit: React.FC<LocationEditProps> = ({
-  editable = true,
-  value: initialValue,
-  submitField,
-  submitRoute,
-  onSuccess,
-  onError,
-}) => {
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [value, setValue] = useState<LocationValue>(initialValue);
-  const submitIconRef = useRef<SubmitIconRef>(null);
-
-  // Update value when prop changes
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  // Toggle editing mode
-  const toggleEdit = () => {
-    if (editable) {
-      setIsEditing(!isEditing);
-    }
-  };
-
-  // Handle location selection on map
-  const handleLocationSelect = (lat: number, lon: number) => {
-    setValue({ lat, lon });
-  };
-
-  // Handle key presses
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter') {
-      submitIconRef.current?.submit();
-    } else if (e.key === 'Escape') {
-      setValue(submitIconRef.current?.lastSuccessfulData as LocationValue);
-      if (!submitIconRef.current?.idle())
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      setIsEditing(false);
-    }
-  };
-
-  return (
-    <div className="relative flex items-center w-full">
-      {isEditing ? (
-        <div 
-          className="w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
-        >
-          <MapContainer
-            center={[value.lat, value.lon]}
-            zoom={13}
-            style={{ height: '300px', width: '100%' }}
-            className="rounded"
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <Marker position={[value.lat, value.lon]} />
-            <MapClickHandler onLocationSelect={handleLocationSelect} />
-          </MapContainer>
-          <div className="text-sm text-gray-600 mt-1 px-1">
-            Lat: {value.lat.toFixed(6)}, Lon: {value.lon.toFixed(6)}
-          </div>
-        </div>
-      ) : (
-        <div 
-          className="w-full px-1 py-1 truncate"
-          style={{paddingRight: ((editable) ? '1.75rem' : '0rem'), transition: 'padding-right 0.3s ease-in-out'}}
-          onClick={undefined}
-        >
-          {value.lat !== 0 || value.lon !== 0 
-            ? `${value.lat.toFixed(6)}, ${value.lon.toFixed(6)}` 
-            : <span style={{opacity:0.25}}>No location set</span>
-          }
-        </div>
-      )}
-      
-      <div className="flex items-center m-0 max-w-0">
-        {submitField && submitRoute && (
-          <div className="ml-2 absolute right-1"
-            style={{opacity: isEditing ? 1 : 0, pointerEvents: 'none', cursor:"pointer", transition: 'opacity 0.3s ease-in-out'}}>
-            <SubmitIcon
-              ref={submitIconRef}
-              data={value}
-              submitField={submitField}
-              submitRoute={submitRoute}
-              onSuccess={onSuccess}
-              onError={onError}
-            />
-          </div>
-        )}
-        
-        <FaEdit
-          className={"absolute right-1 w-5 h-5 cursor-pointer " + (submitIconRef.current?.idle() ? 'text-blue-500 hover:text-blue-700' : 'text-yellow-500 hover:text-yellow-600')}
-          style={{opacity: (editable && !isEditing) ? 1 : 0, pointerEvents: (editable && !isEditing) ? 'auto' : 'none', cursor: (editable && !isEditing) ? 'pointer' : 'default', transition: 'opacity 0.3s ease-in-out'}}
-          onClick={toggleEdit}
-        />
-      </div>
-    </div>
-  );
-};
-*/
-
-import React from 'react';
-
-type LocationValue = { lat: number; lon: number };
-
-interface LocationEditProps {
-  editable?: boolean;
-  value: LocationValue;
+  value: string | LocationValue;
   submitField?: string;
   submitRoute?: string;
   // @ts-expect-error some of your api calls are gonna be anys and you just have to deal with it
@@ -164,41 +25,152 @@ interface LocationEditProps {
  */
 const LocationEdit: React.FC<LocationEditProps> = ({
   editable = true,
-  value,
+  value: initialValue,
   submitField,
   submitRoute,
   onSuccess,
   onError,
 }) => {
-  const hasLocation = value && (value.lat !== 0 || value.lon !== 0);
+
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [value, setValue] = useState<LocationValue>(initialValue as LocationValue);
+  const submitIconRef = useRef<SubmitIconRef>(null);
+  const mapRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isFadingIn, setIsFadingIn] = useState<boolean>(false);
+
+  const mapStyles: string[] = [
+    "mapbox://styles/mapbox/streets-v11",
+    "mapbox://styles/mapbox/satellite-v9",
+    "mapbox://styles/mapbox/outdoors-v11",
+    "mapbox://styles/mapbox/light-v10",
+    "mapbox://styles/mapbox/dark-v10",
+  ]
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 1000);
+    setTimeout(() => {
+      setIsFadingIn(true);
+    }, 1500);
+  }, []);
+
+  useEffect(() => {
+    if (typeof initialValue === 'string') {
+      const [lat, lon] = initialValue.split(',').map(Number);
+      setValue({ lat, lon });
+    } else {
+      setValue(initialValue);
+    }
+  }, [initialValue]);
+
+  const toggleEdit = () => {
+    if (editable) {
+      setIsEditing(!isEditing);
+      // Focus input when entering edit mode
+      setTimeout(() => {
+        if (containerRef.current && !isEditing) {
+          containerRef.current.focus();
+        }
+      }, 10);
+    }
+  };
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log('Key down:', e.key);
+    if (e.key === 'Enter') {
+      submitIconRef.current?.submit();
+    } else if (e.key === 'Escape') {
+      setValue(submitIconRef.current?.lastSuccessfulData as LocationValue);
+      if (!submitIconRef.current?.idle())
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsEditing(false);
+      console.log(submitIconRef.current?.idle());
+    }
+  };
+
+  const handleMapClick = (event: any) => {
+    if (!isEditing) return;
+    setValue({ lat: event.lngLat.lat, lon: event.lngLat.lng });
+  }
+
+  useEffect(() => {
+    if (!editable) setIsEditing(false);
+  }, [editable]);
 
   return (
-    <div
-      role="presentation"
-      style={{
-        background: '#fff',
-        border: '1px solid #e5e7eb',
-        borderRadius: 6,
-        padding: 12,
-        width: '100%',
-        boxSizing: 'border-box',
-      }}
-      // keep pointer-events behavior similar to editable prop
-      aria-disabled={!editable}
-    >
-      <div style={{ fontSize: 13, color: '#111827', marginBottom: 6, fontWeight: 600 }}>
-        LocationEdit (placeholder)
-      </div>
-      <div style={{ fontSize: 13, color: '#6b7280' }}>
-        {hasLocation ? `${value.lat.toFixed(6)}, ${value.lon.toFixed(6)}` : 'No location set'}
-      </div>
-      {/* Minimal visibility of props for quick debugging */}
-      {(submitField || submitRoute) && (
-        <div style={{ marginTop: 8, fontSize: 12, color: '#9ca3af' }}>
-          {submitField && <div>submitField: {String(submitField)}</div>}
-          {submitRoute && <div>submitRoute: {String(submitRoute)}</div>}
+    <div className="relative w-full tc1">
+      <div className={`max-w-full w-full ${isEditing ? 'h-96' : 'h-48'} transition-all duration-300 bg2 rounded-lg relative overflow-hidden shadow-lg outline-hidden `}
+        ref={containerRef}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        onBlur={() => setIsEditing(false)}>
+        {isLoaded && <Map
+          initialViewState={{
+            latitude: value.lat,
+            longitude: value.lon,
+            zoom: 14
+          }}
+          style={{
+            width: "100%",
+            height: "200%",
+            zIndex: 20,
+            position: 'absolute',
+            top: isEditing ? '0' : '-50%',
+            opacity: isFadingIn ? 1 : 0,
+            transition: 'opacity 1.5s ease-in-out, top 0.3s ease-in-out'
+          }}
+          mapStyle={mapStyles[0]}
+          mapboxAccessToken={"pk.eyJ1Ijoid29ybGRzaW5nZXIiLCJhIjoiY202Z2hscG9zMDFhczJpb296Y2I2dDlvayJ9.Fv0uqkCRxvu1tb07rt5Qog"}
+          interactive={isEditing}
+          attributionControl={false}
+          scrollZoom={isEditing}
+          dragPan={isEditing}
+          onClick={handleMapClick}
+          ref={mapRef}
+        >
+          <Marker longitude={value.lon} latitude={value.lat} anchor="bottom">
+            <FaAngleDown
+              className={`inline-block mr-2 text-[#f00] text-3xl -mb-2`}
+            />
+          </Marker>
+        </Map>}
+        {submitField && submitRoute && (
+          <div className="ml-2 absolute right-1 top-1 z-40 rounded-full bg1"
+            style={{ opacity: isEditing ? 1 : 0, pointerEvents: 'none', cursor: "pointer", transition: 'opacity 0.3s ease-in-out' }}>
+            <SubmitIcon
+              ref={submitIconRef}
+              data={`${value.lat}, ${value.lon}`}
+              submitField={submitField}
+              submitRoute={submitRoute}
+              onSuccess={onSuccess}
+              onError={onError}
+            />
+          </div>
+        )}
+        <FaEdit
+          className={"bg1 rounded-full absolute right-1 top-1 w-5 h-5 z-40 cursor-pointer overflow-visible " + (submitIconRef.current?.idle() ? 'text-blue-500 hover:text-blue-700' : 'text-yellow-500 hover:text-yellow-600')}
+          style={{ opacity: (editable && !isEditing) ? 1 : 0, pointerEvents: (editable && !isEditing) ? 'auto' : 'none', cursor: (editable && !isEditing) ? 'pointer' : 'default', transition: 'opacity 0.3s ease-in-out' }}
+          onClick={toggleEdit}
+        />
+        <div className="absolute bottom-2 left-2 bg-white/75 dark:bg-gray-800/75 rounded px-2 py-1 text-sm z-40 cursor-pointer select-none" style={{ fontFamily: 'monospace' }}>
+          <p>{`Lat: ${value.lat > 0 ? '\u00A0' : ''}${value.lat.toFixed(4)}`}</p>
+          <p>{`Lon: ${value.lon > 0 ? '\u00A0' : ''}${value.lon.toFixed(4)}`}</p>
+          <div 
+            className={`${isEditing ? 'max-h-10 opacity-100 mt-2 py-1' : 'max-h-0 opacity-0'} 
+              transition-all duration-300 
+              text-center text-blue-600 dark:text-blue-400 
+              hover:text-blue-800 dark:hover:text-blue-300 
+              border-t border-gray-300 dark:border-gray-600 
+              font-medium tracking-wide`}
+            onClick={() => { submitIconRef.current?.submit(); setIsEditing(false); }}
+          >
+            Submit
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

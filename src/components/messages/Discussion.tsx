@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'; // Import the plugin
+import relTimeFormat from '@/scripts/relativetime';
 
 const THREADS_ROUTE = "/.netlify/functions/thread";
 
@@ -40,6 +41,8 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
 
   const { username, token, isLoggedIn, userId } = useAuth();
 
+  const today = new Date();
+
   useEffect(() => {
     const toFetch = [];
     for (const threadID in threadData) {
@@ -47,14 +50,19 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         toFetch.push(threadData[threadID].creatorId);
       }
     }
-    
+
     if (toFetch.length > 0 && isLoggedIn && username && token) {
       fetchUsernames(toFetch);
     }
   }, [threadData, usernameDict, username, token, isLoggedIn]);
 
   useEffect(() => {
-    fetchThreadData(baseThreadID, isLoggedIn ? username : null, isLoggedIn ? token : null, 1);
+    // if some are already loaded, refresh instead
+    if (Object.keys(threadData).length > 0) {
+      refreshAllThreads();
+    } else {
+      fetchThreadData(baseThreadID, isLoggedIn ? username : null, isLoggedIn ? token : null, 1);
+    }
   }, [baseThreadID, isLoggedIn, username, token]);
 
   const fetchThreadData = async (threadID: string, username: string | null, token: string | null, depth: number = 2) => {
@@ -87,6 +95,15 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       const threadDict: Record<string, any> = {};
       data.allThreads.forEach((thread: any) => {
         threadDict[thread.id] = thread;
+        if (threadData[thread.id]) {
+          if (Object.keys(threadData[thread.id]).includes('expanded')) {
+            threadDict[thread.id].expanded = threadData[thread.id].expanded;
+          } else {
+            threadDict[thread.id].expanded = true;
+          }
+        } else {
+          threadDict[thread.id].expanded = true;
+        }
       });
 
       setThreadData(prev => ({ ...prev, ...threadDict }));
@@ -148,7 +165,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
 
   const fetchUsernames = async (userIds: string[]) => {
     if (!username || !token) return;
-    
+
     try {
       const response = await fetch('/.netlify/functions/profile', {
         method: 'POST',
@@ -219,10 +236,10 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       setLoadingText('Content is required');
       return;
     }
-    
+
     const newThreadID = `${parentID}-reply-${Date.now()}`;
     createThread(newThreadID, username, token, parentID, replyTitle, replyContent);
-    
+
     setReplyTitle('');
     setReplyContent('');
     setReplyingTo(null);
@@ -233,15 +250,15 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       setLoadingText('Content is required');
       return;
     }
-    
+
     if (!isLoggedIn || !username || !token) {
       setLoadingState('error');
       setLoadingText('You must be logged in to edit a thread');
       return;
     }
-    
+
     setLoadingText('Updating Thread...');
-    
+
     try {
       const response = await fetch(THREADS_ROUTE, {
         method: 'POST',
@@ -260,9 +277,9 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
 
       if (!response.ok) throw new Error(`api error: ${response.statusText}`);
       const data = await response.json();
-      
+
       setThreadData(prev => ({ ...prev, [data.thread.id]: data.thread }));
-      
+
       setEditingTitle('');
       setEditingContent('');
       setEditing(null);
@@ -279,7 +296,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       return;
     }
     setLoadingText('Deleting Thread...');
-    
+
     try {
       const response = await fetch(THREADS_ROUTE, {
         method: 'POST',
@@ -302,7 +319,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         setThreadData(prev => {
           const newData = { ...prev };
           delete newData[threadID];
-          
+
           for (const parentID in newData) {
             if (newData[parentID].children?.includes(threadID)) {
               newData[parentID] = {
@@ -311,7 +328,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
               };
             }
           }
-          
+
           return newData;
         });
         setLoadingText('Thread Permanently Deleted');
@@ -319,7 +336,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         setThreadData(prev => ({ ...prev, [data.thread.id]: data.thread }));
         setLoadingText('Thread Deleted (Soft)');
       }
-      
+
       setDeleting(null);
     } catch (error) {
       console.error('Error deleting thread:', error);
@@ -354,81 +371,99 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     fetchThreadData(threadId, isLoggedIn ? username : null, isLoggedIn ? token : null);
   }
 
-	const refreshAllThreads = async () => {
-		setLoadingState('loading');
-		setLoadingText('Refreshing All Discussions...');
+  const refreshAllThreads = async () => {
+    setLoadingState('loading');
+    setLoadingText('Refreshing All Discussions...');
 
-		try {
-			// Get all currently loaded thread IDs
-			const currentThreadIds = Object.keys(threadData).filter(id => id !== baseThreadID);
+    try {
+      // Get all currently loaded thread IDs
+      const currentThreadIds = Object.keys(threadData).filter(id => id !== baseThreadID);
 
-			// Fetch base tree with depth 1
-			const baseTreePromise = fetch(THREADS_ROUTE, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					action: 'getThreadTree',
-					rootId: baseThreadID,
-					username: isLoggedIn ? username : null,
-					token: isLoggedIn ? token : null,
-					depth: 1,
-				}),
-			});
+      // Fetch base tree with depth 1
+      const baseTreePromise = fetch(THREADS_ROUTE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getThreadTree',
+          rootId: baseThreadID,
+          username: isLoggedIn ? username : null,
+          token: isLoggedIn ? token : null,
+          depth: 1,
+        }),
+      });
 
-			// Fetch all currently loaded threads
-			const allThreadsPromise = currentThreadIds.length > 0
-				? fetch(THREADS_ROUTE, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						action: 'getThreads',
-						idArray: currentThreadIds,
-						username: isLoggedIn ? username : null,
-						token: isLoggedIn ? token : null,
-					}),
-				})
-				: Promise.resolve(null);
+      // Fetch all currently loaded threads
+      const allThreadsPromise = currentThreadIds.length > 0
+        ? fetch(THREADS_ROUTE, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'getThreads',
+            idArray: currentThreadIds,
+            username: isLoggedIn ? username : null,
+            token: isLoggedIn ? token : null,
+          }),
+        })
+        : Promise.resolve(null);
 
-			const [baseTreeResponse, allThreadsResponse] = await Promise.all([
-				baseTreePromise,
-				allThreadsPromise,
-			]);
+      const [baseTreeResponse, allThreadsResponse] = await Promise.all([
+        baseTreePromise,
+        allThreadsPromise,
+      ]);
 
-			if (!baseTreeResponse.ok) {
-				throw new Error(`Error fetching base tree: ${baseTreeResponse.statusText}`);
-			}
+      if (!baseTreeResponse.ok) {
+        throw new Error(`Error fetching base tree: ${baseTreeResponse.statusText}`);
+      }
 
-			const baseTreeData = await baseTreeResponse.json();
-			const threadDict: Record<string, any> = {};
+      const baseTreeData = await baseTreeResponse.json();
+      const threadDict: Record<string, any> = {};
 
-			// Add base tree threads
-			baseTreeData.allThreads.forEach((thread: any) => {
-				threadDict[thread.id] = thread;
-			});
+      // Add base tree threads
+      baseTreeData.allThreads.forEach((thread: any) => {
+        threadDict[thread.id] = thread;
+        if (threadData[thread.id]) {
+          if (Object.keys(threadData[thread.id]).includes('expanded')) {
+            threadDict[thread.id].expanded = threadData[thread.id].expanded;
+          } else {
+            threadDict[thread.id].expanded = true;
+          }
+        } else {
+          threadDict[thread.id].expanded = true;
+        }
+      });
 
-			// Add updated threads if any were fetched
-			if (allThreadsResponse && allThreadsResponse.ok) {
-				const allThreadsData = await allThreadsResponse.json();
-				if (allThreadsData.threads) {
-					allThreadsData.threads.forEach((thread: any) => {
-						threadDict[thread.id] = thread;
-					});
-				}
-			}
+      // Add updated threads if any were fetched
+      if (allThreadsResponse && allThreadsResponse.ok) {
+        const allThreadsData = await allThreadsResponse.json();
+        if (allThreadsData.threads) {
+          allThreadsData.threads.forEach((thread: any) => {
+            threadDict[thread.id] = thread;
+            if (threadData[thread.id]) {
+              if (Object.keys(threadData[thread.id]).includes('expanded')) {
+                threadDict[thread.id].expanded = threadData[thread.id].expanded;
+              } else {
+                threadDict[thread.id].expanded = true;
+              }
+            } else {
+              threadDict[thread.id].expanded = true;
+            }
+          });
+        }
+      }
 
-			setThreadData(threadDict);
-			setLoadingState('loaded');
-			setLoadingText('All Discussions Refreshed');
-		} catch (error) {
-			console.error('Error refreshing threads:', error);
-			setLoadingState('error');
-			setLoadingText((error instanceof Error) ? error.message : 'Unknown error');
-		}
-	};
+      setThreadData(threadDict);
+      setLoadingState('loaded');
+      setLoadingText('All Discussions Refreshed');
+    } catch (error) {
+      console.error('Error refreshing threads:', error);
+      setLoadingState('error');
+      setLoadingText((error instanceof Error) ? error.message : 'Unknown error');
+    }
+  };
 
   const toggleThreadLoaded = (threadId: string) => {
     const thread = threadData[threadId];
@@ -441,21 +476,45 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     }
   }
 
+  const toggleThreadExpanded = (threadID: string) => {
+    const thread = threadData[threadID];
+    if (!thread) return;
+    if (thread.expanded && thread.expanded === true) {
+      console.log('collapsing thread', threadID);
+      setThreadData(prev => ({
+        ...prev,
+        [threadID]: {
+          ...prev[threadID],
+          expanded: false,
+        },
+      }));
+    } else {
+      console.log('expanding thread', threadID);
+      setThreadData(prev => ({
+        ...prev,
+        [threadID]: {
+          ...prev[threadID],
+          expanded: true,
+        },
+      }));
+    }
+  };
+
   const renderThread = (threadID: string, depth: number = 0, isBase: boolean = false) => {
     const thread = threadData[threadID];
     if (!thread) return null;
 
-    const expanded = thread.children && thread.children.some((childID: string) => threadData[childID]);
+    const childrenLoaded = thread.children && thread.children.some((childID: string) => threadData[childID]);
 
     const thumbstyle = "hover:scale-110 active:scale-90 cursor-pointer transition-all duration-300 absolute w-[100%] h-[100%] ";
-    
+
     if (isBase) {
       return (
-				<div key={threadID} className="mb-6">
-					
-					<div className="flex items-center gap-3 mb-3 align-middle">
+        <div key={threadID} className="mb-6">
 
-						<p className="text-lg mb-4 tc2 mr-auto">{thread.content}</p>
+          <div className="flex items-center gap-3 mb-3 align-middle">
+
+            <p className="text-lg mb-4 tc2 mr-auto">{thread.content}</p>
             {isLoggedIn && userId === thread.creatorId && (
               <>
                 <button
@@ -474,7 +533,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
                 )}
               </>
             )}
-						</div>
+          </div>
 
           {isLoggedIn && (
             <div
@@ -493,15 +552,15 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
                 placeholder="Discussion title..."
                 value={replyTitle}
                 onChange={(e) => setReplyTitle(e.target.value)}
-								className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-								maxLength={100}
+                className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+                maxLength={100}
               />
               <textarea
                 placeholder="Share your thoughts..."
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-								maxLength={2000}
+                maxLength={2000}
                 rows={4}
               />
               <div className="flex gap-2">
@@ -530,13 +589,13 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       );
     }
 
-    return (<div key={threadID} className={`relative border border-gray-300 rounded dark:border-gray-700 p-2 pl-6 mb-4 overflow-hidden`}>
+    return (<div key={threadID} className={`relative border border-gray-300 rounded dark:border-gray-700 p-2 pl-6 mb-4 overflow-hidden min-h-8`}>
       <div className="absolute w-4 h-full top-0 left-0 bg2 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3"
-      onClick={() => toggleThreadLoaded(threadID)}>
-        <div className="tc3">{thread.children.length > 0 && (expanded ? '-' : '+')}</div>
+        onClick={() => toggleThreadExpanded(threadID)}>
+        <div className="tc3 select-none">{thread.expanded ? '-' : '+'}</div>
       </div>
 
-      <div className="flex flex-row">
+      {thread.expanded ? <div className="flex flex-row">
         <div className="flex flex-col items-center mr-4 tc2">
           <div className="w-6 h-6 relative">
             <FaThumbsUp className={`text-blue-500 ${thumbstyle} ${thread.isUpvoted ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} onClick={() => voteThread(threadID, username, token, 'clear', thread.isUpvoted ? 'upvote' : thread.isDownvoted ? 'downvote' : 'clear')} />
@@ -549,14 +608,14 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           </div>
         </div>
         <div className="flex-1">
-          <h3 className="text-lg font-bold mb-2 tc1">{thread.title || ''}
+          <h3 className="text-lg font-bold tc1">{thread.title || ''}
             <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
           </h3>
-					<p className="mb-2 tc2">
-						<ReactMarkdown remarkPlugins={[remarkGfm]}>
-							{thread.content}
-						</ReactMarkdown>
-					</p>
+          <p className="mb-2 tc2">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {thread.content}
+            </ReactMarkdown>
+          </p>
           <div className="text-sm tc3 mb-2">
             {isLoggedIn && <span
               className="hover:underline cursor-pointer mr-1 select-none"
@@ -579,28 +638,42 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
                   }
                 }}
               >
-              {editing === threadID ? 'cancel' : 'edit'}
+                {editing === threadID ? 'cancel' : 'edit'}
               </span>
               <span
-              className="hover:underline cursor-pointer mr-1 select-none"
-              onClick={() => setDeleting(deleting === threadID ? null : threadID)}
-            >
-              {deleting === threadID ? 'cancel' : 'delete'}
+                className="hover:underline cursor-pointer mr-1 select-none"
+                onClick={() => setDeleting(deleting === threadID ? null : threadID)}
+              >
+                {deleting === threadID ? 'cancel' : 'delete'}
               </span>
             </>}
             {deleting === threadID && <>
-            (<span className="select-none text-red-500 mr-1 hover:underline cursor-pointer ml-1" onClick={() => deleteThread(threadID, username, token, 'hard')}>
-              hard
-            </span>
-            <span className="select-none text-red-500 mr-1 hover:underline cursor-pointer"  onClick={() => deleteThread(threadID, username, token, 'soft')}>
-              soft
-            </span>)</>
+              (<span className="select-none text-red-500 mr-1 hover:underline cursor-pointer ml-1" onClick={() => deleteThread(threadID, username, token, 'hard')}>
+                hard
+              </span>
+              <span className="select-none text-red-500 mr-1 hover:underline cursor-pointer" onClick={() => deleteThread(threadID, username, token, 'soft')}>
+                soft
+              </span>)</>
             }
 
-            | {new Date(thread.lastUpdated).toLocaleString()} | {thread.children ? thread.children.length : 0} replies
+            | {relTimeFormat(today, new Date(thread.timestamp))} | {thread.children ? thread.children.length : 0} replies
+            {!childrenLoaded && thread.children && thread.children.length > 0 &&
+              <span className="ml-1">
+                |
+                <span className="hover:underline cursor-pointer mr-1 select-none ml-1" onClick={() => toggleThreadLoaded(threadID)}>
+                  load replies
+                </span>
+              </span>
+            }
           </div>
         </div>
+
       </div>
+        :
+        <div className="flex flex-col align-center">
+          <p className="text-sm tc3 line-clamp-1 text-ellipsis break-all">{usernameDict[thread.creatorId] || thread.creatorId} - {relTimeFormat(today, new Date(thread.timestamp))} - {(thread.title && thread.title.trim().length > 0) ? thread.title : thread.content}</p>
+        </div>
+      }
       {editing === threadID && (
         <div className="mt-1 mb-2 p-4 border border-green-300 dark:border-green-700 rounded bg-green-50 dark:bg-green-900/20">
           <input
@@ -608,16 +681,16 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             placeholder="Edit title..."
             value={editingTitle}
             onChange={(e) => setEditingTitle(e.target.value)}
-						className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-						maxLength={50}
+            className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+            maxLength={50}
           />
           <textarea
             placeholder="Edit content..."
             value={editingContent}
             onChange={(e) => setEditingContent(e.target.value)}
             className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-						rows={4}
-						maxLength={2000}
+            rows={4}
+            maxLength={2000}
           />
           <button
             onClick={() => handleEditSubmit(threadID)}
@@ -634,16 +707,16 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             placeholder="Reply title..."
             value={replyTitle}
             onChange={(e) => setReplyTitle(e.target.value)}
-						className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-						maxLength={50}
+            className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
+            maxLength={50}
           />
           <textarea
             placeholder="Reply content..."
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             className="w-full p-2 mb-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 tc1"
-						rows={4}
-						maxLength={2000}
+            rows={4}
+            maxLength={2000}
           />
           <button
             onClick={() => handleReplySubmit(threadID)}
@@ -653,10 +726,12 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           </button>
         </div>
       )}
-      {thread.children && thread.children.map((childID: string) => renderThread(childID, depth + 1, false))}
+      {thread.children && thread.expanded && thread.children.map((childID: string) => renderThread(childID, depth + 1, false))}
     </div>
     );
   }
+
+
 
   return (
     <div className={className} style={style}>
@@ -666,7 +741,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         <FaArrowRotateRight
           className="mr-2 cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform"
           title="Refresh Discussions"
-					onClick={refreshAllThreads}
+          onClick={refreshAllThreads}
         />
       </div>
 
