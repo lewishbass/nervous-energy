@@ -5,8 +5,9 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import bookData from "../book_info.json";
 import Discussion from "@/components/messages/Discussion";
-import { FaBook, FaTablet, FaDownload, FaStar, FaCheck } from "react-icons/fa";
+import { FaBook, FaTablet, FaDownload, FaStar, FaCheck, FaArrowLeft } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface Book {
 	paragraph1: string;
@@ -37,6 +38,8 @@ function BookContent() {
 	const [isRead, setIsRead] = useState(false);
 	const [isLoadingReadStatus, setIsLoadingReadStatus] = useState(false);
 	const { isLoggedIn, username, token } = useAuth();
+
+	const router = useRouter();
 
 	useEffect(() => {
 		if (isbn) {
@@ -143,7 +146,13 @@ function BookContent() {
 			{/* Header Section with Title and Cover */}
 			<div className="flex items-start gap-4 mb-6">
 				<div className="flex-1">
-					<h1 className="text-4xl md:text-5xl font-bold tc1 mb-3 leading-tight">{book.title}</h1>
+					<div className="flex flex-row items-center mb-2">
+						<FaArrowLeft
+							className="text-2xl tc2 hover:tc1 cursor-pointer mr-4 text-3xl transition-all hover:translate-x-[-2px] hover:opacity-80"
+							onClick={() => router.back()}
+						/>
+						<h1 className="text-4xl md:text-5xl font-bold tc1 leading-tight">{book.title}</h1>
+					</div>
 					<h2 className="text-xl md:text-2xl tc2 mb-2">by <span className="font-semibold tc1">{book.author}</span></h2>
 					
 					<div className="flex flex-row items-center gap-4 mt-2">
