@@ -82,8 +82,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           depth: depth,
         }),
       });
-
-      if (!response.ok && response.statusText === 'Not Found' && threadID === baseThreadID) {
+      if (!response.ok && response.status === 403) {
         setLoadingState('loaded');
         setLoadingText('Base Thread Not Found');
         return;
@@ -415,7 +414,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         allThreadsPromise,
       ]);
 
-      if (!baseTreeResponse.ok && baseTreeResponse.statusText === 'Not Found') {
+      if (!baseTreeResponse.ok && baseTreeResponse.status == 403) {
         setLoadingState('loaded');
         setLoadingText('Base Thread Not Found');
         return;

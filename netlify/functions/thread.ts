@@ -277,7 +277,7 @@ const handleGetThreadTree = async (body: any) => {
 
 	if (result.length === 0) {
 		return {
-			statusCode: 404,
+			statusCode: 403,
 			body: JSON.stringify({ error: 'Root thread not found' }),
 		};
 	}
@@ -359,7 +359,7 @@ const handleVoteThread = async (body: any) => {
 
 	if (!updatedThread) {
 		return {
-			statusCode: 404,
+			statusCode: 403,
 			body: JSON.stringify({ error: 'Thread not found' }),
 		};
 	}

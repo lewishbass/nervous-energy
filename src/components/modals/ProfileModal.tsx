@@ -71,7 +71,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
 
       const data = await response.json();
       if (response.ok) {
-        console.log('Fetched profile data:', data);
         setUserData(data.user);
       } else {
         setError(data.error || 'Failed to load profile');
