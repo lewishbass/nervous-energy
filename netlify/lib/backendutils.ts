@@ -51,6 +51,7 @@ export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {
       ...sanitizedUser.data,
       // @ts-expect-error user info is dynamically typed
       friends: user.data.friends,
+      booksRead: user.data.booksRead,
     };
   }
 
