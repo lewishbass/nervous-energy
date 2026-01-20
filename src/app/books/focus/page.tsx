@@ -275,7 +275,7 @@ function BookContent() {
 			{/* Discussion Section */}
 			<section className="backdrop-blur-lg bg-white/30 dark:bg-black/30 p-6 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-lg mt-8">
 				<Discussion
-					baseThreadID={`book-${book.ISBN}`}
+					baseThreadID={`book-${book.ISBN.replace(/-/g, '')}`}
 					baseThreadTitle={`Discussion: ${book.title}`}
 					baseThreadContent={`Discuss "${book.title}" by ${book.author}. Share your thoughts, favorite moments, and interpretations!`}
 				/>
