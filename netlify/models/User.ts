@@ -57,6 +57,11 @@ const UserSchema = new mongoose.Schema({
          read: Boolean,
          id: String,
       }],
+      booksRead: [{
+         ISBN: String,
+         title: String,
+         dateRead: Date,
+      }]
    },
 });
 
@@ -73,7 +78,9 @@ UserSchema.pre('save', async function(next) {
       // @ts-expect-error because i said so
       chats: [], 
       // @ts-expect-error because i said so
-      notifications: [] 
+      notifications: [],
+      // @ts-expect-error because i said so
+      booksRead: []
    };
 
    // Check for changes to username or password

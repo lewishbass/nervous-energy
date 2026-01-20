@@ -89,8 +89,8 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]message group chat names for direct messages
 - [ ]figure out custom rendered preview when link is sent
 - [ ]/home content
-- [ ]book reviews and ratings(per book page and discussions)
-- [ ]mapbox generic location edit
+- [-]book reviews and ratings(per book page and discussions)
+- [+]mapbox generic location edit
 
 - [+]analytics collecting
 - [+]analytics storing

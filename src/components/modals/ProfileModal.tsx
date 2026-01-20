@@ -36,6 +36,7 @@ interface UserProfile {
     lastSeen: Date;
     friends?: [];
     history?: [];
+    booksRead?: [];
   };
 }
 
@@ -70,6 +71,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
 
       const data = await response.json();
       if (response.ok) {
+        console.log('Fetched profile data:', data);
         setUserData(data.user);
       } else {
         setError(data.error || 'Failed to load profile');
@@ -187,8 +189,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
               <div className="text-xs tc3">Friends</div>
             </div>
             <div className="p-2 bg2 rounded-lg">
-              <div className="font-bold tc1">⭐</div>
-              <div className="text-xs tc3">Have Fun</div>
+              <div className="font-bold tc1">{userData?.data.booksRead ? userData.data.booksRead.length : 0}</div>
+              <div className="text-xs tc3">Books Read</div>
             </div>
           </div>
 

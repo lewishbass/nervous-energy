@@ -12,9 +12,10 @@ import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import bookData from "./book_info.json";
 import "./books.css";
 import { useAuth } from "@/context/AuthContext";
-import { FaBook, FaTablet, FaDownload, FaListUl, FaSearch } from "react-icons/fa"; // Import icons for shop types
+import { FaBook, FaTablet, FaDownload, FaListUl, FaSearch, FaArrowRight, FaCheck } from "react-icons/fa"; // Import icons for shop types
 import { AnimatePresence, motion } from "framer-motion";
 import { BsFillGridFill } from "react-icons/bs";
+import { useRouter } from "next/navigation";
 
 interface Book {
   paragraph1: string;
@@ -47,15 +48,57 @@ export default function Books() {
   const [shopType, setShopType] = useState<"kobo" | "thriftbooks">("kobo"); // Default to Kobo
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid"); // Add view mode state
 
+  const [booksRead, setBooksRead] = useState<Record<string, boolean>>({});
+
   const [inFiltered, setInFiltered] = useState<Record<string, boolean>>({});
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const dataRef = useRef<Book[]>([]); // Store the original data
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, username, token } = useAuth();
 
   const animationTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const router = useRouter();
+
+  const [isLoadingReadStatus, setIsLoadingReadStatus] = useState<Record<string, boolean>>({});
+
+  const fetchReadStatus = async () => {
+    if (!isLoggedIn || !username || !token) return;
+    try {
+      const response = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'getBooksRead',
+          username,
+          token,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Error fetching read status: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (data.booksRead) {
+        const bookDict = data.booksRead.map((item: { ISBN: string; }) => ({
+          [item.ISBN]: true,
+        })).reduce((acc: Record<string, boolean>, curr: Record<string, boolean>) => {
+          return { ...acc, ...curr };
+        }, {});
+        setBooksRead(bookDict);
+      }
+    } catch (error) {
+
+      console.error("Error fetching read status:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReadStatus();
+  }, [isLoggedIn, username, token]);
 
   useEffect(() => {
     // Initialize books from the imported data
@@ -290,6 +333,37 @@ export default function Books() {
     setShopType(shopType === "kobo" ? "thriftbooks" : "kobo");
   };
 
+  const toggleReadStatus = async (book: Book, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isLoggedIn || !username || !token) return;
+
+    setIsLoadingReadStatus(prev => ({ ...prev, [book.ISBN]: true }));
+    try {
+      const response = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'markBookRead',
+          username,
+          token,
+          ISBN: book.ISBN,
+          title: book.title,
+          mark: !booksRead[book.ISBN]
+        })
+      });
+
+      if (response.ok) {
+        setBooksRead(prev => ({ ...prev, [book.ISBN]: !prev[book.ISBN] }));
+      } else {
+        console.error('Failed to update read status');
+      }
+    } catch (error) {
+      console.error('Error updating read status:', error);
+    } finally {
+      setIsLoadingReadStatus(prev => ({ ...prev, [book.ISBN]: false }));
+    }
+  };
+
   return (
     <div
       className="p-6 max-w-6xl mx-auto focus:outline-none"
@@ -377,6 +451,7 @@ export default function Books() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-100">
           {books.map((book, index) => {
             const isSelected = selectedBook === index;
+            const isReadBook = booksRead[book.ISBN] === true;
             return (
               <div
                 key={index}
@@ -398,7 +473,14 @@ export default function Books() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     priority
                   />
+
                 </div>
+                {/* Read Status Indicator */}
+                {isReadBook && (
+                  <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
+                    <FaCheck className="text-white text-sm" />
+                  </div>
+                )}
 
                 {/* Overlay with Book Info */}
                 <div
@@ -408,7 +490,8 @@ export default function Books() {
                     }`}
                 >
                   <div className="flex justify-between items-start mb-[-6]">
-                    <h2 className="book-title tc1">{book.title}</h2>
+                    <h2 className={`book-title tc1 flex items-center transition-all duration-200 ${isSelected ? 'hover:opacity-50' : 'pointer-events-none'}`}
+                      onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>{book.title}<FaArrowRight className={`ml-2 ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all duration-300`} /></h2>
                     {book.good_score && (
                       <span className="book-rating w-content whitespace-nowrap">
                         ★ {book.good_score.toFixed(1)}
@@ -474,7 +557,7 @@ export default function Books() {
                         {/* Download button */}
                         <div className="flex flex-row mt-6 items-center">
                           {isLoggedIn && (
-                            <div>
+                            <>
                               <a
                                 href={`/${book.book_file}`}
                                 download
@@ -483,7 +566,19 @@ export default function Books() {
                               >
                                 <FaDownload className="mr-2 inline" /> EPUB
                               </a>
-                            </div>
+                              
+                              <button
+                                onClick={(e) => toggleReadStatus(book, e)}
+                                disabled={isLoadingReadStatus[book.ISBN]}
+                                className={`ml-2 px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${
+                                  isReadBook
+                                    ? "bg-green-600 text-white hover:bg-green-700"
+                                    : "bg-gray-600 text-white hover:bg-gray-700"
+                                } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              >
+                                <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
+                              </button>
+                            </>
                           )}
 
                           <div
@@ -529,6 +624,7 @@ export default function Books() {
         <div className="space-y-4 mb-100">
           {books.map((book, index) => {
             const isSelected = selectedBook === index;
+            const isReadBook = booksRead[book.ISBN] === true;
             return (
               <div
                 key={index}
@@ -552,6 +648,12 @@ export default function Books() {
                       sizes="(max-width: 768px) 100vw, 192px"
                       priority
                     />
+                    {/* Read Status Indicator */}
+                    {isReadBook && (
+                      <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
+                        <FaCheck className="text-white text-sm" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Book Info */}
@@ -608,14 +710,28 @@ export default function Books() {
 
                           <div className="flex flex-row items-center gap-3 pt-2">
                             {isLoggedIn && (
-                              <a
-                                href={`/${book.book_file}`}
-                                download
-                                className="book-download-button"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <FaDownload className="mr-2 inline" /> EPUB
-                              </a>
+                              <>
+                                <a
+                                  href={`/${book.book_file}`}
+                                  download
+                                  className="book-download-button"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <FaDownload className="mr-2 inline" /> EPUB
+                                </a>
+
+                                <button
+                                  onClick={(e) => toggleReadStatus(book, e)}
+                                  disabled={isLoadingReadStatus[book.ISBN]}
+                                  className={`px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${
+                                    isReadBook
+                                      ? "bg-green-600 text-white hover:bg-green-700"
+                                      : "bg-gray-600 text-white hover:bg-gray-700"
+                                  } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                  <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
+                                </button>
+                              </>
                             )}
 
                             <div

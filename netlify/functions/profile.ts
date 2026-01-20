@@ -55,6 +55,12 @@ export const handler: Handler = async (event) => {
     } else if (requestBody.action === 'markNotificationRead') {
       console.log('Handling mark notification as read...');
       return await handleMarkNotificationRead(requestBody);
+    } else if (requestBody.action === 'markBookRead') {
+      console.log('Handling mark book as read...');
+      return await handleMarkBookRead(requestBody);
+    } else if (requestBody.action === 'getBooksRead') {
+      console.log('Handling get books read...');
+      return await handleGetBooksRead(requestBody);
     }
 
     return {
@@ -399,3 +405,85 @@ const handleMarkNotificationRead = async (requestBody: any) => {
     }
   };
 };
+
+const handleMarkBookRead = async (requestBody: any) => {
+  const { username, token, ISBN, title, mark } = requestBody;
+
+  // Validate required fields
+  if (!username || !token || !ISBN || !title || (mark === undefined)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, token, and book (with ISBN and title) are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  if (mark === true) {
+    // Add book to booksRead if not already present
+    const alreadyRead = user.data.booksRead.some((book: any) => book.ISBN === ISBN);
+    if (!alreadyRead) {
+      user.data.booksRead.push({
+        ISBN,
+        title,
+        dateRead: new Date()
+      });
+      await user.save();
+    }
+  }
+  else {
+    // Remove book from booksRead
+    user.data.booksRead = user.data.booksRead.filter((book: any) => book.ISBN !== ISBN);
+    await user.save();
+  }
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ success: true }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+};
+
+const handleGetBooksRead = async (requestBody: any) => {
+  const { username, token } = requestBody;
+
+  // Validate required fields
+  if (!username || !token) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username and token are required' }),
+    };
+  }
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+
+  const user = validation.user;
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ booksRead: user.data.booksRead || [] }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  };
+};
+
