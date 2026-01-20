@@ -415,6 +415,12 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         allThreadsPromise,
       ]);
 
+      if (!baseTreeResponse.ok && baseTreeResponse.statusText === 'Not Found') {
+        setLoadingState('loaded');
+        setLoadingText('Base Thread Not Found');
+        return;
+      }
+
       if (!baseTreeResponse.ok) {
         throw new Error(`Error fetching base tree: ${baseTreeResponse.statusText}`);
       }
