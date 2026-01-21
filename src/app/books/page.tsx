@@ -545,6 +545,12 @@ export default function Books() {
                               {book.n_good_ratings.toLocaleString()}
                             </span>
                           </div>
+                          <div>
+                            <span className="book-detail-label tc2 hover:underline cursor-pointer group" onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>
+                              Discussion
+                              <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
+                            </span>
+                          </div>
                         </div>
 
                         <div className="book-trivia">
