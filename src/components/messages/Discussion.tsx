@@ -222,7 +222,14 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
 
       if (!response.ok) throw new Error(`api error: ${response.statusText}`);
       const data = await response.json();
-      setThreadData(prev => ({ ...prev, [data.thread.id]: data.thread }));
+
+      setThreadData(prev => ({
+        ...prev,
+        [data.thread.id]: {
+          ...data.thread,
+          expanded: prev[data.thread.id]?.expanded ?? true,
+        }
+      }));
       setLoadingText('Vote Recorded');
     } catch (error) {
       console.error('Error voting thread:', error);
@@ -277,7 +284,13 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       if (!response.ok) throw new Error(`api error: ${response.statusText}`);
       const data = await response.json();
 
-      setThreadData(prev => ({ ...prev, [data.thread.id]: data.thread }));
+      setThreadData(prev => ({
+        ...prev,
+        [data.thread.id]: {
+          ...data.thread,
+          expanded: prev[data.thread.id]?.expanded ?? true,
+        }
+      }));
 
       setEditingTitle('');
       setEditingContent('');
@@ -332,7 +345,13 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         });
         setLoadingText('Thread Permanently Deleted');
       } else {
-        setThreadData(prev => ({ ...prev, [data.thread.id]: data.thread }));
+        setThreadData(prev => ({
+          ...prev,
+          [data.thread.id]: {
+            ...data.thread,
+            expanded: prev[data.thread.id]?.expanded ?? true,
+          }
+        }));
         setLoadingText('Thread Deleted (Soft)');
       }
 
