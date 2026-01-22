@@ -1,6 +1,8 @@
 'use client';
 
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
+import { analytics } from './Analytics';
 
 interface UserProfile {
   firstName?: string;
@@ -41,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const pathname = usePathname();
 
   const verifyBackend = async () => {
 
@@ -70,6 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setTimeout(() => setError(null), 3000);
     }
   }, [error]);
+
+  // set userid to session when logged in
+  useEffect(() => {
+    if (isLoggedIn && userId) {
+      analytics.setUserId(userId);
+    }
+  }, [isLoggedIn, userId]);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
@@ -249,6 +258,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return () => clearInterval(verifyInterval);
     }
   }, [token, username]);
+
+  // Session metadata - only run once
+  useEffect(() => {
+    analytics.sessionMetadata();
+  }, []);
+
+  // Track pageviews on pathname change
+  useEffect(() => {
+    analytics.pageview();
+  }, [pathname]);
 
   return (
     <AuthContext.Provider value={{

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactNode, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface ModalTemplateProps {
   isOpen: boolean;
@@ -124,8 +125,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="w-10 h-10 border-6 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
-                    <p className="mt-3 text-gray-600 animate-pulse">Loading...</p>
+                      <LoadingSpinner />
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -7,6 +7,7 @@ import CreateMessageModal from './CreateMessageModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGear } from 'react-icons/fa6';
 import { IoClose } from 'react-icons/io5';
+import { analytics } from '@/context/Analytics';
 
 // API endpoint
 const CONVERSATION_API = '/.netlify/functions/conv';
@@ -654,6 +655,13 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
       </AnimatePresence>
     );
   };
+
+  // Track modal open event
+  useEffect(() => {
+    if (isOpen) {
+      analytics.track('modal_open', { modalType: 'message' });
+    }
+  }, [isOpen]);
 
   return (
     <ModalTemplate isOpen={isOpen} onClose={onClose} title="Messages" contentLoading={isLoading && conversations.length === 0} modalWidth={modalWidth}>

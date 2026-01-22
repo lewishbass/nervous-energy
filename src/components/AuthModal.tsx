@@ -3,6 +3,7 @@ import ModalTemplate from './modals/ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import { FaCheck, FaTimes, FaCog } from 'react-icons/fa';
 import ColorProgressBar from './ColorProgressBar';
+import { analytics } from '@/context/Analytics';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -26,7 +27,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { login, register, isLoading, error } = useAuth();
 
-
+  // Track modal open event
+  useEffect(() => {
+    if (isOpen) {
+      analytics.track('modal_open', { modalType: 'auth' });
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {

@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import GenericEdit from '../generics/GenericEdit';
 import ChangePasswordForm from '../generics/ChangePasswordForm';
 import DeleteAccountForm from '../generics/DeleteAccountForm';
+import { analytics } from '@/context/Analytics';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 
@@ -48,6 +49,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, modalWidth
 
   const { username, token, logout, userId } = useAuth();
   const [isEditing, setIsEditing] = React.useState<boolean>(false);
+
+  // Track modal open event
+  useEffect(() => {
+    if (isOpen) {
+      analytics.track('modal_open', { modalType: 'profile' });
+    }
+  }, [isOpen]);
 
   // Function to fetch user profile from backend
   const fetchUserProfile = async () => {

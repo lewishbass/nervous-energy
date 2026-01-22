@@ -6,9 +6,9 @@ import Navbar from '@/components/Navbar';
 import HeadMetadata from '@/components/HeadMetadata';
 import { useState, useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
-
+import { ThemeProvider, useTheme } from 'next-themes';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -43,59 +43,13 @@ function RootLayoutContent({
   children: React.ReactNode;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
-  const pathname = usePathname();
-
   const { isLoggedIn, userId } = useAuth();
-
-  // only run once to set session metadata
-  useEffect(() => {
-    analytics.sessionMetadata();
-  }, []);
-
-  // init tracking
-  useEffect(() => {
-    // init pageview
-    analytics.pageview();
-  }, [pathname]);
-
-  // set userid to session when logged in
-  useEffect(() => {
-    if (isLoggedIn && userId) {
-      analytics.setUserId(userId);
-    }
-  }, [isLoggedIn, userId]);
-
-  // Track modal open/close events
-  useEffect(() => {
-    if (isMessageModalOpen) {
-      analytics.track('modal_open', { modalType: 'message' });
-    }
-  }, [isMessageModalOpen]);
-
-  useEffect(() => {
-    if (isProfileModalOpen) {
-      analytics.track('modal_open', { modalType: 'profile' });
-    }
-  }, [isProfileModalOpen]);
-
-  useEffect(() => {
-    if (isAuthModalOpen) {
-      analytics.track('modal_open', { modalType: 'auth' });
-    }
-  }, [isAuthModalOpen]);
-
-  useEffect(() => {
-    if (isNotificationModalOpen) {
-      analytics.track('modal_open', { modalType: 'notification' });
-    }
-  }, [isNotificationModalOpen]);
-
+  const { theme, setTheme } = useTheme();
 
   const toggleMenu = () => {
     analytics.track('toggle_menu', { isMenuOpen: !isMenuOpen });
@@ -103,9 +57,9 @@ function RootLayoutContent({
   };
 
   const toggleDark = () => {
-    analytics.track('toggle_dark_mode', { isDarkMode: !isDark });
-    setIsDark(!isDark);
-    localStorage.setItem('isDarkMode', JSON.stringify(!isDark));
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    analytics.track('toggle_dark_mode', { isDarkMode: newTheme === 'dark' });
+    setTheme(newTheme);
   };
 
   const handleProfileClick = () => {
@@ -150,16 +104,12 @@ function RootLayoutContent({
   }, [isMenuOpen, isMessageModalOpen, isProfileModalOpen, isNotificationModalOpen]);
 
   useEffect(() => {
-    const savedDarkModeState = localStorage.getItem('isDarkMode');
     const savedMenuState = localStorage.getItem('isMenuOpen');
     const savedMessageModalState = localStorage.getItem('isMessageModalOpen');
     const savedProfileModalState = localStorage.getItem('isProfileModalOpen');
     const savedNotificationModalState = localStorage.getItem('isNotificationModalOpen');
     const savedScrollPosition = localStorage.getItem('scrollPosition');
 
-    if (savedDarkModeState !== null) {
-      setIsDark(JSON.parse(savedDarkModeState));
-    }
     if (savedMenuState !== null && savedMenuState === 'true') {
       setIsMenuOpen(JSON.parse(savedMenuState));
     }
@@ -177,20 +127,19 @@ function RootLayoutContent({
     }
   }, []);
 
-
   return (
-    <html lang="en" className='no-sb'>
+    <html lang="en" className='no-sb' suppressHydrationWarning>
       <HeadMetadata />
-      <body className={`${inter.className} ${isDark ? 'dark' : ''} text1`} >
+      <body className={`${inter.className} text1`} >
         <Suspense fallback={null}>
           <AuthModalHandler
             isLoggedIn={isLoggedIn}
             setIsAuthModalOpen={setIsAuthModalOpen}
           />
-        </Suspense>
+        </ Suspense>
         {/* Menu */}
         <div className="fixed inset-0 z-0">
-          <Suspense fallback={null}>
+          <Suspense fallback={<div className="absolute top-0 right-0 w-[300px] h-full bg2 tc2 flex flex-col"></div>}>
           <Menu 
             isOpen={isMenuOpen} 
             toggleDark={toggleDark}
@@ -208,7 +157,7 @@ function RootLayoutContent({
           className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 ${
             isMenuOpen ? 'translate-x-[-300px]' : ''
           }`} 
-          style={{ boxShadow: isDark ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)' , borderRight: isDark ? '1px solid #fff2' : '1px solid #0004' }}
+          style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)', borderRight: theme === 'dark' ? '1px solid #fff2' : '1px solid #0004' }}
         >
           {children}
         </div>
@@ -255,8 +204,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <RootLayoutContent>{children}</RootLayoutContent>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

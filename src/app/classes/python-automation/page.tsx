@@ -1,19 +1,22 @@
 "use client";
 
 import Image from 'next/image';
-import { Suspense, useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef, lazy } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaBook, FaFileAlt } from "react-icons/fa";
 import { FaListCheck } from "react-icons/fa6";
 import { MdSchedule, MdModeComment } from "react-icons/md";
-import SyllabusTab from './tabs/SyllabusTab/SyllabusTab';
-import ScheduleTab from './tabs/ScheduleTab/ScheduleTab';
-import LecturesTab from './tabs/LecturesTab/LecturesTab';
-import ExercisesTab from './tabs/ExercisesTab/ExercisesTab';
-import DiscussionsTab from './tabs/DiscussionsTab/DiscussionsTab';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 import { analytics } from '@/context/Analytics';
+
+// Lazy load tab components
+const SyllabusTab = lazy(() => import('./tabs/SyllabusTab/SyllabusTab'));
+const ScheduleTab = lazy(() => import('./tabs/ScheduleTab/ScheduleTab'));
+const LecturesTab = lazy(() => import('./tabs/LecturesTab/LecturesTab'));
+const ExercisesTab = lazy(() => import('./tabs/ExercisesTab/ExercisesTab'));
+const DiscussionsTab = lazy(() => import('./tabs/DiscussionsTab/DiscussionsTab'));
 
 function PythonAutomationContent() {
   const router = useRouter();
@@ -194,11 +197,13 @@ function PythonAutomationContent() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'syllabus' && <SyllabusTab />}
-        {activeTab === 'schedule' && <ScheduleTab />}
-        {activeTab === 'lectures' && <LecturesTab />}
-        {activeTab === 'exercises' && <ExercisesTab />}
-        {activeTab === 'discussions' && <DiscussionsTab />}
+        <Suspense fallback={<LoadingSpinner className="min-h-[400px]" />}>
+          {activeTab === 'syllabus' && <SyllabusTab />}
+          {activeTab === 'schedule' && <ScheduleTab />}
+          {activeTab === 'lectures' && <LecturesTab />}
+          {activeTab === 'exercises' && <ExercisesTab />}
+          {activeTab === 'discussions' && <DiscussionsTab />}
+        </Suspense>
       </div>
     </div>
   );
@@ -208,10 +213,7 @@ export default function PythonAutomation() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="tc2">Loading...</p>
-        </div>
+        <LoadingSpinner />
       </div>
     }>
       <PythonAutomationContent />

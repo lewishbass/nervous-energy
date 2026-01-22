@@ -59,6 +59,7 @@ export default function Menu({
     }
   });
 
+
   useEffect(() => {
     if (isLoggedIn) {
       checkNotification(); // Initial check on mount

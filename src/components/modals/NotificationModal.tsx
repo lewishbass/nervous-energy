@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import ModalTemplate from './ModalTemplate';
+import { analytics } from '@/context/Analytics';
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 const SOCIAL_ROUTE = '/.netlify/functions/social';
@@ -27,6 +28,13 @@ const NotificationModal: React.FC<NotificationModalProps> = ({ isOpen, onClose }
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [newNotificationIds, setNewNotificationIds] = useState<Set<string>>(new Set());
+
+  // Track modal open event
+  useEffect(() => {
+    if (isOpen) {
+      analytics.track('modal_open', { modalType: 'notification' });
+    }
+  }, [isOpen]);
 
   const fetchNotifications = useCallback(async () => {
     if (!username || !token) return;
