@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['mathjax-full'],
   images: {
-    unoptimized: false,
+    unoptimized: true,
   },
 
 };
