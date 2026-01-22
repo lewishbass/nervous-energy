@@ -6,7 +6,7 @@ import BackPropDemo from './BackPropDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import NetworkGraph from './NetworkGraph';
 import FiveLayerNetwork from './FiveLayerNetwork';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
 export default function BackProp() {
 
@@ -47,7 +47,7 @@ export default function BackProp() {
         </div>
 
         <h1 className="text-4xl font-bold mb-6 tc1">Backpropagation Visualizer</h1>
-
+        <MathJaxContext>
         <div className="prose dark:prose-invert max-w-none">
           <p className="tc2 text-lg">
             Understanding how backpropagation and gradients are used to train neural networks.
@@ -452,7 +452,8 @@ export default function BackProp() {
             <li>Modern variants and optimizations of backpropagation form the basis of all deep learning systems</li>
           </ul>
           <div className="mb-100" />
-        </div>
+          </div>
+        </MathJaxContext>
       </div>
     </div>
   );

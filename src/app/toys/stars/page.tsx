@@ -4,7 +4,7 @@ import Link from 'next/link';
 import SquareAnimation from '@/components/backgrounds/SquareAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
 import StarsGameComponent from './StarsGameComponent';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import '@/styles/toggles.css';
 import '@/styles/buttons.css';
 import { useState, useRef, useEffect } from 'react';
@@ -318,6 +318,7 @@ export default function StarsPage() {
 				</div>
 
 				{/* Explination */}
+				<MathJaxContext>
 				<h2 className="text-2xl font-bold mb-4 tc1">Automatic Solver</h2>
 
 				<div className="be">
@@ -398,6 +399,7 @@ export default function StarsPage() {
 					</div>*/}
 					that allows you to reach the global extreme in one step?
 				</div>
+				</MathJaxContext>
 			</div>
 		</div>
 	);

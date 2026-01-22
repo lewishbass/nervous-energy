@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { JSX } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -26,13 +26,16 @@ const SanitizedString = (str: any) => {
 	else if (input_type === 'number') sanitizedStr = Enumber(str);
 
 
-	return <MathJax>
-		<ReactMarkdown
-			remarkPlugins={[remarkGfm, remarkMath]}
-			rehypePlugins={[rehypeKatex]}>
-			{sanitizedStr}
-		</ReactMarkdown>
-	</MathJax>
+	return (
+		<MathJaxContext>
+			<MathJax>
+				<ReactMarkdown
+					remarkPlugins={[remarkGfm, remarkMath]}
+					rehypePlugins={[rehypeKatex]}>
+					{sanitizedStr}
+				</ReactMarkdown>
+			</MathJax >
+		</MathJaxContext >);
 }
 
 export default function SlurmPage() {
@@ -272,7 +275,7 @@ export default function SlurmPage() {
 													consoleSpacingTimer.current = setTimeout(() => {
 														setConsoleSpacing(newSpacing);
 													}, 200);
-												
+
 												}}
 											/>
 									)}
@@ -340,7 +343,7 @@ export default function SlurmPage() {
 
 											// Handle both single key (string) and multiple keys (array)
 											const keys = Array.isArray(graphSpec.key) ? graphSpec.key : [graphSpec.key];
-											
+
 											// Check if any of the keys have valid data
 											// @ts-expect-error
 											const hasValidData = keys.some(key => key && database[activeSource][key]);
@@ -351,7 +354,7 @@ export default function SlurmPage() {
 											// Convert data to the format expected by GenericGraph
 											let formattedData: DataPoint[] = [];
 											let labels: string[] = [];
-											
+
 											if (keys.length === 1) {
 												// Single series
 												const graphData = database[activeSource][keys[0]];
@@ -366,7 +369,7 @@ export default function SlurmPage() {
 												labels = [graphSpec.display_name || keys[0]];
 											} else {
 												// Multiple series - need to merge data points by index
-												const allDataSeries = keys.map((key:string) => {
+												const allDataSeries = keys.map((key: string) => {
 													const data = database[activeSource][key];
 													if (Array.isArray(data)) {
 														return data.map(value => typeof value === 'number' ? value : parseFloat(value) || 0);
@@ -375,10 +378,10 @@ export default function SlurmPage() {
 													}
 													return [];
 												});
-												
+
 												// Find the maximum length across all series
 												const maxLength: number = Math.max(...allDataSeries.map((series: number[]) => series.length));
-												
+
 												// Create combined data points
 												formattedData = Array.from({ length: maxLength }, (_, idx) => {
 													const dataPoint: any = { x: idx };
@@ -387,7 +390,7 @@ export default function SlurmPage() {
 													});
 													return dataPoint;
 												});
-												
+
 												labels = keys.map((key: string, idx: number) => graphSpec.labels && graphSpec.labels[idx] || key);
 											}
 
@@ -401,7 +404,7 @@ export default function SlurmPage() {
 														ylabel={graphSpec.ylabel || keys[0]}
 														units={graphSpec.unit || ''}
 														labels={labels}
-														keys={keys.length > 1 ? keys.map((_:string, idx:string) => `y${idx}`) : undefined}
+														keys={keys.length > 1 ? keys.map((_: string, idx: string) => `y${idx}`) : undefined}
 														isLiveData={true}
 														maxDataPoints={200}
 														index={index}
@@ -419,13 +422,13 @@ export default function SlurmPage() {
 											if (el) el.scrollTop = el.scrollHeight;
 										}}
 									>
-									{
-										database[activeSource]["console"].map((consoleLine: string, index: number) => (
-											<li key={index} className="tc2" style={{ marginBottom: `${consoleSpacing}px` }}>
-												{SanitizedString(consoleLine)}
-											</li>
-										))
-									}
+											{
+												database[activeSource]["console"].map((consoleLine: string, index: number) => (
+													<li key={index} className="tc2" style={{ marginBottom: `${consoleSpacing}px` }}>
+														{SanitizedString(consoleLine)}
+													</li>
+												))
+											}
 									</ul>
 
 									}

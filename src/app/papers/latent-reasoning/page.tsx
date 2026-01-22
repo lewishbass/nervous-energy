@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import PDFPreview from '@/app/papers/pdf_preview';
 import AuthorLink from '@/app/papers/author_link';
 
@@ -16,6 +16,8 @@ export default function LatentReasoningReview() {
 				pdfPath="/papers/A_Survey_on_Latent_Reasoning.pdf"
 				title="A Survey on Latent Reasoning"
 			/>
+
+
 			<div className="relative min-h-screen">
 				{/* Background animation */}
 				<div className="absolute inset-0 -z-10 invert dark:invert-0">
@@ -116,6 +118,7 @@ export default function LatentReasoningReview() {
 					</div>
 
 
+					<MathJaxContext>
 
 					{/* Review Content */}
 					<div className="prose dark:prose-invert max-w-none">
@@ -316,7 +319,8 @@ and chart future directions for research at the frontier of LLM cognition
 						</div>
 
 						<div className="mb-100" />
-					</div>
+						</div>
+					</MathJaxContext>
 				</div>
 			</div>
 		</>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import SquareAnimation from '@/components/backgrounds/SquareAnimation';
 import OneStepDemo from './OneStepDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
 export default function OneStepLearningRate() {
 	return (
@@ -44,7 +44,7 @@ export default function OneStepLearningRate() {
 				</div>
 
 				<h1 className="text-4xl font-bold mb-6 tc1">One Step Learning Rate</h1>
-
+				<MathJaxContext>
 				<div className="prose dark:prose-invert max-w-none">
 					<p className="tc2 text-lg">
 						Using taylor expansions to increase the speed of convergence in gradient descent.
@@ -219,7 +219,8 @@ export default function OneStepLearningRate() {
 					</ul>
 					<div className='mb-100'/>
 					
-				</div>
+					</div>
+				</MathJaxContext>
 			</div>
 		</div>
 	);

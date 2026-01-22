@@ -11,8 +11,6 @@ import ScheduleTab from './tabs/ScheduleTab/ScheduleTab';
 import LecturesTab from './tabs/LecturesTab/LecturesTab';
 import ExercisesTab from './tabs/ExercisesTab/ExercisesTab';
 import DiscussionsTab from './tabs/DiscussionsTab/DiscussionsTab';
-import SquareAnimation from '@/components/backgrounds/SquareAnimation';
-import { Square } from '@tensorflow/tfjs-core';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
 
 import { analytics } from '@/context/Analytics';

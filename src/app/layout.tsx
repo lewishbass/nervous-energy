@@ -244,10 +244,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <MathJaxContext>
       <AuthProvider>
         <RootLayoutContent>{children}</RootLayoutContent>
-      </AuthProvider>
-    </MathJaxContext>
+    </AuthProvider>
   );
 }

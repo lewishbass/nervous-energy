@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import LineAnimation from '@/components/backgrounds/LineAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 //import { useEffect, useState } from 'react';
 
 export default function ImageCaptioning() {
@@ -131,7 +131,7 @@ export default function ImageCaptioning() {
 				</div>
 
 				<h1 id="image-captioning" className="text-4xl font-bold mb-6 tc1">Image Captioning</h1>
-
+				<MathJaxContext>
 				<div className="prose dark:prose-invert max-w-none">
 					<p className="tc2 text-lg">
 						Brief description of what this page demonstrates.
@@ -213,7 +213,8 @@ export default function ImageCaptioning() {
 						<li>Second important point with additional details</li>
 					</ul>
 					<div className='mb-100' />
-				</div>
+					</div>
+				</MathJaxContext>
 			</div>
 		</div>
 	);

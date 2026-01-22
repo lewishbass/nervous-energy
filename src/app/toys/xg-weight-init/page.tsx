@@ -6,7 +6,7 @@ import CircleAnimation from '@/components/backgrounds/CircleAnimmation';
 //import 'mathjax-full/es5/tex-mml-chtml.js'; // Import MathJax
 import XGWeightDemo from './XGWeightDemo';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 
 export default function XGWeightInit() {
   //  useEffect(() => {
@@ -55,7 +55,7 @@ export default function XGWeightInit() {
         </div>
 
         <h1 className="text-4xl font-bold mb-6 tc1">XG Weight Initialization</h1>
-
+        <MathJaxContext>
         <div className="prose dark:prose-invert max-w-none">
           <p className="tc2 text-lg">
             Explore how to initialize <b>Neural Network</b> weights to avoid gradient explosion/vanishing.
@@ -269,7 +269,8 @@ export default function XGWeightInit() {
             <li><em className="tc1">Xavier/Glorot</em> initialization leads to a more stable variance across all layers, but is still susceptible to dramatic changes in layer sizes</li>
           </ul>
           <div className='mb-100' />
-        </div>
+          </div>
+        </MathJaxContext>
       </div>
     </div>
   );

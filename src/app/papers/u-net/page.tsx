@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import TriangleAnimation from '@/components/backgrounds/TriangleAnimation';
 import { DownloadButton, GitHubButton } from '@/scripts/sourceButtons';
-import { MathJax } from 'better-react-mathjax';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import PDFPreview from '@/app/papers/pdf_preview';
 import AuthorLink from '@/app/papers/author_link';
 import PaperLink from '@/components/links/paper_link';
@@ -87,6 +87,7 @@ export default function UNetReview() {
 						</div>
 					</div>
 
+					<MathJaxContext>
 					{/* Review Content */}
 					<div className="prose dark:prose-invert max-w-none">
 						<h2 className="text-2xl font-semibold mt-8 mb-4 tc1">Abstract</h2>
@@ -319,7 +320,8 @@ export default function UNetReview() {
 						</div>
 
 						<div className="mb-100" />
-					</div>
+						</div>
+					</MathJaxContext>
 				</div>
 			</div>
 		</>
