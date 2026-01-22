@@ -3,20 +3,21 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/Navbar';
-import Menu from '@/components/Menu';
-import MessageModal from '@/components/messages/MessageModal';
-import ProfileModal from '@/components/modals/ProfileModal';
-import AuthModal from '@/components/AuthModal';
-import NotificationModal from '@/components/modals/NotificationModal';
 import HeadMetadata from '@/components/HeadMetadata';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { MathJaxContext } from 'better-react-mathjax';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
 
 
 const inter = Inter({ subsets: ['latin'] });
+
+// Lazy load modals
+const MessageModal = lazy(() => import('@/components/messages/MessageModal'));
+const ProfileModal = lazy(() => import('@/components/modals/ProfileModal'));
+const AuthModal = lazy(() => import('@/components/AuthModal'));
+const NotificationModal = lazy(() => import('@/components/modals/NotificationModal'));
+const Menu = lazy(() => import('@/components/Menu'));
 
 function AuthModalHandler({
   isLoggedIn,
@@ -189,6 +190,7 @@ function RootLayoutContent({
         </Suspense>
         {/* Menu */}
         <div className="fixed inset-0 z-0">
+          <Suspense fallback={null}>
           <Menu 
             isOpen={isMenuOpen} 
             toggleDark={toggleDark}
@@ -196,7 +198,8 @@ function RootLayoutContent({
             openMessageModal={handleMessageClick}
             openProfileModal={handleProfileClick}
             openNotificationModal={handleNotificationClick}
-          />
+            />
+          </Suspense>
         </div>
         <Navbar onMenuToggle={toggleMenu} isMenuOpen={isMenuOpen} />
 
@@ -211,24 +214,32 @@ function RootLayoutContent({
         </div>
         {/*Modals*/}
         <div>
-          <MessageModal 
-            isOpen={isMessageModalOpen}
-            onClose={() => setIsMessageModalOpen(false)}
-            modalWidth='800px'
-          />
-          <ProfileModal
-            isOpen={isProfileModalOpen}
-            onClose={() => setIsProfileModalOpen(false)}
-            modalWidth='800px'
-          />
-          <AuthModal
-            isOpen={isAuthModalOpen}
-            onClose={() => setIsAuthModalOpen(false)}
-          />
-          <NotificationModal
-            isOpen={isNotificationModalOpen}
-            onClose={() => setIsNotificationModalOpen(false)}
-          />
+          <Suspense fallback={null}>
+            <MessageModal
+              isOpen={isMessageModalOpen}
+              onClose={() => setIsMessageModalOpen(false)}
+              modalWidth='800px'
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <ProfileModal
+              isOpen={isProfileModalOpen}
+              onClose={() => setIsProfileModalOpen(false)}
+              modalWidth='800px'
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <AuthModal
+              isOpen={isAuthModalOpen}
+              onClose={() => setIsAuthModalOpen(false)}
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <NotificationModal
+              isOpen={isNotificationModalOpen}
+              onClose={() => setIsNotificationModalOpen(false)}
+            />
+          </Suspense>
         </div>
         <a href="https://github.com/lewishbass/nervous-energy/issues/new" target="_black" className="fixed z-100 left-0 bottom-0 text-center p-1 dark:bg-black/20 bg-white/20 text-xs tc1 opacity-30 select-none cursor-pointer hover:opacity-100 transition-opacity duration-300">
           Report Issue
