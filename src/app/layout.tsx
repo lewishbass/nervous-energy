@@ -10,7 +10,11 @@ import { useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
 import { ThemeProvider, useTheme } from 'next-themes';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 // Lazy load modals
 const MessageModal = lazy(() => import('@/components/messages/MessageModal'));
@@ -128,7 +132,7 @@ function RootLayoutContent({
   }, []);
 
   return (
-    <html lang="en" className='no-sb' suppressHydrationWarning>
+    <html lang="en" className={`no-sb ${inter.variable}`} suppressHydrationWarning>
       <HeadMetadata />
       <body className={`${inter.className} text1`} >
         <Suspense fallback={null}>
