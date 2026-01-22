@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { FaUserPlus, FaUserFriends, FaClock, FaCheck, FaUserMinus } from 'react-icons/fa';
 
+import '@/styles/toggles.css'; // Import the external slider styles
+
 // Define interfaces for API responses and data structures
 interface UserProfile {
   firstName?: string;
@@ -60,6 +62,7 @@ export default function Friends() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [requestsRefresh, setRequestsRefresh] = useState<number>(0);
   const [removingFriends, setRemovingFriends] = useState<Set<string>>(new Set());
+  const [showFriendsInSearch, setShowFriendsInSearch] = useState<boolean>(false);
   
   const { username, token, isLoggedIn } = useAuth();
 
@@ -148,8 +151,6 @@ export default function Friends() {
       }
     };
 
-
-
     fetchFriends();
   }, [username, token, isLoggedIn]);
 
@@ -206,7 +207,7 @@ export default function Friends() {
           body: JSON.stringify({
             action: 'searchPeople',
             username_fragment: searchTerm,
-            max_return: 10
+            max_return: 20
           })
         });
 
@@ -224,7 +225,10 @@ export default function Friends() {
           };
         });
 
-        setOtherUsers(enhancedUsers);
+        // Exclude self from the list
+        const filteredUsers = enhancedUsers.filter((user: OtherUser) => user.username !== username);
+
+        setOtherUsers(filteredUsers);
       } catch (err) {
         console.error('Error fetching other users:', err);
         // We don't set the main error state here to avoid blocking the friends list
@@ -391,7 +395,7 @@ export default function Friends() {
 
   const getFriendshipButton = (user: OtherUser) => {
     // Define common button/label classes
-    const baseClasses = "px-3 py-1 rounded-full text-sm text-white flex items-center justify-center";
+    const baseClasses = " cursor-pointer select-none px-3 py-1 rounded-full text-sm text-white flex items-center justify-center";
 
     // Define status-specific classes and properties
     let buttonClasses = baseClasses;
@@ -399,29 +403,33 @@ export default function Friends() {
     let toolTipText = "Add Friend";
     let onClick = () => handleFriendRequest(user.id);
     let isButton = true;
+    let buttonStyle: React.CSSProperties = {
+      transition: 'background-color 0.2s',
+      aspectRatio: '1 / 1',
+    };
 
     switch (user.status) {
       case 'friends':
-        buttonClasses = `${baseClasses} bg-green-500`;
+        buttonStyle.backgroundColor = 'var(--khg)';
         buttonIcon = <FaUserFriends className="text-lg" />;
         toolTipText = "Friends";
         isButton = false;
         break;
       case 'pending':
-        buttonClasses = `${baseClasses} bg-yellow-500 hover:bg-yellow-600`;
+        buttonStyle.backgroundColor = 'var(--khy)';
         buttonIcon = <FaClock className="text-lg" />;
         toolTipText = "Request Pending";
         onClick = () => handleRescindRequest(user.id);
         isButton = true;
         break;
       case 'received':
-        buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
+        buttonStyle.backgroundColor = 'var(--khb)';
         buttonIcon = <FaCheck className="text-lg" />;
         toolTipText = "Accept Request";
         onClick = () => handleAcceptRequest(user.id);
         break;
       default:
-        buttonClasses = `${baseClasses} bg-blue-500 hover:bg-blue-600`;
+        buttonStyle.backgroundColor = 'var(--khb)';
         break;
     }
 
@@ -430,10 +438,7 @@ export default function Friends() {
         className={buttonClasses}
         onClick={isButton ? onClick : undefined}
         disabled={!isButton}
-        style={{
-          transition: 'background-color 0.2s',
-          aspectRatio: '1 / 1',
-        }}
+        style={buttonStyle}
         title={toolTipText}
       >
         {buttonIcon}
@@ -464,23 +469,28 @@ export default function Friends() {
       {friends.length === 0 ? (
         <p className="tc2 mb-8">You do not have any friends yet.</p>
       ) : (
-        <div className="grid gap-4 mb-8">
+          <div className="grid gap-4 mb-8 max-h-[50vh] overflow-y-auto mini-scroll">
           {friends.map((friend, index) => (
             <div
               key={index}
-              className={`bg2 p-6 rounded-lg shadow flex items-center justify-between transition-all duration-1000 ${removingFriends.has(friend.id) ? 'opacity-0 transform -translate-x-full shift-out' : ''
+              className={`max-w-full bg2 p-3 rounded-xl shadow flex items-center justify-between transition-all duration-1000 overflow-hidden ${removingFriends.has(friend.id) ? 'opacity-0 transform -translate-x-full shift-out' : ''
                 }`}
             >
-              <div>
-                <h2 className="text-xl font-semibold mb-2 tc1">{friend.username}</h2>
-                <p className="tc2">Last seen: {formatLastSeen(friend.lastSeen)}</p>
+              <div className="flex-grow min-w-0 mr-4">
+                <div className='flex flex-row items-end gap-2 mb-2 border-b-2 border-gray-300 pb-[0.75] w-[75%]'>
+                  <h2 className="text-xl font-semibold tc1">{friend.username}</h2>
+                  <span className="tc2">{friend.firstName !== '-' ? friend.firstName : ''} {friend.lastName !== '-' ? friend.lastName : ''}</span>
+                  <span className="ml-auto tc3 text-sm">{formatLastSeen(friend.lastSeen)}</span>
+                </div>
+                <p className="tc2 overflow-hidden text-ellipsis whitespace-nowrap">{friend.bio.length > 0 ? friend.bio : '---'}</p>
               </div>
               <button
-                className="px-3 py-1 rounded-full text-sm text-white bg-red-500 hover:bg-red-600 flex items-center justify-center"
+                className="cursor-pointer select-none px-3 py-1 rounded-full text-sm text-white flex items-center justify-center flex-shrink-0"
                 onClick={() => handleRemoveFriend(friend.id)}
                 style={{
                   transition: 'background-color 0.2s',
                   aspectRatio: '1 / 1',
+                  backgroundColor: 'var(--khr)'
                 }}
                 disabled={removingFriends.has(friend.id)}
                 title="Remove Friend"
@@ -497,33 +507,58 @@ export default function Friends() {
         <h2 className="text-2xl font-semibold mb-4 tc1">Other Users</h2>
         
         {/* Search input */}
-        <div className="mb-4">
+        <div className="mb-4 flex-row gap-2 flex items-center">
           <input
             type="text"
             placeholder="Search users..."
             value={searchTerm}
             onChange={handleSearchChange}
-            className="p-2 border border-gray-300 rounded w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            className="p-2 border border-gray-300 rounded-lg w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
-        </div>
-
-          <div className="grid gap-4">
-          {otherUsers.map((user) => (
-              <div key={user.id} className="bg2 p-4 rounded-lg shadow flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1 tc1">{user.username}</h3>
-                  <p className="tc2">Last seen: {formatLastSeen(user.lastSeen)}</p>
-                </div>
-                {getFriendshipButton(user)}
+          <label className="flex items-center gap-2 cursor-pointer select-none bg3 rounded-lg px-4 py-2.25 transition-all duration-300 hover:opacity-80">
+            <span className="tc1 font-medium whitespace-nowrap">Friends</span>
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={showFriendsInSearch}
+                onChange={() => setShowFriendsInSearch(!showFriendsInSearch)}
+                className="sr-only peer"
+              />
+              <div className="w-5 h-5 border-2 rounded peer-checked:bg-[var(--khg)] peer-checked:border-[var(--khg)] border-gray-400 transition-all flex items-center justify-center">
+                {showFriendsInSearch && (
+                  <FaCheck className="text-white text-xs" />
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          </label>
+        </div>
 
         {isLoadingOthers ? (
           <p className="tc2">Loading other users...</p>
         ) : otherUsers.length === 0 ? (
           <p className="tc2">No other users found.</p>
-        ) : (<div />)}
+        ) : (
+          <div className="grid gap-4 max-h-[50vh] overflow-y-auto mini-scroll">
+            {otherUsers.map((user) => (
+              (showFriendsInSearch || user.status !== 'friends') && (
+                <div key={user.id} className="max-w-full bg2 p-3 rounded-xl shadow flex items-center justify-between">
+                  <div className="flex-grow min-w-0 mr-4">
+                    <div className='flex flex-row items-end gap-2 mb-2 border-b-2 border-gray-300 pb-[0.75] w-[75%]'>
+                      <h2 className="text-xl font-semibold tc1">{user.username}</h2>
+                      <span className="ml-auto tc3 text-sm">{formatLastSeen(user.lastSeen)}</span>
+                    </div>
+                    <p className="tc2 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {user.status === 'pending' ? 'Friend request pending' :
+                        user.status === 'received' ? 'Sent you a friend request' :
+                          '---'}
+                    </p>
+                </div>
+                {getFriendshipButton(user)}
+                </div>
+              )
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
