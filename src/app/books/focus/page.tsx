@@ -242,7 +242,7 @@ function BookContent() {
 					<button
 						onClick={toggleReadStatus}
 						disabled={isLoadingReadStatus}
-						className={`px-5 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center font-medium cursor-pointer ${
+						className={`px-5 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-start font-medium cursor-pointer min-w-50 ${
 							isRead
 								? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800"
 								: "bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:from-gray-700 hover:to-gray-800"

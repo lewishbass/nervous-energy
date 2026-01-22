@@ -576,7 +576,7 @@ export default function Books() {
                               <button
                                 onClick={(e) => toggleReadStatus(book, e)}
                                 disabled={isLoadingReadStatus[book.ISBN]}
-                                className={`ml-2 px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${
+                                className={`ml-2 px-3 py-2 rounded-md transition-all flex items-center justify-start font-medium cursor-pointer min-w-22 ${
                                   isReadBook
                                     ? "bg-green-600 text-white hover:bg-green-700"
                                     : "bg-gray-600 text-white hover:bg-gray-700"
