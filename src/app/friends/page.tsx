@@ -515,16 +515,17 @@ export default function Friends() {
             onChange={handleSearchChange}
             className="p-2 border border-gray-300 rounded-lg w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
-          <label className="flex items-center gap-2 cursor-pointer select-none bg3 rounded-lg px-4 py-2.25 transition-all duration-300 hover:opacity-80">
+          <label className="flex flex-row items-center gap-2 cursor-pointer select-none bg3 rounded-lg px-4 py-2.25 transition-all duration-300 hover:opacity-80" onClick={()=>{setShowFriendsInSearch(!showFriendsInSearch)}}>
             <span className="tc1 font-medium whitespace-nowrap">Friends</span>
             <div className="relative">
-              <input
-                type="checkbox"
-                checked={showFriendsInSearch}
-                onChange={() => setShowFriendsInSearch(!showFriendsInSearch)}
-                className="sr-only peer"
-              />
-              <div className="w-5 h-5 border-2 rounded peer-checked:bg-[var(--khg)] peer-checked:border-[var(--khg)] border-gray-400 transition-all flex items-center justify-center">
+              
+              <div 
+                className={`w-5 h-5 border-2 rounded transition-all flex items-center justify-center ${
+                  showFriendsInSearch 
+                    ? 'bg-[var(--khg)] border-[var(--khg)]' 
+                    : 'border-gray-400'
+                }`}
+              >
                 {showFriendsInSearch && (
                   <FaCheck className="text-white text-xs" />
                 )}

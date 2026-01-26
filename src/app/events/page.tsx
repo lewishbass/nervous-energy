@@ -17,9 +17,7 @@ const PreviousTab = lazy(() => import('./tabs/PreviousTab'));
 const BirdsTab = lazy(() => import('./tabs/BirdsTab'));
 
 // @ts-expect-error jsx usage
-export default function Events(): JSX.Element {
-
-
+function EventsContent(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isInitialMount = useRef(true);
@@ -132,5 +130,14 @@ export default function Events(): JSX.Element {
         {activeTab === 'birds' && <BirdsTab />}
       </Suspense>
     </div>
+  );
+}
+
+// @ts-expect-error jsx usage
+export default function Events(): JSX.Element {
+  return (
+    <Suspense fallback={<LoadingSpinner className="min-h-screen" />}>
+      <EventsContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,108 @@
+/*code.css*/
+
+/* Code block styling */
+
+/* Inline code */
+code:not([class*="language-"]) {
+  background-color: rgba(110, 118, 129, 0.2);
+  padding: 0.2em 0.4em;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+/* Code blocks with Prism */
+pre[class*="language-"],
+.code-block {
+  padding: 1rem;
+  margin: 0;
+  overflow-x: auto;
+  background-color: #2d2d2d !important;
+  filter:invert(100) brightness(1.16) sepia(0.1);
+  width: 100%;
+  counter-reset: line;
+  position: relative;
+}
+.dark pre[class*="language-"],
+.dark .code-block {
+filter:none;
+}
+
+/* Code block header container */
+.code-block-header {
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 0 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  filter:invert(100) brightness(0.8);
+}
+
+.dark .code-block-header {
+  filter:none;
+}
+/* Filename display */
+.code-filename {
+  color: #8888;
+  font-weight: 500;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top:-0.5rem;
+  margin-bottom: 0.5rem;
+  margin-left:-2rem;
+  border-bottom: 2px solid #6668;
+  width: fit-content;
+  padding-right: 100px;
+  padding-left: 20px;
+}
+
+/* Language label */
+.code-language-label {
+  color: #888;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Copy button styling */
+.copy-code-button {
+  border-radius: 0.375rem;
+  color: #888;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.code-block-header:hover .copy-code-button {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.code-block-header:active .copy-code-button {
+  transform: scale(0.95);
+  opacity: 0.7;
+}
+
+pre[class*="language-"] code {
+  background: transparent;
+  padding: 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: #ccc;
+  display: block;
+}

@@ -160,7 +160,7 @@ export default function LecturesTab() {
         </React.Fragment>
       )}
       {activeLecture && (
-        <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+        <div className="max-w-4xl w-full relative">
           <div className="sticky top-0 right-1 float-right flex flex-row items-center justify-end gap-2">
             <div
               onClick={handleEnterSlideMode}
@@ -176,7 +176,7 @@ export default function LecturesTab() {
             </div>
           </div>
 
-          {React.createElement(activeLecture, { displayMode: slideMode ? 'slideshow' : 'scrollable', className: '', style: { scrollbarGutter: 'stable' }, exitFSCallback: handleExitSlideMode })}
+          {React.createElement(activeLecture, { displayMode: slideMode ? 'slideshow' : 'scrollable', className: '', style: {  }, exitFSCallback: handleExitSlideMode })}
 
         </div>
       )}

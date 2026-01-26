@@ -14,6 +14,7 @@
   --khg: #1AB157;
   --khb: #01AFEE;
   --khp: #EC018C;
+  --khv: #9544ff;
 }
 
 .tout{
@@ -48,6 +49,21 @@ body {
 .dark .tc3 {
   color:#777;
 }
+
+.tc4 {
+  color:#bbb;
+}
+.dark .tc4 {
+  color:#222;
+}
+
+.tc5 {
+  color:#ddd;
+}
+.dark .tc5 {
+  color:#000;
+}
+
 
 .bg1 {
   background-color:#fff;

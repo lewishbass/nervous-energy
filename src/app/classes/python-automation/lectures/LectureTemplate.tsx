@@ -50,11 +50,11 @@ const LectureTemplate: React.FC<LectureTemplateProps> = ({
 	if (displayMode === 'scrollable') {
 		// Render as a scrollable view
 		return (
-			<div className={`${className} ${displayMode==='scrollable' ? 'scrollable' : 'fullscreen'}`} style={style}>
+			<div className={`${className} `} style={style}>
 				{React.Children.map(children, (child, index) => (
 					<React.Fragment key={index}>
 						{child}
-						{index < React.Children.count(children) - 1 && <div className="w-full h-[3px] bg2 rounded-full mb-3" />}
+						{index < React.Children.count(children) - 1 && <div className="w-full h-[6px] opacity-0 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500/0 rounded-full mb-12" />}
 					</React.Fragment>
 				))}
 			</div>

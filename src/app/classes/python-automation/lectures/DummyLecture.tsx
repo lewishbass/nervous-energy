@@ -17,8 +17,17 @@ function DummyLecture(props: DummyLectureProps | null) {
       style={style}
       exitFSCallback={exitFSCallback}
     >
-      <section className="mb-4">
-        Placeholder
+      <section className="mb-4 p-8">
+        <h2 className="text-2xl font-bold mb-4">Section 1</h2>
+        <p>Placeholder content for first section</p>
+      </section>
+      <section className="mb-4 p-8">
+        <h2 className="text-2xl font-bold mb-4">Section 2</h2>
+        <p>Placeholder content for second section</p>
+      </section>
+      <section className="mb-4 p-8">
+        <h2 className="text-2xl font-bold mb-4">Section 3</h2>
+        <p>Placeholder content for third section</p>
       </section>
     </LectureTemplate>
   );

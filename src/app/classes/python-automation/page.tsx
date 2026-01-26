@@ -18,6 +18,48 @@ const LecturesTab = lazy(() => import('./tabs/LecturesTab/LecturesTab'));
 const ExercisesTab = lazy(() => import('./tabs/ExercisesTab/ExercisesTab'));
 const DiscussionsTab = lazy(() => import('./tabs/DiscussionsTab/DiscussionsTab'));
 
+// Navigation Tab Component
+interface NavigationTabProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  tabId: string;
+  title: string;
+  icon: React.ReactNode;
+  rotate?: boolean;
+  color?: string;
+}
+
+function NavigationTab({ activeTab, setActiveTab, tabId, title, icon, rotate = false, color = 'var(--khb)' }: NavigationTabProps) {
+  const tabStyle = {
+    base: "px-[3%] py-3 cursor-pointer transition-all mx-1 font-medium relative user-select-none overflow-hidden",
+    active: "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-t-full after:animate-tabSlideIn after:transition-transform after:duration-300",
+    inactive: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/40 hover:text-gray-900 dark:hover:text-gray-100 rounded-t-lg after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-t-full after:scale-x-0 after:transition-transform after:duration-300"
+  };
+
+  return (
+    <button
+      onClick={() => setActiveTab(tabId)}
+      className={`${tabStyle.base} ${activeTab === tabId ? tabStyle.active : tabStyle.inactive}`}
+      style={activeTab === tabId ? {
+        color: color,
+        '--tw-after-bg': color
+      } as React.CSSProperties & { '--tw-after-bg': string } : {
+        '--tw-after-bg': color
+      } as React.CSSProperties & { '--tw-after-bg': string }}
+    >
+      <span className={`${rotate ? 'rotate' : 'wg'} flex items-center whitespace-nowrap`}>
+        <span className="min-w-5 min-h-5 mx-auto sm:mr-2">{icon}</span>
+        <span className="hidden sm:inline">{title}</span>
+      </span>
+      <style jsx>{`
+        button::after {
+          background-color: var(--tw-after-bg);
+        }
+      `}</style>
+    </button>
+  );
+}
+
 function PythonAutomationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -29,7 +71,7 @@ function PythonAutomationContent() {
       const urlTab = searchParams.get('tab');
       if (urlTab) return urlTab;
     }
-    return 'syllabus';
+    return '';
   });
 
   const [showSidebar, setShowSidebar] = useState(() => {
@@ -77,13 +119,6 @@ function PythonAutomationContent() {
       router.push(`?${params.toString()}`, { scroll: false });
     }
   }, [activeTab]);
-
-  // Tab styles
-  const tabStyle = {
-    base: "px-[3%] py-3 cursor-pointer transition-all mx-1 font-medium relative user-select-none overflow-hidden",
-    active: "text-blue-600 dark:text-blue-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t-full after:animate-tabSlideIn after:transition-transform after:duration-300",
-    inactive: "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/40 hover:text-gray-900 dark:hover:text-gray-100 rounded-t-lg after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t-full after:scale-x-0 after:transition-transform after:duration-300"
-  };
 
   return (
     <div className="relative flex flex-row justify-center">
@@ -149,51 +184,47 @@ function PythonAutomationContent() {
 
         {/* Tabs Navigation */}
         <div className="flex mb-8 border-b border-gray-200 dark:border-gray-700 justify-start gap-1 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('syllabus')}
-            className={`${tabStyle.base} ${activeTab === 'syllabus' ? tabStyle.active : tabStyle.inactive}`}
-          >
-            <span className="wg flex items-center whitespace-nowrap">
-              <FaFileAlt className="min-w-5 min-h-5 mx-auto sm:mr-2" />
-              <span className="hidden sm:inline">Syllabus</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('schedule')}
-            className={`${tabStyle.base} ${activeTab === 'schedule' ? tabStyle.active : tabStyle.inactive}`}
-          >
-            <span className="rotate flex items-center whitespace-nowrap">
-              <MdSchedule className="min-w-5 min-h-5 mx-auto sm:mr-2" />
-              <span className="hidden sm:inline">Schedule</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('lectures')}
-            className={`${tabStyle.base} ${activeTab === 'lectures' ? tabStyle.active : tabStyle.inactive}`}
-          >
-            <span className="wg flex items-center whitespace-nowrap">
-              <FaBook className="min-w-5 min-h-5 mx-auto sm:mr-2" />
-              <span className="hidden sm:inline">Lecture Notes</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('exercises')}
-            className={`${tabStyle.base} ${activeTab === 'exercises' ? tabStyle.active : tabStyle.inactive}`}
-          >
-            <span className="wg flex items-center whitespace-nowrap">
-              <FaListCheck className="min-w-5 min-h-5 mx-auto sm:mr-2" />
-              <span className="hidden sm:inline">Exercises</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('discussions')}
-            className={`${tabStyle.base} ${activeTab === 'discussions' ? tabStyle.active : tabStyle.inactive}`}
-          >
-            <span className="wg flex items-center whitespace-nowrap">
-              <MdModeComment className="min-w-5 min-h-5 mx-auto sm:mr-2" />
-              <span className="hidden sm:inline">Discussions</span>
-            </span>
-          </button>
+          <NavigationTab
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabId="syllabus"
+            title="Syllabus"
+            icon={<FaFileAlt className="min-w-5 min-h-5 mx-auto sm:mr-2" />}
+            color="var(--khr)"
+          />
+          <NavigationTab
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabId="schedule"
+            title="Schedule"
+            icon={<MdSchedule className="min-w-5 min-h-5 mx-auto sm:mr-2" />}
+            rotate={true}
+            color="var(--kho)"
+          />
+          <NavigationTab
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabId="lectures"
+            title="Lecture Notes"
+            icon={<FaBook className="min-w-5 min-h-5 mx-auto sm:mr-2" />}
+            color="var(--khy)"
+          />
+          <NavigationTab
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabId="exercises"
+            title="Exercises"
+            icon={<FaListCheck className="min-w-5 min-h-5 mx-auto sm:mr-2" />}
+            color="var(--khg)"
+          />
+          <NavigationTab
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabId="discussions"
+            title="Discussions"
+            icon={<MdModeComment className="min-w-5 min-h-5 mx-auto sm:mr-2" />}
+            color="var(--khb)"
+          />
         </div>
 
         {/* Tab Content */}

@@ -4,12 +4,14 @@ interface LoadingSpinnerProps {
   text?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  color?: string;
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
   text = 'Loading...', 
   size = 'md',
-  className = '' 
+  className = '',
+  color = 'var(--khb)'
 }) => {
   const sizeClasses = {
     sm: 'w-6 h-6 border-4',
@@ -19,7 +21,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-      <div className={`${sizeClasses[size]} border-t-transparent border-blue-500 rounded-full animate-spin`}></div>
+      <div className={`${sizeClasses[size]} rounded-full animate-spin`} style={{ borderColor: `${color} transparent ${color} transparent` }}></div>
       {text && <p className="mt-3 tc2 animate-pulse">{text}</p>}
     </div>
   );
