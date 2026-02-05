@@ -421,6 +421,7 @@ export default function Books() {
         </button>
 
         {/* Search Input */}
+        <div className="flex gap-2 items-center flex-grow">
         <div className="relative flex-1 min-w-[200px]">
           <input
             type="text"
@@ -443,6 +444,7 @@ export default function Books() {
             className={`absolute w-[100%] h-[100%] cursor-pointer transition-opacity duration-300 ${viewMode === 'grid' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={() => setViewMode('list')}
           />
+          </div>
         </div>
       </div>
 
@@ -627,7 +629,7 @@ export default function Books() {
 
       {/* Book List - List View */}
       {viewMode === "list" && (
-        <div className="space-y-4 mb-100">
+        <div className="space-y-0 mb-100 rounded-xl overflow-hidden">
           {books.map((book, index) => {
             const isSelected = selectedBook === index;
             const isReadBook = booksRead[book.ISBN] === true;
@@ -637,15 +639,15 @@ export default function Books() {
                 ref={(el) => {
                   if (el) bookRefs.current[index] = el;
                 }}
-                className={`outline-none bg2 rounded-lg shadow-md overflow-hidden cursor-pointer transition-all duration-300 ${isSelected ? "ring-2 ring-blue-500" : "hover:shadow-lg"
+                className={` outline-none bg2  overflow-hidden cursor-pointer transition-all duration-300 ${isSelected ? "shadow-[inset_10px_4px_10px_-1px_rgba(0,0,0,0.2),inset_10px_-4px_10px_-1px_rgba(0,0,0,0.2)] brightness-110" : "dark:brightness-60 brightness-100 dark:hover:brightness-75 hover:brightness-105"
                   }`}
                 onClick={() => handleBookClick(index)}
                 tabIndex={0}
                 style={{ display: inFiltered[book.ISBN] === false ? "none" : "block" }}
               >
-                <div className="flex flex-col md:flex-row">
+                <div className="flex flex-row">
                   {/* Book Cover */}
-                  <div className="relative w-full md:w-48 h-64 md:h-auto flex-shrink-0">
+                  <div className="relative w-14 md:w-24 h-64 h-auto flex-shrink-0">
                     <Image
                       src={`./${book.cover_file}`}
                       alt={`Cover of ${book.title}`}
@@ -663,9 +665,12 @@ export default function Books() {
                   </div>
 
                   {/* Book Info */}
-                  <div className="flex-1 p-6">
-                    <div className="flex justify-between items-start mb-2">
-                      <h2 className="text-2xl font-bold tc1">{book.title}</h2>
+                  <div className="flex-1 p-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-wrap items-end">
+                        <h2 className="text-2xl font-bold tc1 mr-1 truncate">{book.title}</h2>
+                        <span className="text-lg tc2 truncate">By {book.author}</span>
+                      </div>
                       {book.good_score && (
                         <span className="bg-yellow-500 text-white px-2 py-1 rounded text-sm font-semibold whitespace-nowrap ml-2">
                           ★ {book.good_score.toFixed(1)}
@@ -673,18 +678,18 @@ export default function Books() {
                       )}
                     </div>
 
-                    <p className="text-lg tc2 mb-1">By {book.author}</p>
+                    <p className="text-sm tc3 mb-3 hidden sm:block">
                     {book.book_series && (
-                      <p className="text-sm tc3 mb-2">
+                        <span className="text-sm tc3">
                         {book.book_series}
-                        {book.reading_order && <span> (#{book.reading_order})</span>}
-                      </p>
-                    )}
-                    <p className="text-sm tc3 mb-3">
-                      {book.genre} • {book.year} • {book.wordcount.toLocaleString()} words
+                          {book.reading_order && <span> (#{book.reading_order})</span>}
+                          &nbsp;•&nbsp;
+                        </span>
+                      )}
+                      {book.year} • {book.wordcount.toLocaleString()} words • {book.genre}
                     </p>
 
-                    <p className="tc2 mb-3">{book.paragraph1}</p>
+                    <p className="tc2 mb-0">{book.paragraph1}</p>
 
                     <AnimatePresence>
                       {isSelected && (
@@ -696,7 +701,7 @@ export default function Books() {
                           transition={{ duration: 0.3 }}
                           className="space-y-3"
                         >
-                          <p className="tc2">{book.paragraph2}</p>
+                          <p className="tc2 mt-3">{book.paragraph2}</p>
 
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
                             <div>
@@ -707,67 +712,75 @@ export default function Books() {
                               <span className="font-semibold tc2">Ratings: </span>
                               <span className="tc3">{book.n_good_ratings.toLocaleString()}</span>
                             </div>
+                            <div>
+                              <span className="font-semibold tc2 hover:underline cursor-pointer group" onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>
+                                Discussion
+                                <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
+                              </span>
+                            </div>
                           </div>
 
+                          <div className="flex flex-row justify-between items-center mt-2">
                           <div className="p-3 bg3 rounded">
                             <span className="font-semibold tc1">Trivia: </span>
                             <span className="tc2">{book.trivia}</span>
-                          </div>
+                            </div>
+                            <div className="ml-3 flex flex-row items-center gap-3 pt-2">
+                              {isLoggedIn && (
+                                <>
+                                  <a
+                                    href={`/${book.book_file}`}
+                                    download
+                                    className="book-download-button"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <FaDownload className="mr-2 inline" /> EPUB
+                                  </a>
 
-                          <div className="flex flex-row items-center gap-3 pt-2">
-                            {isLoggedIn && (
-                              <>
-                                <a
-                                  href={`/${book.book_file}`}
-                                  download
-                                  className="book-download-button"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <FaDownload className="mr-2 inline" /> EPUB
-                                </a>
-
-                                <button
-                                  onClick={(e) => toggleReadStatus(book, e)}
-                                  disabled={isLoadingReadStatus[book.ISBN]}
-                                  className={`px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${
-                                    isReadBook
+                                  <button
+                                    onClick={(e) => toggleReadStatus(book, e)}
+                                    disabled={isLoadingReadStatus[book.ISBN]}
+                                    className={`px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${isReadBook
                                       ? "bg-green-600 text-white hover:bg-green-700"
                                       : "bg-gray-600 text-white hover:bg-gray-700"
-                                  } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                  <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
-                                </button>
-                              </>
-                            )}
+                                      } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                  >
+                                    <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
+                                  </button>
+                                </>
+                              )}
 
-                            <div
-                              className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
-                              style={{
-                                backgroundColor: "var(--khg)",
-                                borderRadius: "0.375rem",
-                              }}
-                            >
                               <div
-                                className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                                className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
                                 style={{
-                                  backgroundColor: "var(--khp)",
+                                  backgroundColor: "var(--khg)",
+                                  borderRadius: "0.375rem",
                                 }}
-                                onClick={toggleShopType}
                               >
-                                <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
-                                <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
+                                <div
+                                  className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
+                                  style={{
+                                    backgroundColor: "var(--khp)",
+                                  }}
+                                  onClick={toggleShopType}
+                                >
+                                  <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
+                                  <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
+                                </div>
+                                <a
+                                  href={book[`${shopType}_link`] || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  Shop
+                                </a>
                               </div>
-                              <a
-                                href={book[`${shopType}_link`] || "#"}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                Shop
-                              </a>
                             </div>
                           </div>
+
+
                         </motion.div>
                       )}
                     </AnimatePresence>

@@ -55,6 +55,15 @@ export const toys: Toy[] = [
         reqAuth: false
     },
     {
+        title: 'Tank Game',
+        description: 'A simple multiplayer tank game built with Phaser.js',
+        link: '/toys/tanks',
+        hasPage: true,
+        keywords: 'multiplayer game phaser.js tanks arcade',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    },
+    /*{
         title: 'Image Captioning',
         description: "Generating image captions with with RNNs",
         link: '/toys/image-captioning',
@@ -117,6 +126,6 @@ export const toys: Toy[] = [
         keywords: 'computer vision object detection yolo rcnn ssd',
         imagePath: '/KH_back.svg',
         reqAuth: false
-    }
+    }*/
 
 ];
