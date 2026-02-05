@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
+const SUBTOKEN_SECRET = process.env.SUBTOKEN_SECRET || 'default_subtoken_secret_for_development';
 
 export async function validateUser(username: string, token: string) {
   // Find user by username
@@ -12,16 +13,47 @@ export async function validateUser(username: string, token: string) {
     return { user: null, error: "User not found" };
   // Verify JWT token
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { username: string, userId: string, category: string };
     if (decoded.username !== username) {
       return { user: null, error: "Token username mismatch" };
+    }
+    if (decoded.userId !== user.id) {
+      return { user: null, error: "Token userId mismatch" };
+    }
+    if (decoded.category !== 'login') {
+      return { user: null, error: "Token category mismatch" };
     }
   }
   catch (error) {
     return { user: null, error: "Invalid token" };
   }
   user.data.lastSeen = new Date();
-  return { user: user, error: "OK" };
+  return { user: user, error: "OK", category: "login" };
+}
+
+export async function validateSubToken(username: string, token: string, expectedCategory: string) {
+  const user = await User.findOne({ username });
+  if (!user)
+    return { user: null, error: "User not found" };
+  // Verify JWT token
+  try {
+    const decoded = jwt.verify(token, SUBTOKEN_SECRET + '_' + expectedCategory) as { username: string, userId: string, category: string };
+    if (decoded.username !== username) {
+      return { user: null, error: "Token username mismatch" };
+    }
+    if (decoded.userId !== user.id) {
+      return { user: null, error: "Token userId mismatch" };
+    }
+    if (expectedCategory !== undefined && decoded.category !== expectedCategory) {
+      return { user: null, error: "Token category mismatch" };
+    }
+
+    return { user: user, error: "OK", category: expectedCategory };
+  }
+  catch (error) {
+    return { user: null, error: "Invalid token" };
+  }
+
 }
 
 export function sanitizeUser(user: any, auth: "public" | "friend" | "self") {

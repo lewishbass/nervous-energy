@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
 import { ThemeProvider, useTheme } from 'next-themes';
+import { FooterContent } from '@/components/FooterContent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -164,6 +165,8 @@ function RootLayoutContent({
           style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)', borderRight: theme === 'dark' ? '1px solid #fff2' : '1px solid #0004' }}
         >
           {children}
+          {/*footer content*/}
+          <FooterContent />
         </div>
         {/*Modals*/}
         <div>

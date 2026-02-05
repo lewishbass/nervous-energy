@@ -524,7 +524,17 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     }
   };
 
-  const renderThread = (threadID: string, depth: number = 0, isBase: boolean = false) => {
+  const colorIndex: string[] = [
+    '#EC343E',
+    '#F47820',
+    '#FEE606',
+    '#1AB157',
+    '#01AFEE',
+    '#EC018C',
+    '#9544ff',
+  ]
+
+  const renderThread = (threadID: string, depth: number = 0, isBase: boolean = false, commentIndex: number = 0) => {
     const thread = threadData[threadID];
     if (!thread) return null;
 
@@ -608,15 +618,16 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             </div>
           )}
 
-          {thread.children && thread.children.map((childID: string) => renderThread(childID, depth + 1, false))}
+          {thread.children && thread.children.map((childID: string, index: number) => renderThread(childID, depth + 1, false, index))}
         </div>
       );
     }
 
     return (<div key={threadID} className={`relative border border-gray-300 rounded dark:border-gray-700 p-2 pl-6 mb-4 overflow-hidden min-h-8`}>
-      <div className="absolute w-4 h-full top-0 left-0 bg2 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3"
+      <div className="absolute w-4 h-full top-0 left-0 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3 dark:saturate-75"
+        style={{ backgroundColor: `${colorIndex[(commentIndex + depth) % colorIndex.length]}` }}
         onClick={() => toggleThreadExpanded(threadID)}>
-        <div className="tc3 select-none">{thread.expanded ? '-' : '+'}</div>
+        <div className="text-white font-bold select-none">{thread.expanded ? '-' : '+'}</div>
       </div>
 
       {thread.expanded ? <div className="flex flex-row">
@@ -635,11 +646,11 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           <h3 className="text-lg font-bold tc1">{thread.title || ''}
             <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
           </h3>
-          <p className="mb-2 tc2">
+          <div className="mb-2 tc2">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {thread.content}
             </ReactMarkdown>
-          </p>
+          </div>
           <div className="text-sm tc3 mb-2">
             {isLoggedIn && <span
               className="hover:underline cursor-pointer mr-1 select-none"
@@ -750,7 +761,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
           </button>
         </div>
       )}
-      {thread.children && thread.expanded && thread.children.map((childID: string) => renderThread(childID, depth + 1, false))}
+      {thread.children && thread.expanded && thread.children.map((childID: string, index: number) => renderThread(childID, depth + 1, false, index + commentIndex))}
     </div>
     );
   }

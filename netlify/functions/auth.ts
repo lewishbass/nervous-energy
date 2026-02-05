@@ -3,9 +3,12 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import connectMongoDB from '../lib/mongodb';
 import User from '../models/User';  // Import the model directly, not the schema
+import { validateUser, validateSubToken } from '../lib/backendutils';
 
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
+const SUBTOKEN_SECRET = process.env.SUBTOKEN_SECRET || 'default_subtoken_secret_for_development';
+const VALID_CATEGORIES = process.env.VALID_SUBTOKEN_CATEGORIES ? process.env.VALID_SUBTOKEN_CATEGORIES.split(',').map(cat => cat.trim()) : [];
 
 export const handler: Handler = async (event) => {
   
@@ -56,6 +59,12 @@ export const handler: Handler = async (event) => {
     }
     if (path === 'delete-account') {
       return await handleAccountDeletion(requestBody);
+    }
+    if (path === 'get-sub-token') {
+      return await handleGetSubToken(requestBody);
+    }
+    if (path === 'verify-sub-token') {
+      return await handleVerifySubToken(requestBody);
     }
     return {
       statusCode: 404,
@@ -141,7 +150,8 @@ async function handleLogin(requestBody: any) {
   const token = jwt.sign(
     { 
       userId: user.id, 
-      username: user.username 
+      username: user.username,
+      category: 'login'
     },
     JWT_SECRET,
     { expiresIn: '5 days' }
@@ -352,6 +362,100 @@ async function handleAccountDeletion(requestBody: any) {
     body: JSON.stringify({
       success: true,
       message: 'Account deleted successfully'
+    }),
+  };
+}
+
+async function handleGetSubToken(requestBody: any) {
+  // generates tokens that are valid for a specific category (e.g., chat, game, etc.)
+  // for logging into external services without giving them the main token or access to other categories
+  const { username, token, category } = requestBody;
+
+  if (category && !VALID_CATEGORIES.includes(category)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid subtoken category' }),
+    };
+  }
+
+  // Validate required fields
+  if (!username || !token || !category) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, token, and category are required' }),
+    };
+  }
+
+  // Validate token
+  const validation = await validateUser(username, token);
+  if (validation.error !== "OK") {
+    //console.log(validation);
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+  const user = validation.user;
+
+  // Generate sub-token for the requested category
+  const secret = SUBTOKEN_SECRET + '_' + category; // Use a different secret for sub-tokens to add an extra layer of security
+
+  const subToken = jwt.sign(
+    {
+      userId: user.id,
+      username: user.username,
+      category
+    },
+    secret,
+    { expiresIn: '1 hour' }
+  );
+
+  // return the sub-token
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      subToken,
+      category,
+      expiresIn: Date.now() + 60 * 60 * 1000
+    }),
+  };
+}
+
+async function handleVerifySubToken(requestBody: any) {
+  const { username, subToken, category } = requestBody;
+  // add fake wait
+  // await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Validate required fields
+  if (!username || !subToken || !category) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Username, subToken, and category are required' }),
+    };
+  }
+  // Validate sub-token
+  const validation = await validateSubToken(username, subToken, category);
+  if (validation.error !== "OK") {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ error: validation.error }),
+    };
+  }
+
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      success: true,
+      category: validation.category
     }),
   };
 }

@@ -61,13 +61,13 @@ export default function Menu({
 
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && isOpen) {
       checkNotification(); // Initial check on mount
       const intervalId = setInterval(checkNotification, 10000); // Check every 10 seconds
 
       return () => clearInterval(intervalId); // Clean up interval on unmount
     }
-  }, [username, newChats, newNotifications, isLoggedIn]);
+  }, [username, newChats, newNotifications, isLoggedIn, isOpen]);
 
   const checkNotification = async () => {
     try {

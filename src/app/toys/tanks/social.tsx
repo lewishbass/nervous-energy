@@ -280,7 +280,7 @@ export default function Social() {
 										setChatMessage('');
 									}
 								}}
-								className="absolute right-1 top-1 rounded-full cursor-pointer select-none px-2 py-2 tc1 font-bold hover:brightness-110 transition-all shadow-lg flex items-center justify-center"
+								className="absolute right-1 top-1 rounded-full cursor-pointer select-none px-2 py-2 tc1 font-bold hover:brightness-110 transition-all flex items-center justify-center hover:opacity-70"
 							>
 								<IoSend />
 							</button>

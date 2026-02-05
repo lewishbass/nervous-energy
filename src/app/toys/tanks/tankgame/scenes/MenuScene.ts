@@ -582,11 +582,12 @@ import Phaser from 'phaser';
 			nextPlayerButton.input!.cursor = 'pointer';
 
 			const lastPlayerButton = this.add.image(-160, yoffset, 'arrow');
-			lastPlayerButton.setScale(0.6);
+			lastPlayerButton.setScale(0.8);
+			lastPlayerButton.setAlpha(0.6);
 			lastPlayerButton.setFlipX(true);
 			lastPlayerButton.setInteractive();
-			lastPlayerButton.on('pointerover', () => lastPlayerButton.setScale(0.63));
-			lastPlayerButton.on('pointerout', () => lastPlayerButton.setScale(0.6));
+			lastPlayerButton.on('pointerover', () => lastPlayerButton.setScale(0.85));
+			lastPlayerButton.on('pointerout', () => lastPlayerButton.setScale(0.8));
 			lastPlayerButton.on('pointerdown', () => {
 				this.clickSound();
 				if (this.selectingNumber > 1) {

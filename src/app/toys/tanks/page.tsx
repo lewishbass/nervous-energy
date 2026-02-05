@@ -9,8 +9,9 @@ import { GiTank, GiBoltShield, GiCrossedSwords, GiRocket } from 'react-icons/gi'
 import { FaGamepad, FaMousePointer, FaTrophy, FaBook, FaExpand, FaArrowLeft, FaArrowRight, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { IoMdPeople } from 'react-icons/io';
 import { MdSportsEsports } from 'react-icons/md';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaArrowRotateRight } from 'react-icons/fa6';
+import { useAuth } from '@/context/AuthContext';
 
 const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 	ssr: false,
@@ -19,9 +20,86 @@ const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 
 const baseThreadID = "tank-game-discussions";
 
+const tokenStateToTitle = {
+	'no-token': 'Not logged in',
+	'verifying': 'Verifying token...',
+	'valid': 'Connected',
+	'invalid': 'Token invalid',
+}
+const tokenStateToColor = {
+	'no-token': 'gray',
+	'verifying': 'yellow',
+	'valid': 'green',
+	'invalid': 'red',
+};
+
 export default function TanksPage() {
 
+	const { username, isLoggedIn, getSubToken } = useAuth();
+
 	const [gameKey, setGameKey] = useState(0);
+	const [gameToken, setGameToken] = useState<string | null>(null);
+	const [gameTokenState, setGameTokenState] = useState<'no-token' | 'verifying' | 'valid' | 'invalid'>('no-token');
+
+	// Fetch token on mount and when login state changes
+	useEffect(() => {
+		const fetchToken = async () => {
+			if (isLoggedIn) {
+				const token = await getSubToken('tank-game');
+				if (token !== null) {
+					setGameToken(token);
+				}
+			}
+		};
+		fetchToken();
+	}, [isLoggedIn]);
+
+	useEffect(() => {
+
+		verifyGameToken(gameToken);
+	}, [gameToken]);
+
+	const verifyGameToken = async (token: string | null) => {
+
+		if (token === null) {
+			setGameTokenState('no-token');
+			return;
+		} else if (!username) {
+			setGameTokenState('invalid');
+			return;
+		} else {
+			setGameTokenState('verifying');
+		}
+
+
+		try {
+			const response = await fetch('/.netlify/functions/auth/verify-sub-token', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					username,
+					subToken: token,
+					category: 'tank-game',
+				}),
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				if (data.success) {
+					setGameTokenState('valid');
+				} else {
+					setGameTokenState('invalid');
+				}
+			} else {
+				setGameTokenState('invalid');
+			}
+		} catch (error) {
+			console.error('Error verifying game token:', error);
+			setGameTokenState('invalid');
+		}
+	};
 
 	const reloadGame = () => {
 		setGameKey(prev => prev + 1);
@@ -69,7 +147,7 @@ export default function TanksPage() {
 								</div>
 								<div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 px-4 py-2 rounded-lg flex items-center gap-2">
 									<GiBoltShield className="text-xl" />
-									<span className="tc1 font-bold">Real-time Action</span>
+									<span className="tc1 font-bold">Turn-Based Action</span>
 								</div>
 								<div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 px-4 py-2 rounded-lg flex items-center gap-2">
 									<FaTrophy className="text-xl" />
@@ -87,10 +165,17 @@ export default function TanksPage() {
 					{/* Game Area */}
 					<div className={`flex-grow bg2 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden aspect-[64/52] max-h-[90vh]`}>
 						<div className="p-4 border-b border-gray-200 dark:border-gray-700">
-							<h2 className="text-2xl font-bold tc1 flex items-center gap-2">
+							<h2 className="text-2xl font-bold tc1 flex items-center">
+								<div
+									className={`mr-2 w-3 h-3 rounded-full transition-all duration-400 ${`bg-${tokenStateToColor[gameTokenState]}-500`}`}
+									title={tokenStateToTitle[gameTokenState]}
+								/>
 								<MdSportsEsports />
 								<span>Tanks <span className="ml-2 text-sm font-normal tc2">Multiple terrains, multiple weapons - get them before they get you!</span></span>
-								<FaArrowRotateRight className="ml-auto mr-2 cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform" onClick={reloadGame} />
+								<div className="ml-auto flex items-center gap-2">
+
+									<FaArrowRotateRight className="cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform" onClick={reloadGame} />
+								</div>
 							</h2>
 						</div>
 						<div key={gameKey} className="h-[calc(100%-4rem)]">
