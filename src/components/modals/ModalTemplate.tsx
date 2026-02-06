@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import LoadingSpinner from '../LoadingSpinner';
+import { IoClose } from "react-icons/io5";
 
 interface ModalTemplateProps {
   isOpen: boolean;
@@ -150,8 +151,9 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                     }}
                   >
                     {title && (
-                      <div className="border-b-2 pb-2 mb-4 border-gray-200">
-                        <h2 className="text-2xl font-semibold tc1">{title}</h2>
+                        <div className="border-b-2 pb-2 mb-4 border-gray-200 flex justify-between items-center flex-row">
+                          <h2 className="text-2xl font-semibold tc1">{title}</h2><IoClose size={24} onClick={resetModal} className="mr-2 opacity-30 cursor-pointer select-none hover:opacity-50" />
+
                       </div>
                     )}
                     <div>{children}</div>

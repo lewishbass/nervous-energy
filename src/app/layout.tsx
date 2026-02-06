@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
 import { analytics } from '@/context/Analytics';
 import { ThemeProvider, useTheme } from 'next-themes';
-import { FooterContent } from '@/components/FooterContent';
+import FooterContent from '@/components/FooterContent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -159,14 +159,19 @@ function RootLayoutContent({
 
         {/* Content wrapper */}
         <div 
-          className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 ${
+          className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 flex flex-col ${
             isMenuOpen ? 'translate-x-[-300px]' : ''
           }`} 
           style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)', borderRight: theme === 'dark' ? '1px solid #fff2' : '1px solid #0004' }}
         >
-          {children}
+          <div className="flex-1">
+            {children}
+          </div>
           {/*footer content*/}
-          <FooterContent />
+          <div className="mt-auto">
+            <FooterContent />
+          </div>
+          {/* */}
         </div>
         {/*Modals*/}
         <div>

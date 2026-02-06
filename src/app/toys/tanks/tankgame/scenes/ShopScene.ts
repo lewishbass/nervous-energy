@@ -203,7 +203,7 @@ export class ShopScene extends Phaser.Scene {
 			iconName: 'upgrade_energy',
 			price: 5000,
 			bundleSize: 10,
-			getNBought: (tank: Tank) => tank.maxHealth,
+			getNBought: (tank: Tank) => tank.maxHealth - 100,
 			buy: (tank: Tank, num: number) => tank.maxHealth += num
 		},
 		{
@@ -320,6 +320,13 @@ export class ShopScene extends Phaser.Scene {
 				ease: 'Quad.easeOut',
 				fillAlpha: 0,
 			});
+			this.tweens.killTweensOf(container);
+			this.tweens.add({
+				targets: container,
+				duration: 600,
+				ease: 'Quad.easeOut',
+				y: y,
+			});
 		});
 		
 
@@ -340,19 +347,37 @@ export class ShopScene extends Phaser.Scene {
 				container.removeAllListeners('pointerdown');
 				container.on('pointerdown', () => {
 					if (tank.cash >= item.price) {
-						this.clickSound(1.2);
+						this.clickSound(1.2, (-item.price / 1000) * 80 + 160);
 						tank.cash -= item.price;
 						item.buy(tank, item.bundleSize);
 						this.updateShop(tank);
+						this.tweens.killTweensOf(container);
+						this.tweens.add({
+							targets: container,
+							duration: 150,
+							ease: 'Quad.easeOut',
+							y: container.y + 2,
+						});
 					}
+				});
+				container.removeAllListeners('pointerup');
+				container.on('pointerup', () => {
+					this.clickSound(0.7, (-item.price / 1000) * 80 + 360);
+					this.tweens.killTweensOf(container);
+					this.tweens.add({
+						targets: container,
+						duration: 150,
+						ease: 'Quad.easeOut',
+						y: y,
+					});
 				});
 			}
 			
 		};
 			
 	}
-	clickSound(volume: number = 1) {
-			this.sound.play('click', { volume: volume * Phaser.Math.FloatBetween(0.4, 0.8), detune: Phaser.Math.Between(-200, 200) });
+	clickSound(volume: number = 1, detune: number = 0) {
+		this.sound.play('click', { volume: volume * Phaser.Math.FloatBetween(0.4, 0.8), detune: detune + Phaser.Math.Between(-200, 200) });
 		}
 	
 

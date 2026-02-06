@@ -1,26 +1,31 @@
 import Link from 'next/link';
-import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope } from 'react-icons/fa';
-import { FaE } from 'react-icons/fa6';
+import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope, FaHeart } from 'react-icons/fa';
+import { BiSolidCoffee } from "react-icons/bi";
 
-function FooterContent() {
+import { copyToClipboard } from '@/scripts/clipboard';
+
+interface FooterContentProps {
+}
+
+export default function FooterContent(props: FooterContentProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg2 border-t border-gray-200 dark:border-gray-800 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+		<footer className="w-full bg2 border-t-3 border-gray-300 dark:border-gray-700 mt-auto opacity-50">
+			<div className="max-w-2xl mx-auto px-8 py-4">
+				<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
           {/* About Section */}
           <div>
             <h3 className="text-base font-semibold mb-3 tc1">About</h3>
             <p className="tc2 text-sm">
-              A platform for sharing thoughts and ideas.
+							A platform for me to publish various projects, and learn about web development.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
             <h3 className="text-base font-semibold mb-3 tc1">Links</h3>
-            <ul className="space-y-1.5">
+						<ul className="-mt-1">
               <li>
                 <Link href="/" className="tc2 text-sm hover:tc1 transition-colors">
                   Home
@@ -47,7 +52,7 @@ function FooterContent() {
           {/* Support */}
           <div>
             <h3 className="text-base font-semibold mb-3 tc1">Support</h3>
-            <ul className="space-y-1.5">
+						<ul className="-mt-1">
               <li>
                 <a 
                   href="https://github.com/lewishbass/nervous-energy/issues/new" 
@@ -79,7 +84,7 @@ function FooterContent() {
                 href="https://github.com/lewishbass" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="tc2 hover:tc1 transition-colors"
+								className="tc2 hover:tc1 transition-colors cursor-pointer select-none"
                 aria-label="GitHub"
               >
                 <FaGithub size={18} />
@@ -88,24 +93,23 @@ function FooterContent() {
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="tc2 hover:tc1 transition-colors"
+								className="tc2 hover:tc1 transition-colors cursor-pointer select-none"
                 aria-label="Twitter"
               >
                 <FaTwitter size={18} />
               </a>
               <a 
-                href="https://linkedin.com" 
+								href="https://www.linkedin.com/in/lewis-bass/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="tc2 hover:tc1 transition-colors"
+								className="tc2 hover:tc1 transition-colors cursor-pointer select-none"
                 aria-label="LinkedIn"
               >
                 <FaLinkedin size={18} />
               </a>
-              <a 
-                href="mailto:contact@example.com"
-                className="tc2 hover:tc1 transition-colors"
-                aria-label="Email"
+							<a 
+								className="tc2 hover:tc1 transition-colors cursor-pointer select-none"
+								onClick={() => copyToClipboard('lewishbass@gmail.com')}
               >
                 <FaEnvelope size={18} />
               </a>
@@ -127,13 +131,13 @@ function FooterContent() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+				<div className="mt-1 pt-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs tc2">
-            <p>
+						<p className="mb-1">
               © {currentYear} Nervous Energy. All rights reserved.
             </p>
             <p>
-              Made with ❤️ by{' '}
+							Made with <FaHeart className="inline text-red-400 mb-1" size={16} /> and <BiSolidCoffee className="inline text-brown-400 mb-0.5" size={16} /> by{' '}
               <a 
                 href="https://lewisbass.org" 
                 target="_blank" 
@@ -159,5 +163,3 @@ function FooterContent() {
     </footer>
   );
 }
-
-export { FooterContent };

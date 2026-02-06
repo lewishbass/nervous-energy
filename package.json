@@ -11,6 +11,7 @@
     "sitemap": "next-sitemap"
   },
   "dependencies": {
+    "@colyseus/sdk": "^0.17.26",
     "@netlify/functions": "^3.0.1",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-converter": "^4.22.0",

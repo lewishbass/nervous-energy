@@ -624,7 +624,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     }
 
     return (<div key={threadID} className={`relative border border-gray-300 rounded dark:border-gray-700 p-2 pl-6 mb-4 overflow-hidden min-h-8`}>
-      <div className="absolute w-4 h-full top-0 left-0 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center tc3 dark:saturate-75"
+      <div className="absolute w-4 h-full top-0 left-0 border-r border-gray-300 dark:border-gray-700 cursor-pointer hover:opacity-70 transition-opacity duration-200 flex-row items-center justify-center text-center dark:saturate-75"
         style={{ backgroundColor: `${colorIndex[(commentIndex + depth) % colorIndex.length]}` }}
         onClick={() => toggleThreadExpanded(threadID)}>
         <div className="text-white font-bold select-none">{thread.expanded ? '-' : '+'}</div>

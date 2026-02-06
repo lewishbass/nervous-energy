@@ -31,7 +31,7 @@ export default function PhaserGame({ width = 1200, height = 900 }: PhaserGamePro
 			dom: {
 				createContainer: true
 			},
-			scene: [MenuScene, MainScene, ShopScene],
+			scene: [MainScene, ShopScene],
 			scale: {
 				mode: Phaser.Scale.FIT,
 				autoCenter: Phaser.Scale.CENTER_BOTH

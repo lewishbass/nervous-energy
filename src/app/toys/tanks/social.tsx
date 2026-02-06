@@ -7,8 +7,9 @@ import { GiTank } from 'react-icons/gi';
 import { IoMdPeople } from 'react-icons/io';
 import { IoSend } from 'react-icons/io5';
 
+import { Client } from 'colyseus.js';
 
-const serverEndpoint = process.env.TANKS_SERVER_ENDPOINT || 'http://localhost:2567';
+import RoomModal, { RoomOptions } from './RoomModal';
 
 interface Lobby {
 	id: string;
@@ -32,6 +33,19 @@ interface ChatMessage {
 	playerName: string;
 	message: string;
 	timestamp: Date;
+}
+
+interface Room {
+	clients: number;
+	createdAt: Date;
+	locked: boolean;
+	maxClients: number;
+	name: string;
+	private: boolean;
+	processId: string;
+	roomId: string;
+	unlisted: boolean;
+	metadata: Record<string, any>;
 }
 
 // Dummy data for demonstration
@@ -59,7 +73,14 @@ const dummyChatMessages: ChatMessage[] = [
 	{ id: '6', playerId: '1', playerName: 'TankCommander', message: 'Perfect! Let\'s coordinate our attack', timestamp: new Date(Date.now() - 30000) },
 ];
 
-export default function Social() {
+interface SocialProps {
+	username: string,
+	subToken: string | null,
+	isLoggedIn: boolean,
+	client: Client | any,
+}
+
+export default function Social({ username, subToken, isLoggedIn, client }: SocialProps) {
 	const [selectedLobby, setSelectedLobby] = useState<string | null>('1');
 	const [lobbiesCollapsed, setLobbiesCollapsed] = useState(false);
 	const [playersCollapsed, setPlayersCollapsed] = useState(false);
@@ -67,6 +88,8 @@ export default function Social() {
 	const [isDragging, setIsDragging] = useState(false);
 	const [chatMessage, setChatMessage] = useState('');
 
+	const [rooms, setRooms] = useState<Room[]>([]);
+	const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
 	const getStatusColor = (status: string) => {
 		switch (status) {
@@ -100,7 +123,26 @@ export default function Social() {
 		setIsDragging(true);
 	};
 
+	const createRoom = (options: RoomOptions) => {
+		// Implement room creation logic here
+		console.log('Creating room with options:', options);
+		// TODO: Use client to create room with the provided options
+	};
+
+	const joinRoom = (roomId: string) => {
+
+	}
+
+
+
 	useEffect(() => {
+		if (isDragging) {
+			document.body.style.userSelect = 'none';
+			document.body.style.cursor = 'ns-resize';
+		} else {
+			document.body.style.userSelect = 'auto';
+			document.body.style.cursor = 'default';
+		}
 		const handleMouseMove = (e: MouseEvent) => {
 			if (!isDragging) return;
 
@@ -129,6 +171,21 @@ export default function Social() {
 		};
 	}, [isDragging]);
 
+	const getLobbies = async () => {
+		// Fetch lobbies from server
+
+		if (!client) return;
+		console.log('Fetching lobbies...');
+		client.http.get("/api/room_list").then((response: any) => {
+			if (response && response.data && response.data.rooms) {
+				console.log('Lobbies fetched:', response.data.rooms);
+				setRooms(response.data.rooms);
+			}
+		});
+	};
+
+
+
 	if (lobbiesCollapsed && playersCollapsed) {
 		return (
 			<div className="fixed right-0 bottom-[5vh] -translate-y-1/2 z-50">
@@ -150,18 +207,18 @@ export default function Social() {
 			<div className={`bg2 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all ${lobbiesCollapsed ? 'flex-grow-0' : 'flex-grow'}`}>
 				<div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500/10 to-purple-500/10 cursor-pointer select-none" onClick={() => setLobbiesCollapsed(!lobbiesCollapsed)}>
 					<h3 className="text-xl font-bold tc1 flex items-center">
-						<FaGamepad className="mr-2" />
+						<FaGamepad className="cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform mr-2" onClick={(e: React.MouseEvent) => { getLobbies(); e.stopPropagation(); }} />
 						Available Lobbies
 						<FaChevronUp className={`ml-auto rounded-full p-1 cursor-pointer w-6 h-6 transition-transform duration-300 ${lobbiesCollapsed ? 'rotate-180' : ''}`} />
 					</h3>
 				</div>
 				<div className="overflow-y-scroll mini-scroll transition-all duration-300 flex-grow bg1" style={{ maxHeight: lobbiesCollapsed ? '0' : playersCollapsed ? '800px' : '400px' }}>
 					<div className="space-y-2 p-4">
-						{dummyLobbies.map((lobby) => (
+						{rooms.map((lobby) => (
 							<div
-								key={lobby.id}
-								onClick={() => setSelectedLobby(lobby.id)}
-								className={`p-3 rounded-xl cursor-pointer transition-all duration-300 ${selectedLobby === lobby.id
+								key={lobby.roomId}
+								onClick={() => setSelectedLobby(lobby.roomId)}
+								className={`p-3 rounded-xl cursor-pointer transition-all duration-300 ${selectedLobby === lobby.roomId
 										? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 outline-2 outline-blue-500/50'
 										: 'bg2 opacity-50 hover:opacity-80 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10'
 									}`}
@@ -169,18 +226,17 @@ export default function Social() {
 								<div className="flex items-center justify-between mb-2">
 									<span className="font-bold tc1">{lobby.name}</span>
 									<div className="flex items-center gap-1">
-										<div className={`w-2 h-2 rounded-full ${getStatusColor(lobby.status)}`} />
-										<span className="text-xs tc2">{getStatusText(lobby.status)}</span>
+										<div className={`w-2 h-2 rounded-full ${getStatusColor(lobby.metadata.status || 'waiting')}`} />
+										<span className="text-xs tc2">{getStatusText(lobby.metadata.status || 'invalid')}</span>
 									</div>
 								</div>
 								<div className="flex items-center justify-between text-sm tc2">
 									<span className="flex items-center gap-1">
-										<GiTank className="text-base" />
-										{lobby.map}
+										{lobby.metadata.map || 'Unknown Map'}
 									</span>
 									<span className="flex items-center gap-1">
 										<IoMdPeople className="text-base" />
-										{lobby.players}/{lobby.maxPlayers}
+										{lobby.clients}/{lobby.maxClients}
 									</span>
 								</div>
 							</div>
@@ -188,9 +244,12 @@ export default function Social() {
 					</div>
 				</div>
 				<div className="px-4 border-t border-gray-200 dark:border-gray-700 transition-all duration-300" style={{ maxHeight: lobbiesCollapsed ? '0' : '100px' }}>
-					<button className="my-4 cursor-pointer select-none w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-lg hover:brightness-110 transition-all hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2">
+					<button
+						onClick={() => setIsRoomModalOpen(true)}
+						className="my-4 cursor-pointer select-none w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-lg hover:brightness-110 transition-all hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2"
+					>
 						<FaPlus />
-						Create Lobby
+						Create Room
 					</button>
 				</div>
 			</div>
@@ -288,6 +347,14 @@ export default function Social() {
 					</div>
 				</div>
 			)}
+			{/* Room Creation Modal */}
+			<RoomModal
+				isOpen={isRoomModalOpen}
+				onClose={() => setIsRoomModalOpen(false)}
+				onCreateRoom={createRoom}
+			/>
 		</div>
+
+
 	);
 }

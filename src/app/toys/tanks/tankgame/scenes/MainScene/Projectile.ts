@@ -10,7 +10,7 @@ export class Projectile {
 	private v0: Phaser.Math.Vector2; // Initial velocity
 	public startTime: number;
 	public windSpeed: number;
-	public drag: number = 0.5; // Drag coefficient
+	public drag: number = 0.6; // Drag coefficient
 	private gravity: number = 200;
 	public radius: number = 5;
 	public color: number = 0x000000;

@@ -20,12 +20,12 @@ import Phaser from 'phaser';
 		private playerText!: Phaser.GameObjects.Text;
 		private nameInputBox!: Phaser.GameObjects.DOMElement;
 		private colorOptions: Array<string> = [
-			'#ff0000',
-			'#00ff00',
-			'#0000ff',
+			'#b40a0a',
+			'#50c750',
+			'#1e1ecf',
 			'#000000',
-			'#ffff00',
-			'#ffa500',
+			'#cece4e',
+			'#c47f00',
 		];
 		private colorButtons: Record<string, Phaser.GameObjects.Container> = {};
 		private aiOptions: Record<string, string> = {
@@ -72,6 +72,8 @@ import Phaser from 'phaser';
 			// Load font
 			this.load.font('machine-font', '/tanks/mf.otf');
 		}
+
+
 
 		create() {
 			const { width, height } = this.cameras.main;
@@ -698,7 +700,7 @@ import Phaser from 'phaser';
 
 		private updatePlayerSelectionContent() {
 			while(this.playerInfo.length < this.selectingNumber) {
-				this.playerInfo.push({ name: ``, color: 'black', isAI: false, aiDifficulty: 'NORMAL' });
+				this.playerInfo.push({ name: ``, color: '#000000', isAI: false, aiDifficulty: 'NORMAL' });
 			}
 			this.playerText.setText(`PLAYER ${this.selectingNumber}`);
 			if (this.selectingNumber === this.selectedPlayers) this.nextPlayerText.setText('START !');

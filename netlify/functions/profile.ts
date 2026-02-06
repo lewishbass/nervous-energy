@@ -2,7 +2,6 @@ import { Handler } from '@netlify/functions';
 import connectMongoDB from '../lib/mongodb';
 import User from '../models/User';  // Import the model directly, not the schema
 import { validateUser, sanitizeUser } from '../lib/backendutils';
-
 // JWT secret key should be in environment variables in production
 const JWT_SECRET = process.env.JWT_SECRET || 'default_jwt_secret_for_development';
 

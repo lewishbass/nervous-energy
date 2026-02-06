@@ -11,14 +11,11 @@ export class Dashboard {
 	private nameText: Phaser.GameObjects.Text;
 	private healthText: Phaser.GameObjects.Text;
 	private fuelText: Phaser.GameObjects.Text;
-	private nameColorMatrix: Phaser.FX.ColorMatrix;
 
 	private tankSprite: Phaser.GameObjects.Sprite;
-	private tankSpriteColorMatrix: Phaser.FX.ColorMatrix;
 	private turret: Phaser.GameObjects.Graphics;
 
 	private angleTankSprite: Phaser.GameObjects.Sprite;
-	private angleTankSpriteColorMatrix: Phaser.FX.ColorMatrix;
 	private angleTankTurret: Phaser.GameObjects.Graphics;
 
 	private nameDrawer: Phaser.GameObjects.Graphics;
@@ -115,14 +112,12 @@ export class Dashboard {
 		
 		this.background1 = scene.add.rectangle(0, 0, containerWidth, containerHeight, 0xffffff, 0.55);
 		
-		this.tankSprite = scene.add.sprite(-118, -40, 'player');
-		this.tankSpriteColorMatrix = this.tankSprite.postFX.addColorMatrix();
+		this.tankSprite = scene.add.sprite(-118, -40, 'player'); // Will be updated in update()
 		this.turret = scene.add.graphics();
 		this.turret.setDepth(11);
 		this.drawTurret(this.tankSprite.x, this.tankSprite.y, this.turret, -145);
 
-		this.angleTankSprite = scene.add.sprite(30, -0, 'player');
-		this.angleTankSpriteColorMatrix = this.angleTankSprite.postFX.addColorMatrix();
+		this.angleTankSprite = scene.add.sprite(30, -0, 'player'); // Will be updated in update()
 		this.angleTankTurret = scene.add.graphics();
 		this.angleTankTurret.setDepth(11);
 		this.drawTurret(this.angleTankSprite.x, this.angleTankSprite.y, this.angleTankTurret, 0);
@@ -157,9 +152,7 @@ export class Dashboard {
 		
 		this.teleporterImage = scene.add.image(startGadgetX + 2 * gadgetSpacing, gadgetY + 15, 'teleport_dash');
 		this.teleporterText = scene.add.text(startGadgetX + 2 * gadgetSpacing + 17, gadgetY, '', textStyle);
-		
-		this.nameColorMatrix = this.nameText.postFX.addColorMatrix();
-		this.nameColorMatrix.hue(0);
+
 		
 		const buttonY = 14;
 		const buttonSize = 26;
@@ -207,9 +200,12 @@ export class Dashboard {
 		this.powerBar.on('pointerdown', () => {
 			this.clickSound(0.5);
 		});
+		this.powerBar.on('pointerup', () => {
+			this.clickSound(0.5, 200);
+		});
 		
 		this.powerBar.on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-			this.clickSound(0.1);
+
 
 			// Clamp to triangle bounds
 			const minY = this.powerTriY - this.powerTriHeight / 2;
@@ -220,6 +216,7 @@ export class Dashboard {
 			
 			// Calculate power from position (inverted - top is max power)
 			const fraction = (clampedY - minY) / (maxY - minY);
+			//this.clickSound(0.1, fraction * -1200 + 600); // Higher pitch for higher power
 			if (this.onPowerChange) {
 				this.onPowerChange(1 - fraction); // Invert so top is 100%
 			}
@@ -242,9 +239,11 @@ export class Dashboard {
 		this.angleBar.on('pointerdown', () => {
 			this.clickSound(0.5);
 		});
+		this.angleBar.on('pointerup', () => {
+			this.clickSound(0.5, 200);
+		});
 		
 		this.angleBar.on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-			this.clickSound(0.1);
 			
 			// Clamp to box bounds
 			const minX = this.angleBoxX - this.angleBoxWidth / 2;
@@ -254,6 +253,7 @@ export class Dashboard {
 			
 			// Calculate angle from position (left is -180, right is 0)
 			const fraction = (clampedX - minX) / (maxX - minX);
+			//this.clickSound(0.1, Math.abs(fraction - 0.5) * 2400 - 1200); // Higher pitch for more extreme angles
 			const angle = -180 + fraction * 180;
 			if (this.onAngleChange) {
 				this.onAngleChange(angle);
@@ -300,6 +300,7 @@ export class Dashboard {
 			});
 		});
 		this.fireButton.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			this.scene.tweens.add({
 				targets: this.fireButton,
 				scale: 1.3,
@@ -335,6 +336,7 @@ export class Dashboard {
 			});
 		});
 		this.fireButtonText.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			this.scene.tweens.add({
 				targets: this.fireButton,
 				scale: 1.3,
@@ -481,8 +483,8 @@ export class Dashboard {
 		container4.add([this.background4, this.leaderboardTitle]);
 	}
 	
-	clickSound(volume: number = 1) {
-		this.scene.sound.play('click', { volume: volume * Phaser.Math.FloatBetween(0.4, 0.8), detune: Phaser.Math.Between(-200, 200) });
+	clickSound(volume: number = 1, detune: number = 0) {
+		this.scene.sound.play('click', { volume: volume * Phaser.Math.FloatBetween(0.4, 0.8), detune: detune + Phaser.Math.Between(-200, 200) });
 	}
 
 	
@@ -504,6 +506,7 @@ export class Dashboard {
 			this.leftButton.setFillStyle(0xff0000, 1);
 		});
 		this.leftButton.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			this.leftButtonPressed = false;
 			this.leftButton.setFillStyle(0x000000, 1);
 		});
@@ -531,6 +534,7 @@ export class Dashboard {
 			this.rightButton.setFillStyle(0xff0000, 1);
 		});
 		this.rightButton.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			this.rightButtonPressed = false;
 			this.rightButton.setFillStyle(0x000000, 1);
 		});
@@ -556,6 +560,7 @@ export class Dashboard {
 			this.weaponLeftButton.setFillStyle(0xff0000, 1);
 		});
 		this.weaponLeftButton.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			if (this.weaponLeftButtonPressed && this.onWeaponScroll) {
 				this.onWeaponScroll(-1);
 			}
@@ -582,6 +587,7 @@ export class Dashboard {
 			this.weaponRightButton.setFillStyle(0xff0000, 1);
 		});
 		this.weaponRightButton.on('pointerup', () => {
+			this.clickSound(0.7, 200);
 			if (this.weaponRightButtonPressed && this.onWeaponScroll) {
 				this.onWeaponScroll(1);
 			}
@@ -720,10 +726,20 @@ export class Dashboard {
 		this.maxPower = Math.min(tank.health, 100);
 		tank.power = Math.min(tank.power, this.maxPower);
 
-		this.nameColorMatrix.hue(tank.hue);
-		this.angleTankSpriteColorMatrix.hue(tank.hue);
-		this.tankSpriteColorMatrix.hue(tank.hue);
+		// Update tank sprites to use the correct colored texture
+		const textureKey = tank.getTextureKey();
+		if (this.scene.textures.exists(textureKey)) {
+			if (this.tankSprite.texture.key !== textureKey) {
+				this.tankSprite.setTexture(textureKey);
+			}
+			if (this.angleTankSprite.texture.key !== textureKey) {
+				this.angleTankSprite.setTexture(textureKey);
+			}
+		}
+
+
 		this.nameText.setText(`${tank.name || 'Unnamed'}`);
+		this.nameText.setColor(Phaser.Display.Color.ValueToColor(tank.color).rgba);
 		this.fuelText.setText(`${Phaser.Math.Clamp(Math.floor(tank.fuel), 0, 999)}`);
 		this.healthText.setText(`${Math.floor(tank.health)}`);
 		

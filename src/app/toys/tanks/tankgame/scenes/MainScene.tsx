@@ -73,7 +73,10 @@ export class MainScene extends Phaser.Scene {
 		}
 	}
 
+
 	preload() {
+
+
 		// Load assets
 		this.load.spritesheet('player', '/tanks/props/tank.svg', {
 			frameWidth: 32,
@@ -132,7 +135,7 @@ export class MainScene extends Phaser.Scene {
 		for (let i = 0; i < this.nTanks; i++) {
 			console
 			const color = this.playerInfo[i]?.color ? Phaser.Display.Color.HexStringToColor(this.playerInfo[i].color).color : 0xff00ff;
-			this.tanks.push(new Tank(this, -200, -200, false, 360/this.nTanks * i, this.terrain, this.playerInfo[i]?.name || `Tank ${i+1}`, this.projectiles, color));
+			this.tanks.push(new Tank(this, -200, -200, false, this.terrain, this.playerInfo[i]?.name || `Tank ${i + 1}`, this.projectiles, color));
 		}
 		
 		
@@ -164,11 +167,12 @@ export class MainScene extends Phaser.Scene {
 		this.dashboard.onPowerChange = (fraction: number) => {
 			const currentTank = this.tanks[this.turnOrder[this.currentTurnIndex]];
 			const maxPower = 100;
-			currentTank.power = fraction * maxPower;
+			currentTank.adjustPower(fraction * maxPower - currentTank.power);
 		};
 		this.dashboard.onAngleChange = (angle: number) => {
 			const currentTank = this.tanks[this.turnOrder[this.currentTurnIndex]];
-			currentTank.turretAngle = angle;
+			currentTank.rotateTurret(angle - currentTank.turretAngle);
+
 		};
 		this.dashboard.onWeaponScroll = (delta: number) => {
 			const currentTank = this.tanks[this.turnOrder[this.currentTurnIndex]];
@@ -274,10 +278,10 @@ export class MainScene extends Phaser.Scene {
 		const tank = this.tanks[this.turnOrder[this.currentTurnIndex]];
 		const delta = this.game.loop.delta;
 		if (this.pageUpKey.isDown || this.wKey.isDown) {
-			tank.power = Phaser.Math.Clamp(tank.power + delta/75, 0, Math.min(100, tank.health));
+			tank.adjustPower(delta / 75);
 		}
 		if (this.pageDownKey.isDown || this.sKey.isDown) {
-			tank.power = Phaser.Math.Clamp(tank.power - delta/75, 0, Math.min(100, tank.health));
+			tank.adjustPower(-delta / 75);
 		}
 
 		if(Phaser.Input.Keyboard.JustDown(this.aKey)) {
@@ -335,7 +339,7 @@ export class MainScene extends Phaser.Scene {
 	endRound(winner?: Tank) {
 		this.launchedShop = true;
 		// distribute money based on damage dealt and bonus to winner
-		const totalWinnings = 20_000 + 20_000 * (this.roundNumber);
+		const totalWinnings = 20_000 + 10_000 * (this.roundNumber);
 		const pityMoney = totalWinnings * 0.1;
 		//console.log(`Round over. ${winner ? winner.name + ' wins!' : 'No winner.'} Distributing ${totalWinnings} cash plus ${pityMoney} pity money to each tank.`);
 		if (winner) winner.cash += totalWinnings * 0.2;

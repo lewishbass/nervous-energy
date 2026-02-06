@@ -3,6 +3,10 @@ import { Terrain } from './Terrain';
 import { Projectile } from './Projectile';
 import { projectilelist } from './projectiles/projectilelist';
 
+const svgText = `
+	<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="29.9" height="13.42" viewBox="0 0 17.08 7.69"><path d="m.7 5.98 1.06 1.7H15.3l1.06-1.77"/><path fill="#FF0000" d="M2.37 2.17 3.59 0H13.6l1.32 2.17L17.1 3.3l-.34 2.83H.3l-.33-2.83z"/></svg>
+`;
+
 export class Tank {
 	private scene: Phaser.Scene;
 	private body: Phaser.Physics.Matter.Sprite | undefined;
@@ -21,10 +25,9 @@ export class Tank {
 	
 	private speed: number = 25;
 	private rotationSpeed: number = 2;
-	private turretRotationSpeed: number = 48;
+	public turretRotationSpeed: number = 48;
 	private recoilOffset: number = 0; // Recoil animation offset
 	private recoilTween?: Phaser.Tweens.Tween; // Track the recoil tween
-	public climbSlope: number = 1.0; // max ration of height to width for climbing
 	private gravity = 1000;
 	private drag = 0.1;
 	private fallSpeed = 0;
@@ -39,10 +42,8 @@ export class Tank {
 
 	private dirtyPhysics: boolean = true; // physics is in steady state, stop updating unless moved
 	private terrain: Terrain; // pointer to terrain for collision checks
-	
-	public hue: number = 0; // Hue rotation value
+
 	public color: number = 0xff00ff;
-	private colorMatrix: Phaser.FX.ColorMatrix | undefined;
 
 	public name: string = "";
 	
@@ -91,6 +92,7 @@ export class Tank {
 	public health: number = this.maxHealth;
 	public fuel: number = 100; // consumed when moving
 	public maxFuel: number = 100;
+	public climbSlope: number = 1.0; // max ration of height to width for climbing
 
 	public fuelEfficiency: number = 1; // multiplier for fuel consumption
 	public armor: number = 0;
@@ -99,18 +101,41 @@ export class Tank {
 
 	private muzzleSpeed: number = 800; // px/s
 
-	constructor(scene: Phaser.Scene, x: number, y: number, showDebug: boolean = false, hue: number = 0, terrain: Terrain, name: string = "", projectiles: Projectile[], hexColor: number = 0xff00ff) {
+	private static createCustomTexture(scene: Phaser.Scene, key: string, hexColor: number, svgText: string): Promise<void> {
+		// Convert hex color to CSS color string
+		const colorString = '#' + hexColor.toString(16).padStart(6, '0');
+
+		// Replace the accent color (assuming #FF0000 is the template color)
+		const updatedSvg = svgText.replace(/#FF0000/gi, colorString);
+		console.log(`Creating custom texture with color ${colorString}`);
+
+		// Load into Phaser as base64
+		const base64 = 'data:image/svg+xml;base64,' + btoa(updatedSvg);
+
+		return new Promise((resolve) => {
+			const loader = scene.load.image(key, base64);
+			scene.load.once('complete', () => {
+				console.log(`Texture ${key} loaded successfully`);
+				resolve();
+			});
+			scene.load.start();
+		});
+	}
+
+	constructor(scene: Phaser.Scene, x: number, y: number, showDebug: boolean = false, terrain: Terrain, name: string = "", projectiles: Projectile[], hexColor: number = 0xff00ff) {
 		this.scene = scene;
 		this.x = x;
 		this.y = y;
 		this.showDebug = showDebug;
-		this.hue = hue;
 		this.terrain = terrain;
 		this.name = name;
 		this.projectiles = projectiles;
 		this.color = hexColor;
 		// Don't create Matter body yet - will be done in initializeBody()
-		this.initializeBody()
+		this.initializeBody().then(() => {
+			// Body is ready, initial draw
+			this.drawTurret();
+		});
 		
 		// Create turret graphics
 		this.turret = scene.add.graphics();
@@ -128,20 +153,28 @@ export class Tank {
 		this.aimingProjectile = new Projectile(this.scene, this.x, this.y-10, 0, 0, this.terrain.getWindSpeed(), this.projectiles, this);
 	}
 
-	initializeBody() {
-		// Create Matter sprite for collision detection only
-		this.body = this.scene.matter.add.sprite(this.x, this.y, 'player', undefined, {
+	async initializeBody() {
+		// Create unique texture key based on color
+		const textureKey = `player_${this.color.toString(16)}_${this.name}`;
+
+		// Only create texture if it doesn't exist
+		if (!this.scene.textures.exists(textureKey)) {
+			await Tank.createCustomTexture(this.scene, textureKey, this.color, svgText);
+		}
+
+		// Create Matter sprite with custom colored texture
+		this.body = this.scene.matter.add.sprite(this.x, this.y, textureKey, undefined, {
 			isStatic: true, // We'll handle movement manually
 		});
 		this.body.setDepth(5.5);
 		this.body.setFixedRotation();
 		this.body.setScale(1, 1.15);
-		
-		// Add hue shift effect
-		this.colorMatrix = this.body.postFX.addColorMatrix();
-		this.colorMatrix.hue(this.hue);
-		
 	}
+
+	public getTextureKey() {
+		return `player_${this.color.toString(16)}_${this.name}`;
+	}
+
 
 	update(cursors?: Phaser.Types.Input.Keyboard.CursorKeys) : {exploded: boolean, x?: number, y?: number} {
 
@@ -159,10 +192,10 @@ export class Tank {
 		// Custom movement logic
 		if (cursors) {
 			if (cursors.up.isDown) {
-				this.rotateTurret(delta / 1000);
+				this.rotateTurret(delta / 1000 * this.turretRotationSpeed);
 			}
 			if (cursors.down.isDown) {
-				this.rotateTurret(-delta / 1000);
+				this.rotateTurret(-delta / 1000 * this.turretRotationSpeed);
 			}
 
 			if (cursors.left.isDown) {
@@ -242,7 +275,8 @@ export class Tank {
 		
 		const slopeSlowdown = 1 - 1.3**(-(this.climbSlope - slope) / this.climbSlope * 5);
 		this.x += direction * this.speed * slopeSlowdown * (delta / 1000);
-		this.fuel = Math.max(0, this.fuel - delta/40 * (0.9**this.fuelEfficiency)); // consume fuel
+		this.fuel = Math.max(0, this.fuel - delta / 40 * (0.9 ** this.fuelEfficiency)); // consume fuel
+		this.clickSound(0.2, slope * 400 - 1800);
 		if(slope>0)this.y = this.getTerrainCollision(this.x) - this.tankYOffset; // Adjust y based on terrain height
 		this.updateTankPos()
 	}
@@ -279,18 +313,33 @@ export class Tank {
 
 	
 	rotateTurret(delta: number) {
-		this.turretAngle += delta * this.turretRotationSpeed;
+		const lastAngle = this.turretAngle;
+		this.turretAngle += delta;
 		// Clamp turret angle to reasonable range
 		this.turretAngle = Phaser.Math.Clamp(this.turretAngle, -180, 0);
-		// Draw turret
-		this.drawTurret();
+		if (lastAngle !== this.turretAngle) {
+			// Draw turret
+			this.drawTurret();
+
+			const fraction = Math.abs(this.turretAngle + 90) / 90;
+			const vol = (Math.abs(lastAngle - this.turretAngle) / 90) ** 0.5;
+			this.clickSound(vol, fraction * -1200 + 600);
+		}
 	}
 	
 	adjustPower(delta: number) {
+		const lastPower = this.power;
 		this.power += delta;
-		this.power = Phaser.Math.Clamp(this.power, 1, 30);
+		this.power = Phaser.Math.Clamp(this.power, 0, Math.min(100, this.health));
+
+		if (lastPower !== this.power) {
+			const fraction = (this.power) / 100;
+			const vol = (Math.abs(lastPower - this.power) / 100) ** 0.5;
+			this.clickSound(vol, fraction * -1200 + 600);
+		}
 	}
 	
+
 	private drawTurret() {
 		this.turret.clear();
 		this.healthBar.clear();
@@ -352,12 +401,18 @@ export class Tank {
 				this.terrain.getWindSpeed(),
 				0  // Use 0 as start time
 			);
-			this.aimingLine.lineStyle(2, 0xff00ff, 0.02);
-			const startPos = this.aimingProjectile!.getPosition(0);
-			this.aimingLine.moveTo(startPos.x, startPos.y);
-			for (let t = 0; t < 6; t += 0.1) {
+
+			const maxTime = 2;
+			let startPos = this.aimingProjectile!.getPosition(0);
+			for (let t = 0; t < maxTime; t += 0.1) {
 				const pos = this.aimingProjectile?.getPosition(t);
-				if (pos) this.aimingLine.lineTo(pos.x, pos.y);
+				if (pos) {
+					// Calculate alpha that fades from 0.02 to 0 over time
+					const alpha = (1 - t / maxTime);
+					this.aimingLine.lineStyle(5 * (1 - alpha), 0xff00ff, alpha * 0.1);
+					this.aimingLine.lineBetween(startPos.x, startPos.y, pos.x, pos.y);
+					startPos = pos;
+				}
 			}
 			this.aimingLine.strokePath();
 		}
@@ -571,6 +626,10 @@ export class Tank {
 		} else {
 			this.shields[shieldName] = amount;
 		}
+	}
+
+	clickSound(volume: number = 1, detune: number = 0) {
+		this.scene.sound.play('click', { volume: volume * Phaser.Math.FloatBetween(0.4, 0.8), detune: detune + Phaser.Math.Between(-200, 200) });
 	}
 
 }

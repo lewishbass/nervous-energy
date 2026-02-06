@@ -13,6 +13,10 @@ import { useState, useEffect } from 'react';
 import { FaArrowRotateRight } from 'react-icons/fa6';
 import { useAuth } from '@/context/AuthContext';
 
+
+import { Client, Room } from '@colyseus/sdk'
+const TANKS_SERVER_ENDPOINT = "192.168.1.185:2567";
+
 const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 	ssr: false,
 	loading: () => <LoadingSpinner className="h-full" text="Loading Tank Game..." size="lg" />,
@@ -40,6 +44,7 @@ export default function TanksPage() {
 	const [gameKey, setGameKey] = useState(0);
 	const [gameToken, setGameToken] = useState<string | null>(null);
 	const [gameTokenState, setGameTokenState] = useState<'no-token' | 'verifying' | 'valid' | 'invalid'>('no-token');
+	const [client, setClient] = useState<Client | null>(null);
 
 	// Fetch token on mount and when login state changes
 	useEffect(() => {
@@ -56,17 +61,19 @@ export default function TanksPage() {
 
 	useEffect(() => {
 
-		verifyGameToken(gameToken);
+		verifyGameToken(gameToken).then(isValid => {
+			if (isValid) connectColyseus();
+		});
 	}, [gameToken]);
 
-	const verifyGameToken = async (token: string | null) => {
+	const verifyGameToken = async (token: string | null): Promise<boolean> => {
 
 		if (token === null) {
 			setGameTokenState('no-token');
-			return;
+			return false;
 		} else if (!username) {
 			setGameTokenState('invalid');
-			return;
+			return false;
 		} else {
 			setGameTokenState('verifying');
 		}
@@ -89,20 +96,28 @@ export default function TanksPage() {
 				const data = await response.json();
 				if (data.success) {
 					setGameTokenState('valid');
+					return true;
 				} else {
 					setGameTokenState('invalid');
+					return false;
 				}
 			} else {
 				setGameTokenState('invalid');
+				return false;
 			}
 		} catch (error) {
 			console.error('Error verifying game token:', error);
 			setGameTokenState('invalid');
+			return false;
 		}
 	};
 
 	const reloadGame = () => {
 		setGameKey(prev => prev + 1);
+	}
+
+	const connectColyseus = async () => {
+		setClient(new Client(`http://${TANKS_SERVER_ENDPOINT}`));
 	}
 
 	return (
@@ -166,11 +181,9 @@ export default function TanksPage() {
 					<div className={`flex-grow bg2 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden aspect-[64/52] max-h-[90vh]`}>
 						<div className="p-4 border-b border-gray-200 dark:border-gray-700">
 							<h2 className="text-2xl font-bold tc1 flex items-center">
-								<div
-									className={`mr-2 w-3 h-3 rounded-full transition-all duration-400 ${`bg-${tokenStateToColor[gameTokenState]}-500`}`}
-									title={tokenStateToTitle[gameTokenState]}
-								/>
-								<MdSportsEsports />
+
+								<MdSportsEsports className={`mr-2 transition-all duration-400 ${`text-${tokenStateToColor[gameTokenState]}-500`}`}
+									title={tokenStateToTitle[gameTokenState]} />
 								<span>Tanks <span className="ml-2 text-sm font-normal tc2">Multiple terrains, multiple weapons - get them before they get you!</span></span>
 								<div className="ml-auto flex items-center gap-2">
 
@@ -185,7 +198,7 @@ export default function TanksPage() {
 
 					{/* Social Sidebar */}
 					<div className="w-content flex-shrink-0 lg:max-h-[790px] lg:min-h-[790px]" >
-						<Social />
+						<Social username={username} isLoggedIn={isLoggedIn} subToken={gameToken} client={client} />
 					</div>
 				</div>
 			</section>
