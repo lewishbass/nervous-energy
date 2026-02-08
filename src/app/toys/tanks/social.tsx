@@ -80,15 +80,38 @@ interface SocialProps {
 	client: Client | any,
 }
 
+const statusToColor: Record<string, string> = {
+	'idle': 'gray-500',
+	'fetching': 'yellow-500',
+	'success': 'green-500',
+	'error': 'red-500',
+};
+
 export default function Social({ username, subToken, isLoggedIn, client }: SocialProps) {
 	const [selectedLobby, setSelectedLobby] = useState<string | null>('1');
-	const [lobbiesCollapsed, setLobbiesCollapsed] = useState(false);
-	const [playersCollapsed, setPlayersCollapsed] = useState(false);
+	const [lobbiesCollapsed, setLobbiesCollapsed] = useState(true);
+	const [playersCollapsed, setPlayersCollapsed] = useState(true);
 	const [dividerPosition, setDividerPosition] = useState(50); // percentage
 	const [isDragging, setIsDragging] = useState(false);
 	const [chatMessage, setChatMessage] = useState('');
 
-	const [rooms, setRooms] = useState<Room[]>([]);
+	const [roomFetchStatus, setRoomFetchStatus] = useState<'idle' | 'fetching' | 'success' | 'error'>('idle');
+
+	const [rooms, setRooms] = useState<Room[]>([{
+		clients: 0,
+		createdAt: new Date(),
+		locked: false,
+		maxClients: 0,
+		name: 'WIP coming soon',
+		private: false,
+		processId: '12345',
+		roomId: '1',
+		unlisted: false,
+		metadata: {
+			map: 'Desert',
+			status: 'waiting'
+		}
+	}]);
 	const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
 	const getStatusColor = (status: string) => {
@@ -173,14 +196,22 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 
 	const getLobbies = async () => {
 		// Fetch lobbies from server
-
-		if (!client) return;
-		console.log('Fetching lobbies...');
+		setRoomFetchStatus('fetching');
+		if (!client) {
+			setTimeout(() => setRoomFetchStatus('error'), 3000);
+			console.error('No client available to fetch lobbies');
+			return;
+		}
 		client.http.get("/api/room_list").then((response: any) => {
 			if (response && response.data && response.data.rooms) {
-				console.log('Lobbies fetched:', response.data.rooms);
 				setRooms(response.data.rooms);
+				setRoomFetchStatus('success');
+			} else {
+				setRoomFetchStatus('error');
 			}
+		}).catch((error: any) => {
+			console.error('Error fetching lobbies:', error);
+			setRoomFetchStatus('error');
 		});
 	};
 
@@ -207,7 +238,7 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 			<div className={`bg2 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all ${lobbiesCollapsed ? 'flex-grow-0' : 'flex-grow'}`}>
 				<div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500/10 to-purple-500/10 cursor-pointer select-none" onClick={() => setLobbiesCollapsed(!lobbiesCollapsed)}>
 					<h3 className="text-xl font-bold tc1 flex items-center">
-						<FaGamepad className="cursor-pointer text-xl tc1 hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-transform mr-2" onClick={(e: React.MouseEvent) => { getLobbies(); e.stopPropagation(); }} />
+						<FaGamepad className={`cursor-pointer text-xl hover:opacity-70 active:-rotate-360 duration-1000 active:duration-0 active:opacity-50 transition-all mr-2 text-${statusToColor[roomFetchStatus]}`} onClick={(e: React.MouseEvent) => { getLobbies(); e.stopPropagation(); }} />
 						Available Lobbies
 						<FaChevronUp className={`ml-auto rounded-full p-1 cursor-pointer w-6 h-6 transition-transform duration-300 ${lobbiesCollapsed ? 'rotate-180' : ''}`} />
 					</h3>

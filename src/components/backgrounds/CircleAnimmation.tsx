@@ -6,6 +6,7 @@ interface CircleAnimationProps {
   style?: React.CSSProperties; // Additional styles
   seed?: number; // Seed for random generation
   strokeWidth?: number;
+  doAnimation?: boolean; // Whether to animate the circles
 }
 
 interface Circle {
@@ -24,6 +25,7 @@ const CircleAnimation: React.FC<CircleAnimationProps> = ({
   style = {},
   seed = 42,
   strokeWidth = 8,
+  doAnimation = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [circles, setCircles] = useState<Circle[]>([]);
@@ -238,15 +240,15 @@ const CircleAnimation: React.FC<CircleAnimationProps> = ({
             cy={circle.y}
             r={circle.radius}
             fill={'none'}
-            opacity={0}
+            opacity={doAnimation ? 0 : 1}
             stroke={circle.color}
             strokeWidth={strokeWidth}
             //strokeDasharray={`${1 / 32 * Math.PI * circle.radius} ${3 / 32 * Math.PI * circle.radius}`}
             //strokeDashoffset={`${4 * Math.PI * circle.radius}`}
             
             style={{
-              animation: `fade-in ${5 + 30 / circle.radius ** 0.5}s ease 0.2s forwards`,
-              animationDelay: `${30 / circle.radius**0.5}s`,
+              animation: doAnimation ? `fade-in ${5 + 30 / circle.radius ** 0.5}s ease 0.2s forwards` : undefined,
+              animationDelay: doAnimation ? `${30 / circle.radius ** 0.5}s` : undefined,
               strokeLinejoin: "round",
               strokeLinecap: "round"
 

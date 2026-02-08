@@ -122,12 +122,18 @@ export default function LecturesTab() {
     }
   }, []);
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (slideMode && e.key === 'Escape') {
+      handleExitSlideMode();
+    }
+  };
+
   React.useEffect(() => {
     if (slideMode) {
-      document.addEventListener('keydown', handleExitSlideMode);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
-      document.removeEventListener('keydown', handleExitSlideMode);
+      document.removeEventListener('keydown', handleKeyDown);
     }
   }, [slideMode]);
   
@@ -152,6 +158,7 @@ export default function LecturesTab() {
           <div className="grid gap-4">
             <div className={`grid grid-cols-1 gap-1 ${listMode == 'grid' ? 'md:grid-cols-2 lg:grid-cols-3 gap-4' : 'rounded-xl overflow-hidden'}`}>
               {lectureList.map((lecture, index) => {
+                if (!lecture.finished) return null;
                 const IconComponent = lecture.icon as React.ComponentType<{ displayMode: 'list' | 'card'; onClick: () => void; key: number }>;
                 return <IconComponent displayMode={listMode === 'list' ? 'list' : 'card'} onClick={() => handleLectureClick(index)} key={index} />;
               })}

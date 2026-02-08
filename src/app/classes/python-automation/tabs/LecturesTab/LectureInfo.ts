@@ -26,30 +26,31 @@ export type LecturePair = {
 	lecture: typeof DummyLecture;
 	classNumber?: number;
 	index: number;
+	finished?: boolean;
 }
 
 
 
 export const lectureList: LecturePair[] = [
-	{ icon: SetupLectureIcon, lecture: SetupLecture, index: 0, classNumber: 0 },
-	{ icon: VariablesLectureIcon, lecture: VariablesLecture, index: 1, classNumber: 1 },
-	{ icon: StringsLectureIcon, lecture: StringsLecture, index: 2, classNumber: 2 },
-	{ icon: BooleanLectureIcon, lecture: BooleanLecture, index: 3, classNumber: 3 },
-	{ icon: LoopsLectureIcon, lecture: LoopsLecture, index: 4, classNumber: 4 },
-	{ icon: ListsLectureIcon, lecture: ListsLecture, index: 5, classNumber: 5 },
-	{ icon: DictionariesLectureIcon, lecture: DictionariesLecture, index: 6, classNumber: 6 },
-	{ icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 7, classNumber: 7 },
-	{ icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 8, classNumber: 8 },
-	{ icon: ClassesLectureIcon, lecture: ClassesLecture, index: 9, classNumber: 9 },
-	{ icon: FilesLectureIcon, lecture: FilesLecture, index: 10, classNumber: 10 },
-	{ icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 11, classNumber: 11 },
-	{ icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 12, classNumber: 12 },
-	{ icon: PackagingLectureIcon, lecture: PackagingLecture, index: 13, classNumber: 13 },
-	{ icon: ProjectLectureIcon, lecture: ProjectLecture, index: 14, classNumber: 14 },
-	{ icon: ProjectLectureIcon, lecture: ProjectLecture, index: 15, classNumber: 15 },
-	{ icon: ProjectLectureIcon, lecture: ProjectLecture, index: 16, classNumber: 16 },
-	{ icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 17, classNumber: 17 },
-	{ icon: DecoratorsLectureIcon, lecture: DecoratorsLecture, index: 18, classNumber: 18 },
+	{ finished: true, icon: SetupLectureIcon, lecture: SetupLecture, index: 0, classNumber: 0 },
+	{ finished: true, icon: VariablesLectureIcon, lecture: VariablesLecture, index: 1, classNumber: 1 },
+	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 2, classNumber: 2 },
+	{ finished: false, icon: BooleanLectureIcon, lecture: BooleanLecture, index: 3, classNumber: 3 },
+	{ finished: false, icon: LoopsLectureIcon, lecture: LoopsLecture, index: 4, classNumber: 4 },
+	{ finished: false, icon: ListsLectureIcon, lecture: ListsLecture, index: 5, classNumber: 5 },
+	{ finished: false, icon: DictionariesLectureIcon, lecture: DictionariesLecture, index: 6, classNumber: 6 },
+	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 7, classNumber: 7 },
+	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 8, classNumber: 8 },
+	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 9, classNumber: 9 },
+	{ finished: false, icon: FilesLectureIcon, lecture: FilesLecture, index: 10, classNumber: 10 },
+	{ finished: false, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 11, classNumber: 11 },
+	{ finished: false, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 12, classNumber: 12 },
+	{ finished: false, icon: PackagingLectureIcon, lecture: PackagingLecture, index: 13, classNumber: 13 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 14, classNumber: 14 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 15, classNumber: 15 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 16, classNumber: 16 },
+	{ finished: false, icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 17, classNumber: 17 },
+	{ finished: false, icon: DecoratorsLectureIcon, lecture: DecoratorsLecture, index: 18, classNumber: 18 },
 ];
 
 lectureList.forEach((lecturePair, index) => {

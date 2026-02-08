@@ -10,6 +10,7 @@ export type AssignmentInfo = {
 	startClassIndex: number;
 	endClassIndex: number;
 	type?: AssignmentType;
+	finished?: boolean;
 };
 
 
@@ -193,7 +194,8 @@ export const assignments: AssignmentInfo[] = [
 		uuid: 'z9y8x7w6-v5u4-3210-zyxw-v9876543210ab',
 		startClassIndex: 0,
 		endClassIndex: 1,
-		type: 'survey'
+		type: 'survey',
+		finished: true
 	},
 	{
 		name: 'TMP-Personal Budget Calculator',

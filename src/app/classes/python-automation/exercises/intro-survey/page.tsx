@@ -22,7 +22,8 @@ export default function IntroSurvey() {
     uses: '',
     dayJob: '',
     interests: [] as string[],
-    availability: ''
+    availability: '',
+    operatingSystem: '',
   });
 
   const [submissionMessage, setSubmissionMessage] = useState<string | null>(null);
@@ -196,7 +197,7 @@ export default function IntroSurvey() {
 
         {/* Availability */}
         <RadioQuestionComponent
-          questionText="How many hours per week can you dedicate to coursework?"
+          questionText="How many hours per week do you expect to dedicate to coursework?"
           value={formData.availability}
           setValue={(value) => setFormData(prev => ({ ...prev, availability: value as string }))}
           options={['0-3 hours', '3-5 hours', '5-10 hours', '10+ hours']}
@@ -218,6 +219,15 @@ export default function IntroSurvey() {
             'App Development',
             'AI & Machine Learning',
           ]}
+        />
+
+        {/* Operating System */}
+        <RadioQuestionComponent
+          questionText="What is your primary operating system?"
+          value={formData.operatingSystem}
+          setValue={(value) => setFormData(prev => ({ ...prev, operatingSystem: value as string }))}
+          options={['Windows', 'macOS', 'Linux', 'Other']}
+          required
         />
 
         {/* Submit Button */}

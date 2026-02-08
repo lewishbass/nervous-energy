@@ -37,6 +37,7 @@ function SetupLecture(props: SetupLectureProps | null) {
     }
   };
 
+
   return (
     <LectureTemplate
       displayMode={displayMode}
@@ -44,23 +45,23 @@ function SetupLecture(props: SetupLectureProps | null) {
       style={style}
       exitFSCallback={exitFSCallback}
     >
-      <section className={` ${isScroll ? 'mb-4' : 'text-center m-[10vh]'}`}>
-        <h2 className={`tc1 font-bold ${isScroll ? 'text-2xl' : 'text-[8vw]'}`}>Setting Up Python</h2>
+      <section className="lecture-section mini-scroll">
+        <h2 className={`tc1 lecture-big-title`}>Setting Up Python</h2>
       </section>
 
-      <section className="mb-4" id="sections-overview">
+      <section className="lecture-section mini-scroll" id="sections-overview">
         <h3 className="lecture-section-header">Sections</h3>
         <div className="lecture-header-decorator" />
         <div className="flex flex-row">
           <ul className="list-['-'] list-inside tc2 space-y-1 ml-4">
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('what-is-python')}>What is Python?</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('python-libraries')}>Python Libraries</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('virtual-environments')}>Virtual Environments</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('command-line-interface')}>Command Line Interface</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('installing-miniconda')}>Installing Miniconda</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('configuring-vscode')}>Configuring VS Code for Python</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('jupyter-notebooks')}>Jupyter Notebooks</li>
-            <li className="lecture-link select-none cursor-pointer" onClick={() => scrollToSection('first-program')}>First Program</li>
+            <li className="lecture-link" onClick={() => scrollToSection('what-is-python')}>What is Python?</li>
+            <li className="lecture-link" onClick={() => scrollToSection('python-libraries')}>Python Libraries</li>
+            <li className="lecture-link" onClick={() => scrollToSection('virtual-environments')}>Virtual Environments</li>
+            <li className="lecture-link" onClick={() => scrollToSection('command-line-interface')}>Command Line Interface</li>
+            <li className="lecture-link" onClick={() => scrollToSection('installing-miniconda')}>Installing Miniconda</li>
+            <li className="lecture-link" onClick={() => scrollToSection('configuring-vscode')}>Configuring VS Code for Python</li>
+            <li className="lecture-link" onClick={() => scrollToSection('jupyter-notebooks')}>Jupyter Notebooks</li>
+            <li className="lecture-link" onClick={() => scrollToSection('first-program')}>First Program</li>
           </ul>
           <div className="relative w-full aspect-square max-w-[150px] mx-auto hidden sm:block">
             <Image
@@ -73,7 +74,7 @@ function SetupLecture(props: SetupLectureProps | null) {
         </div>
       </section>
 
-      <section className="mb-4" id="what-is-python">
+      <section className="lecture-section mini-scroll" id="what-is-python">
         <h3 className="lecture-section-header">What is Python?</h3>
         <div className="lecture-header-decorator" />
         <div className="flex-1">
@@ -81,7 +82,7 @@ function SetupLecture(props: SetupLectureProps | null) {
             <div className="mr-0 sm:mr-6">
               <p className="lecture-paragraph"> Python is a high-level programming language designed with a focus on readability and streamlined syntax.</p>
               <p className="lecture-paragraph"> It was developed in the late 1980s by Guido van Rossum and Python 3 (released in 2008) is the most popular programming language today.</p>
-              <p className="lecture-paragraph"> Python remains dominant in <span className="lecture-link">data science</span>, <span className="lecture-link">machine learning</span> and <span className="lecture-link">scientific computing</span> thanks to its powerful libraries, community support and portability.</p>
+              <p className="lecture-paragraph"> Python remains dominant in <span className="lecture-bold">data science</span>, <span className="lecture-bold">machine learning</span> and <span className="lecture-bold">scientific computing</span> thanks to its powerful libraries, community support and portability.</p>
             </div>
             <div className="relative w-full aspect-[2/3] max-w-[200px] mx-auto rounded-lg overflow-hidden shadow-lg hidden sm:block">
               <Image
@@ -100,13 +101,13 @@ function SetupLecture(props: SetupLectureProps | null) {
       </section>
 
 
-      <section className="mb-4" id="python-libraries">
+      <section className="lecture-section mini-scroll" id="python-libraries">
         <h3 className="lecture-section-header">Python Libraries</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph"> Most of Python's functionality is enabled through libraries. </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
           <div>
-            <span className="lecture-link">First party libraries</span>
+            <span className="lecture-bold">First party libraries</span>
             <table className="lecture-table">
               <tbody>
                 <tr className="lecture-table-row">
@@ -133,7 +134,7 @@ function SetupLecture(props: SetupLectureProps | null) {
             </table>
           </div>
           <div>
-            <span className="lecture-link">Third party libraries</span>
+            <span className="lecture-bold">Third party libraries</span>
             <table className="lecture-table">
               <tbody>
                 <tr className="lecture-table-row">
@@ -166,7 +167,7 @@ function SetupLecture(props: SetupLectureProps | null) {
         <p className="lecture-paragraph">
           These libraries are designed to be modular, easy to use, and easy to install. Compared to other languages, Python modules can be installed from a central source with a single command, imported with a single line, and expected to work across different operating systems and hardware with minimal configuration.
         </p>
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`import numpy as np
 randomNumbers = np.random.rand(1000)  # generate 1000 random numbers`}
           language="python"
@@ -178,7 +179,7 @@ randomNumbers = np.random.rand(1000)  # generate 1000 random numbers`}
         <p className="lecture-paragraph">
           <a className="lecture-link" href="https://pip.pypa.io/en/stable/" target="_blank" rel="noopener noreferrer">Package Installer for Python (pip)</a> is Pythons built in tool for installing and managing third party libraries.
         </p>
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`pip install numpy`}
           language="bash"
           caption="installing a library using pip"
@@ -198,7 +199,7 @@ randomNumbers = np.random.rand(1000)  # generate 1000 random numbers`}
         </div>*/}
       </section>
 
-      <section className="mb-4" id="virtual-environments">
+      <section className="lecture-section mini-scroll" id="virtual-environments">
         <h3 className="lecture-section-header">Virtual Environments</h3>
         <div className="lecture-header-decorator" />
         <div className="flex flex-row mb-6 gap-8">
@@ -227,7 +228,7 @@ randomNumbers = np.random.rand(1000)  # generate 1000 random numbers`}
           </div>
         </div>
 
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`conda create -n myenv python=3.10 numpy pandas
 conda activate myenv`}
           language="bash"
@@ -236,14 +237,14 @@ conda activate myenv`}
         <p className="lecture-paragraph">
           Lists of requirements can be saved to a file (typically named <code className="lecture-code-inline">environment.yml</code> or <code className="lecture-code-inline">requirements.txt</code>) and shared with others to recreate the same environment.
         </p>
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`conda env export > environment.yml
 conda env create -f environment.yml`}
           language="bash"
           caption="exporting and creating a conda environment from a YAML file"
         />
 
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`name: myenv
 channels:
   - defaults
@@ -257,7 +258,7 @@ dependencies:
 
       </section>
 
-      <section className="mb-4" id="command-line-interface">
+      <section className="lecture-section mini-scroll" id="command-line-interface">
         <h3 className="lecture-section-header">Command Line Interface</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
@@ -289,7 +290,7 @@ dependencies:
                 On Windows, you can open a terminal by searching for "Command Prompt", "PowerShell", or "Windows Terminal" in the Start Menu.
               </p>
               <p className="mb-3">
-                <span className="lecture-link">Common CLI Commands on Windows</span>
+                <span className="lecture-bold">Common CLI Commands on Windows</span>
               </p>
               <table className="lecture-table">
                 <tbody>
@@ -324,7 +325,7 @@ dependencies:
                 On Linux and Mac, look for "Terminal" in your applications (some distributions support the <code className="lecture-code-inline">Ctrl+Alt+T</code> shortcut).
               </p>
               <p className="mb-3">
-                <span className="lecture-link">Common CLI Commands on Linux/Mac</span>
+                <span className="lecture-bold">Common CLI Commands on Linux/Mac</span>
               </p>
               <table className="lecture-table">
                 <tbody>
@@ -354,7 +355,7 @@ dependencies:
           )}
         </div>
 
-        <CodeBlock
+        <CodeBlock className="lecture-codeblock"
           code={`cd Documents/Projects
 python my_script.py`}
           language="bash"
@@ -365,11 +366,11 @@ python my_script.py`}
           <span className="tc1 font-semibold">Tip:</span> In most terminals, you can use the up arrow key to recall previous commands, and Tab to auto-complete file and folder names.
         </p>
       </section>
-      <section className="mb-4" id="installing-miniconda">
+      <section className="lecture-section mini-scroll" id="installing-miniconda">
         <h3 className="lecture-section-header">Installing Miniconda</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          This section will give a quick overview of installing Miniconda, please refer to the <a href="https://www.anaconda.com/docs/getting-started/miniconda/install" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">official documentation</a> for more detailed instructions.
+          This section will give a quick overview of installing Miniconda, please refer to the <a href="https://www.anaconda.com/docs/getting-started/miniconda/install" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">official documentation</a> for more detailed instructions.
         </p>
 
         <div className="mb-4">
@@ -393,7 +394,7 @@ python my_script.py`}
               <p className="mb-3">
                 Download and run the Miniconda installer script for Linux:
               </p>
-              <CodeBlock
+              <CodeBlock className="lecture-codeblock"
                 code={`wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh`}
                 language="bash"
@@ -410,7 +411,7 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
               <p className="mb-3">
                 Download the Miniconda installer for Windows using PowerShell:
               </p>
-              <CodeBlock
+              <CodeBlock className="lecture-codeblock"
                 code={`Invoke-WebRequest -Uri "https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe" -OutFile ".\\Miniconda3-latest-Windows-x86_64.exe"`}
                 language="powershell"
                 caption="downloading Miniconda installer on Windows"
@@ -423,18 +424,18 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
         </div>
       </section>
 
-      <section className="mb-4" id="configuring-vscode">
+      <section className="lecture-section mini-scroll" id="configuring-vscode">
         <h3 className="lecture-section-header">Configuring VS Code for Python</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          <a className="lecture-link" href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VSCode</a> is a popular code editor and <a className='lecture-link' href="https://en.wikipedia.org/wiki/Integrated_development_environment" target='_blank' rel="noopener noreferrer">Integrated Development Environment (IDE)</a> with a wide range of community extensions for language support, development and customization.
+          <a className="lecture-link" href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VSCode</a> is a popular code editor and <a className='lecture-bold' href="https://en.wikipedia.org/wiki/Integrated_development_environment" target='_blank' rel="noopener noreferrer">Integrated Development Environment (IDE)</a> with a wide range of community extensions for language support, development and customization.
         </p>
         <p className="lecture-paragraph">
           This course will primarily use VSCode, but you are free to use any code editor or IDE you prefer. Alternatives include&nbsp;
-          <a className='lecture-link' href='https://thonny.org/' target="_blank" rel="noopener noreferrer">Thonny</a>,&nbsp;
-          <a className='lecture-link' href='http://www.jetbrains.com/pycharm/' target="_blank" rel="noopener noreferrer">PyCharm</a>,&nbsp;
-          <a className='lecture-link' href='https://jupyter.org/' target="_blank" rel="noopener noreferrer">Jupyter Notebook</a> and&nbsp;
-          <a className='lecture-link' href='https://www.sublimetext.com/' target="_blank" rel="noopener noreferrer">Sublime Text</a>.
+          <a className='lecture-bold' href='https://thonny.org/' target="_blank" rel="noopener noreferrer">Thonny</a>,&nbsp;
+          <a className='lecture-bold' href='http://www.jetbrains.com/pycharm/' target="_blank" rel="noopener noreferrer">PyCharm</a>,&nbsp;
+          <a className='lecture-bold' href='https://jupyter.org/' target="_blank" rel="noopener noreferrer">Jupyter Notebook</a> and&nbsp;
+          <a className='lecture-bold' href='https://www.sublimetext.com/' target="_blank" rel="noopener noreferrer">Sublime Text</a>.
 
         </p>
 
@@ -458,10 +459,10 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
           {vscodeTab === 'windows' && (
             <div className='lecture-tab-content'>
               <p className="mb-3">
-                Download and install VS Code for Windows through the <a href="ms-windows-store://pdp/?productid=xp9khm4bk9fz7q" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">Windows Store</a>.
+                Download and install VS Code for Windows through the <a href="ms-windows-store://pdp/?productid=xp9khm4bk9fz7q" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">Windows Store</a>.
               </p>
               <p className="mb-3">
-                Alternatively, download the installer from the <a href="https://code.visualstudio.com/download" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">official VS Code website</a> and run it manually.
+                Alternatively, download the installer from the <a href="https://code.visualstudio.com/download" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">official VS Code website</a> and run it manually.
               </p>
             </div>
           )}
@@ -469,15 +470,15 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
           {vscodeTab === 'linux' && (
             <div className='lecture-tab-content'>
               <p className="mb-3">
-                For Ubuntu/Debian-based distributions, download the <a href="https://go.microsoft.com/fwlink/?LinkID=760868" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">VS Code .deb package</a> and install it using:
+                For Ubuntu/Debian-based distributions, download the <a href="https://go.microsoft.com/fwlink/?LinkID=760868" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">VS Code .deb package</a> and install it using:
               </p>
-              <CodeBlock
+              <CodeBlock className="lecture-codeblock"
                 code={`sudo apt install ./<file>.deb`}
                 language="bash"
                 caption="installing VS Code on Ubuntu/Debian"
               />
               <p className="mb-3">
-                For other distributions, refer to the <a href="https://code.visualstudio.com/docs/setup/linux" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">VS Code Linux installation guide</a>.
+                For other distributions, refer to the <a href="https://code.visualstudio.com/docs/setup/linux" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">VS Code Linux installation guide</a>.
               </p>
             </div>
           )}
@@ -523,7 +524,7 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
 
       </section>
 
-      <section className="mb-4" id="jupyter-notebooks">
+      <section className="lecture-section mini-scroll" id="jupyter-notebooks">
         <h3 className="lecture-section-header">Jupyter Notebooks</h3>
         <div className="lecture-header-decorator" />
         <div className="flex flex-row mb-6 gap-8">
@@ -562,14 +563,14 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
           <li className="lecture-list-item-card">
             Install the Jupyter conda packages and run the following command in your terminal to open the Jupyter interface in your web browser:
             <br /><br />
-            <CodeBlock
+            <CodeBlock className="lecture-codeblock"
               code={`conda install jupyter\njupyter notebook # or 'jupyter lab' for the lab interface`}
               language="bash"
               caption="installing and launching Jupyter Notebook"
             />
           </li>
           <li className="lecture-list-item-card">
-            Use <a href="https://colab.research.google.com/" className="lecture-link-blue" target="_blank" rel="noopener noreferrer">Google Colab</a> for free cloud-based notebooks.<br />
+            Use <a href="https://colab.research.google.com/" className="lecture-bold-blue" target="_blank" rel="noopener noreferrer">Google Colab</a> for free cloud-based notebooks.<br />
             These are stored in your google drive for easy access and sharing.<br />
             Google provides limited free access to their GPUs and TPUs.
           </li>
@@ -578,7 +579,7 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
 
       </section>
 
-      <section className="mb-4" id="first-program">
+      <section className="lecture-section mini-scroll" id="first-program">
         <h3 className="lecture-section-header">First Program</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
@@ -614,33 +615,29 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
             <div className='lecture-tab-content'>
               <ul className="list-decimal list-inside tc3 space-y-8">
                 <li >Create and save a new file called <code className="lecture-code-inline">hello.py</code> using any text editor (Notepad, nano, vim, etc.).
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`print("Hello, World!")`}
                     language="python"
 
                     filename="hello.py"
-                    className="mt-2"
                   />
                 </li>
                 <li >Open your terminal or command prompt and activate conda
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`conda activate myenv  # replace 'myenv' with your environment name`}
                     language="bash"
-                    className="mt-2"
                   />
                 </li>
                 <li >Navigate to the directory where you saved <code className="lecture-code-inline">hello.py</code> using the <code className="lecture-code-inline">cd</code> command.
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`cd path/to/your/directory`}
                     language="bash"
-                    className="mt-2"
                   />
                 </li>
                 <li >Call Python to run your script:
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`python hello.py`}
                     language="bash"
-                    className="mt-2"
                   />
                 </li>
               </ul>
@@ -655,21 +652,19 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
             <div className='lecture-tab-content'>
               <ul className="list-decimal list-inside tc3 space-y-8">
                 <li>Open VS Code and create a new file called <code className="lecture-code-inline">hello.py</code>. Add the following code (and save the file):
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`print("Hello, World!")`}
                     language="python"
                     filename="hello.py"
-                    className="mt-2"
                   />
                 </li>
                 <li>
                   Open the command palette (<code className="lecture-code-inline">Ctrl+Shift+P</code> or <code className="lecture-code-inline">Cmd+Shift+P</code> on Mac) and type "Python: Select Interpreter". Choose the Python interpreter from the conda environment you set up earlier.
                 </li>
                 <li>Open the integrated terminal in VS Code (<code className="lecture-code-inline">Ctrl+`</code> or <code className="lecture-code-inline">Cmd+`</code> on Mac) and activate your conda environment.
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`conda activate myenv  # replace 'myenv' with your environment name`}
                     language="bash"
-                    className="mt-2"
                   />
                 </li>
                 <li>You can run the script in several ways:
@@ -701,10 +696,9 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
                     <div className="lecture-list-item-card flex-2">
                       <div className="w-full text-center font-semibold mb-2 tc1">Jupyter</div>
                       <p className="text-sm mb-2">Make sure the jupyter conda package was installed and activated with</p>
-                      <CodeBlock
+                      <CodeBlock className="lecture-codeblock mt-2"
                         code={`conda activate myenv\nconda install jupyter`}
                         language="bash"
-                        className="mt-2"
                       />
                       <p className="text-sm mt-2">Then run <code className="lecture-code-inline">jupyter notebook</code> or <code className="lecture-code-inline">jupyter lab</code> in your terminal to open the Jupyter interface in your web browser.</p>
                     </div>
@@ -712,11 +706,10 @@ bash Miniconda3-latest-Linux-x86_64.sh`}
                   and create a new Jupyter notebook file (<code className="lecture-code-inline">.ipynb</code>).
                 </li>
                 <li>In a new code cell, type:
-                  <CodeBlock
+                  <CodeBlock className="lecture-codeblock mt-2"
                     code={`print("Hello, World!")`}
                     language="python"
                     caption="Jupyter notebook cell"
-                    className="mt-2"
                   />
                 </li>
                 <li>Run the cell by:

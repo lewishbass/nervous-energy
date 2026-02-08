@@ -169,7 +169,7 @@ export default function ExercisesTab() {
 
             if (listMode === 'grid') {
               return (
-                <div className='relative lecture-card p-5 rounded-xl bg-gray-300/15 hover:bg-gray-300/25 dark:hover:bg-gray-300/20 hover:shadow-md dark:shadow-white/15 transition-all duration-200 cursor-pointer flex flex-col ' onClick={() => { navigateToAssignment(assignment); }}>
+                <div className='relative lecture-card p-5 rounded-xl bg-gray-300/15 hover:bg-gray-300/25 dark:hover:bg-gray-300/20 hover:shadow-md dark:shadow-white/15 transition-all duration-200 cursor-pointer flex flex-col ' onClick={() => { navigateToAssignment(assignment); }} style={{ opacity: assignment.finished ? 1 : 0.25, pointerEvents: assignment.finished ? 'auto' : 'none' }}>
                   
                     <h2 className="text-xl font-semibold tc2 mb-2">{assignment.name}</h2>
                     <p className="tc3 text-sm mb-4 min-h-[4em]">{assignment.description}</p>

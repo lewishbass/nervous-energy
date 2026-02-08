@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FaBook, FaFileAlt } from "react-icons/fa";
 import { FaListCheck } from "react-icons/fa6";
 import { MdSchedule, MdModeComment } from "react-icons/md";
-import LineAnimation from '@/components/backgrounds/LineAnimation';
+import CircleAnimation from '@/components/backgrounds/CircleAnimmation';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 import { analytics } from '@/context/Analytics';
@@ -123,10 +123,11 @@ function PythonAutomationContent() {
   return (
     <div className="relative flex flex-row justify-center">
       <div className="absolute inset-0 -z-10 invert dark:invert-0">
-        <LineAnimation
-          spacing={300}
+        <CircleAnimation
+          radiusRange={[100, 800]}
           seed={456}
           style={{ opacity: 0.125 }}
+          doAnimation={false}
         />
       </div>
       {/* Sidebar */}
@@ -137,7 +138,6 @@ function PythonAutomationContent() {
         </div>
         <ul className="list-disc space-y-2 marker:text-purple-500 pl-6">
           <li>Start Lecture Content</li>
-          <li>Lecture Styles and Nav Links</li>
           <li>Start Exercise Content</li>
           <li>Discussion latex and codeblocks rendering</li>
 
@@ -155,11 +155,12 @@ function PythonAutomationContent() {
           <li>Redo Syllabus</li>
           <li>Link Exercises to Users</li>
           <li>Discussion Functionality</li>
+          <li>Lecture Styles and Nav Links</li>
         </ul>
       </div>}
 
       {/* Main Content */}
-      <div className={`p-6 relative min-h-full max-w-4xl w-4xl mx-auto ${showSidebar ? 'ml-10' : 'ml-auto'} pb-200`}>
+      <div className={`p-6 relative min-h-[100vh] max-w-4xl w-4xl mx-auto ${showSidebar ? 'ml-10' : 'ml-auto'} pb-200`}>
         {/* Header */}
         <div className="inset-0 absolute backdrop-blur-[8px] bg-white/25 dark:bg-gray-950/25 -z-1">
 

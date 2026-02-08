@@ -20,11 +20,11 @@ import Phaser from 'phaser';
 		private playerText!: Phaser.GameObjects.Text;
 		private nameInputBox!: Phaser.GameObjects.DOMElement;
 		private colorOptions: Array<string> = [
-			'#b40a0a',
-			'#50c750',
+			'#e61919',
+			'#03c703',
 			'#1e1ecf',
 			'#000000',
-			'#cece4e',
+			'#ffff3d',
 			'#c47f00',
 		];
 		private colorButtons: Record<string, Phaser.GameObjects.Container> = {};
@@ -509,8 +509,8 @@ import Phaser from 'phaser';
 				const button = this.add.container(index * 42-60, 0);
 				
 
-				const circle = this.add.circle(0, 0, 15, Phaser.Display.Color.HexStringToColor(colorname).brighten(75).color, 0.85);
-				circle.setStrokeStyle(2, Phaser.Display.Color.HexStringToColor(colorname).brighten(-30).color);
+				const circle = this.add.circle(0, 0, 15, Phaser.Display.Color.HexStringToColor(colorname).brighten(30).color, 0.85);
+				circle.setStrokeStyle(2, Phaser.Display.Color.HexStringToColor(colorname).brighten(-10).color);
 
 				const innerCircle = this.add.circle(0, 0, 8, 0x006600, 0);
 				button.add([circle, innerCircle]);
