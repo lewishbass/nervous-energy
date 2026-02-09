@@ -15,7 +15,7 @@ import { useAuth } from '@/context/AuthContext';
 
 
 import { Client, Room } from '@colyseus/sdk'
-const TANKS_SERVER_ENDPOINT = "192.168.1.185:2567";
+const TANKS_SERVER_ENDPOINT = "tanks.lewisbass.org";
 
 const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 	ssr: false,

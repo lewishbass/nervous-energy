@@ -85,7 +85,7 @@ export default function SyllabusTab() {
 					</p>
 					<h3 className="font-bold tc1 text-lg mt-4">Location</h3>
 					<p>
-						Henrico County Adult Education Center, Room 2xx : <span className="opacity-50 text-green-500">[</span><span className="opacity-70 cursor-pointer text-blue-500 hover:text-blue-400 transition-colors" onClick={() => copyToClipboard('1420 N Parham Rd, Henrico, VA 23229', 'Address Copied!')}>1420 N Parham Rd, Henrico, VA 23229</span><span className="opacity-50 text-green-500">]</span>
+						Henrico County Adult Education Center, <b className="tc1">Room 209</b> : <span className="opacity-50 text-green-500">[</span><span className="opacity-70 cursor-pointer text-blue-500 hover:text-blue-400 transition-colors" onClick={() => copyToClipboard('1420 N Parham Rd, Henrico, VA 23229', 'Address Copied!')}>1420 N Parham Rd, Henrico, VA 23229</span><span className="opacity-50 text-green-500">]</span>
 					</p>
 					<p>
 						Entrance is through the covered parking to the right of the big NOVA sign and pool entrance.
