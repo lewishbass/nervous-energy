@@ -81,7 +81,7 @@ export default function EntranceMap({ location, parkingPolygon, entrancePath }: 
 				style={{ width: '100%', height: '100%' }}
 				mapStyle={mapStyles[4]}
 				mapboxAccessToken="pk.eyJ1Ijoid29ybGRzaW5nZXIiLCJhIjoiY202Z2hscG9zMDFhczJpb296Y2I2dDlvayJ9.Fv0uqkCRxvu1tb07rt5Qog"
-				interactive={false}
+				interactive={true}
 				attributionControl={false}
 				onClick={handleMapClick}
 			>
