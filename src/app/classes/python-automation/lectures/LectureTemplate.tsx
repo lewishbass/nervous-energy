@@ -80,7 +80,7 @@ const LectureTemplate: React.FC<LectureTemplateProps> = ({
 				{React.Children.map(children, (child, index) => (
 					<React.Fragment key={index}>
 						{child}
-						{index > 0 && index < React.Children.count(children) - 1 && <div className="w-full min-h-[6px] opacity-0 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500/0 rounded-full mb-12" />}
+						{index > 0 && index < React.Children.count(children) - 1 && <div className="w-full min-h-[6px] opacity-0 bg-gradient-to-r from-blue-500 via-purple-600 to-pink-500/0 rounded-full mb-6" />}
 					</React.Fragment>
 				))}
 			</div>
@@ -134,7 +134,7 @@ const LectureIcon: React.FC<LectureIconProps> = ({
 	} else if (displayMode === 'table') {
 		// minimal text entry for use in tables
 		return (
-			<span onClick={onClick} className={`${className}`} style={style}>{title}</span>
+			<span onClick={onClick} className={`${className}`} style={style} title={summary}>{title}</span>
 		);
 	}
 }

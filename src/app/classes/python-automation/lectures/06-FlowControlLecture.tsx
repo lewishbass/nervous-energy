@@ -1,42 +1,42 @@
 import React from 'react';
 import {LectureTemplate, LectureIcon} from './LectureTemplate';
 
-interface BooleanLectureProps {
+interface LoopsLectureProps {
   displayMode?: 'scrollable' | 'slideshow';
   className?: string;
   style?: React.CSSProperties;
   exitFSCallback?: () => void;
 }
 
-function BooleanLecture(props: BooleanLectureProps | null) {
+function FlowControlLecture(props: LoopsLectureProps | null) {
 	const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
       <section className="mb-4">
         <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
-          <li>Boolean logic and operators</li>
-          <li>Conditional statements</li>
-          <li>If, elif, and else structures</li>
-          <li>Logical decision making</li>
+          <li>For and while loops</li>
+          <li>Loop control with break and continue</li>
+          <li>Iterating over sequences</li>
+          <li>Nested loops</li>
         </ul>
       </section>
     </LectureTemplate>
   );
 }
 
-interface BooleanLectureIconProps {
+interface LoopsLectureIconProps {
 	displayMode?: 'list' | 'card';
 	className?: string;
 	style?: React.CSSProperties;
 	onClick?: () => void;
 }
 
-function BooleanLectureIcon(props: BooleanLectureIconProps | null) {
+function FlowControlLectureIcon(props: LoopsLectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="Boolean Logic and If Statements" summary="Learn conditional programming with boolean logic." displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="If, Else, For, While" summary="Master repetitive tasks with loops." displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 
-export { BooleanLecture, BooleanLectureIcon };
+export { FlowControlLecture, FlowControlLectureIcon };

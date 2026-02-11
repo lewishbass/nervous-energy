@@ -16,7 +16,8 @@ function ListOperationsLecture(props: ListOperationsLectureProps | null) {
         <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
           <li>Advanced list operations</li>
-          <li>Sorting and filtering</li>
+          <li>Sorting Algorithms</li>
+          <li>List comprehensions</li>
           <li>Introduction to NumPy arrays</li>
           <li>Performance considerations</li>
         </ul>

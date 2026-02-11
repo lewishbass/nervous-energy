@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Terrain } from './Terrain';
 import { Projectile } from './Projectile';
 import { projectilelist } from './projectiles/projectilelist';
+import { v4 as uuidv4 } from 'uuid';
 
 const svgText = `
 	<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="29.9" height="13.42" viewBox="0 0 17.08 7.69"><path d="m.7 5.98 1.06 1.7H15.3l1.06-1.77"/><path fill="#FF0000" d="M2.37 2.17 3.59 0H13.6l1.32 2.17L17.1 3.3l-.34 2.83H.3l-.33-2.83z"/></svg>
@@ -15,7 +16,7 @@ export class Tank {
 
 	public healthBar: Phaser.GameObjects.Graphics;
 	 
-	
+	public id: string = "";
 	public x: number;
 	public y: number;
 	private angle: number = 0; // Tank body angle
@@ -129,6 +130,7 @@ export class Tank {
 		this.showDebug = showDebug;
 		this.terrain = terrain;
 		this.name = name;
+		this.id = uuidv4();
 		this.projectiles = projectiles;
 		this.color = hexColor;
 		// Don't create Matter body yet - will be done in initializeBody()

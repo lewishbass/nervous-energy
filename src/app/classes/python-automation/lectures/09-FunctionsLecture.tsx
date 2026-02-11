@@ -16,8 +16,10 @@ function FunctionsLecture(props: FunctionsLectureProps | null) {
         <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
           <li>Defining and calling functions</li>
-          <li>Parameters and return values</li>
+          <li>Return values</li>
+          <li>Positional, optional and arbitrary arguments</li>
           <li>Scope and lifetime</li>
+          <li>First-Class Functions</li> {/*https://en.wikipedia.org/wiki/First-class_function*/}
           <li>Lambda functions</li>
         </ul>
       </section>

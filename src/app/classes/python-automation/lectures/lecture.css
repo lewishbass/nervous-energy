@@ -29,6 +29,14 @@
   width:100%;
 }
 
+.slideshow .lecture-codeblock-compact{
+  font-size: 1vw;
+}
+
+.scrollview .lecture-codeblock-compact{
+  font-size: 0.8rem;
+}
+
 .scrollview .lecture-big-title{
   font-weight: 700;
   font-size: 3rem;
@@ -123,6 +131,14 @@
   border-bottom: 3px solid rgba(75, 85, 99, 0.5);
 }
 
+.scrollview .lecture-table-row.compact {
+  border-bottom: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.slideshow .lecture-table-row.compact {
+  border-bottom: 2px solid rgba(75, 85, 99, 0.5);
+}
+
 .scrollview .lecture-table-header {
   font-weight: 700;
   padding-right: 1rem;
@@ -150,6 +166,16 @@
 .slideshow .lecture-table-cell {
   padding: 1rem;
 	color: #222;
+}
+
+.scrollview .lecture-table-cell.compact {
+  padding-top: 0.05rem;
+  padding-bottom: 0.05rem;
+  padding-right:0.25rem;
+}
+
+.slideshow .lecture-table-cell.compact {
+  padding: 0.5rem;
 }
 
 .dark .lecture-table-cell {

@@ -149,7 +149,15 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 	const createRoom = (options: RoomOptions) => {
 		// Implement room creation logic here
 		console.log('Creating room with options:', options);
-		// TODO: Use client to create room with the provided options
+		client.joinOrCreate(options.name || 'Unnamed Room', {
+			maxClients: options.maxPlayers,
+			map: options.map,
+		}).then((room: Room) => {
+			console.log('Joined room:', room);
+			// You can navigate to the game screen or update the UI accordingly
+		}).catch((error: any) => {
+			console.error('Error creating/joining room:', error);
+		});
 	};
 
 	const joinRoom = (roomId: string) => {

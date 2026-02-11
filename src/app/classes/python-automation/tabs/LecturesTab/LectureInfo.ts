@@ -2,12 +2,13 @@ import { index } from 'd3';
 import { DummyLecture, DummyLectureIcon } from '../../lectures/DummyLecture';
 import { SetupLecture, SetupLectureIcon } from '../../lectures/01-SetupLecture';
 import { VariablesLecture, VariablesLectureIcon } from '../../lectures/02-VariablesLecture';
-import { StringsLecture, StringsLectureIcon } from '../../lectures/03-StringsLecture';
-import { BooleanLecture, BooleanLectureIcon } from '../../lectures/04-BooleanLecture';
-import { LoopsLecture, LoopsLectureIcon } from '../../lectures/05-LoopsLecture';
-import { ListsLecture, ListsLectureIcon } from '../../lectures/06-ListsLecture';
-import { DictionariesLecture, DictionariesLectureIcon } from '../../lectures/07-DictionariesLecture';
-import { ListOperationsLecture, ListOperationsLectureIcon } from '../../lectures/08-ListOperationsLecture';
+import { BagLecture, BagLectureIcon } from '../../lectures/03-BagLecture';
+import { ListLecture, ListLectureIcon } from '../../lectures/04-ListLecture';
+import { StringsLecture, StringsLectureIcon } from '../../lectures/05-StringsLecture';
+import { IntroToMLLecture, IntroToMLLectureIcon } from '../../lectures/05.5-IntroToML';
+import { FlowControlLecture, FlowControlLectureIcon } from '../../lectures/06-FlowControlLecture';
+import { ListOperationsLecture, ListOperationsLectureIcon } from '../../lectures/07-ListOperationsLecture';
+import { MoreFlowLecture, MoreFlowLectureIcon } from '../../lectures/08-MoreFlowLecture';
 import { FunctionsLecture, FunctionsLectureIcon } from '../../lectures/09-FunctionsLecture';
 import { ClassesLecture, ClassesLectureIcon } from '../../lectures/10-ClassesLecture';
 import { FilesLecture, FilesLectureIcon } from '../../lectures/11-FilesLecture';
@@ -33,24 +34,25 @@ export type LecturePair = {
 
 export const lectureList: LecturePair[] = [
 	{ finished: true, icon: SetupLectureIcon, lecture: SetupLecture, index: 0, classNumber: 0 },
-	{ finished: true, icon: VariablesLectureIcon, lecture: VariablesLecture, index: 1, classNumber: 1 },
-	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 2, classNumber: 2 },
-	{ finished: false, icon: BooleanLectureIcon, lecture: BooleanLecture, index: 3, classNumber: 3 },
-	{ finished: false, icon: LoopsLectureIcon, lecture: LoopsLecture, index: 4, classNumber: 4 },
-	{ finished: false, icon: ListsLectureIcon, lecture: ListsLecture, index: 5, classNumber: 5 },
-	{ finished: false, icon: DictionariesLectureIcon, lecture: DictionariesLecture, index: 6, classNumber: 6 },
-	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 7, classNumber: 7 },
-	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 8, classNumber: 8 },
-	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 9, classNumber: 9 },
-	{ finished: false, icon: FilesLectureIcon, lecture: FilesLecture, index: 10, classNumber: 10 },
-	{ finished: false, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 11, classNumber: 11 },
-	{ finished: false, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 12, classNumber: 12 },
-	{ finished: false, icon: PackagingLectureIcon, lecture: PackagingLecture, index: 13, classNumber: 13 },
-	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 14, classNumber: 14 },
-	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 15, classNumber: 15 },
-	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 16, classNumber: 16 },
-	{ finished: false, icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 17, classNumber: 17 },
-	{ finished: false, icon: DecoratorsLectureIcon, lecture: DecoratorsLecture, index: 18, classNumber: 18 },
+	{ finished: true, icon: VariablesLectureIcon, lecture: VariablesLecture, index: 1, classNumber: 0 },
+	{ finished: true, icon: BagLectureIcon, lecture: BagLecture, index: 2, classNumber: 1 },
+	{ finished: true, icon: ListLectureIcon, lecture: ListLecture, index: 3, classNumber: 1 },
+	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 4, classNumber: 2 },
+	{ finished: false, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 5, classNumber: 2 },
+	{ finished: false, icon: FlowControlLectureIcon, lecture: FlowControlLecture, index: 6, classNumber: 3 },
+	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 7, classNumber: 3 },
+	{ finished: false, icon: MoreFlowLectureIcon, lecture: MoreFlowLecture, index: 8, classNumber: 6 },
+	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 9, classNumber: 8 },
+	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 10, classNumber: 9 },
+	{ finished: false, icon: FilesLectureIcon, lecture: FilesLecture, index: 11, classNumber: 10 },
+	{ finished: false, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 12, classNumber: 11 },
+	{ finished: false, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 13, classNumber: 12 },
+	{ finished: false, icon: PackagingLectureIcon, lecture: PackagingLecture, index: 14, classNumber: 13 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 15, classNumber: 14 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 16, classNumber: 15 },
+	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 17, classNumber: 16 },
+	{ finished: false, icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 18, classNumber: 17 },
+	{ finished: false, icon: DecoratorsLectureIcon, lecture: DecoratorsLecture, index: 19, classNumber: 18 },
 ];
 
 lectureList.forEach((lecturePair, index) => {

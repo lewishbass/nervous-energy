@@ -20,7 +20,7 @@ export type ClassSessionInfo = {
 	unitNumber: number;
 	assignmentsDue: AssignmentInfo[];
 	assignmentsAssigned: AssignmentInfo[];
-	lecture?: LecturePair;
+	lecture?: LecturePair[];
 };
 
 export type UnitInfo = {
@@ -459,7 +459,10 @@ assignments.forEach((assignment) => {
 lectureList.forEach((lecturePair) => {
 	const classIndex = lecturePair.classNumber;
 	if (classIndex !== undefined && classSessions[classIndex]) {
-		classSessions[classIndex].lecture = lecturePair;
+		if (!classSessions[classIndex].lecture) {
+			classSessions[classIndex].lecture = [];
+		}
+		classSessions[classIndex].lecture?.push(lecturePair);
 	}
 });
 

@@ -428,7 +428,10 @@ export default function ScheduleTab() {
                 })}
                 
                 {showLectures && <td className="p-2 px-3 sm:p-3 sm:px-6 tc2">
-                  {classinfo.lecture ? React.createElement(classinfo.lecture.icon, { displayMode: "table", className:"cursor-pointer select-none hover:opacity-60 active:opacity-40 transition-opacity duration-200 whitespace-nowrap touch-manipulation text-xs sm:text-base", onClick: () => {if(classinfo && classinfo.lecture && classinfo.lecture.index !== undefined) navigateToLecture(classinfo.lecture.index) } } as any) : '--'}
+                  {classinfo.lecture ?
+                    classinfo.lecture.map((lecture, index) =>
+                      <div>{React.createElement(lecture.icon, { key: lecture.index, displayMode: "table", className: `${lecture.finished ? 'cursor-pointer select-none hover:opacity-60 active:opacity-40 transition-opacity duration-200' : 'opacity-40 cursor-default'} whitespace-nowrap touch-manipulation text-xs sm:text-base`, onClick: () => { if (lecture && lecture.index !== undefined && lecture.finished) navigateToLecture(lecture.index) } } as any)}</div>
+                    ) : '--'}
                 </td>}
                 
                 {showAssignmentsDue && <td className="p-2 px-3 sm:p-3 sm:px-6 tc2 text-xs sm:text-base" >

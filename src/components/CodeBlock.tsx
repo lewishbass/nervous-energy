@@ -10,6 +10,9 @@ import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-powershell';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-java';
 import 'prismjs/plugins/line-numbers/prism-line-numbers';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
 
@@ -20,9 +23,10 @@ interface CodeBlockProps {
 		className?: string;
 		style?: React.CSSProperties;
 		filename?: string;
+	compact?: boolean;
 }
 
-export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename }: CodeBlockProps) {
+export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false }: CodeBlockProps) {
 		const codeRef = useRef<HTMLElement>(null);
 
 		useEffect(() => {
@@ -38,6 +42,7 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 		// Get display name for language
 		const getLanguageDisplayName = (lang: string) => {
 			const languageMap: { [key: string]: string } = {
+				'jupyter': 'Jupyter',
 				'python': 'Python',
 				'javascript': 'JavaScript',
 				'typescript': 'TypeScript',
@@ -48,9 +53,20 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 				'json': 'JSON',
 				'bash': 'Bash',
 				'powershell': 'PowerShell',
+				'cpp': 'C++',
+				'c': 'C',
+				'java': 'Java',
 			};
 			return languageMap[lang.toLowerCase()] || lang.toUpperCase();
 		};
+
+	// get highlight language
+	const getLanguageHighlight = (lang: string) => {
+		const languageMap: { [key: string]: string } = {
+			'jupyter': 'python'
+		};
+		return languageMap[lang.toLowerCase()] || lang.toLowerCase();
+	}
 
 		return (
 			<div className={`flex flex-col justify-center items-center mb-3 ${className}`} style={style}>
@@ -81,13 +97,13 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 						</div>
 					</div>
 					
-					<pre className={`mini-scroll code-block line-numbers language-${language}`} data-language={language}>
+					<pre className={`mini-scroll code-block ${!compact ? 'line-numbers' : ''} ${compact ? 'compact' : ''} language-${getLanguageHighlight(language)}`} data-language={getLanguageHighlight(language)}>
 						{filename && (
 							<div className="code-filename">
 								{filename}
 							</div>
 						)}
-						<code ref={codeRef} className={`language-${language}`}>
+						<code ref={codeRef} className={`language-${getLanguageHighlight(language)}`}>
 							{code}
 						</code>
 					</pre>

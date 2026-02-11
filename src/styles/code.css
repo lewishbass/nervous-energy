@@ -106,3 +106,9 @@ pre[class*="language-"] code {
   color: #ccc;
   display: block;
 }
+
+/* Compact code blocks */
+pre.compact {
+  padding: 0.5rem;
+
+}
