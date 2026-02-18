@@ -38,8 +38,9 @@ export type PythonIdeProps = {
 	initialVDivider?: number;
 	initialHDivider?: number;
 	initialPersistentExec?: boolean;
+	initialWordWrap?: boolean;
 	onCodeStartCallback?: (code: string, pyodide: any) => void;
-	onCodeEndCallback?: (code: string, error: string | null, pyodide: any) => void;
+	onCodeEndCallback?: (code: string, error: string | null, pyodide: any, vars: Record<string, VariableInfo>) => void;
 };
 
 // ---------- Component ----------
@@ -52,12 +53,14 @@ export default function PythonIde({
 	initialVDivider = 70,
 	initialHDivider = 50,
 	initialPersistentExec = false,
+	initialWordWrap=true,
 	onCodeStartCallback,
 	onCodeEndCallback,
 }: PythonIdeProps) {
 	const [code, setCode] = useState(initialCode);
 	const [showLineNumbers, setShowLineNumbers] = useState(initialShowLineNumbers);
 	const [persistentExec, setPersistentExec] = useState(initialPersistentExec);
+	const [wordWrap, setWordWrap] = useState(initialWordWrap);
 	const [isCompact, setIsCompact] = useState(initialIsCompact);
 
 	const [documentName, setDocumentName] = useState(initialDocumentName);
@@ -67,6 +70,7 @@ export default function PythonIde({
 		{ text: 'Show Line Numbers', get: showLineNumbers, set: setShowLineNumbers },
 		{ text: 'Persistent Execution Context', get: persistentExec, set: setPersistentExec },
 		{ text: 'Compact UI', get: isCompact, set: setIsCompact },
+		{ text: 'Word Wrap', get: wordWrap, set: setWordWrap },
 	];
 
 	// ---------- Horizontal divider (editor | info) ----------
@@ -144,6 +148,8 @@ export default function PythonIde({
 			return;
 		}
 
+		
+
 		setRunning(true);
 		onCodeStartCallback?.(codeToRun, pyodideRef.current);
 		setTerminalLines(prev => [...prev, { text: `>> python${isCompact ? '' : ' ' + (documentName || 'playground')}`, type: 'info' as const }]);
@@ -153,12 +159,14 @@ export default function PythonIde({
 		}
 
 		let execError: string | null = null;
+		let validationVars = {} as Record<string, VariableInfo>;
 
 		try {
 			// Set up real-time print callback so stdout/stderr stream to the terminal
 			pyodideRef.current.globals.set('_js_print_cb', (text: string, type: string) => {
 				setTerminalLines(prev => [...prev, { text, type: type as 'stdout' | 'stderr' | 'info' | 'error' }]);
 			});
+
 
 			pyodideRef.current.globals.set('_user_code', codeToRun);
 			pyodideRef.current.globals.set('_expanded_vars', getExpandedVariables());
@@ -255,6 +263,7 @@ _json.dumps({
 
 			// remove non-base variables
 			const vars = parsed.variables as Record<string, VariableInfo>;
+			validationVars = vars;
 			const baseVars = Object.fromEntries(Object.entries(vars).filter(([k]) => !k.includes('.')));
 			// Re-append non-base variables to base vars
 			Object.entries(vars).filter(([k]) => k.includes('.')).forEach(([k, v]) => {
@@ -288,7 +297,7 @@ _json.dumps({
 		} finally {
 			setRunning(false);
 			setTerminalLines(prev => [...prev, { text: '>> ', type: 'info' as const }]);
-			onCodeEndCallback?.(codeToRun, execError, pyodideRef.current);
+			onCodeEndCallback?.(codeToRun, execError, pyodideRef.current, validationVars);
 		}
 	}, [variables, documentName, isCompact, persistentExec, onCodeStartCallback, onCodeEndCallback]);
 
@@ -579,6 +588,7 @@ _json.dumps({
 										occurrencesHighlight: 'singleFile',
 										'semanticHighlighting.enabled': true,
 										folding: !isCompact,
+										wordWrap: wordWrap ? 'on' : 'off',
 									}}
 								/>
 							</div>
@@ -607,7 +617,7 @@ _json.dumps({
 							</div>}
 							<div className={`flex-grow bg2 px-${isCompact ? '1' : '4'} py-${isCompact ? '0' : '4'} tc1 overflow-auto mini-scroll min-w-[10vw] `}>
 								{Object.keys(variables).length === 0 ? (
-									<p className="opacity-40 text-sm select-none">Run code to inspect variables.</p>
+									<p className="opacity-40 text-sm select-none p-3">Run code to inspect variables.</p>
 								) : (
 									<table className="w-full text-sm font-mono">
 										<thead>

@@ -1,0 +1,220 @@
+/* ===========================================
+   Question Border Animation
+   Animated border wrapper for exercise questions.
+   States: idle, pending, passed, failed
+   =========================================== */
+
+/* --- Base wrapper (the 2px padding acts as the visible border) --- */
+.qba-wrapper {
+  position: relative;
+  padding: 2px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: #e5e7eb;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+:is(.dark) .qba-wrapper {
+  background: #1f2937;
+}
+
+/* --- Inner content (covers the center, exposing only the 2px border) --- */
+.qba-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* --- Beam pseudo-element (large rotating conic-gradient for sweep effects) --- */
+.qba-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===========================
+   IDLE STATE
+   =========================== */
+.qba-idle {
+  background: #e5e7eb;
+}
+
+:is(.dark) .qba-idle {
+  background: #1f2937;
+}
+
+/* ===========================
+   PASSED STATE
+   White light beam sweeps around the green border,
+   followed by a green glow pulse and a subtle slam.
+   =========================== */
+.qba-passed {
+  background: #22c55e;
+  animation:
+    qba-slam 0.35s cubic-bezier(0.22, 1, 0.36, 1) both,
+    qba-glow-green 1.2s ease-out 0.15s both;
+}
+
+.qba-passed::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(134, 239, 172, 0.03) 50%,
+    rgba(134, 239, 172, 0.1) 58%,
+    rgba(74, 222, 128, 0.25) 66%,
+    rgba(74, 222, 128, 0.6) 74%,
+    rgba(255, 255, 255, 0.85) 78%,
+    white 80%,
+    rgba(255, 255, 255, 0.6) 83%,
+    rgba(74, 222, 128, 0.2) 87%,
+    transparent 93%,
+    transparent 100%
+  );
+  opacity: 1;
+  will-change: transform, opacity;
+  animation:
+    qba-spin 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+    qba-fade-out 0.25s ease-out 0.6s forwards;
+}
+
+/* ===========================
+   PENDING STATE
+   Spinning beam indicator + pulsing yellow border
+   =========================== */
+.qba-pending {
+  animation: qba-pulse-yellow 0.5s ease-in-out infinite;
+}
+
+:is(.dark) .qba-pending {
+  animation: qba-pulse-yellow-dark 0.5s ease-in-out infinite;
+}
+
+.qba-pending::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 65%,
+    rgba(250, 204, 21, 0.4) 80%,
+    rgba(234, 179, 8, 0.7) 90%,
+    rgba(250, 204, 21, 0.4) 96%,
+    transparent 100%
+  );
+  opacity: 1;
+  will-change: transform;
+  animation: qba-spin 1.8s linear infinite;
+}
+
+:is(.dark) .qba-pending::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    transparent 65%,
+    rgba(161, 98, 7, 0.4) 80%,
+    rgba(180, 83, 9, 0.7) 90%,
+    rgba(161, 98, 7, 0.4) 96%,
+    transparent 100%
+  );
+}
+
+/* ===========================
+   FAILED STATE
+   Shake + red glow
+   =========================== */
+.qba-failed {
+  background: #ef4444;
+  animation:
+    qba-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both,
+    qba-glow-red 1s ease-out 0.1s both;
+}
+
+/* ===========================
+   KEYFRAMES
+   =========================== */
+
+/* Rotate the beam around the border */
+@keyframes qba-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Fade out the beam after the sweep */
+@keyframes qba-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Green glow pulse for passed */
+@keyframes qba-glow-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+  35% {
+    box-shadow:
+      0 0 25px 8px rgba(34, 197, 94, 0.5),
+      0 0 60px 20px rgba(34, 197, 94, 0.12);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Red glow for failed */
+@keyframes qba-glow-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  25% {
+    box-shadow:
+      0 0 18px 5px rgba(239, 68, 68, 0.4),
+      0 0 40px 12px rgba(239, 68, 68, 0.08);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Shake animation for failed */
+@keyframes qba-shake {
+  0%, 100% { transform: translateX(0); }
+  10%      { transform: translateX(-6px); }
+  20%      { transform: translateX(6px); }
+  30%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  50%      { transform: translateX(-3px); }
+  60%      { transform: translateX(3px); }
+  70%      { transform: translateX(-2px); }
+  80%      { transform: translateX(2px); }
+  90%      { transform: translateX(-1px); }
+}
+
+/* Yellow pulse for pending (light mode) */
+@keyframes qba-pulse-yellow {
+  0%, 100% { background: #fde68a; }
+  50%      { background: #fbbf24; }
+}
+
+/* Yellow pulse for pending (dark mode) */
+@keyframes qba-pulse-yellow-dark {
+  0%, 100% { background: #854d0e; }
+  50%      { background: #a16207; }
+}
+
+/* Subtle slam (scale up then settle) for passed */
+@keyframes qba-slam {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.018); }
+  55%  { transform: scale(1.027); }
+  75%  { transform: scale(1.031); }
+  100% { transform: scale(1); }
+}

@@ -98,7 +98,6 @@ function BagLecture(props: BackgroundLectureProps | null) {
           <li className="lecture-link" onClick={() => scrollToSection('chars')}>Characters</li>
           <li className="lecture-link" onClick={() => scrollToSection('strings')}>Strings</li>
           <li className="lecture-link" onClick={() => scrollToSection('functions')}>Functions</li>
-          <li className="lecture-link" onClick={() => scrollToSection('scope')}>Scope</li>
           <li className="lecture-link" onClick={() => scrollToSection('classes-objects')}>Classes and Objects</li>
           <li className="lecture-link" onClick={() => scrollToSection('pointers-references')}>Pointers and References</li>
         </ul>

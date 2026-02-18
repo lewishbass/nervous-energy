@@ -198,9 +198,9 @@ export const assignments: AssignmentInfo[] = [
 		finished: true
 	},
 	{
-		name: 'TMP-Personal Budget Calculator',
-		description: 'Build a calculator that takes monthly income and expenses as input, performs calculations, and displays a formatted budget summary with savings recommendations.',
-		link: 'budget-calculator',
+		name: 'Simple Coding Practice',
+		description: 'Perform simple operations with ints, floats, bools and strings.',
+		link: 'simple-coding-practice',
 		uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 		startClassIndex: 1,
 		endClassIndex: 4,
