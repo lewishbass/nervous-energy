@@ -63,6 +63,15 @@ export const toys: Toy[] = [
         imagePath: '/KH_back.svg',
         reqAuth: false
     },
+    {
+        title: 'Python Playground',
+        description: 'Experiment with Python code snippets and visualize outputs',
+        link: '/toys/python-playground',
+        hasPage: true,
+        keywords: 'python code snippets visualization interactive',
+        imagePath: '/images/classes/Python-logo-notext.svg',
+        reqAuth: false
+    }
     /*{
         title: 'Image Captioning',
         description: "Generating image captions with with RNNs",

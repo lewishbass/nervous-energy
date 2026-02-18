@@ -7,7 +7,7 @@ interface ToastProps {
   duration?: number;
 }
 
-const Toast: React.FC<ToastProps> = ({ message, duration = 2000 }) => {
+const Toast: React.FC<ToastProps> = ({ message, duration = 2000}) => {
   return (
     <div
       className="fixed bottom-5 right-5 z-[9999] px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm animate-fade-in-out"
@@ -38,9 +38,9 @@ const Toast: React.FC<ToastProps> = ({ message, duration = 2000 }) => {
   );
 };
 
-export const copyToClipboard = async (text: string, message: string = 'Copied!'): Promise<boolean> => {
+export const copyToClipboard = async (text: string, message: string = 'Copied!', doCopy: boolean = true): Promise<boolean> => {
   try {
-    await navigator.clipboard.writeText(text);
+    if(doCopy)await navigator.clipboard.writeText(text);
     
     // Create toast notification
     const toastContainer = document.createElement('div');
