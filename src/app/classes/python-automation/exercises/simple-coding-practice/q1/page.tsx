@@ -7,6 +7,7 @@ import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAni
 import PythonIde from '@/components/coding/PythonIde';
 import { copyToClipboard } from '@/scripts/clipboard';
 import { useState } from 'react';
+import { validateVariable } from '../../exercise-components/ExerciseUtils';
 
 export default function Question1() {
 
@@ -15,22 +16,6 @@ export default function Question1() {
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
 
   const assignmentPath = '/classes/python-automation/exercises/simple-coding-practice';
-
-  const validateVariable = (vars: Record<string, any>, name: string, expectedType: string, expectedValue: any): {passed : boolean, message: string} => {
-    if (!vars[name]) {
-      console.log(`Validation failed. Variable "${name}" not found.`);
-      return {passed: false, message: `Variable "${name}" not found.`};
-    }
-    if (vars[name].type !== expectedType) {
-      console.log(`Validation failed. Variable "${name}" is of type ${vars[name].type}, expected '${expectedType}'.`);
-      return {passed: false, message: `Variable "${name}" is of type ${vars[name].type}, expected '${expectedType}'.`};
-    }
-    if (expectedValue !== undefined && vars[name].value !== expectedValue) {
-      console.log(`Validation failed. Variable "${name}" has value ${vars[name].value}, expected ${expectedValue}.`);
-      return {passed: false, message: `Variable "${name}" has value ${vars[name].value}, expected ${expectedValue}.`};
-    }
-    return {passed: true, message: `Variable "${name}" is correctly assigned.`};
-  };
 
   const startCode = (part: string) => {
     setValidationStates(prev => ({...prev, [part]: 'pending'}));
@@ -41,19 +26,19 @@ export default function Question1() {
   };
 
   const validateCodeP1 = (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
-    const passed = validateVariable(vars, 'my_number', 'int', '42');
+    const passed = validateVariable(vars, 'my_number', 'int', 42);
     setValidationMessages(prev => ({...prev, 'p1': passed.message}));
     setValidationStates(prev => ({...prev, 'p1': passed.passed ? 'passed' : 'failed'}));
   };
 
   const validateCodeP2 = (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
-    const passed = validateVariable(vars, 'my_string', 'str', "'Hello World'");
+    const passed = validateVariable(vars, 'my_string', 'str', 'Hello World');
     setValidationMessages(prev => ({...prev, 'p2': passed.message}));
     setValidationStates(prev => ({...prev, 'p2': passed.passed ? 'passed' : 'failed'}));
   };
 
   const validateCodeP3 = (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
-    const passed = validateVariable(vars, 'my_bool', 'bool', 'True');
+    const passed = validateVariable(vars, 'my_bool', 'bool', true);
     setValidationMessages(prev => ({...prev, 'p3': passed.message}));
     setValidationStates(prev => ({...prev, 'p3': passed.passed ? 'passed' : 'failed'}));
   }

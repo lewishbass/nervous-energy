@@ -7,6 +7,7 @@ import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAni
 import PythonIde from '@/components/coding/PythonIde';
 import { copyToClipboard } from '@/scripts/clipboard';
 import { useState } from 'react';
+import { validateVariable, deRepr } from '../../exercise-components/ExerciseUtils';
 
 export default function Question2() {
 
@@ -15,22 +16,6 @@ export default function Question2() {
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
 
   const assignmentPath = '/classes/python-automation/exercises/simple-coding-practice';
-
-  const validateVariable = (vars: Record<string, any>, name: string, expectedType: string, expectedValue: any): {passed : boolean, message: string} => {
-    if (!vars[name]) {
-      console.log(`Validation failed. Variable "${name}" not found.`);
-      return {passed: false, message: `Variable "${name}" not found.`};
-    }
-    if (vars[name].type !== expectedType) {
-      console.log(`Validation failed. Variable "${name}" is of type ${vars[name].type}, expected '${expectedType}'.`);
-      return {passed: false, message: `Variable "${name}" is of type ${vars[name].type}, expected '${expectedType}'.`};
-    }
-    if (expectedValue !== undefined && vars[name].value !== expectedValue) {
-      console.log(`Validation failed. Variable "${name}" has value ${vars[name].value}, expected ${expectedValue}.`);
-      return {passed: false, message: `Variable "${name}" has value ${vars[name].value}, expected ${expectedValue}.`};
-    }
-    return {passed: true, message: `Variable "${name}" is correctly assigned.`};
-  };
 
   const startCode = (part: string) => {
     setValidationStates(prev => ({...prev, [part]: 'pending'}));
@@ -53,9 +38,11 @@ export default function Question2() {
       return;
     }
     
-    const expectedSum = parseInt(vars['a'].value) + parseInt(vars['b'].value);
-    const expectedProduct = parseInt(vars['a'].value) * parseInt(vars['b'].value);
-    const expectedDifference = parseInt(vars['a'].value) - parseInt(vars['b'].value);
+    const aValue = deRepr(vars['a'].value, vars['a'].type);
+    const bValue = deRepr(vars['b'].value, vars['b'].type);
+    const expectedSum = aValue + bValue;
+    const expectedProduct = aValue * bValue;
+    const expectedDifference = aValue - bValue;
     
     if (!sum.passed) {
       setValidationMessages(prev => ({...prev, 'p1': sum.message}));
@@ -63,8 +50,9 @@ export default function Question2() {
       return;
     }
     
-    if (parseInt(vars['sum'].value) !== expectedSum) {
-      setValidationMessages(prev => ({...prev, 'p1': `Variable "sum" should equal ${expectedSum}, got ${vars['sum'].value}.`}));
+    const sumValue = deRepr(vars['sum'].value, vars['sum'].type);
+    if (sumValue !== expectedSum) {
+      setValidationMessages(prev => ({...prev, 'p1': `Variable "sum" should equal ${expectedSum}, got ${sumValue}.`}));
       setValidationStates(prev => ({...prev, 'p1': 'failed'}));
       return;
     }
@@ -75,8 +63,9 @@ export default function Question2() {
       return;
     }
     
-    if (parseInt(vars['product'].value) !== expectedProduct) {
-      setValidationMessages(prev => ({...prev, 'p1': `Variable "product" should equal ${expectedProduct}, got ${vars['product'].value}.`}));
+    const productValue = deRepr(vars['product'].value, vars['product'].type);
+    if (productValue !== expectedProduct) {
+      setValidationMessages(prev => ({...prev, 'p1': `Variable "product" should equal ${expectedProduct}, got ${productValue}.`}));
       setValidationStates(prev => ({...prev, 'p1': 'failed'}));
       return;
     }
@@ -87,8 +76,9 @@ export default function Question2() {
       return;
     }
     
-    if (parseInt(vars['difference'].value) !== expectedDifference) {
-      setValidationMessages(prev => ({...prev, 'p1': `Variable "difference" should equal ${expectedDifference}, got ${vars['difference'].value}.`}));
+    const differenceValue = deRepr(vars['difference'].value, vars['difference'].type);
+    if (differenceValue !== expectedDifference) {
+      setValidationMessages(prev => ({...prev, 'p1': `Variable "difference" should equal ${expectedDifference}, got ${differenceValue}.`}));
       setValidationStates(prev => ({...prev, 'p1': 'failed'}));
       return;
     }
@@ -143,10 +133,12 @@ export default function Question2() {
       return;
     }
     
+    const numStrValue = deRepr(vars['num_str'].value, vars['num_str'].type);
+    const numIntValue = deRepr(vars['num_int'].value, vars['num_int'].type);
     
     // Verify num_int was converted from num_str
-    if (vars['num_str'].value !== "'"+String(vars['num_int'].value)+"'") {
-      setValidationMessages(prev => ({...prev, 'p3': `'num_int' should be the integer conversion of 'num_str' ${vars['num_str'].value} -> '${String(vars['num_int'].value)}'.`}));
+    if (numStrValue !== String(numIntValue)) {
+      setValidationMessages(prev => ({...prev, 'p3': `'num_int' should be the integer conversion of 'num_str' (${numStrValue} -> ${numIntValue}).`}));
       setValidationStates(prev => ({...prev, 'p3': 'failed'}));
       return;
     }
@@ -163,9 +155,12 @@ export default function Question2() {
       return;
     }
     
+    const ageValue = deRepr(vars['age'].value, vars['age'].type);
+    const ageStrValue = deRepr(vars['age_str'].value, vars['age_str'].type);
+    
     // Verify age_str was converted from age
-    if ("'"+String(vars['age'].value)+"'" !== vars['age_str'].value) {
-      setValidationMessages(prev => ({...prev, 'p3': `'age_str' should be the string conversion of 'age' (${String(vars['age'].value)}) -> ${vars['age_str'].value}.`}));
+    if (String(ageValue) !== ageStrValue) {
+      setValidationMessages(prev => ({...prev, 'p3': `'age_str' should be the string conversion of 'age' (${ageValue} -> ${ageStrValue}).`}));
       setValidationStates(prev => ({...prev, 'p3': 'failed'}));
       return;
     }

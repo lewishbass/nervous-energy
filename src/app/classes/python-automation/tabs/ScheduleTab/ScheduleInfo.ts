@@ -204,7 +204,8 @@ export const assignments: AssignmentInfo[] = [
 		uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 		startClassIndex: 1,
 		endClassIndex: 4,
-		type: 'homework'
+		type: 'homework',
+		finished: true
 	},
 	{
 		name: 'TMP-Password Strength Analyzer',
