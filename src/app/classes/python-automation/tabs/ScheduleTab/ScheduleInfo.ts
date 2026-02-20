@@ -208,9 +208,9 @@ export const assignments: AssignmentInfo[] = [
 		finished: true
 	},
 	{
-		name: 'TMP-Password Strength Analyzer',
-		description: 'Create a tool that evaluates password strength using conditional logic, checking for length, character variety, and common patterns. Provides specific feedback for improvement.',
-		link: 'password-analyzer',
+		name: 'Functions, Arrays and Loops',
+		description: 'Using functions and loops to perform more complex manipulations',
+		link: 'functions-arrays-loops',
 		uuid: 'b2c3d4e5-f6g7-8901-bcde-fg2345678901',
 		startClassIndex: 3,
 		endClassIndex: 6,

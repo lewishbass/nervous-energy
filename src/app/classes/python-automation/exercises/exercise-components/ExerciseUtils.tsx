@@ -247,9 +247,10 @@ export const spawnParticle = (position: { x: number; y: number }, velocity: { x:
   }, lifetime);
 }
 
-export const spawnParticlesAroundBox = (box: HTMLElement, color: string, n: number = 40) => {
+export const spawnParticlesAroundBox = (box: HTMLElement, color: string, n: number = 20) => {
   // spawns particles around edge of box
   const rect = box.getBoundingClientRect();
+  console.log('Spawning particles around box at', rect);
   for (let i = 0; i < n; i++) {
     const edge = Math.floor(Math.random() * 4);
     let position = { x: 0, y: 0 };

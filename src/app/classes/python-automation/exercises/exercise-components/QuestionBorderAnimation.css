@@ -232,10 +232,11 @@
 
 
 .particle {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   pointer-events: none;
   z-index: 100;
   animation-name: particle-float;
   animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
 }

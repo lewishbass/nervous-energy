@@ -63,7 +63,7 @@ export default function SimpleCodingPractice() {
     { title: 'Q5-Boolean Operations', link: 'q5', description: 'Use AND, OR, and NOT operators to combine and negate boolean values.' },
     { title: 'Q6-Numerical Comparisons', link: 'q6', description: 'Use comparison operators to compare numbers, strings, and check equality.' },
     { title: 'Q7-Binary and Hexadecimal', link: 'q7', description: 'Convert numbers to binary and hexadecimal strings, and validate their formats.' },
-    { title: 'Q8', link: 'q8', description: 'Perform simple operations with ints, floats, bools and strings.' },
+    { title: 'Q8-Review', link: 'q8', description: 'Perform simple operations with ints, floats, bools and strings.' },
   ].map(q => ({ ...q, status: questionStatuses[q.link] }));
 
   return (
