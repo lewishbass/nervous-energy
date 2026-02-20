@@ -10,7 +10,7 @@ type Props = {
   objectives?: string[];
   startHref?: string;
   className?: string;
-  questionList?: { title: string; link: string; description: string }[];
+  questionList?: { title: string; link: string; description: string, status?: string }[];
 };
 
 export default function AssignmentOverview({
@@ -22,6 +22,14 @@ export default function AssignmentOverview({
   questionList,
 }: Props) {
   const router = useRouter();
+
+  const statusColor = (status?: string): string => {
+    if (!status || status === 'not-started') return '';
+    if (status === 'completed') return 'text-green-500 dark:text-green-400';
+    if (status === 'incorrect') return 'text-red-500 dark:text-red-400';
+    if (status === 'in-progress') return 'text-yellow-500 dark:text-yellow-400';
+    return '';
+  };
 
   return (
     <div className={`mb-6 ${className}`}>
@@ -40,14 +48,14 @@ export default function AssignmentOverview({
 				</Link>}
 			
 			{questionList && (
-				<div className="px-4">
+				<div className="px-0">
 					{questionList.map((q, index) => (
 						<div key={index} className="mb-2">
 							<button
-								className="tc3 py-2 px-4 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/50 transition-all duration-100 cursor-pointer w-full text-left select-none opacity-70"
+								className={`tc3 py-2 px-4 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/50 transition-all duration-100 cursor-pointer w-full text-left select-none opacity-70 ${statusColor(q.status)}`}
 								onClick={() => router.push(`/classes/python-automation/exercises/simple-coding-practice/${q.link}`)}
 							>
-								<span className="tc2 font-bold">{q.title}</span>{` — ${q.description}`}
+								<span className={`font-bold ${statusColor(q.status) || 'tc2'}`}>{q.title}</span><span className="text-sm">{` ${q.description}`}</span>
 							</button>
 						</div>
 					))}

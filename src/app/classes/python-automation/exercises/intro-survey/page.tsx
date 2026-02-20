@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { QuestionComponent, SlideQuestionComponent, TextQuestionComponent, CheckboxQuestionComponent, RadioQuestionComponent } from '../questionparts';
+import { QuestionComponent, SlideQuestionComponent, TextQuestionComponent, CheckboxQuestionComponent, RadioQuestionComponent } from '../exercise-components/questionparts';
 
 
 const SUBMIT_ROUTE = '/.netlify/functions/classwork';

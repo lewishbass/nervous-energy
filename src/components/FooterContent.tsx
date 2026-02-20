@@ -11,7 +11,7 @@ export default function FooterContent(props: FooterContentProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-		<footer className="w-full bg2 border-t-3 border-gray-300 dark:border-gray-700 mt-auto opacity-50">
+		<footer className="w-full bg1 border-t-3 border-gray-300 dark:border-gray-700 mt-auto">
 			<div className="max-w-2xl mx-auto px-8 py-4">
 				<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6">
           {/* About Section */}
@@ -122,8 +122,9 @@ export default function FooterContent(props: FooterContentProps) {
                   placeholder="Email"
                   className="flex-1 px-4 py-2 text-sm bg-transparent border-none rounded-full focus:outline-none tc4 w-2 "
                 />
-                <button className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full">
+                <button title="register for newsletter" className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg1 text-white hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full">
                   <FaEnvelope size={14} />
+                  {/*TODO: Add newsletter functionality*/}
                 </button>
               </div>
             </div>

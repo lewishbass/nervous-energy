@@ -13,7 +13,7 @@ export default function NextQuestion({ prevHref, nextHref, prevLabel = 'Previous
   return (
     <div className="flex items-center rounded-lg overflow-hidden">
       {prevHref ? (
-        <Link href={prevHref} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-sm tc3 hover:bg-gray-200 dark:hover:bg-gray-700 border-r-2 border-gray-300 dark:border-gray-700 group">
+        <Link href={prevHref} className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-sm tc3 hover:bg-gray-200 dark:hover:bg-gray-700 border-r-2 border-gray-800 dark:border-gray-500 group">
           <FaArrowLeft className="inline mr-2 mb-1 transition-transform duration-200 group-hover:translate-x-[-2px]" />
           {prevLabel}
         </Link>

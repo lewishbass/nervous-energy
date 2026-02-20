@@ -3,7 +3,6 @@ import connectMongoDB from '../lib/mongodb';
 import { validateUser } from '../lib/backendutils';
 
 import AssignmentSubmission from '../models/AssignmentSubmission';
-import { read } from 'node:fs';
 
 const readSubmissionsWhitelist = ['Lewis']
 
@@ -38,9 +37,17 @@ export const handler: Handler = async (event) => {
 			console.log("Handling submit_assignment...");
 			return await handleSubmitAssignment(requestBody);
 		}
+		else if (requestBody.action === 'submit_partial') {
+			console.log("Handling submit_partial...");
+			return await handlePartialSubmission(requestBody);
+		}
 		else if (requestBody.action === 'get_submitted_assignments') {
 			console.log("Handling get_submitted_assignments...");
 			return await getSubmittedAssignments(requestBody);
+		}
+		else if (requestBody.action === 'get_partial_submission') {
+			console.log("Handling get_partial_submission...");
+			return await getPartialSubmission(requestBody);
 		}
 		else if (requestBody.action === 'check_authorization') {
 			console.log("Handling check_authorization...");
@@ -116,6 +123,67 @@ async function handleSubmitAssignment(requestBody: any) {
 	}
 }
 
+async function handlePartialSubmission(requestBody: any) {
+	// fetches or creates submission from database, and updates or appends the new submission part
+
+	const { username, token, submissionData, className, assignmentName, questionName } = requestBody;
+
+	// validate required fields
+	if(!username || !token || !submissionData || !className || !assignmentName || !questionName) {
+		return {
+			statusCode: 400,
+			body: JSON.stringify({ message: 'API missing required fields' }),
+		};
+	}
+
+	// Validate token
+	const validation = await validateUser(username, token);
+	if (validation.error != "OK") {
+		return {
+			statusCode: 401,
+			body: JSON.stringify({ message: 'User validation failed' }),
+		};
+	}
+	const user = validation.user;
+
+	// Check for existing submission
+	try {
+		let submission = await AssignmentSubmission.findOne({ userId: user.id, className, assignmentName }).exec();
+		if (!submission) {
+			// Create new submission if none exists
+			submission = new AssignmentSubmission({
+				username: user.username,
+				userId: user.id,
+				className,
+				assignmentName,
+				submissionData: {
+					[questionName]: submissionData
+				},
+			});
+		}
+		else {
+			// Update existing submission
+			submission.submissionData = {
+				...submission.submissionData,
+				[questionName]: submissionData
+			};
+		}
+		// Save the submission
+		const savedSubmission = await submission.save();
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ message: 'Submission part saved successfully', submissionId: savedSubmission.id }),
+		};
+
+	} catch (error) {
+		console.error("Error fetching assignment submission:", error);
+		return {
+			statusCode: 500,
+			body: JSON.stringify({ message: 'Error fetching assignment submission' }),
+		};
+	}
+}
+
 async function getSubmittedAssignments(requestBody: any) {
 	const { username, token, className } = requestBody;
 
@@ -151,6 +219,51 @@ async function getSubmittedAssignments(requestBody: any) {
 		};
 	}
 
+}
+
+async function getPartialSubmission(requestBody: any) {
+	// given array of question names, array of submitted question data is returned
+	const { username, token, className, assignmentName, questionNames } = requestBody;
+	// Validate required fields
+	if (!username || !token || !className || !assignmentName || !questionNames) {
+		return {
+			statusCode: 400,
+			body: JSON.stringify({ message: 'API missing required fields' }),
+		};
+	}
+	// Validate token
+	const validation = await validateUser(username, token);
+	if (validation.error != "OK") {
+		return {
+			statusCode: 401,
+			body: JSON.stringify({ message: 'User validation failed' }),
+		};
+	}
+	const user = validation.user;
+	try {
+		const submission = await AssignmentSubmission.findOne({ userId: user.id, className, assignmentName }).exec();
+		if (!submission) {
+			return {
+				statusCode: 200,
+				body: JSON.stringify({ submittedQuestionData: {} }),
+			};
+		}
+		const submittedQuestions = questionNames.filter((qName: string) => submission.submissionData && submission.submissionData[qName]) as string[];
+		const submittedQuestionData: any = {};
+		submittedQuestions.forEach(qName => {
+			submittedQuestionData[qName] = submission.submissionData[qName];
+		});
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ submissionStates: submittedQuestionData }),
+		};
+	} catch (error) {
+		console.error("Error fetching partial submission:", error);
+		return {
+			statusCode: 500,
+			body: JSON.stringify({ message: 'Error fetching partial submission' }),
+		};
+	}
 }
 
 async function checkUserAuthorization(requestBody: any) {

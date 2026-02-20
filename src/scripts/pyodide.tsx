@@ -169,14 +169,17 @@ class _RTOut:
         self._cb = cb
         self._type = stype
         self._buf = ''
+        self._hist = []
     def write(self, text):
         self._buf += text
         while '\\n' in self._buf:
             line, self._buf = self._buf.split('\\n', 1)
             self._cb(line, self._type)
+            self._hist.append(line)
     def flush(self):
         if self._buf:
             self._cb(self._buf, self._type)
+            self._hist.append(self._buf)
             self._buf = ''
 `);
     console.log('[Pyodide] Async execution helpers installed');

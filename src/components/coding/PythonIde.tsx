@@ -18,6 +18,7 @@ import { useTheme } from 'next-themes';
 import { usePyodide, registerPyodideCompletions, registerPyodideSemanticTokens, definePythonThemes, resetPyodideContext, getVariableInfo } from '@/scripts/pyodide';
 import { copyToClipboard } from '@/scripts/clipboard';
 import { MdContentCopy } from 'react-icons/md';
+import { exec } from 'child_process';
 
 // ---------- Types ----------
 
@@ -40,7 +41,7 @@ export type PythonIdeProps = {
 	initialPersistentExec?: boolean;
 	initialWordWrap?: boolean;
 	onCodeStartCallback?: (code: string, pyodide: any) => void;
-	onCodeEndCallback?: (code: string, error: string | null, pyodide: any, vars: Record<string, VariableInfo>) => void;
+	onCodeEndCallback?: (code: string, pyodide: any, error: string | null, vars: Record<string, VariableInfo>, stdout: string | null) => void;
 };
 
 // ---------- Component ----------
@@ -160,6 +161,7 @@ export default function PythonIde({
 
 		let execError: string | null = null;
 		let validationVars = {} as Record<string, VariableInfo>;
+		let execStdout: string | null = null;
 
 		try {
 			// Set up real-time print callback so stdout/stderr stream to the terminal
@@ -175,7 +177,8 @@ export default function PythonIde({
 import sys as _sys, json as _json, traceback as _tb, textwrap as _textwrap
 
 _save_out, _save_err = _sys.stdout, _sys.stderr
-_sys.stdout = _RTOut(_js_print_cb, 'stdout')
+_rt_stdout = _RTOut(_js_print_cb, 'stdout')
+_sys.stdout = _rt_stdout
 _sys.stderr = _RTOut(_js_print_cb, 'stderr')
 
 _exec_err = None
@@ -245,20 +248,23 @@ for _n, _v in sorted(_new_vars.items()):
 _json.dumps({
     'error': _exec_err,
     'variables': _user_vars,
+		'stdout': _rt_stdout._hist,
 })
 `);
 
 			const parsed = JSON.parse(resultJson);
-
 			// Errors are not streamed — display them from the result
 			if (parsed.error) {
-				execError = parsed.error;
+				execError = parsed.error.endsWith('\n') ? parsed.error.slice(0, -1) : parsed.error;
 				setTerminalLines(prev => {
 					const lines = [...prev];
-					const e = parsed.error.endsWith('\n') ? parsed.error.slice(0, -1) : parsed.error;
+					const e = execError || '';
 					for (const l of e.split('\n')) lines.push({ text: l, type: 'error' as const });
 					return lines;
 				});
+			}
+			if (parsed.stdout && Array.isArray(parsed.stdout)) {
+				execStdout = parsed.stdout.join('\n');
 			}
 
 			// remove non-base variables
@@ -297,7 +303,7 @@ _json.dumps({
 		} finally {
 			setRunning(false);
 			setTerminalLines(prev => [...prev, { text: '>> ', type: 'info' as const }]);
-			onCodeEndCallback?.(codeToRun, execError, pyodideRef.current, validationVars);
+			onCodeEndCallback?.(codeToRun, pyodideRef.current, execError, validationVars, execStdout);
 		}
 	}, [variables, documentName, isCompact, persistentExec, onCodeStartCallback, onCodeEndCallback]);
 
