@@ -1,14 +1,14 @@
 import React from 'react';
 import {LectureTemplate, LectureIcon} from './LectureTemplate';
 
-interface MoreFlowLectureProps {
+interface BreakIteratorsInlineLectureProps {
   displayMode?: 'scrollable' | 'slideshow';
   className?: string;
   style?: React.CSSProperties;
   exitFSCallback?: () => void;
 }
 
-function MoreFlowLecture(props: MoreFlowLectureProps | null) {
+function BreakIteratorsInlineLecture(props: BreakIteratorsInlineLectureProps | null) {
 	const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
@@ -23,18 +23,18 @@ function MoreFlowLecture(props: MoreFlowLectureProps | null) {
   );
 }
 
-interface MoreFlowLectureIconProps {
+interface BreakIteratorsInlineLectureIconProps {
 	displayMode?: 'list' | 'card';
 	className?: string;
 	style?: React.CSSProperties;
 	onClick?: () => void;
 }
 
-function MoreFlowLectureIcon(props: MoreFlowLectureIconProps | null) {
+function BreakIteratorsInlineLectureIcon(props: BreakIteratorsInlineLectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="More Flow Control" summary="Manipulate loops with advanced techniques. 'with' and 'trys'" displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="Break, Iterators & Inline" summary="Manipulate loops with advanced techniques. break, continue, for/while patterns" displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 
-export { MoreFlowLecture, MoreFlowLectureIcon };
+export { BreakIteratorsInlineLecture, BreakIteratorsInlineLectureIcon };

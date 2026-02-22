@@ -203,7 +203,7 @@ export const assignments: AssignmentInfo[] = [
 		link: 'simple-coding-practice',
 		uuid: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
 		startClassIndex: 1,
-		endClassIndex: 4,
+		endClassIndex: 3,
 		type: 'homework',
 		finished: true
 	},
@@ -213,7 +213,7 @@ export const assignments: AssignmentInfo[] = [
 		link: 'functions-arrays-loops',
 		uuid: 'b2c3d4e5-f6g7-8901-bcde-fg2345678901',
 		startClassIndex: 3,
-		endClassIndex: 6,
+		endClassIndex: 5,
 		type: 'homework'
 	},
 	{
@@ -226,9 +226,9 @@ export const assignments: AssignmentInfo[] = [
 		type: 'project'
 	},
 	{
-		name: 'TMP-Unit 2 Quiz',
+		name: 'TMP-Unit 1 Quiz',
 		description: 'Assessment covering lists, dictionaries, sets, tuples, and basic numpy operations.',
-		link: 'unit-2-quiz',
+		link: 'unit-1-quiz',
 		uuid: 'd4e5f6g7-h8i9-0123-defg-hi4567890123',
 		startClassIndex: 7,
 		endClassIndex: 8,

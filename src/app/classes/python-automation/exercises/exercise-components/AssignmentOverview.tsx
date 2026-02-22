@@ -53,7 +53,7 @@ export default function AssignmentOverview({
 						<div key={index} className="mb-2">
 							<button
 								className={`tc3 py-2 px-4 rounded-lg hover:bg-indigo-100/50 dark:hover:bg-indigo-900/50 transition-all duration-100 cursor-pointer w-full text-left select-none opacity-70 ${statusColor(q.status)}`}
-								onClick={() => router.push(`/classes/python-automation/exercises/simple-coding-practice/${q.link}`)}
+								onClick={() => router.push(q.link)}
 							>
 								<span className={`font-bold ${statusColor(q.status) || 'tc2'}`}>{q.title}</span><span className="text-sm">{` ${q.description}`}</span>
 							</button>

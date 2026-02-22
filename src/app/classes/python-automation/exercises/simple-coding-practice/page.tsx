@@ -7,6 +7,7 @@ import AssignmentOverview from '../exercise-components/AssignmentOverview';
 import { useEffect, useState } from 'react';
 import { getQuestionSubmissionStatus } from '../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
+import BackToAssignment from '../exercise-components/BackToAssignment';
 
 const className = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -56,14 +57,14 @@ export default function SimpleCodingPractice() {
   const assignmentPath = '/classes/python-automation/exercises/simple-coding-practice';
 
   const questions: { title: string; link: string; description: string; status?: string }[] = [
-    { title: 'Q1-Variable Assignment', link: 'q1', description: 'Assign integer, string, and boolean values to variables.' },
-    { title: 'Q2-Integer Operations', link: 'q2', description: 'Perform arithmetic operations, print to console, and convert between types.' },
-    { title: 'Q3-String Operations', link: 'q3', description: 'Concatenate strings, convert case, trim whitespace, and check substrings.' },
-    { title: 'Q4-Combining String Operations', link: 'q4', description: 'Count characters, vowels, and calculate string fractions.' },
-    { title: 'Q5-Boolean Operations', link: 'q5', description: 'Use AND, OR, and NOT operators to combine and negate boolean values.' },
-    { title: 'Q6-Numerical Comparisons', link: 'q6', description: 'Use comparison operators to compare numbers, strings, and check equality.' },
-    { title: 'Q7-Binary and Hexadecimal', link: 'q7', description: 'Convert numbers to binary and hexadecimal strings, and validate their formats.' },
-    { title: 'Q8-Review', link: 'q8', description: 'Perform simple operations with ints, floats, bools and strings.' },
+    { title: 'Q1-Variable Assignment', link: `${assignmentPath}/q1`, description: 'Assign integer, string, and boolean values to variables.' },
+    { title: 'Q2-Integer Operations', link: `${assignmentPath}/q2`, description: 'Perform arithmetic operations, print to console, and convert between types.' },
+    { title: 'Q3-String Operations', link: `${assignmentPath}/q3`, description: 'Concatenate strings, convert case, trim whitespace, and check substrings.' },
+    { title: 'Q4-Combining String Operations', link: `${assignmentPath}/q4`, description: 'Count characters, vowels, and calculate string fractions.' },
+    { title: 'Q5-Boolean Operations', link: `${assignmentPath}/q5`, description: 'Use AND, OR, and NOT operators to combine and negate boolean values.' },
+    { title: 'Q6-Numerical Comparisons', link: `${assignmentPath}/q6`, description: 'Use comparison operators to compare numbers, strings, and check equality.' },
+    { title: 'Q7-Binary and Hexadecimal', link: `${assignmentPath}/q7`, description: 'Convert numbers to binary and hexadecimal strings, and validate their formats.' },
+    { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Perform simple operations with ints, floats, bools and strings.' },
   ].map(q => ({ ...q, status: questionStatuses[q.link] }));
 
   return (
@@ -108,6 +109,10 @@ export default function SimpleCodingPractice() {
           questionList={questions}
           className="mb-8"
         />
+      </div>
+      <div className="p-4 px-8">
+        <BackToAssignment assignmentPath={"../?tab=exercises"} textOverride="Back to Assignments"/>
+        
       </div>
     </div>
     </>

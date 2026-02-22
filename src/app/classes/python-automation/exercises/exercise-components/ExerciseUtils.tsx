@@ -181,7 +181,6 @@ export const checkRequiredCode = (
   return { passed: true, message: '' };
 };
 
-
 /**
  * Checks a provided error string against an optionally expected message and
  * produces a result indicating whether the validation passed along with a
@@ -216,6 +215,146 @@ export const validateError = (
   const lastLine = error.trim().split('\n').slice(-1)[0];
   return { passed: false, message: `${lastLine}` };
 };
+/**
+ * Validates a test case for a function
+ * @param pyodide - The Pyodide instance to run the code
+ * @param funcName - The name of the function to test
+ * @param testCase - An object containing the test case with properties:
+ *   - `args`: An array of arguments to pass to the function.
+ *   - `expected`: The expected output from the function.
+ *   - `expectedError`: An optional expected error message substring if the test case should raise an error.
+ * @return An object containing:
+ *   - `passed`: A boolean indicating whether the test case passed.
+ *   - `message`: A string describing the result of the test case.
+ */
+export async function validateFunction (
+ pyodide: any,
+  funcName: string,
+  testCase: {
+    args: any[];
+    expected: any;
+    expectedError?: string | null;
+  }
+): Promise<{ passed: boolean; message: string; }> {
+  if (!pyodide) {
+    return { passed: false, message: 'Pyodide is not loaded.' };
+  }
+
+  // Check that the function exists in the global scope
+  const funcExists: boolean = pyodide.runPython(
+    `callable(globals().get('${funcName}', None))`
+  );
+
+  if (!funcExists) {
+    return { passed: false, message: `Function "${funcName}" not found or is not callable.` };
+  }
+
+  // Serialize the args to Python and call the function
+  pyodide.globals.set('_test_args', testCase.args);
+  pyodide.globals.set('_test_func_name', funcName);
+
+  try {
+    const resultJson: string = await pyodide.runPythonAsync(`
+import json as _json, traceback as _tb
+
+_fn = globals()[_test_func_name]
+_args = _test_args.to_py() if hasattr(_test_args, 'to_py') else list(_test_args)
+
+_test_error = None
+_test_result = None
+try:
+    _test_result = _fn(*_args)
+except Exception:
+    _test_error = _tb.format_exc()
+
+_json.dumps({
+    'result': repr(_test_result) if _test_result is not None else 'None',
+    'result_type': type(_test_result).__name__ if _test_error is None else None,
+    'error': _test_error,
+})
+`);
+
+    const parsed = JSON.parse(resultJson);
+
+    // If we expected an error
+    if (testCase.expectedError) {
+      if (parsed.error && parsed.error.includes(testCase.expectedError)) {
+        return { passed: true, message: `${funcName}(${testCase.args.join(', ')}) correctly raised expected error.` };
+      }
+      if (!parsed.error) {
+        return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) expected an error containing "${testCase.expectedError}" but no error was raised.` };
+      }
+      const lastLine = parsed.error.trim().split('\n').slice(-1)[0];
+      return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) expected error "${testCase.expectedError}" but got: ${lastLine}` };
+    }
+
+    // If an unexpected error occurred
+    if (parsed.error) {
+      const lastLine = parsed.error.trim().split('\n').slice(-1)[0];
+      return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) raised an error: ${lastLine}` };
+    }
+
+    // Compare the result to expected value
+    const actualValue = deRepr(parsed.result, parsed.result_type);
+    const expectedValue = testCase.expected;
+
+    // Deep comparison for arrays/lists
+    if (Array.isArray(expectedValue) && Array.isArray(actualValue)) {
+      if (JSON.stringify(actualValue) !== JSON.stringify(expectedValue)) {
+        return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) returned ${parsed.result}, expected ${JSON.stringify(expectedValue)}.` };
+      }
+    } else if (actualValue !== expectedValue) {
+      return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) returned ${parsed.result}, expected ${JSON.stringify(expectedValue)}.` };
+    }
+    console.log('Test case passed:', { args: testCase.args, expected: testCase.expected, actual: actualValue });
+    return { passed: true, message: `${funcName}(${testCase.args.join(', ')}) returned ${parsed.result} ✓` };
+
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { passed: false, message: `Error testing ${funcName}(${testCase.args.join(', ')}): ${msg}` };
+  }
+}
+
+/**
+ * Runs a series of test cases
+ * @param pyodide - The Pyodide instance to run the code
+ * @param funcName - The name of the function to test
+ * @param testCases - An array of test case objects, each containing:
+ * @return An object containing:
+ *  - 'passed': boolean indicating if all test cases passed
+ *  - 'message': a human-readable summary of the test results
+ *  - 'casesPassed': number of test cases that passed
+ */
+
+export async function runTestCases (
+  pyodide: any,
+  funcName: string,
+  cases: {args:any[]; expected: any; expectedError?: string | null;}[]
+):Promise<{passed: boolean; message: string, casesPassed: number}> {
+
+  let firstFailureMessage: string | null = null;
+  let passedCount = 0;
+
+  for (const tc of cases) {
+    const result = await validateFunction(pyodide, funcName, tc);
+    if (result.passed) {
+      passedCount++;
+    } else if (firstFailureMessage === null) {
+      firstFailureMessage = result.message;
+    }
+  }
+
+  const total = cases.length;
+  if (passedCount === total) {
+    return { passed: true, message: `All ${total}/${total} test cases passed!`, casesPassed: passedCount };
+  } else {
+    return {
+      passed: false,
+      message: `${passedCount}/${total} test cases passed - ${firstFailureMessage}`,
+      casesPassed: passedCount
+    };
+  }
+}
 
 /**
  * Creates and animates a particle element at the given position with the
@@ -250,7 +389,7 @@ export const spawnParticle = (position: { x: number; y: number }, velocity: { x:
 export const spawnParticlesAroundBox = (box: HTMLElement, color: string, n: number = 20) => {
   // spawns particles around edge of box
   const rect = box.getBoundingClientRect();
-  console.log('Spawning particles around box at', rect);
+  //console.log('Spawning particles around box at', rect);
   for (let i = 0; i < n; i++) {
     const edge = Math.floor(Math.random() * 4);
     let position = { x: 0, y: 0 };

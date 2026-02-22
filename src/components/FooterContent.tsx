@@ -32,18 +32,18 @@ export default function FooterContent(props: FooterContentProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="tc2 text-sm hover:tc1 transition-colors">
-                  About
+                <Link href="/books" className="tc2 text-sm hover:tc1 transition-colors">
+                  Books
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="tc2 text-sm hover:tc1 transition-colors">
-                  Privacy
+                <Link href="/toys/python-playground" className="tc2 text-sm hover:tc1 transition-colors">
+                  Python IDE
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="tc2 text-sm hover:tc1 transition-colors">
-                  Terms
+                <Link href="/classes/python-automation?tab=" className="tc2 text-sm hover:tc1 transition-colors">
+                  Class
                 </Link>
               </li>
             </ul>

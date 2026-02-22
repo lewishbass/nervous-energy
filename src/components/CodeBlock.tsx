@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Prism from 'prismjs';
 import { copyToClipboard } from '@/scripts/clipboard';
+import '@/styles/code.css';
 
 
 import 'prism-themes/themes/prism-one-dark.css';

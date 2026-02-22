@@ -8,9 +8,10 @@ type QuestionBorderAnimationProps = {
 	children: React.ReactNode;
 	validationState: 'passed' | 'failed' | 'pending' | null;
 	className?: string;
+	style?: React.CSSProperties;
 };
 
-export default function QuestionBorderAnimation({children, validationState, className}: QuestionBorderAnimationProps) {
+export default function QuestionBorderAnimation({children, validationState, className, style}: QuestionBorderAnimationProps) {
 	const stateClass = validationState
 		? `qba-${validationState}`
 		: 'qba-idle';
@@ -34,8 +35,8 @@ export default function QuestionBorderAnimation({children, validationState, clas
 	}, [validationState]);
 
 	return (
-		<div ref={wrapperRef} className={`qba-wrapper ${stateClass}`}>
-			<div className={`qba-content ${className || ''}`}>
+		<div ref={wrapperRef} className={`qba-wrapper ${stateClass}`} >
+			<div className={`qba-content ${className || ''}`} style={style}>
 				{children}
 			</div>
 		</div>

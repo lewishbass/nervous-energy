@@ -154,6 +154,7 @@ export default function Minecraft() {
 			</div>
 
 			<h1 className="text-4xl font-bold mb-6 tc1 backdrop-blur-sm rounded-lg px-2 w-fit">Minecraft Server</h1>
+			<h1 className="text-xl mb-6 tc1 backdrop-blur-sm rounded-lg px-2 w-fit"><span className="text-red-500 font-bold">Server Temporarily Offline</span> because my parents think port forwarding is devils magic!</h1>
 
 			{/* Hero Section */}
 			<section className="mb-12 relative">

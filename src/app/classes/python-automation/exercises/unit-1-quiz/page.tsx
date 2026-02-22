@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-export default function Unit2Quiz() {
+export default function Unit1Quiz() {
   const router = useRouter();
   const { isLoggedIn } = useAuth();
 
@@ -29,9 +29,9 @@ export default function Unit2Quiz() {
             onClick={() => router.push('/classes/python-automation')}
           />
           <div>
-            <h1 className="text-4xl font-bold tc1">Unit 2 Quiz</h1>
+            <h1 className="text-4xl font-bold tc1">Unit 1 Quiz</h1>
             <p className="tc2 text-lg mt-2">Python for Automation and Scripting</p>
-            <p className="tc3 text-sm">Unit 2: The Data Structures Toolbox</p>
+            <p className="tc3 text-sm">Unit 1: The Data Structures Toolbox</p>
           </div>
         </div>
       </div>

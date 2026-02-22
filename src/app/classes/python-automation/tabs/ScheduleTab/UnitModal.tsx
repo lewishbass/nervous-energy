@@ -2,6 +2,7 @@ import React from 'react';
 import ModalTemplate from '@/components/modals/ModalTemplate';
 import { UnitInfo, unitColors, AssignmentInfo } from './ScheduleInfo';
 import { useRouter } from 'next/navigation';
+import { FaArrowRight } from 'react-icons/fa6';
 
 interface UnitModalProps {
   isOpen: boolean;
@@ -45,14 +46,14 @@ const UnitModal: React.FC<UnitModalProps> = ({ isOpen, onClose, displayData }) =
           </div>
           {displayData.link && (
             <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-700">
-              <h3 className="text-lg font-semibold tc1 mb-2">Resource</h3>
+              <h3 className="text-lg font-semibold tc1 mb-2">Link</h3>
               <a 
                 onClick={() => router.push(`/classes/python-automation/exercises/${displayData.link}`)} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="tc2 hover:opacity-60 transition-opacity duration-300 break-all cursor-pointer"
               >
-                {displayData.link}
+                <FaArrowRight className="inline"/> {displayData.link}
               </a>
             </div>
           )}
@@ -84,10 +85,10 @@ const UnitModal: React.FC<UnitModalProps> = ({ isOpen, onClose, displayData }) =
               )}
             <h3 className="text-lg font-semibold tc1 mb-2">Assignments</h3>
             {displayData.assignmentsAssigned.length > 0 ? (
-              <ul className="list-disc list-inside tc2">
+              <ul className="tc2">
                 {displayData.assignmentsAssigned.map((assignment, index) => (
                   <li key={index} className="mb-1 hover:opacity-60 transition-opacity duration-300 break-all cursor-pointer" onClick={() => router.push(`/classes/python-automation/exercises/${assignment.link}`)}>
-                    {assignment.name} (Due by Class {assignment.endClassIndex + 1})
+                    <FaArrowRight className="inline"/> {assignment.name} (Due by Class {assignment.endClassIndex + 1})
                   </li>
                 ))}
               </ul>
