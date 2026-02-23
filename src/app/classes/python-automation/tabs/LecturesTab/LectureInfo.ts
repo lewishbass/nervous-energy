@@ -5,7 +5,7 @@ import { VariablesLecture, VariablesLectureIcon } from '../../lectures/02-Variab
 import { BagLecture, BagLectureIcon } from '../../lectures/03-BagLecture';
 import { ListLecture, ListLectureIcon } from '../../lectures/04-ListLecture';
 import { FlowControlLecture, FlowControlLectureIcon } from '../../lectures/05-FlowControlLecture';
-import { IntroToMLLecture, IntroToMLLectureIcon } from '../../lectures/05.5-IntroToML';
+import { IntroToMLLecture, IntroToMLLectureIcon } from '../../lectures/06.5-IntroToML';
 import { StringsLecture, StringsLectureIcon } from '../../lectures/07-StringsLecture';
 import { ListOperationsLecture, ListOperationsLectureIcon } from '../../lectures/08-ListOperationsLecture';
 import { BreakIteratorsInlineLecture, BreakIteratorsInlineLectureIcon } from '../../lectures/06-BreakIteratorsInline';
@@ -38,8 +38,8 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: BagLectureIcon, lecture: BagLecture, index: 2, classNumber: 1 },
 	{ finished: true, icon: ListLectureIcon, lecture: ListLecture, index: 3, classNumber: 2 },
 	{ finished: true, icon: FlowControlLectureIcon, lecture: FlowControlLecture, index: 4, classNumber: 3 },
-	{ finished: true, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 5, classNumber: 3 },
 	{ finished: false, icon: BreakIteratorsInlineLectureIcon, lecture: BreakIteratorsInlineLecture, index: 6, classNumber: 4 },
+	{ finished: false, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 4 },
 	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 7, classNumber: 5 },
 	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 8, classNumber: 6 },
 	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 9, classNumber: 8 },

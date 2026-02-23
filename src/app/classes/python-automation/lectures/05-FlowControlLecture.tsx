@@ -36,8 +36,8 @@ function FlowControlLecture(props: FlowControlLectureProps | null) {
   // branching: lines 1 2 3 6 7 (the if-true path, skipping else branch)
   // looping:  lines 1, then 2 3 4 × 3, then 5 6 7 8
   const SEQ_LINES = [1, 2, 3, 4, 5];
-  const BRANCH_LINES = [1, 2, 3, 6, 7];
-  const LOOP_LINES = [1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 5, 6, 7, 8];
+  const BRANCH_LINES = [1, 2, 3, 6, 7, 8];
+  const LOOP_LINES = [1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 5, 6, 7, 8, 9];
 
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
@@ -209,9 +209,9 @@ print(f"Your grade is: {grade}")  # Your grade is: C`} />
         <h3 className="lecture-section-header">While Loops</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          A <code className="lecture-code-inline">while</code> loop repeats a block of code <span className="lecture-bold">as long as</span> the condition is <code className="lecture-code-inline">True</code>. The condition is checked <span className="lecture-bold">before</span> each iteration — if it's <code className="lecture-code-inline">False</code> from the start, the loop body never executes.
+          A <code className="lecture-code-inline">while</code> loop repeats a block of code <span className="lecture-bold">as long as</span> the condition is <code className="lecture-code-inline">True</code>. The condition is checked <span className="lecture-bold">before</span> each iteration, if it's <code className="lecture-code-inline">False</code> from the start, the loop body never executes.
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="basic while loop"
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="basic while loop" lines={[1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 5, 6, 7, 8, 9]} scrollMode="onClick"
           code={`countdown = 5
 while countdown > 0:
     print(countdown)
@@ -222,7 +222,7 @@ print("Liftoff!")
         <p className="lecture-paragraph">
           If the condition never becomes <code className="lecture-code-inline">False</code>, you create an <span className="lecture-bold">infinite loop</span>. You can use the break command <code className="lecture-code-inline">Ctrl+C</code> in the terminal to kill programs stuck in this loop.
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="infinite loop — avoid this!"
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="infinite loop — avoid this!" lines={[1, 2]} scrollMode="onClick"
           code={`while True:
     print("Help, I'm stuck!")`} />
 
@@ -237,7 +237,7 @@ print("Liftoff!")
         <p className="lecture-paragraph">
           A <code className="lecture-code-inline">for</code> loop iterates over a <span className="lecture-bold">sequence</span> (such as a list, string, or range), executing the loop body once for each element. Unlike <code className="lecture-code-inline">while</code> loops, <code className="lecture-code-inline">for</code> loops are used when you know (or can determine) how many iterations are needed.
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="basic for loop with a list"
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="basic for loop with a list" lines={[1, 2, 3, 2, 3, 2, 3, 4, 5, 6, 7, 8]} scrollMode="onClick"
           code={`fruits = ["apple", "banana", "cherry"]
 for fruit in fruits:
     print(fruit)
@@ -245,9 +245,17 @@ for fruit in fruits:
 # apple
 # banana
 # cherry`} />
+        <p className="lecture-paragraph">
+          you can iterate over strings character by character:
+          </p>
+        <CodeBlock className="lecture-codeblock" language="python" caption="for loop with a string"
+          code={`message = "Hello"
+for char in message:
+    print(char, end="-")
+# Output: H-e-l-l-o-`} />
 
         <p className="lecture-paragraph">
-          The <code className="lecture-code-inline">range()</code> function generates a sequence of numbers and is commonly used for repeating an action a specific number of times:
+          The <code className="lecture-code-inline">range()</code> function generates a sequence of numbers and is commonly used for repeating an action a specific number of times. By default it starts aat 0 and counts up to but not including the stop value, but you can also specify a different start and a step value <code className="lecture-code-inline">range(start, stop, step)</code>:
         </p>
         <CodeBlock className="lecture-codeblock" language="python" caption="for loop with range()"
           code={`# range(stop) — 0 to stop-1
@@ -265,54 +273,31 @@ for i in range(0, 20, 5):
 # Counting backwards
 for i in range(10, 0, -2):
     print(i, end=" ")   # 10 8 6 4 2`} />
-
-        <p className="lecture-paragraph">
-          You can iterate over strings character by character:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="iterating over a string"
-          code={`message = "Hello"
-for char in message:
-    print(char, end="-")
-# Output: H-e-l-l-o-`} />
-
-        <p className="lecture-paragraph">
-          <code className="lecture-code-inline">break</code> and <code className="lecture-code-inline">continue</code> work the same way in <code className="lecture-code-inline">for</code> loops:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="break and continue in for loops"
-          code={`# Find the first even number in a list
-numbers = [1, 3, 7, 8, 12, 15]
-for num in numbers:
-    if num % 2 == 0:
-        print(f"First even number: {num}")  # 8
-        break
-
-# Print only odd numbers
-for num in range(10):
-    if num % 2 == 0:
-        continue
-    print(num, end=" ")  # 1 3 5 7 9`} />
-
-        <p className="lecture-paragraph">
-          For loops also support an <code className="lecture-code-inline">else</code> block, which runs after the loop finishes <span className="lecture-bold">without</span> hitting a <code className="lecture-code-inline">break</code>:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="for-else pattern — searching for a value"
-          code={`target = 7
-numbers = [1, 3, 5, 9, 11]
-
-for num in numbers:
-    if num == target:
-        print(f"Found {target}!")
-        break
-else:
-    print(f"{target} not found in the list.")
-# Output: 7 not found in the list.`} />
       </section>
 
       <section className="lecture-section mini-scroll" id="fors-with-iterators">
-        <h3 className="lecture-section-header">Fors with Iterators</h3>
+        <h3 className="lecture-section-header">Iterators</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          Python provides several built-in functions that produce <span className="lecture-bold">iterators</span> — objects that yield values one at a time. These are commonly paired with <code className="lecture-code-inline">for</code> loops to make iteration more expressive and Pythonic.
+           All for loops work using <span className="lecture-bold">iterators</span>, which are objects that <span className='lecture-bold'>yield</span> values one at a time, and then progress to the next value based on user defined code.
+        </p>
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="simple iterator" lines={[6, 7, 8, 3, 8, 9, 8, 4, 8, 9, 8, 5, 8, 9, 10, 11, 12]} scrollMode="onClick"
+          code={`# Create an iterator from a list
+def my_iterator():
+    yield 1
+    yield 20
+    yield 300
+#
+# Use the iterator in a for loop
+for item in my_iterator():
+    print(item, end=" ")
+# Output:
+# 1 20 300`} />
+        <p className="lecture-paragraph">
+          <span className="lecture-bold">range</span> is an iterator that yields a sequence of numbers. <span className="lecture-bold">arrays</span> automatically create an iterator that yields each element. <span className="lecture-bold">strings</span> create an iterator that yields each character.
+        </p>
+        <p className="lecture-paragraph">
+          Python provides some built-in iterators that can be used to combine or enhance for loops.
         </p>
 
         <div className="mb-4 mx-auto">
@@ -327,14 +312,6 @@ else:
                 <td className="lecture-table-header">zip()</td>
                 <td className="lecture-table-cell">Pairs elements from multiple sequences</td>
               </tr>
-              <tr className="lecture-table-row">
-                <td className="lecture-table-header">reversed()</td>
-                <td className="lecture-table-cell">Iterates in reverse order</td>
-              </tr>
-              <tr className="lecture-table-row">
-                <td className="lecture-table-header">sorted()</td>
-                <td className="lecture-table-cell">Iterates in sorted order</td>
-              </tr>
               <tr className="">
                 <td className="lecture-table-header">.items()</td>
                 <td className="lecture-table-cell">Iterates over dictionary key-value pairs</td>
@@ -346,7 +323,7 @@ else:
         <p className="lecture-paragraph">
           <code className="lecture-code-inline">enumerate()</code> is used when you need both the <span className="lecture-bold">index</span> and the <span className="lecture-bold">value</span> of each element:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="enumerate() — index and value"
+        <CodeBlock className="lecture-codeblock" language="python" caption="enumerate()-index and value"
           code={`fruits = ["apple", "banana", "cherry"]
 
 # Without enumerate (manual index tracking)
@@ -367,7 +344,7 @@ for i, fruit in enumerate(fruits):
         <p className="lecture-paragraph">
           <code className="lecture-code-inline">zip()</code> combines multiple sequences element-by-element. It stops at the shortest sequence:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="zip() — pairing multiple lists"
+        <CodeBlock className="lecture-codeblock" language="python" caption="zip()-pairing multiple lists"
           code={`names = ["Alice", "Bob", "Charlie"]
 scores = [85, 92, 78]
 grades = ["B", "A", "C"]
@@ -380,177 +357,75 @@ for name, score, grade in zip(names, scores, grades):
 # Bob: 92 (A)
 # Charlie: 78 (C)`} />
 
-        <p className="lecture-paragraph">
-          <code className="lecture-code-inline">reversed()</code> and <code className="lecture-code-inline">sorted()</code> let you control iteration order without modifying the original sequence:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="reversed() and sorted()"
-          code={`numbers = [3, 1, 4, 1, 5, 9, 2]
-
-# Iterate in reverse
-for num in reversed(numbers):
-    print(num, end=" ")  # 2 9 5 1 4 1 3
-
-# Iterate in sorted order
-for num in sorted(numbers):
-    print(num, end=" ")  # 1 1 2 3 4 5 9
-
-# Sorted descending
-for num in sorted(numbers, reverse=True):
-    print(num, end=" ")  # 9 5 4 3 2 1 1
-
-# Original list is unchanged
-print(numbers)  # [3, 1, 4, 1, 5, 9, 2]`} />
+          <p className="lecture-paragraph">
+            <code className="lecture-code-inline">.items()</code> is used to iterate over key-value pairs in a dictionary:
+          </p>
+          <CodeBlock className="lecture-codeblock" language="python" caption=".items()-iterating over a dictionary"
+          code={`scores = {"Alice": 85, "Bob": 92, "Charlie": 78}
+for name, score in scores.items():
+    print(f"{name}: {score}")`}
+          />
 
         <p className="lecture-paragraph">
-          Iterating over <span className="lecture-bold">dictionaries</span> using <code className="lecture-code-inline">.items()</code>, <code className="lecture-code-inline">.keys()</code>, and <code className="lecture-code-inline">.values()</code>:
+          you can also manually create iterators using <code className="lecture-code-inline">iter()</code> and access elements using <code className="lecture-code-inline">next()</code>:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="iterating over dictionaries"
-          code={`student = {"name": "Alice", "age": 20, "major": "Physics"}
-
-# Iterate over keys (default behavior)
-for key in student:
-    print(key)  # name, age, major
-
-# Iterate over values
-for value in student.values():
-    print(value)  # Alice, 20, Physics
-
-# Iterate over key-value pairs
-for key, value in student.items():
-    print(f"{key}: {value}")
-# name: Alice
-# age: 20
-# major: Physics`} />
-
-        <p className="lecture-paragraph">
-          <span className="lecture-bold">List comprehensions</span> are a compact way to create lists using a for loop in a single line:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="list comprehensions"
-          code={`# Standard loop
-squares = []
-for x in range(10):
-    squares.append(x ** 2)
-
-# List comprehension (equivalent, more concise)
-squares = [x ** 2 for x in range(10)]
-# [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-
-# With a condition (filter)
-even_squares = [x ** 2 for x in range(10) if x % 2 == 0]
-# [0, 4, 16, 36, 64]
-
-# With transformation
-names = ["alice", "bob", "charlie"]
-capitalized = [name.upper() for name in names]
-# ["ALICE", "BOB", "CHARLIE"]`} />
+        <CodeBlock className="lecture-codeblock" language="python" caption="manual iterator creation"
+          code={`numbers = [1, 2, 3]
+iterator = iter(numbers)
+print(next(iterator))  # Output: 1
+print(next(iterator))  # Output: 2
+print(next(iterator))  # Output: 3
+print(next(iterator))  # Throws StopIteration error
+`} />
+      <p className="lecture-paragraph">
+        <code className="lecture-code-inline">.next()</code> throws a <code className="lecture-code-inline text-red-500">StopIteration</code> exception when there are no more elements to yield, which is how for loops know when to stop iterating.
+      </p>
+      <p className="lecture-paragraph">
+        Iterators are powerful because they allow you to create custom looping behavior and work with data that doesn't fit in memory all at once (large ML datasets).
+      </p>
       </section>
 
       <section className="lecture-section mini-scroll" id="nested-loops">
         <h3 className="lecture-section-header">Nested Loops</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          A <span className="lecture-bold">nested loop</span> is a loop inside another loop. The inner loop completes all of its iterations for <span className="lecture-bold">each</span> iteration of the outer loop. This is useful for working with multi-dimensional data, grids, or combinations.
+          <span className="lecture-bold">Nesting</span> loops inside each other allows you to produce more complicated patterns and work with 2d data.
+          The inner loop runs through its entire range, then the outer loop moves to its next iteration.
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="basic nested loop — multiplication table"
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="basic nested loop" lines={[1, 2, 3, 2, 3, 2, 3, 4, 1, 2, 3, 2, 3, 2, 3, 4, 1, 2, 3, 2, 3, 2, 3, 4, 5, 6, 7, 8, 9, 10]} scrollMode="onClick"
           code={`for row in range(1, 4):
     for col in range(1, 4):
-        print(f"{row * col:4d}", end="")
+        print(row, "", col, " ", end="")
     print()  # New line after each row
-
+#
 # Output:
-#    1   2   3
-#    2   4   6
-#    3   6   9`} />
+# 1 1   1 2   1 3
+# 2 1   2 2   2 3
+# 3 1   3 2   3 3`} />
 
         <p className="lecture-paragraph">
-          Nested loops are essential for working with <span className="lecture-bold">2D lists</span> (matrices):
+          Nested loops are essential for working with <span className="lecture-bold">2D lists</span> (matrices) and images:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="iterating over a 2D list"
-          code={`matrix = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-]
-
-# Access every element
-for row in matrix:
-    for element in row:
-        print(element, end=" ")
-    print()
-
-# Access with indices
-for i in range(len(matrix)):
-    for j in range(len(matrix[i])):
-        print(f"matrix[{i}][{j}] = {matrix[i][j]}")`} />
+        <CodeBlock className="lecture-codeblock" language="python" caption="iterating over an image and darkening colors" 
+          code={`for x in img.width:
+    for y in img.height:
+        img[y, x] = img[y, x]*0.5`} />
 
         <p className="lecture-paragraph">
-          Nested loops can be used to generate <span className="lecture-bold">combinations</span> and <span className="lecture-bold">patterns</span>:
+          Nested loops can be used to <span className="lecture-bold">compare</span> a list against itself:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="generating combinations"
-          code={`colors = ["red", "green", "blue"]
-sizes = ["S", "M", "L"]
-
-# All combinations of color and size
-for color in colors:
-    for size in sizes:
-        print(f"{color}-{size}", end="  ")
-    print()
-
-# Output:
-# red-S  red-M  red-L
-# green-S  green-M  green-L
-# blue-S  blue-M  blue-L`} />
+        <CodeBlock className="lecture-codeblock" language="python" caption="comparing elements in a list"
+          code={`names = ["Alice", "Bob", "Charlie", "David", "Christopher"]
+for i, name1 in enumerate(names):
+    for j, name2 in enumerate(names):
+        if i != j: # dont compare names at the same index
+            if name1[0] == name2[0]: # check if first letters match
+                print(f"{name1} and {name2} have the same initial.")`}/>
 
         <p className="lecture-paragraph">
           <span className="tc1 font-semibold">Performance note:</span> Nested loops multiply the number of iterations. A loop of <code className="lecture-code-inline">n</code> inside a loop of <code className="lecture-code-inline">m</code> runs <code className="lecture-code-inline">n × m</code> times. Three levels deep with 100 iterations each would be 1,000,000 operations. Keep nesting shallow when possible.
         </p>
 
-        <CodeBlock className="lecture-codeblock" language="python" caption="break only exits the innermost loop"
-          code={`for i in range(3):
-    for j in range(3):
-        if j == 1:
-            break           # Only breaks out of the inner loop
-        print(f"({i}, {j})", end=" ")
-    print()
-
-# Output:
-# (0, 0)
-# (1, 0)
-# (2, 0)`} />
-
-        <p className="lecture-paragraph">
-          To break out of multiple levels, use a <span className="lecture-bold">flag variable</span> or move the nested loops into a <span className="lecture-bold">function</span> and use <code className="lecture-code-inline">return</code>:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="breaking out of nested loops with a function"
-          code={`def findValue(matrix, target):
-    """Search a 2D matrix for a target value and return its position"""
-    for i, row in enumerate(matrix):
-        for j, val in enumerate(row):
-            if val == target:
-                return (i, j)      # Exits both loops immediately
-    return None                    # Not found
-
-data = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-position = findValue(data, 5)
-print(position)  # (1, 1)`} />
-
-        <p className="lecture-paragraph">
-          Nested <span className="lecture-bold">list comprehensions</span> can flatten or transform multi-dimensional data:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="nested list comprehensions"
-          code={`matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-
-# Flatten a 2D list into 1D
-flat = [val for row in matrix for val in row]
-# [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-# Create a 2D list with comprehension
-grid = [[i * j for j in range(1, 4)] for i in range(1, 4)]
-# [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-
-# Transpose a matrix (swap rows and columns)
-transposed = [[row[i] for row in matrix] for i in range(len(matrix[0]))]
-# [[1, 4, 7], [2, 5, 8], [3, 6, 9]]`} />
       </section>
 
     </LectureTemplate>
