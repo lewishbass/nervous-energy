@@ -192,7 +192,7 @@ export default function ExercisesTab() {
               );
             } else {
               return (
-                <div className='relative lecture-list-item bg-gray-300/10 hover:bg-gray-300/25 dark:hover:bg-gray-300/15 flex items-center p-5 transition-colors duration-300 cursor-pointer' onClick={() => { navigateToAssignment(assignment); }}>
+                <div className='relative lecture-list-item bg-gray-300/10 hover:bg-gray-300/25 dark:hover:bg-gray-300/15 flex items-center p-5 transition-colors duration-300 cursor-pointer' onClick={() => { navigateToAssignment(assignment); }} style={{ opacity: assignment.finished ? 1 : 0.25, pointerEvents: assignment.finished ? 'auto' : 'none' }}>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base font-semibold tc2 mb-0.5 truncate">{assignment.name}</h3>
                     <p className="tc3 text-xs line-clamp-1">{assignment.description}</p>

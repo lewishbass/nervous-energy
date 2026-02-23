@@ -214,7 +214,8 @@ export const assignments: AssignmentInfo[] = [
 		uuid: 'b2c3d4e5-f6g7-8901-bcde-fg2345678901',
 		startClassIndex: 3,
 		endClassIndex: 5,
-		type: 'homework'
+		type: 'homework',
+		finished: true
 	},
 	{
 		name: 'TMP-Grade Book Manager',
