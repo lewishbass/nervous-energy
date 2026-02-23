@@ -10,7 +10,7 @@
 //   contains links to relevant exercises, interactive elements, dynamic content
 
 import React, { useEffect } from 'react';
-
+import RandomBackground from '@/components/backgrounds/RandomBackground';
 
 
 interface LectureTemplateProps {
@@ -89,6 +89,7 @@ const LectureTemplate: React.FC<LectureTemplateProps> = ({
 		// Render as a fullscreen slideshow view
 		return (
 			<div className={`${className} select-none fixed max-w-[100vw] max-h-[100vh] min-w-[100vw] min-h-[100vh] inset-0 z-[70] slideshow bg1`} style={style} onClick={(e) => { e.stopPropagation(); nextSlide(); }}>
+				<RandomBackground seed={currentSlideIndex} density={1} />
 				{React.Children.toArray(children)[currentSlideIndex]}
 			</div>
 		);

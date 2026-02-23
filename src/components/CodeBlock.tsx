@@ -24,11 +24,14 @@ interface CodeBlockProps {
 		className?: string;
 		style?: React.CSSProperties;
 		filename?: string;
-	compact?: boolean;
-	highlightLine?: number | number[] | null; // Line(s) to highlight, 1-indexed
+		compact?: boolean;
+		highlightLine?: number | number[] | null;
+		onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
+		onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
+		onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false, highlightLine = -1 }: CodeBlockProps) {
+export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false, highlightLine = -1, onMouseEnter, onMouseLeave, onClick }: CodeBlockProps) {
 	const codeRef = useRef<HTMLElement>(null);
 	const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,7 +93,13 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 	}
 
 		return (
-			<div className={`flex flex-col justify-center items-center mb-3 ${className}`} style={style}>
+			<div
+				className={`flex flex-col justify-center items-center mb-3 ${className}`}
+				style={style}
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
+				onClick={onClick}
+			>
 				<div className="relative rounded-md overflow-hidden max-w-[80vw] w-full" style={{ boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.1)' }}>
 					<div className="code-block-header" onClick={handleCopy}>
 						<button
@@ -212,17 +221,18 @@ export function AnimatedCodeBlock({
 		: {};
 
 	return (
-		<div {...hoverProps} {...clickProps}>
 			<CodeBlock
 				code={code}
 				language={language}
 				caption={caption}
-				className={className}
-				style={scrollMode === 'onClick' ? {} : style}
+				className={className + " cursor-pointer"}
+				style={style}
 				filename={filename}
 				compact={compact}
 				highlightLine={highlightLine}
+				onMouseEnter={scrollMode === 'onHover' ? startAnimation : undefined}
+				onMouseLeave={scrollMode === 'onHover' ? stopAnimation : undefined}
+				onClick={scrollMode === 'onClick' ? (e) => { advance(); e.stopPropagation(); } : undefined}
 			/>
-		</div>
 	);
 }

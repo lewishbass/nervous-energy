@@ -22,6 +22,7 @@
   align-items: start;
   padding: 0vh 6vw;
   overflow-y:scroll;
+  backdrop-filter: blur(7px);
 }
 
 .slideshow .lecture-codeblock{
@@ -301,6 +302,7 @@
 	background-color: rgba(236, 245, 237, 0.533);
 	color:#555;
   margin-bottom: 3vh;
+  min-width: 80vw;
 }
 
 .dark .lecture-tab-content{
