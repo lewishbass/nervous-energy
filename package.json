@@ -13,7 +13,7 @@
   "dependencies": {
     "@colyseus/sdk": "^0.17.26",
     "@monaco-editor/react": "^4.7.0",
-    "@netlify/functions": "^3.0.1",
+    "@netlify/functions": "^2.8.2",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-converter": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",

@@ -113,7 +113,7 @@ export default function Question1() {
             <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
             <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
           </div>
-          <p className="tc2 mb-2">Assign the integer value 42 to a variable named <CopyCode code="my_number" />.</p>
+          <p className="tc2 mb-2">Use the <CopyCode code="=" /> operator to assign the integer value 42 to a variable named <CopyCode code="my_number" />.</p>
           <p className="tc2 mb-2">Notice the variable inspector on the right, click on the variable to see its member functions.</p>
           <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
@@ -197,7 +197,7 @@ export default function Question1() {
 
         <div className="mt-6 flex items-center justify-between gap-4">
           <BackToAssignment assignmentPath={assignmentPath} />
-          <NextQuestion assignmentPath={assignmentPath} nextHref="/classes/python-automation/exercises/simple-coding-practice/q2" />
+          <NextQuestion assignmentPath={assignmentPath} nextHref="q2" prevHref={undefined} />
         </div>
       </div>
     </>

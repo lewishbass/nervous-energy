@@ -2,6 +2,7 @@ import Image from "next/image";
 import DragCard from "@/components/DragCard";
 import { SiKeras, SiTensorflow, SiPytorch, SiReact, SiNodedotjs, SiBlender, SiLatex, SiPython, SiCplusplus, SiDocker, SiOpengl, SiNextdotjs } from 'react-icons/si';
 import { RainbowText } from "@/scripts/rainbowtext";
+import Link from "next/link";
 
 export default function Home() {
 
@@ -212,10 +213,12 @@ export default function Home() {
 					<h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Work</h3>
 					<p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 						<a draggable="false" href="https://eng.vt.edu/ceed/ceed-pre-college-programs/imagination.html" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT CEED Engineering Outreach Camps</a>
-
 					</p>
 					<p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
 						<a draggable="false" href="https://people.cs.vt.edu/onufriev" target="_blank" rel="noopener noreferrer" className="text-blue-700 dark:text-blue-300">→ VT Computational Bio-Physics</a>
+					</p>
+					<p className="text-xl w-auto max-w-[100%] flex items-center gap-2">
+						<Link draggable="false" href="/classes/python-automation" className="text-blue-700 dark:text-blue-300">→ Intro to Python Instructor</Link>
 					</p>
 					<h3 className="text-2xl font-bold mb-2 ml-10 mt-2">Publications</h3>
 					<p className="text-xl w-auto max-w-[100%] flex items-center gap-2">

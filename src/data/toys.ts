@@ -60,7 +60,7 @@ export const toys: Toy[] = [
         link: '/toys/tanks',
         hasPage: true,
         keywords: 'multiplayer game phaser.js tanks arcade',
-        imagePath: '/KH_back.svg',
+        imagePath: '/tanks/menu_s.webp',
         reqAuth: false
     },
     {

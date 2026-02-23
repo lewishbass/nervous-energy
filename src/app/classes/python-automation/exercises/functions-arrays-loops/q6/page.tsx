@@ -87,7 +87,7 @@ export default function Question6() {
 
         <div className="mt-6 flex items-center justify-between gap-4">
           <BackToAssignment assignmentPath={assignmentPath} />
-          <NextQuestion assignmentPath={assignmentPath} nextHref="/classes/python-automation/exercises/functions-arrays-loops/q7" />
+          <NextQuestion assignmentPath={assignmentPath} prevHref="q5" nextHref="q7" />
         </div>
       </div>
     </>

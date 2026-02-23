@@ -23,7 +23,7 @@ export default function RandomBackground({ density = 1, seed }: BackgroundProps)
 		const r3 = seededRandom(seedValue + 2);
 
 		const choice = ['line', 'circle', 'square'][seedValue%3];
-		const adjustedDensity = density * (0.4 * r2 + 0.8);
+		const adjustedDensity = 0.5*density * (0.4 * r2 + 0.8);
 		const opacity = r3 * 0.2 + 0.1;
 
 		return { choice, adjustedDensity, opacity };

@@ -137,8 +137,6 @@ function PythonAutomationContent() {
           <div className="mb-0 w-full rounded-full h-[4px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
         </div>
         <ul className="list-disc space-y-2 marker:text-purple-500 pl-6">
-          <li>Start Lecture Content</li>
-          <li>Start Exercise Content</li>
           <li>Discussion latex and codeblocks rendering</li>
 
         </ul>
@@ -156,6 +154,8 @@ function PythonAutomationContent() {
           <li>Link Exercises to Users</li>
           <li>Discussion Functionality</li>
           <li>Lecture Styles and Nav Links</li>
+          <li>Start Lecture Content</li>
+          <li>Start Exercise Content</li>
         </ul>
       </div>}
 

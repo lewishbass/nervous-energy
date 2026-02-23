@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Prism from 'prismjs';
 import { copyToClipboard } from '@/scripts/clipboard';
 import '@/styles/code.css';
@@ -25,16 +25,36 @@ interface CodeBlockProps {
 		style?: React.CSSProperties;
 		filename?: string;
 	compact?: boolean;
+	highlightLine?: number | number[] | null; // Line(s) to highlight, 1-indexed
 }
 
-export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false }: CodeBlockProps) {
-		const codeRef = useRef<HTMLElement>(null);
+export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false, highlightLine = -1 }: CodeBlockProps) {
+	const codeRef = useRef<HTMLElement>(null);
+	const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 		useEffect(() => {
 			if (codeRef.current) {
+				codeRef.current.textContent = code;
 				Prism.highlightElement(codeRef.current);
+
+				if (highlightLine !== undefined) {
+					if (highlightTimeoutRef.current) {
+						clearTimeout(highlightTimeoutRef.current);
+					}
+					highlightTimeoutRef.current = setTimeout(() => {
+						if (!codeRef.current) return;
+						const highlightLines = Array.isArray(highlightLine) ? highlightLine : [highlightLine];
+						const lines = codeRef.current.innerHTML.split('\n');
+						codeRef.current.innerHTML = lines.map((line, i) => {
+							if (highlightLines.includes(i + 1)) {
+								return `<span class="highlighted-line">${line}</span mark>`;
+							}
+							return line;
+						}).join('\n').replace(/<\/span mark>\n/g, '</span>');
+					}, 10);
+				}
 			}
-		}, [code, language]);
+		}, [code, language, highlightLine]);
 
 		const handleCopy = () => {
 			copyToClipboard(code, 'Code copied!');
@@ -116,4 +136,93 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 				)}
 			</div>
 		);
-	}
+}
+
+interface AnimatedCodeBlockProps {
+	code: string;
+	language?: string;
+	caption?: string;
+	className?: string;
+	style?: React.CSSProperties;
+	filename?: string;
+	compact?: boolean;
+	/** Ordered sequence of 1-indexed line numbers to cycle through */
+	lines: number[];
+	/** 'onHover' — animates continuously while hovered; 'onClick' — advances one line per click */
+	scrollMode?: 'onHover' | 'onClick';
+	/** Delay in ms between line advances in onHover mode (default 700) */
+	interval?: number;
+}
+
+export function AnimatedCodeBlock({
+	code,
+	language = 'python',
+	caption,
+	className = '',
+	style = {},
+	filename,
+	compact = false,
+	lines,
+	scrollMode = 'onHover',
+	interval = 700,
+}: AnimatedCodeBlockProps) {
+	const [highlightLine, setHighlightLine] = useState<number | null>(null);
+	const idxRef = useRef<number>(-1);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const activeRef = useRef(false);
+
+	const advance = useCallback(() => {
+		if (lines.length === 0) return;
+		idxRef.current = (idxRef.current + 1) % lines.length;
+		setHighlightLine(lines[idxRef.current]);
+	}, [lines]);
+
+	const startAnimation = useCallback(() => {
+		if (activeRef.current) return;
+		activeRef.current = true;
+		idxRef.current = -1;
+		advance();
+		const tick = () => {
+			if (!activeRef.current) return;
+			advance();
+			timerRef.current = setTimeout(tick, interval);
+		};
+		timerRef.current = setTimeout(tick, interval);
+	}, [advance, interval]);
+
+	const stopAnimation = useCallback(() => {
+		activeRef.current = false;
+		if (timerRef.current) {
+			clearTimeout(timerRef.current);
+			timerRef.current = null;
+		}
+		setHighlightLine(null);
+		idxRef.current = -1;
+	}, []);
+
+	// Cleanup on unmount
+	useEffect(() => () => stopAnimation(), [stopAnimation]);
+
+	const hoverProps = scrollMode === 'onHover'
+		? { onMouseEnter: startAnimation, onMouseLeave: stopAnimation }
+		: {};
+
+	const clickProps = scrollMode === 'onClick'
+		? { onClick: (e: React.MouseEvent) => { advance(); e.stopPropagation(); }, style: { cursor: 'pointer', ...style } }
+		: {};
+
+	return (
+		<div {...hoverProps} {...clickProps}>
+			<CodeBlock
+				code={code}
+				language={language}
+				caption={caption}
+				className={className}
+				style={scrollMode === 'onClick' ? {} : style}
+				filename={filename}
+				compact={compact}
+				highlightLine={highlightLine}
+			/>
+		</div>
+	);
+}

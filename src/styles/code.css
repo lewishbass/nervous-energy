@@ -31,7 +31,7 @@ filter:none;
 .code-block-header {
   position: absolute;
   z-index: 20;
-  top: 4px;
+  top: 8px;
   right: 0;
   display: flex;
   align-items: center;
@@ -39,7 +39,7 @@ filter:none;
   gap: 0.5rem;
   padding: 0.35rem 0.5rem;
   background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 0 0 0 0.75rem;
+  border-radius: 0 4px 0 0.75rem;
   cursor: pointer;
   user-select: none;
   filter:invert(100) brightness(0.8);
@@ -111,4 +111,14 @@ pre[class*="language-"] code {
 pre.compact {
   padding: 0.5rem;
 
+}
+
+/* Highlighted lines */
+.highlighted-line {
+  display: block;
+  background-image:linear-gradient(to right, rgba(255, 220, 0, 0.12), rgba(255, 220, 0, 0.0) 95%, rgba(255, 220, 0, 0) 100%);
+  border-left: 3px solid rgba(255, 220, 0, 0.6);
+  margin: 0 -1rem;
+  padding: 0 1rem 0 calc(1rem - 3px);
+  width: calc(100% - 2rem);
 }

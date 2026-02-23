@@ -69,7 +69,7 @@ export default function FunctionsArraysLoops() {
 
   return (
     <>
-    <RandomBackground seed={2} density={0.5} />
+    <RandomBackground seed={10} density={0.5} />
     <div className="p-6 max-w-4xl mx-auto mb-20 min-h-screen">
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">

@@ -11,6 +11,7 @@ import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
 import { CodeBlock } from '@/components/CodeBlock';
+import test from 'node:test';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -137,13 +138,23 @@ export default function Question1() {
   const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p3', 'failed', err.message, code); return; }
-    // TODO: Add validation logic for part 3
-    setResult('p3', 'passed', 'Part 3 passed!', code);
+    // test swap(a, b) returns b, a
+    const testCases = [
+      { args: [1, 2], expected: [2, 1] },
+      { args: ['hello', 'world'], expected: ['world', 'hello'] },
+      { args: [true, false], expected: [false, true] },
+    ]
+    const validateFunc = await runTestCases(pyodide, 'swap', testCases);
+    if (!validateFunc.passed) {
+      setResult('p3', 'failed', validateFunc.message, code);
+      return;
+    }
+    setResult('p3', 'passed', validateFunc.message, code);
   };
 
   return (
     <>
-      <RandomBackground seed={2} density={0.5} />
+      <RandomBackground seed={11} density={0.5} />
       <div className="p-6 max-w-4xl mx-auto backdrop-blur bg-white/20 dark:bg-black/20 min-h-[100vh]">
         <AssignmentOverview
           title="Q1 - Intro To Functions"
@@ -223,10 +234,21 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
             <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
             <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
           </div>
-          <p className="tc2 mb-6">[TODO: Add part 3 description here]</p>
+          <p className="tc3 mb-2">Functions can take and return multiple values.</p>
+          <p className="tc3 mb-2">After the <CopyCode code="def"/> keyword, inside the parentheses you can list multiple parameters separated by commas. </p>
+          <p className="tc3 mb-2">List multiple variables after the <CopyCode code="return"/> keyword separated by commas, and catch the output in multiple variables.</p>
+          <CodeBlock compact code={`def math_ops(a, b): # this function requires both a and b to work
+  sum = a + b
+  diff = a - b
+  return sum, diff
+
+result_sum, result_diff = math_ops(5, 3) # call the function, and catch both outputs`} language="python" className="my-4" />
+          <p className="tc2 mb-2">Create a function named <CopyCode code="swap"/> that takes two parameters and returns them in reverse order.</p>
+          <p className="tc2 mb-6">e.g. <CopyCode code="swap(1, 2)"/> should return <CopyCode code="2, 1"/>.</p>
+
           <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
-              initialCode={"# TODO: Add initial code for part 3"}
+              initialCode={"# Create a swap function\n\n\n# Test your swap function"}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
               onCodeStartCallback={() => startCode('p3')}
@@ -241,7 +263,7 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
 
         <div className="mt-6 flex items-center justify-between gap-4">
           <BackToAssignment assignmentPath={assignmentPath} />
-          <NextQuestion assignmentPath={assignmentPath} nextHref="/classes/python-automation/exercises/functions-arrays-loops/q2" />
+          <NextQuestion assignmentPath={assignmentPath} nextHref="q2" prevHref={undefined} />
         </div>
       </div>
     </>

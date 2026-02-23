@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { LectureTemplate, LectureIcon } from './LectureTemplate';
-import { CodeBlock } from '@/components/CodeBlock';
+import { CodeBlock, AnimatedCodeBlock } from '@/components/CodeBlock';
 
 import { useEffect, useState } from 'react';
 import Prism from 'prismjs';
@@ -31,6 +31,13 @@ function FlowControlLecture(props: FlowControlLectureProps | null) {
   };
 
   const [flowTab, setFlowTab] = useState<'sequential' | 'branching' | 'looping'>('sequential');
+
+  // seq:      lines 1 2 3 4 5 (repeat)
+  // branching: lines 1 2 3 6 7 (the if-true path, skipping else branch)
+  // looping:  lines 1, then 2 3 4 × 3, then 5 6 7 8
+  const SEQ_LINES = [1, 2, 3, 4, 5];
+  const BRANCH_LINES = [1, 2, 3, 6, 7];
+  const LOOP_LINES = [1, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 5, 6, 7, 8];
 
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
@@ -89,7 +96,8 @@ function FlowControlLecture(props: FlowControlLectureProps | null) {
               <p className="lecture-paragraph">
                 Code runs line by line, in order. This is the default behavior.
               </p>
-              <CodeBlock className="lecture-codeblock" language="python" caption="sequential execution"
+              <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="sequential execution"
+                lines={SEQ_LINES} scrollMode="onHover"
                 code={`x = 10
 y = 20
 z = x + y
@@ -102,12 +110,15 @@ print(z)  # 30`} />
               <p className="lecture-paragraph">
                 The program chooses which path to take based on a condition. Only one branch executes.
               </p>
-              <CodeBlock className="lecture-codeblock" language="python" caption="branching execution"
+              <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="branching execution"
+                lines={BRANCH_LINES} scrollMode="onHover"
                 code={`temperature = 35
 if temperature > 30:
     print("It's hot outside!")     # This runs
 else:
-    print("It's not too hot.")     # This is skipped`} />
+    print("It's not too hot.")     # This is skipped
+print("Also it's raining")
+print("have a nice day!")`} />
             </div>
           )}
 
@@ -116,7 +127,8 @@ else:
               <p className="lecture-paragraph">
                 The program repeats a block of code multiple times, either a fixed number of times or until a condition is met.
               </p>
-              <CodeBlock className="lecture-codeblock" language="python" caption="looping execution"
+              <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="looping execution"
+                lines={LOOP_LINES} scrollMode="onHover"
                 code={`count = 0
 while count < 3:
     print("Count is:", count)
@@ -130,7 +142,7 @@ while count < 3:
         </div>
 
         <p className="lecture-paragraph">
-          Python uses <span className="lecture-bold">indentation</span> (whitespace at the beginning of a line) to define code blocks, rather than curly braces <code className="lecture-code-inline">{'{}'}</code> like C, Java, or JavaScript. This means consistent indentation is <span className="lecture-bold">required</span> — mixing tabs and spaces or using inconsistent indentation will cause an <code className="lecture-code-inline text-red-500">IndentationError</code>.
+          Python uses <span className="lecture-bold">indentation</span> to separate code into blocks, the standard indentation is 4 spaces or one tab.
         </p>
         <CodeBlock className="lecture-codeblock" language="python" caption="indentation defines code blocks"
           code={`if True:
@@ -138,39 +150,45 @@ while count < 3:
     print("So is this")                     # same level = same block
 print("This is outside the if block")       # back to base level`} />
         <p className="lecture-paragraph">
-          The standard convention is to use <span className="lecture-bold">4 spaces</span> per indentation level. Most editors can be configured to insert spaces when you press Tab.
+          Most of the time, your editor will automatically standardize this for you, but mixing tabs and space can cause an <code className="lecture-code-inline text-red-500">IndentationError</code>.
         </p>
+        <CodeBlock className="lecture-codeblock" language="python" caption="indentation error example"
+          code={`# This will cause an error:
+if True:
+    print("task1")
+   print("task2")
+    print("task3")`} />
       </section>
 
       <section className="lecture-section mini-scroll" id="if-statements">
         <h3 className="lecture-section-header">If Statements</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          An <code className="lecture-code-inline">if</code> statement evaluates a boolean expression and executes the indented block of code only if the expression is <code className="lecture-code-inline">True</code>.
+          An <code className="lecture-code-inline">if</code> statement the boolean value of an expression and executes the following block of code only if the expression is <code className="lecture-code-inline">True</code>.
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="basic if statement"
-          code={`age = 20
-
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="basic if statement" lines={[1, 2, 4, 5, 6]} scrollMode="onClick"
+          code={`age = 15
 if age >= 18:
-    print("You are an adult.")`} />
+    print("You are an adult.")
+if age < 18:
+    print("You are a child.")`} />
 
         <p className="lecture-paragraph">
-          Use <code className="lecture-code-inline">else</code> to define a block that runs when the condition is <code className="lecture-code-inline">False</code>:
+          An <code className="lecture-code-inline">else</code> statement immediately following an  <code className="lecture-code-inline">if</code> block executes when the  condition is <code className="lecture-code-inline">False</code>:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="if-else statement"
-          code={`age = 15
-
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="if-else statement" lines={[1, 2, 4, 5, 6]} scrollMode="onClick"
+          code={`age=15
 if age >= 18:
     print("You are an adult.")
 else:
-    print("You are a minor.")`} />
+    print("You are a child.")`} />
 
         <p className="lecture-paragraph">
           Use <code className="lecture-code-inline">elif</code> <span className="opacity-50">(else if)</span> to chain multiple conditions. Python evaluates them top to bottom and executes the <span className="lecture-bold">first</span> branch whose condition is <code className="lecture-code-inline">True</code>, then skips the rest:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="if-elif-else chain"
-          code={`score = 85
-
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="if-elif-else chain" lines={[1, 2, 3, 5, 7, 8, 13, 14]} scrollMode="onClick"
+          code={`score = 75
+# 
 if score >= 90:
     grade = "A"
 elif score >= 80:
@@ -181,110 +199,10 @@ elif score >= 60:
     grade = "D"
 else:
     grade = "F"
+#
+print(f"Your grade is: {grade}")  # Your grade is: C`} />
 
-print(f"Your grade is: {grade}")  # Your grade is: B`} />
 
-        <p className="lecture-paragraph">
-          Conditions can be combined using <code className="lecture-code-inline">and</code>, <code className="lecture-code-inline">or</code>, and <code className="lecture-code-inline">not</code> operators:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="compound conditions"
-          code={`temperature = 22
-is_sunny = True
-is_weekend = False
-
-if is_sunny and temperature > 20:
-    print("Great weather for a walk!")
-
-if is_weekend or temperature > 25:
-    print("Consider going to the beach!")
-
-if not is_weekend:
-    print("It's a weekday.")`} />
-
-        <p className="lecture-paragraph">
-          Python also supports a <span className="lecture-bold">ternary</span> (inline) conditional expression for simple assignments:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="ternary conditional expression"
-          code={`age = 20
-status = "adult" if age >= 18 else "minor"
-print(status)  # "adult"
-
-# Equivalent to:
-if age >= 18:
-    status = "adult"
-else:
-    status = "minor"`} />
-
-        <p className="lecture-paragraph">
-          <span className="lecture-bold">Truthy and Falsy values:</span> Python treats certain values as <code className="lecture-code-inline">False</code> in boolean contexts. Everything else is <code className="lecture-code-inline">True</code>.
-        </p>
-        <div className="flex gap-4 w-full flex-col md:flex-row justify-center mb-4">
-          <div className="flex-grow">
-            <span className="lecture-link">Falsy Values</span>
-            <table className="lecture-table">
-              <tbody>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">False</td>
-                  <td className="lecture-table-cell">Boolean false</td>
-                </tr>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">None</td>
-                  <td className="lecture-table-cell">Null value</td>
-                </tr>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">0, 0.0</td>
-                  <td className="lecture-table-cell">Zero numbers</td>
-                </tr>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">"", '', """"""</td>
-                  <td className="lecture-table-cell">Empty strings</td>
-                </tr>
-                <tr className="">
-                  <td className="lecture-table-header">[], {'{}'}, ()</td>
-                  <td className="lecture-table-cell">Empty collections</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div className="flex-grow">
-            <span className="lecture-link">Truthy Values</span>
-            <table className="lecture-table">
-              <tbody>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">True</td>
-                  <td className="lecture-table-cell">Boolean true</td>
-                </tr>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">Any non-zero number</td>
-                  <td className="lecture-table-cell">1, -5, 3.14</td>
-                </tr>
-                <tr className="lecture-table-row">
-                  <td className="lecture-table-header">Non-empty strings</td>
-                  <td className="lecture-table-cell">"hello", "0", " "</td>
-                </tr>
-                <tr className="">
-                  <td className="lecture-table-header">Non-empty collections</td>
-                  <td className="lecture-table-cell">[1], {'{"a": 1}'}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <CodeBlock className="lecture-codeblock" language="python" caption="truthy and falsy values in practice"
-          code={`my_list = [1, 2, 3]
-
-# Instead of:
-if len(my_list) > 0:
-    print("List has items")
-
-# You can write:
-if my_list:
-    print("List has items")
-
-# Checking for None
-result = None
-if result is None:
-    print("No result yet")`} />
       </section>
 
       <section className="lecture-section mini-scroll" id="while-loops">
@@ -302,52 +220,11 @@ print("Liftoff!")
 # Output: 5 4 3 2 1 Liftoff!`} />
 
         <p className="lecture-paragraph">
-          <span className="tc1 font-semibold">Warning:</span> If the condition never becomes <code className="lecture-code-inline">False</code>, you create an <span className="lecture-bold">infinite loop</span>. You can stop an infinite loop with <code className="lecture-code-inline">Ctrl+C</code> in the terminal.
+          If the condition never becomes <code className="lecture-code-inline">False</code>, you create an <span className="lecture-bold">infinite loop</span>. You can use the break command <code className="lecture-code-inline">Ctrl+C</code> in the terminal to kill programs stuck in this loop.
         </p>
         <CodeBlock className="lecture-codeblock" language="python" caption="infinite loop — avoid this!"
-          code={`# This will run forever!
-# while True:
-#     print("Help, I'm stuck!")`} />
-
-        <p className="lecture-paragraph">
-          Sometimes infinite loops are <span className="lecture-bold">intentional</span> — for example, a game loop or a server waiting for connections. Use the <code className="lecture-code-inline">break</code> statement to exit a loop early:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="using break to exit a loop"
           code={`while True:
-    user_input = input("Enter 'quit' to exit: ")
-    if user_input == "quit":
-        print("Goodbye!")
-        break
-    print(f"You entered: {user_input}")`} />
-
-        <p className="lecture-paragraph">
-          The <code className="lecture-code-inline">continue</code> statement skips the rest of the current iteration and jumps back to the condition check:
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="using continue to skip iterations"
-          code={`i = 0
-while i < 10:
-    i += 1
-    if i % 3 == 0:
-        continue        # Skip multiples of 3
-    print(i, end=" ")
-# Output: 1 2 4 5 7 8 10`} />
-
-        <p className="lecture-paragraph">
-          While loops can also have an optional <code className="lecture-code-inline">else</code> block that executes when the condition becomes <code className="lecture-code-inline">False</code> (but <span className="lecture-bold">not</span> when the loop is exited via <code className="lecture-code-inline">break</code>):
-        </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="while-else pattern"
-          code={`attempts = 0
-max_attempts = 3
-
-while attempts < max_attempts:
-    password = input("Enter password: ")
-    if password == "secret":
-        print("Access granted!")
-        break
-    attempts += 1
-else:
-    # Only runs if the loop completed without break
-    print("Too many failed attempts. Account locked.")`} />
+    print("Help, I'm stuck!")`} />
 
         <p className="lecture-paragraph">
           <span className="lecture-bold">When to use while loops:</span> Use <code className="lecture-code-inline">while</code> when you don't know in advance how many iterations you need — for example, reading user input until a valid response is given, or processing data until a condition is met.

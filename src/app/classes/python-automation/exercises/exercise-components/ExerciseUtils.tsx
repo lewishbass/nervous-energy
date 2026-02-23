@@ -16,6 +16,7 @@ const inferPythonType = (repr: string): string => {
   if (trimmed === 'None') return 'NoneType';
   if (trimmed.startsWith("'") || trimmed.startsWith('"')) return 'str';
   if (trimmed.startsWith('[')) return 'list';
+  if (trimmed.startsWith('(')) return 'tuple';
   if (trimmed.includes('.') && !isNaN(Number(trimmed))) return 'float';
   if (!isNaN(Number(trimmed)) && trimmed !== '') return 'int';
   return 'str';
@@ -85,6 +86,14 @@ export const deRepr = (value: string, type: string): any => {
     case 'list': {
       const trimmed = value.trim();
       if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return value;
+      const inner = trimmed.slice(1, -1).trim();
+      if (inner === '') return [];
+      const elements = splitPythonListElements(inner);
+      return elements.map(el => deRepr(el, inferPythonType(el)));
+    }
+    case 'tuple': {
+      const trimmed = value.trim();
+      if (!trimmed.startsWith('(') || !trimmed.endsWith(')')) return value;
       const inner = trimmed.slice(1, -1).trim();
       if (inner === '') return [];
       const elements = splitPythonListElements(inner);
