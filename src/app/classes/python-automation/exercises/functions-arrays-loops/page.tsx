@@ -54,7 +54,7 @@ export default function FunctionsArraysLoops() {
     });
   }, [isLoggedIn, username, token]);
 
-  const assignmentPath = '/classes/python-automation/exercises/functions-arrays-loops';
+  const assignmentPath = 'functions-arrays-loops';
 
   const questions: { title: string; link: string; description: string; status?: string }[] = [
     { title: 'Q1-Intro To Functions', link: `${assignmentPath}/q1`, description: 'Define simple functions with parameters, return values, and call them.' },
@@ -65,7 +65,7 @@ export default function FunctionsArraysLoops() {
     { title: 'Q6-While Loops', link: `${assignmentPath}/q6`, description: 'Use while loops for condition-based iteration.' },
     { title: 'Q7-Sums, Min and Max, Fourier', link: `${assignmentPath}/q7`, description: 'Implement algorithms to perform array operations..' },
     { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Create arrays, loop over the elements, and apply all concepts learned.' },
-  ].map(q => ({ ...q, status: questionStatuses[q.link] }));
+  ].map(q => ({ ...q, status: questionStatuses[q.link.split('/').pop()!] }));
 
   return (
     <>

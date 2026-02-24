@@ -45,16 +45,18 @@ export default function SimpleCodingPractice() {
     const allPartNames = Object.entries(questionPartMap).flatMap(([q, parts]) =>
       parts.map(p => `${q}_${p}`)
     );
+    //console.log('Fetching submission status for:', allPartNames);
     getQuestionSubmissionStatus(username, token, className, assignmentName, allPartNames).then(states => {
       const statuses: Record<string, string> = {};
       for (const q of Object.keys(questionPartMap)) {
         statuses[q] = computeQuestionStatus(q, states);
+        //console.log(`Status for ${q}:`, statuses[q]);
       }
       setQuestionStatuses(statuses);
     });
   }, [isLoggedIn, username, token]);
 
-  const assignmentPath = '/classes/python-automation/exercises/simple-coding-practice';
+  const assignmentPath = 'simple-coding-practice';
 
   const questions: { title: string; link: string; description: string; status?: string }[] = [
     { title: 'Q1-Variable Assignment', link: `${assignmentPath}/q1`, description: 'Assign integer, string, and boolean values to variables.' },
@@ -65,7 +67,7 @@ export default function SimpleCodingPractice() {
     { title: 'Q6-Numerical Comparisons', link: `${assignmentPath}/q6`, description: 'Use comparison operators to compare numbers, strings, and check equality.' },
     { title: 'Q7-Binary and Hexadecimal', link: `${assignmentPath}/q7`, description: 'Convert numbers to binary and hexadecimal strings, and validate their formats.' },
     { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Perform simple operations with ints, floats, bools and strings.' },
-  ].map(q => ({ ...q, status: questionStatuses[q.link] }));
+  ].map(q => ({ ...q, status: questionStatuses[q.link.split('/').pop()!] }));
 
   return (
     <>
