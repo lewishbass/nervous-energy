@@ -6,6 +6,7 @@ interface SquareAnimationProps {
 	style?: React.CSSProperties; // Additional styles
 	seed?: number; // Seed for random generation
 	strokeWidth?: number;
+	doAnimation?: boolean; // Whether to animate the squares
 }
 
 interface Square {
@@ -24,6 +25,7 @@ const SquareAnimation: React.FC<SquareAnimationProps> = ({
 	style = {},
 	seed = 42,
 	strokeWidth = 8,
+	doAnimation = true,
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [squares, setSquares] = useState<Square[]>([]);
@@ -134,10 +136,10 @@ const SquareAnimation: React.FC<SquareAnimationProps> = ({
 						opacity={0}
 						stroke={square.color}
 						strokeWidth={strokeWidth}
-						strokeDasharray={`0 ${square.radius * 0} ${square.radius * 3} ${square.radius * 5}`}
-						strokeDashoffset={square.radius * 3}
+						strokeDasharray={doAnimation ? `0 ${square.radius * 0} ${square.radius * 3} ${square.radius * 5}` : 'none'}
+						strokeDashoffset={doAnimation ? square.radius * 3 : 0}
 						style={{
-							animation: `dash ${square.animationDuration}s ease 0.2s forwards, fade-in ${square.animationDuration/8}s ease 0.2s forwards`,
+							animation: doAnimation ? `dash ${square.animationDuration}s ease 0.2s forwards, fade-in ${square.animationDuration / 8}s ease 0.2s forwards` : 'none',
 							animationDelay: `${square.animationDelay}s`,
 							strokeLinejoin: "round",
 							strokeLinecap: "round",

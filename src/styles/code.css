@@ -13,8 +13,7 @@ code:not([class*="language-"]) {
 /* Code blocks with Prism */
 pre[class*="language-"],
 .code-block {
-  padding: 1rem;
-  margin: 0;
+  padding: 0.75rem 0.5rem 0.75rem 2.8rem !important;
   overflow-x: auto;
   background-color: #2d2d2d !important;
   filter:invert(100) brightness(1.16) sepia(0.1);
@@ -26,6 +25,7 @@ pre[class*="language-"],
 .dark .code-block {
 filter:none;
 }
+
 
 /* Code block header container */
 .code-block-header {
@@ -121,4 +121,30 @@ pre.compact {
   margin: 0 -1rem;
   padding: 0 1rem 0 calc(1rem - 3px);
   width: calc(100% - 2rem);
+}
+
+@media print {
+  pre[class*="language-"],
+  .code-block {
+    padding: 0.25rem 0.5rem 0.25rem 2.8rem !important;
+    filter: none !important;
+    background-color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  pre[class*="language-"] code {
+    color: #000 !important;
+  }
+
+  /* Strip syntax highlight colors that rely on dark bg */
+  pre[class*="language-"] .token {
+    color: #000 !important;
+    background: none !important;
+    text-shadow: none !important;
+  }
+
+  .code-block-header {
+    display: none;
+  }
 }

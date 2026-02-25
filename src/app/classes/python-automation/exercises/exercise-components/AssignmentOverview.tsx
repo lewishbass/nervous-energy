@@ -38,7 +38,7 @@ export default function AssignmentOverview({
 			<h3 className="text-4xl font-bold tc1 ml-3 mb-2">{title}</h3>
 			{description && <p className="tc2 mb-4 text-lg">{description}</p>}
 
-			{ objectives && <ul className="tc3 mt-3 list-disc list-inside space-y-1">
+			{objectives && <ul className="tc3 mt-3 list-disc list-inside space-y-1 mx-4 rounded-lg ">
 				{objectives.map((o, i) => (
 					<li key={i}>{o}</li>
 				))}

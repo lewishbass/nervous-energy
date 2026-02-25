@@ -9,7 +9,8 @@ import RandomBackground from '@/components/backgrounds/RandomBackground';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import { CodeBlock } from '@/components/CodeBlock';
 import { FaCheckCircle, FaTimesCircle, FaCircle, FaPrint } from 'react-icons/fa';
-import { get } from 'http';
+import './overview.css';
+import { copyToClipboard } from '@/scripts/clipboard';
 
 const className_val = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -378,6 +379,10 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  const [showMechanics, setShowMechanics] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const [showCodeExamples, setShowCodeExamples] = useState(false);
+
   const allPartNames = questions.flatMap(q =>
     q.parts.map(p => `${q.id}_${p.id}`)
   );
@@ -435,40 +440,93 @@ export default function OverviewPage() {
     if (anyFailed) return 'failed';
     if (anySubmitted) return 'in-progress';
     return undefined;
+  }; 
+
+  const handleCopyAllCode = () => {
+    let allCode = '';
+    questions.forEach((q, qi) => {
+      q.parts.forEach((p, pi) => {
+        const code = getPartCode(q.id, p.id);
+        if (code) {
+          allCode += `######## Q${qi} - P${pi} - ${getPartStatus(q.id, p.id)} ########\n${code}\n\n`;
+        }
+      });
+    });
+    copyToClipboard(allCode.trim(), "Copied All Code!");
   };
 
   return (
     <>
-      <RandomBackground seed={0} density={0.5} />
+      <div className="print:hidden">
+        <RandomBackground seed={0} density={0.5} doAnimation={false} />
+      </div>
       <div className="p-6 max-w-4xl mx-auto mb-20 min-h-screen print:mb-0 print:p-2 bg-white/40 dark:bg-black/40">
 
         {/* Header */}
-        <div className="mb-8 print:mb-4">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="mb-8 print:mb-4 print:min-h-[70vh]] header title-page">
+          <div className="flex items-center gap-4 mb-4 print:min-h-[50vh]">
             <Image
               src="/images/classes/Python-logo-notext.svg"
               alt="Python Logo"
               width={80}
               height={80}
-              className="rounded-lg cursor-pointer print:w-12 print:h-12"
+              className="rounded-lg cursor-pointer print:hidden"
               onClick={() => router.push('/classes/python-automation')}
             />
-            <div className="backdrop-blur-sm rounded-lg">
-              <h1 className="text-4xl font-bold tc1 print:text-2xl">Simple Coding Practice — Overview</h1>
-              <p className="tc2 text-lg mt-2 print:text-sm">Python for Automation and Scripting</p>
-              <p className="tc3 text-sm">Unit 0: Foundations of Programming</p>
+            <div className="bg-white/40 dark:bg-black/40 rounded-lg">
+              <h1 className="text-4xl font-bold tc1 print:text-6xl">Ex1: Simple Coding Practice - Overview</h1>
+              <p className="tc2 text-lg mt-2 print:text-3xl">Python for Automation and Scripting</p>
+              <p className="tc3 text-sm print:text-xl">Unit 0: Foundations of Programming</p>
             </div>
           </div>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg1 border border-gray-200 dark:border-gray-800 tc2 hover:tc1 transition-colors print:hidden"
-          >
-            <FaPrint /> Print
-          </button>
+
+          {/* Toggle buttons */}
+          <div className="flex flex-wrap gap-2 mt-4 print:hidden">
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-4 py-2 transition-all duration-300 rounded-lg not-active:bg3 border-2 border-[var(--khr)] bg-slate-100 dark:bg-slate-800 active:bg-[var(--khr)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40 active:text-white active:border-white/30 select-none cursor-pointer"
+            >
+              <FaPrint /> Print
+            </button>
+            <button
+              onClick={handleCopyAllCode}
+              className="flex items-center gap-2 px-4 py-2 transition-all duration-300 rounded-lg not-active:bg3 border-2 border-[var(--kho)] bg-slate-100 dark:bg-slate-800 active:bg-[var(--kho)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40 active:text-white active:border-white/30 select-none cursor-pointer"
+
+            >
+              Copy All Code
+            </button>
+            <button
+              onClick={() => setShowMechanics(v => !v)}
+              className={`select-none cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 ${showMechanics
+                ? 'bg-[var(--khg)] text-white border-white/30'
+                : 'bg-slate-100 dark:bg-slate-800 border-[var(--khg)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40'
+                }`}
+            >
+              Mechanics
+            </button>
+            <button
+              onClick={() => setShowHints(v => !v)}
+              className={`select-none cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 ${showHints
+                ? 'bg-[var(--khb)] text-white border-white/30'
+                : 'bg-slate-100 dark:bg-slate-800 border-[var(--khb)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40'
+                }`}
+            >
+              Hints
+            </button>
+            <button
+              onClick={() => setShowCodeExamples(v => !v)}
+              className={`select-none cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 ${showCodeExamples
+                ? 'bg-[var(--khv)] text-white border-white/30'
+                : 'bg-slate-100 dark:bg-slate-800 border-[var(--khv)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40'
+                }`}
+            >
+              Code Examples
+            </button>
+          </div>
         </div>
 
         {/* Navigation List */}
-        <div className="bg1 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-800 mb-8 print:p-3 print:mb-4">
+        <div className="bg1 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-800 mb-8 print:hidden">
           <h2 className="text-xl font-bold tc1 mb-4 print:text-lg">Questions</h2>
           {loading ? (
             <p className="tc3 animate-pulse">Loading submission status…</p>
@@ -512,11 +570,11 @@ export default function OverviewPage() {
             className="mb-10 print:mb-6 scroll-mt-6"
           >
             {/* Question header */}
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 print:mb-0 question-header">
               {statusIcon(getQuestionStatus(q))}
               <h2 className="text-2xl font-bold tc1 print:text-xl cursor-pointer select-none hover:underline hover:opacity-70" onClick={() => router.push(`${assignmentPath}/${q.id}`)}>{q.title}</h2>
             </div>
-            <p className="tc2 mb-4 print:text-sm">{q.description}</p>
+            <p className="tc2 mb-4 print:mb-0 print:text-sm">{q.description}</p>
 
             {/* Parts */}
             {q.parts.map(p => {
@@ -529,8 +587,9 @@ export default function OverviewPage() {
                 <div
                   key={partKey}
                   ref={el => { sectionRefs.current[partKey] = el; }}
-                  className={`bg2 rounded-lg p-3 shadow-sm border-l-4 mb-4 scroll-mt-6 print:p-3 print:mb-2 ${statusBorder(st)}`}
+                  className={`bg2 rounded-lg overflow-hidden p-0 shadow-sm print:shadow-none border-l-4 print:border-none mb-4 scroll-mt-6 question-part print:mb-0 ${statusBorder(st)}`}
                 >
+                  <div className="p-3 pb-0"> {/* question info*/}
                   {/* Part title — navigates to the question page */}
                   <button
                     onClick={() => router.push(`${assignmentPath}/${q.id}`)}
@@ -542,50 +601,51 @@ export default function OverviewPage() {
 
                   {/* Objectives */}
                   {p.objectives.length > 0 && (
-                    <ul className="ml-4 list-inside mb-2">
+                      <ul className="ml-4 list-inside mb-1">
                       {p.objectives.map((obj, i) => (
                         <li key={i} className="tc2 text-sm print:text-xs">{obj}</li>
                       ))}
                     </ul>
                   )}
 
-                  {/* Mechanics /}
-                  {p.mechanics && p.mechanics.length > 0 && (
-                    <div className="mb-2">
+                    {/* Mechanics */}
+                    {showMechanics && p.mechanics && p.mechanics.length > 0 && (
+                      <div className="mb-1 ml-4">
                       {p.mechanics.map((m, i) => (
                         <p key={i} className="tc3 text-sm italic print:text-xs">{m}</p>
                       ))}
                     </div>
                   )}
 
-                  {/* Hints /}
-                  {p.hints && p.hints.length > 0 && (
-                    <div className="mb-2">
+                    {/* Hints */}
+                    {showHints && p.hints && p.hints.length > 0 && (
+                      <div className="mb-1 ml-4">
                       {p.hints.map((h, i) => (
                         <p key={i} className="text-fuchsia-600 dark:text-fuchsia-400 text-sm print:text-xs">{h}</p>
                       ))}
                     </div>
-                  )}
+                    )}
 
-                  {/* Code examples /}
-                  {p.codeExamples && p.codeExamples.length > 0 && (
-                    <div className="mb-3">
+                    {/* Code examples */}
+                    {showCodeExamples && p.codeExamples && p.codeExamples.length > 0 && (
+                      <div className="mb-1">
                       {p.codeExamples.map((c, i) => (
                         <CodeBlock key={i} code={c} language="python" compact className="mb-1 text-sm" />
                       ))}
                     </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Submitted code */}
                   {code ? (
-                    <div className="mt-3 px-8">
+                    <div className="mt-1.5 px-8 border-t-4 print:border-none bg-white/40 dark:bg-gray-800/30 border-gray-500/20 pb-3 pt-2 print:pb-0">
                       <p className={`text-xs font-semibold mb-1 ${st === 'passed' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                         {st === 'passed' ? '✓ ' : '✗ '}{message}
                       </p>
                       <CodeBlock code={code} language="python" className="" />
                     </div>
                   ) : (
-                    <p className="tc3 text-xs italic mt-2 print:text-xs">No submission yet.</p>
+                      <p className="tc3 text-xs italic mt-2 print:text-xs p-3">No submission yet.</p>
                   )}
                 </div>
               );

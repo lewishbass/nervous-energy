@@ -48,10 +48,10 @@ const UnitModal: React.FC<UnitModalProps> = ({ isOpen, onClose, displayData }) =
             <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-700">
               <h3 className="text-lg font-semibold tc1 mb-2">Link</h3>
               <a 
-                onClick={() => router.push(`/classes/python-automation/exercises/${displayData.link}`)} 
-                target="_blank" 
+                onClick={() => router.push(`/classes/python-automation/exercises/${displayData.link}`)}
+                target="_blank"
                 rel="noopener noreferrer"
-                className="tc2 hover:opacity-60 transition-opacity duration-300 break-all cursor-pointer"
+                className={`tc2 transition-opacity duration-300 break-all ${displayData.finished ? 'cursor-pointer hover:opacity-60 active:opacity-40' : 'opacity-50 cursor-default'}`}
               >
                 <FaArrowRight className="inline"/> {displayData.link}
               </a>

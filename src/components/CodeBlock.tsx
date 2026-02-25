@@ -100,7 +100,7 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 				onMouseLeave={onMouseLeave}
 				onClick={onClick}
 			>
-				<div className="relative rounded-md overflow-hidden max-w-[80vw] w-full" style={{ boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.1)' }}>
+				<div className="relative rounded-md overflow-hidden max-w-[80vw] w-full print:shadow-none shadow-[2px_2px_5px_rgba(0,0,0,0.1)]">
 					<div className="code-block-header" onClick={handleCopy}>
 						<button
 							className="copy-code-button"

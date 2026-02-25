@@ -384,7 +384,7 @@ export default function ScheduleTab() {
                       <td
                         key={`hw-${index}-${colIdx}`}
                         rowSpan={rowSpan}
-                        className="relative cursor-pointer hover:opacity-90 active:opacity-50 transition-opacity duration-300 select-none min-w-[20px] sm:min-w-[25px] p-1 touch-manipulation"
+                        className={`relative  transition-opacity duration-300 select-none min-w-[20px] sm:min-w-[25px] p-1 touch-manipulation ${assignment.finished ? 'cursor-pointer hover:opacity-90 active:opacity-50' : 'cursor-default opacity-50 saturate-50 contrast-50 blur-[1px]'}`}
                         onClick={() => handleAssignmentClick(assignment)}
                         style={{ verticalAlign: 'top'}}
                       >
@@ -436,7 +436,7 @@ export default function ScheduleTab() {
                 
                 {showAssignmentsDue && <td className="p-2 px-3 sm:p-3 sm:px-6 tc2 text-xs sm:text-base" >
                   {classinfo.assignmentsDue.length > 0
-                    ? classinfo.assignmentsDue.map((a) => <p key={a.uuid} className="cursor-pointer select-none hover:opacity-60 active:opacity-40 transition-opacity duration-200 touch-manipulation" onClick={() => handleAssignmentClick(a)}>{a.name}</p>)
+                    ? classinfo.assignmentsDue.map((a) => <p key={a.uuid} className={` select-none transition-opacity duration-200 touch-manipulation ${a.finished ? 'cursor-pointer hover:opacity-60 active:opacity-40' : 'opacity-40'}`} onClick={() => handleAssignmentClick(a)}>{a.name}</p>)
                     : '--'}
                 </td>}
                 <div

@@ -6,6 +6,7 @@ interface LineAnimationProps {
   style?: React.CSSProperties; // Additional styles
   seed?: number; // Seed for random generation
   strokeWidth?: number;
+  doAnimation?: boolean; // Whether to animate the lines
 }
 
 interface Line {
@@ -27,6 +28,7 @@ const LineAnimation: React.FC<LineAnimationProps> = ({
   style = {},
   seed = 42,
   strokeWidth = 8,
+  doAnimation = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [lines, setLines] = useState<Line[]>([]);
@@ -145,10 +147,10 @@ const LineAnimation: React.FC<LineAnimationProps> = ({
               fill={'none'}
               stroke={line.color}
               strokeWidth={strokeWidth/(1+line.depth)}
-              strokeDasharray={lineLength}
-              strokeDashoffset={lineLength}
+              strokeDasharray={doAnimation ? lineLength : 0}
+              strokeDashoffset={doAnimation ? lineLength : 0}
               style={{
-                animation: `dash ${(5 + 30 / line.length ** 0.5)*(1+line.depth)}s ease-in-out forwards`,
+                animation: doAnimation ? `dash ${(5 + 30 / line.length ** 0.5) * (1 + line.depth)}s ease-in-out forwards` : 'none',
                 animationDelay: `${30 / line.length**0.5}s`,
                 strokeLinejoin: "round",
                 strokeLinecap: "round"

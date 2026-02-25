@@ -7,6 +7,7 @@ import TriangleAnimation from './TriangleAnimation';
 type BackgroundProps = {
 	density: number;
 	seed?: number;
+	doAnimation?: boolean;
 };
 
 function seededRandom(seed: number) {
@@ -14,7 +15,7 @@ function seededRandom(seed: number) {
 	return x - Math.floor(x);
 }
 
-export default function RandomBackground({ density = 1, seed }: BackgroundProps) {
+export default function RandomBackground({ density = 1, seed, doAnimation = true }: BackgroundProps) {
 	const seedValue = useMemo(() => seed ?? Math.floor(Math.random() * 1000000), [seed]);
 
 	const { choice, adjustedDensity, opacity } = useMemo(() => {
@@ -35,13 +36,13 @@ export default function RandomBackground({ density = 1, seed }: BackgroundProps)
 	return (
 		<div className="absolute inset-0 -z-10 invert dark:invert-0" style={{ opacity }}>
 			{choice === 'line' && (
-				<LineAnimation seed={seedValue} spacing={spacing * 10} />
+				<LineAnimation seed={seedValue} spacing={spacing * 10} doAnimation={doAnimation} />
 			)}
 			{choice === 'circle' && (
-				<CircleAnimation seed={seedValue} radiusRange={radiusRange} />
+				<CircleAnimation seed={seedValue} radiusRange={radiusRange} doAnimation={doAnimation} />
 			)}
 			{choice === 'square' && (
-				<SquareAnimation seed={seedValue} radiusRange={[radiusRange[0] * 0.75, radiusRange[1] * 0.75]} />
+				<SquareAnimation seed={seedValue} radiusRange={[radiusRange[0] * 0.75, radiusRange[1] * 0.75]} doAnimation={doAnimation} />
 			)}
 			{choice === 'triangle' && (
 				<TriangleAnimation seed={seedValue} radiusRange={[radiusRange[0] * 5, radiusRange[1] * 5]} />

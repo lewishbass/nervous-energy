@@ -143,7 +143,7 @@ function RootLayoutContent({
           />
         </ Suspense>
         {/* Menu */}
-        <div className="fixed inset-0 z-0">
+        <div className="fixed inset-0 z-0 print:hidden">
           <Suspense fallback={<div className="absolute top-0 right-0 w-[300px] h-full bg2 tc2 flex flex-col"></div>}>
           <Menu 
             isOpen={isMenuOpen} 
@@ -159,16 +159,15 @@ function RootLayoutContent({
 
         {/* Content wrapper */}
         <div 
-          className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 flex flex-col ${
-            isMenuOpen ? 'translate-x-[-300px]' : ''
+          className={`overflow-x-hidden min-h-screen pt-16 transition-transform duration-300 bg1 relative z-10 flex flex-col print:border-none border-r border-[#00000040] dark:border-[#ffffff20] ${isMenuOpen ? 'translate-x-[-300px] print:translate-x-0' : ''
           }`} 
-          style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)', borderRight: theme === 'dark' ? '1px solid #fff2' : '1px solid #0004' }}
+          style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)' }}
         >
           <div className="flex-1">
             {children}
           </div>
           {/*footer content*/}
-          <div className="mt-auto">
+          <div className="mt-auto print:hidden">
             <FooterContent />
           </div>
           {/* */}
@@ -202,7 +201,7 @@ function RootLayoutContent({
             />
           </Suspense>
         </div>
-        <a href="https://github.com/lewishbass/nervous-energy/issues/new" target="_black" className="fixed z-100 left-0 bottom-0 text-center p-1 dark:bg-black/20 bg-white/20 text-xs tc1 opacity-30 select-none cursor-pointer hover:opacity-100 transition-opacity duration-300">
+        <a href="https://github.com/lewishbass/nervous-energy/issues/new" target="_black" className="print:hidden fixed z-100 left-0 bottom-0 text-center p-1 dark:bg-black/20 bg-white/20 text-xs tc1 opacity-30 select-none cursor-pointer hover:opacity-100 transition-opacity duration-300">
           Report Issue
         </a>
       </body>

@@ -1,0 +1,23 @@
+@media print {
+  header, .question:first-child {
+    page-break-inside: avoid;
+    page-break-before: avoid;
+  }
+	.question-header{
+		page-break-before: always;
+	}
+	.question-part{
+		page-break-inside: avoid;
+	}
+	.title-page {
+		page-break-after: always;
+		break-after: page;
+	}
+  @page :first {
+    margin-top: 0;
+  }
+  body > *:first-child,
+  main > *:first-child {
+    break-before: page;
+  }
+}

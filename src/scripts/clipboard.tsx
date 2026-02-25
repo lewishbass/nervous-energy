@@ -10,7 +10,7 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({ message, duration = 2000}) => {
   return (
     <div
-      className="fixed bottom-5 right-5 z-[9999] px-4 py-2 rounded-lg shadow-lg backdrop-blur-sm animate-fade-in-out"
+      className="fixed bottom-5 right-5 z-[9999] px-4 py-2 rounded-lg shadow-lg animate-fade-in-out print:hidden"
       style={{
         background: 'var(--khg)',
         color: 'white',
