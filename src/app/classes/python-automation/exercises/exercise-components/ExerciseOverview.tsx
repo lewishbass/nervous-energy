@@ -11,6 +11,8 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { FaCheckCircle, FaTimesCircle, FaCircle, FaPrint } from 'react-icons/fa';
 import './ExerciseOverview.css';
 import { copyToClipboard } from '@/scripts/clipboard';
+import NextQuestion from './NextQuestion';
+import { FaArrowUp } from 'react-icons/fa6';
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
 
@@ -182,10 +184,10 @@ export default function ExerciseOverview({
       <div className="print:hidden">
         <RandomBackground seed={backgroundSeed} density={0.5} doAnimation={false} />
       </div>
-      <div className="p-6 max-w-4xl mx-auto mb-20 min-h-screen print:mb-0 print:p-2 bg-white/40 dark:bg-black/40">
+      <div className="p-6 max-w-4xl mx-auto min-h-screen mb-0 print:p-2 bg-white/40 dark:bg-black/40">
 
         {/* Header */}
-        <div className="mb-8 print:mb-4 print:min-h-[70vh]] header title-page">
+        <div className="mb-8 print:mb-4 print:min-h-[70vh]] header title-page" ref={el => { sectionRefs.current['header'] = el; }}>
           <div className="flex items-center gap-4 mb-4 print:min-h-[50vh]">
             <Image
               src={logoSrc}
@@ -281,9 +283,11 @@ export default function ExerciseOverview({
               ))}
             </div>
           )}
-          <div className="p-0 px-8 print:hidden mt-4 w-full text-end">
-            <BackToAssignment assignmentPath={assignmentPath} textOverride="Back to Assignment" />
-          </div>
+        </div>
+
+        <div className="mb-6 flex items-center justify-between gap-4 bg1 p-3 rounded-lg print:hidden outline outline-1 outline-gray-300 dark:outline-gray-700">
+          <BackToAssignment assignmentPath={assignmentPath} />
+          <NextQuestion assignmentPath={assignmentPath} prevHref={questions[questions.length - 1]?.id || 'overview'} />
         </div>
 
         {/* Question Sections */}
@@ -297,6 +301,7 @@ export default function ExerciseOverview({
             <div className="flex items-center gap-3 mb-2 print:mb-0 question-header">
               {statusIcon(getQuestionStatus(q))}
               <h2 className="text-2xl font-bold tc1 print:text-xl cursor-pointer select-none hover:underline hover:opacity-70" onClick={() => router.push(`${assignmentPath}/${q.id}`)}>{q.title}</h2>
+              <FaArrowUp className="tc3 cursor-pointer transition-opacity ml-auto hover:opacity-70 active:opacity-40 bg-red w-12 h-12 p-3 print:hidden" onClick={() => scrollTo('header')} />
             </div>
             <p className="tc2 mb-4 print:mb-0 print:text-sm">{q.description}</p>
 
@@ -378,8 +383,9 @@ export default function ExerciseOverview({
         ))}
 
         {/* Footer */}
-        <div className="p-0 px-8 print:hidden w-full text-end">
-          <BackToAssignment assignmentPath={assignmentPath} textOverride="Back to Assignment" />
+        <div className="mb-6 flex items-center justify-between gap-4 bg1 p-3 rounded-lg print:hidden outline outline-1 outline-gray-300 dark:outline-gray-700">
+          <BackToAssignment assignmentPath={assignmentPath} />
+          <NextQuestion assignmentPath={assignmentPath} prevHref={questions[questions.length - 1]?.id || 'overview'} />
         </div>
       </div>
     </>

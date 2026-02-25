@@ -246,7 +246,7 @@ _json.dumps(_results)
 
   return (
     <>
-      <RandomBackground seed={2} density={0.5} />
+      <RandomBackground seed={13} density={0.5} />
       <div className="p-6 max-w-4xl mx-auto backdrop-blur bg-white/20 dark:bg-black/20 min-h-[100vh]">
         <AssignmentOverview
           title="Q3 - Making and Editing Arrays"
@@ -260,7 +260,7 @@ _json.dumps(_results)
         />
 
         {/* P1: Create Arrays */}
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Create Arrays" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">An array (called a <CopyCode code="list"/> in Python) is an ordered collection of values.</p>
           <p className="tc3 mb-2">Create a list using square brackets <CopyCode code="[]"/> with values separated by commas.</p>
@@ -290,7 +290,7 @@ my_words = ["hello", "world"]`} language="python" className="my-4" />
         <div className="h-4"></div>
 
         {/* P2: Modify Arrays */}
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Modify Arrays" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">Lists can be modified after creation. You can change elements, add new ones, reverse the order, and more.</p>
           <CodeBlock compact code={`nums = [1, 2, 3]
@@ -323,7 +323,7 @@ nums.extend([7,8]) # add multiple items → [4, 3, 2, 99, 7, 8]`} language="pyth
         <div className="h-4"></div>
 
         {/* P3: Retrieve Values */}
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Retrieve Values" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">You can access elements by index, slice a sub-list, or remove items with <CopyCode code=".pop()"/>.</p>
           <CodeBlock compact code={`nums = [10, 20, 30, 40, 50, 60]
@@ -354,7 +354,7 @@ last = nums.pop()       # remove & return last → 60`} language="python" classN
         <div className="h-4"></div>
 
         {/* P4: Loop Over Array */}
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Loop Over an Array" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">A <CopyCode code="for"/> loop lets you visit each element in a list one at a time.</p>
           <CodeBlock compact code={`fruits = ["apple", "banana", "cherry"]

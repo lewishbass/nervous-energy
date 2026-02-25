@@ -42,7 +42,7 @@ export default function RandomBackground({ density = 1, seed, doAnimation = true
 				<CircleAnimation seed={seedValue} radiusRange={radiusRange} doAnimation={doAnimation} />
 			)}
 			{choice === 'square' && (
-				<SquareAnimation seed={seedValue} radiusRange={[radiusRange[0] * 0.75, radiusRange[1] * 0.75]} doAnimation={doAnimation} />
+				<SquareAnimation seed={seedValue} radiusRange={[radiusRange[0] * 0.35, radiusRange[1] * 0.35]} doAnimation={doAnimation} />
 			)}
 			{choice === 'triangle' && (
 				<TriangleAnimation seed={seedValue} radiusRange={[radiusRange[0] * 5, radiusRange[1] * 5]} />

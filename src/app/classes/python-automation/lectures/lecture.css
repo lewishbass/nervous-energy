@@ -310,6 +310,21 @@
 	color:#777;
 }
 
+.lecture-caption{
+  font-size: 0.75rem;
+  color: #555;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+.dark .lecture-caption{
+  color:#777;
+}
+.slideshow .lecture-caption{
+  font-size: 0.6vw;
+  margin-top: 1vh;
+}
+
+
 /* Image Containers */
 .lecture-image-caption {
   position: absolute;

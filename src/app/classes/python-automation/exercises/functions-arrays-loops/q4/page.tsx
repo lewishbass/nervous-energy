@@ -200,7 +200,7 @@ export default function Question4() {
 
   return (
     <>
-      <RandomBackground seed={2} density={0.5} />
+      <RandomBackground seed={14} density={0.5} />
       <div className="p-6 max-w-4xl mx-auto backdrop-blur bg-white/20 dark:bg-black/20 min-h-[100vh]">
         <AssignmentOverview
           title="Q4 - If Statements"

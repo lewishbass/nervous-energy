@@ -39,7 +39,7 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: ListLectureIcon, lecture: ListLecture, index: 3, classNumber: 2 },
 	{ finished: true, icon: FlowControlLectureIcon, lecture: FlowControlLecture, index: 4, classNumber: 3 },
 	{ finished: true, icon: BreaksInlineLectureIcon, lecture: BreaksInlineLecture, index: 5, classNumber: 4 },
-	{ finished: false, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 4 },
+	{ finished: false, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 5 },
 	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 7, classNumber: 5 },
 	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 8, classNumber: 6 },
 	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 9, classNumber: 8 },

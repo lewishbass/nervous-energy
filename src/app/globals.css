@@ -498,6 +498,21 @@ body {
   background: rgba(255, 255, 255, 0.5);
 }
 
+@media print{
+  .mini-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .mini-scroll::-webkit-scrollbar-track {
+    display: none;
+  }
+  .mini-scroll::-webkit-scrollbar-thumb {
+    display: none;
+  }
+  .mini-scroll::-webkit-scrollbar-thumb:hover {
+    display: none;
+  }
+}
+
 @keyframes slowpulse {
   0% {
     transform: scale(1);

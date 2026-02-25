@@ -102,7 +102,7 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 			>
 				<div className="relative rounded-md overflow-hidden max-w-[80vw] w-full print:shadow-none shadow-[2px_2px_5px_rgba(0,0,0,0.1)]">
 					{compact && (
-						<div className="absolute top-[5px] left-[8px] bg-gray-500/20 h-[calc(100%-10px)] w-[3px] z-100" />
+						<div className="absolute top-[5px] left-[8px] bg-black/10 dark:bg-white/10 h-[calc(100%-10px)] w-[1px] z-100 rounded-full" />
 					)}
 					<div className="code-block-header" onClick={handleCopy}>
 						<button

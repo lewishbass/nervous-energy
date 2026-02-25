@@ -73,7 +73,7 @@ export default function Question6() {
 
   return (
     <>
-      <RandomBackground seed={2} density={0.5} />
+      <RandomBackground seed={16} density={0.5} />
       <div className="p-6 max-w-4xl mx-auto backdrop-blur bg-white/20 dark:bg-black/20 min-h-[100vh]">
         <AssignmentOverview
           title="Q6 - While Loops"
@@ -82,7 +82,16 @@ export default function Question6() {
 						''
 					]}
         />
+        {/* Part Descriptions, parts contain mechanics descriptions , code examples, objectives and hints(fuchsia)
+        Part 1
+        
+        Part 2
 
+        Part 3
+
+        Part 4
+        
+        */}
         {/* TODO: Add question parts */}
 
         <div className="mt-6 flex items-center justify-between gap-4">
