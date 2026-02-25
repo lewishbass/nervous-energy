@@ -469,7 +469,71 @@ export const submitQuestionToBackend = async (username:string, token:string, cod
     return { submissionState: 'error', message: error instanceof Error ? error.message : 'An error occurred while submitting your answer.' };
   }
   
-};
+}
+
+/**
+ * Creates a standardized setResult function for exercise questions.
+ * This function handles validation result setting and backend submission.
+ * 
+ * @param params - Configuration object containing:
+ *   - setValidationMessages: State setter for validation messages
+ *   - setValidationStates: State setter for validation states
+ *   - setSubmissionStates: State setter for submission states
+ *   - submissionStates: Current submission states object
+ *   - isLoggedIn: Boolean indicating if user is logged in
+ *   - username: Current user's username
+ *   - token: Authentication token
+ *   - className: Name of the class
+ *   - assignmentName: Name of the assignment
+ *   - questionName: Name of the question
+ * @returns A setResult function that can be used to set validation results and submit to backend
+ */
+export const createSetResult = (params: {
+  setValidationMessages: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setValidationStates: React.Dispatch<React.SetStateAction<Record<string, 'passed' | 'failed' | 'pending' | null>>>;
+  setSubmissionStates: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  submissionStates: Record<string, any>;
+  isLoggedIn: boolean;
+  username: string | null;
+  token: string | null;
+  className: string;
+  assignmentName: string;
+  questionName: string;
+}) => {
+  return (part: string, state: 'passed' | 'failed', message: string, code: string) => {
+    params.setValidationMessages(prev => ({ ...prev, [part]: message }));
+    params.setValidationStates(prev => ({ ...prev, [part]: state }));
+    
+    if (params.isLoggedIn && params.username && params.token) {
+      const partKey = `${params.questionName}_${part}`;
+      const submissionState = params.submissionStates[partKey];
+      if(state !== 'passed' && sanitizeSubmissionState(submissionState) === 'correct') return; // don't overwrite a previously passed result with a failed one
+
+      params.setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
+      submitQuestionToBackend(
+        params.username,
+        params.token,
+        code,
+        params.className,
+        params.assignmentName,
+        partKey,
+        state === 'passed' ? 'passed' : 'failed',
+        message
+      )
+        .then(res => {
+          params.setSubmissionStates(prev => ({
+            ...prev,
+            [partKey]: res.submissionState === 'submitted'
+              ? { code: code, resultStatus: state === 'passed' ? 'passed' : 'failed' }
+              : null
+          }));
+        })
+        .catch(() => {
+          params.setSubmissionStates(prev => ({ ...prev, [partKey]: submissionState }));
+        });
+    }
+  };
+};;
 
 /**
  * Retrieves the submission status for one or more questions in a given class

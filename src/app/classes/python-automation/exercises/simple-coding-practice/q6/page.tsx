@@ -5,12 +5,15 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, deRepr, checkRequiredCode, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, deRepr, checkRequiredCode, validateError, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, createSetResult } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
+import { max } from 'd3';
 
 const className = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -46,30 +49,18 @@ export default function Question6() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  /**
-   * Sets the validation message and state for a part, and submits the result to the backend.
-   */
-  const setResult = (
-    part: string,
-    state: 'passed' | 'failed',
-    message: string,
-    code: string
-  ) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(
-        username, token, code, className, assignmentName, partKey,
-        state === 'passed' ? 'passed' : 'failed', message
-      ).then(res => {
-        setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-      }).catch(() => {
-        setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-      });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   // loads submission states from the backend
   useEffect(() =>{
@@ -247,17 +238,14 @@ export default function Question6() {
         />
 
         {/* P1: Comparing Numbers */}
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Comparing Numbers</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Comparing Numbers"  partName="p1"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The comparison operators <CopyCode code="<" />, <CopyCode code="<=" />, <CopyCode code=">" />, <CopyCode code=">=" />, <CopyCode code="==" />, and <CopyCode code="!=" /> take the values on the left and right, and return the boolean result.</p>
+          <CodeBlock code={`5 < 10 # Less Than : True\n5 > 10 # Greater Than: False\n5 == 5 # Equals: True\n5 != 5 # Not Equals: False`} language="python" className="mb-4" />
           <p className="tc2 mb-2">Use the <CopyCode code="&lt;" /> operator to set <CopyCode code="is_am" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> when <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">time</code> is before noon.</p>
-          <p className="tc2 mb-6">Use <CopyCode code=">=" /> to set <CopyCode code="is_pm" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> when <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">time</code> is noon or later.</p>
+          <p className="tc2 mb-2">Use <CopyCode code=">=" /> to set <CopyCode code="is_pm" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> when <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">time</code> is noon or later.</p>
 
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
               initialCode={"# Compare time to determine AM or PM\ntime = 14\nis_am = \nis_pm = "}
               initialDocumentName="test.py"
@@ -268,6 +256,7 @@ export default function Question6() {
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1}
               onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -279,21 +268,19 @@ export default function Question6() {
         <div className="h-4"></div>
 
         {/* P2: Double Comparison */}
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Double Comparison</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Double Comparison"  partName="p2"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">Comparisons can be combined with <CopyCode code="and" /> and <CopyCode code="or" /> operators to test if a number is inside a range</p>
+          <CodeBlock code={`is_between = (x > 0) and (x < 10) # True if x is in (0, 10)`} language="python" className="mb-4" />
           <p className="tc2 mb-2">Use <CopyCode code="and" /> to combine <CopyCode code="<" /> and <CopyCode code="<=" /> comparisons and determine the tax bracket membership:</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="in_low_bracket" /> — $0 to $99,999</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="in_medium_bracket" /> — $100,000 to $249,999</p>
-          <p className="tc2 mb-6 ml-4">• <CopyCode code="in_high_bracket" /> — $250,000 and above</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="in_low_bracket" /> is <CopyCode code="True"/> if <CopyCode code="salary"/> is between $0 to $99,999</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="in_medium_bracket" /> is <CopyCode code="True"/> if <CopyCode code="salary"/> is between $100,000 to $249,999</p>
+          <p className="tc2 mb-6 ml-4">• <CopyCode code="in_high_bracket" /> is <CopyCode code="True"/> if <CopyCode code="salary"/> is $250,000 or above</p>
 
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
               initialCode={"# Assign salary bracket membership\nsalary = 75000\n# $0 - $100,000 not including $100,000\nin_low_bracket = \n# $100,000 - $250,000 not including $250,000\nin_medium_bracket = \n# $250,000 and above\nin_high_bracket = "}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code? submissionStates[`${questionName}_p2`].code : undefined}
               initialDocumentName="test.py"
               initialShowLineNumbers={false}
               initialIsCompact={true}
@@ -313,19 +300,15 @@ export default function Question6() {
         <div className="h-4"></div>
 
         {/* P3: Comparing Strings */}
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Comparing Strings</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">The comparison operators (<CopyCode code="&gt;="/> <CopyCode code="&lt;" />...) compare strings alphabetically, like their order in a dictionary.</p>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Comparing Strings"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The comparison operators (<CopyCode code="&gt;="/> <CopyCode code="&lt;" />...) compare strings alphabetically, like their order in a dictionary.</p>
+          <CodeBlock code={`a_before_b = "apple" < "banana" # True`} language="python" className="mb-4" />
           <p className="tc2 mb-2">We are arranging our students alphabetically, and want to know where the new student fits in.</p>
           <p className="tc2 mb-2">Set <CopyCode code="between_name1_and_name2" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if <CopyCode code="new_name" /> comes after <CopyCode code="name1" /> and before <CopyCode code="name2" /></p>
           <p className="tc2 mb-6">Set <CopyCode code="between_name2_and_name3" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if <CopyCode code="new_name" /> comes after <CopyCode code="name2" /> and before <CopyCode code="name3" /></p>
 
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
               initialCode={'# Compare strings alphabetically\nname1 = "Alice"\nname2 = "Bob"\nname3 = "David"\n\nnew_name = "Charlie"\n\nbetween_name1_and_name2 = \nbetween_name2_and_name3 = '}
               initialDocumentName="test.py"
@@ -335,8 +318,7 @@ export default function Question6() {
               initialHDivider={60}
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-            />}
+              onCodeStartCallback={() => startCode('p3')}              cachedCode={submissionStates[`${questionName}_p3`]?.code? submissionStates[`${questionName}_p3`].code : undefined}            />}
           </div>
           <div className="mt-4">
             <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -347,21 +329,18 @@ export default function Question6() {
         <div className="h-4"></div>
 
         {/* P4: Equals and Not Equals */}
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p4' ? null : 'p4')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Equals and Not Equals</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p4`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p4'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p4' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Equals and Not Equals"  partName="p4"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The equality operator <CopyCode code="==" /> checks if the values on the left and right are equal, while the inequality operator <CopyCode code="!=" /> checks if they are not equal.</p>
+          <CodeBlock code={`5 == 5 # True\n5 == 10 # False\n5 != 5 # False\n5 != 10 # True`} language="python" className="mb-4" />
           <p className="tc2 mb-2">When handling cash in a transaction, we need to know if the payment is correct.</p>
           <p className="tc2 mb-2">Use <CopyCode code="<"/>, <CopyCode code=">"/>, <CopyCode code="==" /> and <CopyCode code="!=" /> to assign:</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_paid_in_full" /> — <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid equals due</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_underpaid" /> — <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid is less than due</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_overpaid" /> — <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid is more than due</p>
-          <p className="tc2 mb-6 ml-4">• <CopyCode code="needs_change" /> — <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid does not equal due</p>
-
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_paid_in_full" /> - <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid equals due</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_underpaid" /> - <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid is less than due</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="is_overpaid" /> - <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid is more than due</p>
+          <p className="tc2 mb-2 ml-4">• <CopyCode code="needs_change" /> - <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> if paid does not equal due</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Change around the <CopyCode code="paid" /> variable to see how it affects the boolean values.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p4' && <PythonIde
               initialCode={"# Use <, >, == and != to compare values\ndue = 102.21\npaid = 101.99\n\nis_paid_in_full = \nis_underpaid = \nis_overpaid = \nneeds_change = "}
               initialDocumentName="test.py"
@@ -371,8 +350,7 @@ export default function Question6() {
               initialHDivider={60}
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP4}
-              onCodeStartCallback={() => startCode('p4')}
-            />}
+              onCodeStartCallback={() => startCode('p4')}              cachedCode={submissionStates[`${questionName}_p4`]?.code? submissionStates[`${questionName}_p4`].code : undefined}            />}
           </div>
           <div className="mt-4">
             <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p4' ? '' : 'hidden'} ${(!validationStates['p4'] || validationStates['p4'] === 'pending') ? 'opacity-0' : validationStates['p4'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>

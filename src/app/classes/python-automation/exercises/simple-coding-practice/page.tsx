@@ -108,6 +108,7 @@ export default function SimpleCodingPractice() {
             'Format strings for readable output',
           ]}
           startHref={`${assignmentPath}/q1`}
+          endHref={`${assignmentPath}/overview`}
           questionList={questions}
           className="mb-8"
         />

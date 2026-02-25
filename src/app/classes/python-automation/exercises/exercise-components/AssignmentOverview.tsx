@@ -9,6 +9,7 @@ type Props = {
   description?: string;
   objectives?: string[];
   startHref?: string;
+	endHref?: string;
   className?: string;
   questionList?: { title: string; link: string; description: string, status?: string }[];
 };
@@ -18,6 +19,7 @@ export default function AssignmentOverview({
   description,
   objectives,
   startHref,
+	endHref,
   className = '',
   questionList,
 }: Props) {
@@ -61,6 +63,11 @@ export default function AssignmentOverview({
 					))}
 				</div>
 			)}
+			{endHref && 
+				<Link href={endHref} className="group my-4 block tc1 font-bold text-right mr-12">
+					Overview
+          <FaArrowRight className="inline-block ml-2 mb-1 transition-transform group-hover:translate-x-1" />
+				</Link>}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa6';
+import { FaArrowLeft, FaArrowRight, FaList } from 'react-icons/fa6';
 
 type Props = {
   prevHref?: string;
@@ -10,6 +10,7 @@ type Props = {
 };
 
 export default function NextQuestion({ prevHref, nextHref, prevLabel = 'Previous', nextLabel = 'Next', assignmentPath }: Props) {
+  const isNextOverview = nextHref ? nextHref.indexOf('overview') > -1 : false;
   return (
     <div className="flex items-center rounded-lg overflow-hidden">
       {prevHref ? (
@@ -20,9 +21,9 @@ export default function NextQuestion({ prevHref, nextHref, prevLabel = 'Previous
       ) : null}
         <Link
           href={nextHref ?? assignmentPath}
-          className={`px-4 py-2 text-sm group ${nextHref ? 'bg-indigo-600 text-white hover:opacity-95' : 'bg-green-600 text-white hover:opacity-95'}`}>
-          {nextHref ? `${nextLabel}` : 'Finish'}
-					{nextHref ? <FaArrowRight className="inline ml-2 mb-1 transition-transform duration-200 group-hover:translate-x-[2px]" /> : null}
+          className={`px-4 py-2 text-sm group ${nextHref ? !isNextOverview ? 'bg-indigo-600 text-white hover:opacity-95' : 'bg-sky-600 text-white hover:opacity-95' : 'bg-green-600 text-white hover:opacity-95'}`}>
+          {nextHref ? isNextOverview ? 'Overview' : nextLabel : 'Finish'}
+					{nextHref ? isNextOverview ? <FaList className="inline ml-2 mb-0.5" /> :<FaArrowRight className="inline ml-2 mb-1 transition-transform duration-200 group-hover:translate-x-[2px]" /> : null}
         </Link>
     </div>
   );

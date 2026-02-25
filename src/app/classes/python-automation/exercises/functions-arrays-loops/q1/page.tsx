@@ -177,7 +177,7 @@ export default function Question1() {
 					<p className="tc3 mb-2">Use the <CopyCode code="def"/> keyword to name your function.</p>
 					<p className="tc3 mb-2">The input parameters are listed in parentheses after the function name.</p>
 					<p className="tc3 mb-2">The <CopyCode code="return"/> keyword is used to return a value from a function.</p>
-          <p className="mb-2 font-bold text-fuchsia-400/85 dark:text-fuchsia-600/85">The indented block after the line with <CopyCode code="def"/> statement ending with a colon <CopyCode code=":"/> tells Python what is in the function.</p>
+          <p className="mb-2 text-fuchsia-600 dark:text-fuchsia-400">The indented block after the line with <CopyCode code="def"/> statement ending with a colon <CopyCode code=":"/> tells Python what is in the function.</p>
 					<CodeBlock compact code={`def double(a): # function named double that takes one parameter a
 		output = a * 2 # multiply a by 2 and store in variable output
 		return output # return the value of output

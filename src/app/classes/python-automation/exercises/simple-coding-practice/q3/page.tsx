@@ -4,12 +4,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, deRepr, checkRequiredCode, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, deRepr, checkRequiredCode, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -35,20 +37,18 @@ export default function Question3() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -163,21 +163,20 @@ export default function Question3() {
           ]}
         />
 
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">String Concatenation</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="String Concatenation"  partName="p1"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}
+          />
+          <p className="tc3 mb-2">When applied to strings, the <CopyCode code="+" /> operator concatenates them. This can be applied to multiple strings in a row.</p>
+          <CodeBlock code={`name = "Lewis"\ngreeting = "Hello, " + name + ", Welcome!"\nprint(greeting) # Output: Hello, Lewis, Welcome!`} language="python" className="mb-2" />
           <p className="tc2 mb-2">Create two string variables <CopyCode code="first_name" /> and <CopyCode code="last_name" /> with any names.</p>
-          <p className="tc2 mb-6">Use the <CopyCode code="+" /> operator to concatenate them with a space in between and store in <CopyCode code="full_name" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2">Use the <CopyCode code="+" /> operator to concatenate them <span className="tc1 font-bold">with a space in between</span> and store in <CopyCode code="full_name" />.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
               initialCode={"# Concatenate strings\nfirst_name = \"John\"\nlast_name = \"Doe\"\nfull_name = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1} onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -188,22 +187,19 @@ export default function Question3() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Case Conversion</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="message" /> with mixed case text.</p>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Case Conversion"  partName="p2"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">Strings have built-in methods for common operations. Methods are called using dot notation.</p>
+          <CodeBlock code={`text = "Hello World"\ncount = text.count("l") # use the count method that belongs to strings`} language="python" className="mb-2" />
           <p className="tc2 mb-2">Use <CopyCode code=".upper()" /> to convert it to uppercase and store in <CopyCode code="upper_message" />.</p>
-          <p className="tc2 mb-6">Use <CopyCode code=".lower()" /> to convert it to lowercase and store in <CopyCode code="lower_message" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2">Use <CopyCode code=".lower()" /> to convert it to lowercase and store in <CopyCode code="lower_message" />.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
               initialCode={"# Convert string case\nmessage = \"Hello World\"\nupper_message = \nlower_message = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2} onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -214,21 +210,19 @@ export default function Question3() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Trimming Whitespace</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="untrimmed" /> with leading and trailing whitespace.</p>
-          <p className="tc2 mb-6">Use <CopyCode code=".strip()" /> to remove the whitespace and store in <CopyCode code="trimmed" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Trimming Whitespace"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">Whitespace characters (spaces, tabs, newlines) are often accidentally included when users enter strings and can cause errors when processing.</p>
+          <p className="tc2 mb-2">The string variable <CopyCode code="untrimmed" /> has leading and trailing whitespace.</p>
+          <p className="tc2 mb-2">Use the member <CopyCode code=".strip()" /> method to remove the whitespace and store in <CopyCode code="trimmed" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Try using <CopyCode code=".lstrip()" /> and <CopyCode code=".rstrip()" /> to remove white space from the left or right.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
               initialCode={"# Trim whitespace from string\nuntrimmed = \"  Hello Python  \"\ntrimmed = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3} onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -239,22 +233,20 @@ export default function Question3() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p4' ? null : 'p4')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Substring Check</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p4`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p4'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p4' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="sentence" /> with any text.</p>
-          <p className="tc2 mb-2">Use the <CopyCode code="in" /> operator to check if "Python" is in the sentence and store in <CopyCode code="has_python" />.</p>
-          <p className="tc2 mb-6">Check if "java" is in the sentence and store in <CopyCode code="has_java" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Substring Check"  partName="p4"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The <CopyCode code="in" /> operator checks if a substring exists within a string.</p>
+          <CodeBlock code={`is_gmail = "gmail.com" in "test_user@gmail.com"`} language="python" className="mb-2" />
+          <p className="tc2 mb-2">Use the <CopyCode code="in" /> operator to check if <CopyCode code='"Python"' /> is in the sentence and store in <CopyCode code="has_python" />.</p>
+          <p className="tc2 mb-2">Check if <CopyCode code='"java"' /> is in the sentence and store in <CopyCode code="has_java" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2"><CopyCode code="Python" /> and <CopyCode code="python"/> different strings, and <CopyCode code="in" /> is case-sensitive!</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p4' && <PythonIde
               initialCode={"# Check for substrings\nsentence = \"I love Python programming\"\nhas_python = \nhas_java = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP4} onCodeStartCallback={() => startCode('p4')}
+              cachedCode={submissionStates[`${questionName}_p4`]?.code? submissionStates[`${questionName}_p4`].code : undefined}
             />}
           </div>
           <div className="mt-4">

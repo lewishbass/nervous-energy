@@ -5,12 +5,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, deRepr, checkRequiredCode, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, deRepr, checkRequiredCode, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -36,20 +38,18 @@ export default function Question5() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -160,22 +160,20 @@ export default function Question5() {
           ]}
         />
 
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">AND Operator</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="AND Operator"  partName="p1"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The <CopyCode code="and" /> operator takes the value on the left and right and returns True only if both values are True.</p>
+          <CodeBlock code={`result = False and True # False`} language="python" className="mb-2" />
           <p className="tc2 mb-2">To succeed you must be in the right place at the right time.</p>
-          <p className="tc2 mb-2">Create two boolean variables <CopyCode code="right_place" /> and <CopyCode code="right_time" /> with any values.</p>
-          <p className="tc2 mb-6"> Use the <CopyCode code="and" /> operator to combine them and store in <CopyCode code="success" />. The result is <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> only when both values are <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code>.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2"> Use the <CopyCode code="and" /> operator to combine the two boolean valuess and store the result in <CopyCode code="success" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Change the values of <CopyCode code="right_place" /> and <CopyCode code="right_time" /> to see how the <CopyCode code="and" /> operator behaves.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
               initialCode={"# Use the AND operator\nright_place = True\nright_time = False\nsuccess = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1} onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -186,22 +184,20 @@ export default function Question5() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">OR Operator</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="OR Operator"  partName="p2"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The <CopyCode code="or" /> operator takes the value on the left and right and returns True if at least one is True. It only returns False if both values are False.</p>
+          <CodeBlock code={`result = False or True # True`} language="python" className="mb-2" />
           <p className="tc2 mb-2">To stay dry in the rain you need an umbrella or a jacket, but having both doesn't hurt.</p>
-          <p className="tc2 mb-2">Create two boolean variables <CopyCode code="has_umbrella" /> and <CopyCode code="has_jacket" /> with any values.</p>
-          <p className="tc2 mb-6">Use the <CopyCode code="or" /> operator to combine them and store in <CopyCode code="is_dry" />. The result is <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> when at least one value is <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code>.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2">Use the <CopyCode code="or" /> operator to combine the boolean variables and store the result in <CopyCode code="is_dry" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Change the values of <CopyCode code="has_umbrella" /> and <CopyCode code="has_jacket" /> to see how the <CopyCode code="or" /> operator behaves.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
               initialCode={"# Use the OR operator\nhas_umbrella = True\nhas_jacket = False\nis_dry = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2} onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -212,21 +208,18 @@ export default function Question5() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">NOT Operator</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create a boolean variable <CopyCode code="is_tall" /> with any value.</p>
-          <p className="tc2 mb-6">Use the <CopyCode code="not" /> operator to negate it and store in <CopyCode code="is_short" />. The result is always the opposite of the input.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="NOT Operator"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The <CopyCode code="not" /> operator takes a single boolean value to the right and returns the opposite. If the input is True, it returns False. If the input is False, it returns True.</p>
+          <CodeBlock code={`result = not True # False`} language="python" className="mb-2" />
+          <p className="tc2 mb-2">Use the <CopyCode code="not" /> operator to negate <CopyCode code="is_tall" /> and store in <CopyCode code="is_short" />.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
               initialCode={"# Use the NOT operator\nis_tall = True\nis_short = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3} onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -237,22 +230,17 @@ export default function Question5() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p4' ? null : 'p4')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Combining Boolean Expressions</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p4`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p4'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p4' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create three boolean variables <CopyCode code="hungry" />, <CopyCode code="dinner_time" />, and <CopyCode code="has_leftovers" /> with any values.</p>
-          <p className="tc2 mb-2">Combine them using <CopyCode code="(hungry and dinner_time) and not has_leftovers" /> and store in <CopyCode code="need_to_cook" />.</p>
-          <p className="tc2 mb-6">Use parentheses to control the order of operations, just like in math.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Combining Boolean Expressions"  partName="p4"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">You can combine multiple boolean operators together to create more complex expressions. Use parentheses to control the order of operations.</p>
+          <p className="tc2 mb-2">Combine the boolean using <CopyCode code="(hungry and dinner_time) and not has_leftovers" /> and store in <CopyCode code="need_to_cook" />.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p4' && <PythonIde
               initialCode={"# Combine boolean expressions\nhungry = True\ndinner_time = False\nhas_leftovers = True\nneed_to_cook = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP4} onCodeStartCallback={() => startCode('p4')}
+              cachedCode={submissionStates[`${questionName}_p4`]?.code? submissionStates[`${questionName}_p4`].code : undefined}
             />}
           </div>
           <div className="mt-4">

@@ -127,7 +127,7 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 						</div>
 					</div>
 					
-					<pre className={`mini-scroll code-block ${!compact ? 'line-numbers' : ''} ${compact ? 'compact' : ''} language-${getLanguageHighlight(language)}`} data-language={getLanguageHighlight(language)}>
+					<pre style={{margin: 0}} className={`mini-scroll code-block ${!compact ? 'line-numbers' : ''} ${compact ? 'compact' : ''} language-${getLanguageHighlight(language)}`} data-language={getLanguageHighlight(language)}>
 						{filename && (
 							<div className="code-filename">
 								{filename}

@@ -4,12 +4,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, deRepr, checkRequiredCode, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, deRepr, checkRequiredCode, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'simple-coding-practice';
@@ -35,20 +37,18 @@ export default function Question2() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -152,18 +152,16 @@ export default function Question2() {
           ]}
         />
 
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Basic Math Operations</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Basic Math Operations"  partName="p1"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">Arithmetic operators take two operands (values) from their left and right sides, and return the results</p>
+          <CodeBlock code={`a = 1 + 3 # result 4 is stored in a`} language="python" className="mb-2" />
           <p className="tc2 mb-2">Create two integer variables <CopyCode code="a" /> and <CopyCode code="b" /> with any values.</p>
           <p className="tc2 mb-2">Create a variable <CopyCode code="sum" /> that adds them using <CopyCode code="+" />.</p>
           <p className="tc2 mb-2">Create a variable <CopyCode code="product" /> that multiplies them using <CopyCode code="*" />.</p>
-          <p className="tc2 mb-6">Create a variable <CopyCode code="difference" /> that subtracts b from a using <CopyCode code="-" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2">Create a variable <CopyCode code="difference" /> that subtracts b from a using <CopyCode code="-" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Experiment with different values and see how it effects the results in the right panel.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
               initialCode={"# Create two integers and perform operations\na = 6\nb = 7\nsum = \nproduct = \ndifference = "}
               initialDocumentName="test.py"
@@ -173,8 +171,7 @@ export default function Question2() {
               initialHDivider={60}
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1}
-              onCodeStartCallback={() => startCode('p1')}
-            />}
+              onCodeStartCallback={() => startCode('p1')}              cachedCode={submissionStates[`${questionName}_p1`]?.code? submissionStates[`${questionName}_p1`].code : undefined}            />}
           </div>
           <div className="mt-4">
             <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p1' ? '' : 'hidden'} ${(!validationStates['p1'] || validationStates['p1'] === 'pending') ? 'opacity-0' : validationStates['p1'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -184,17 +181,16 @@ export default function Question2() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Printing to Console</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Printing to Console"  partName="p2"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}
+            validationStates={validationStates}
+          />
+          <p className="tc3 mb-2">The <CopyCode code="print()" /> function outputs values or variables to the console. You can print multiple values by separating them with commas.</p>
+          <CodeBlock code={`name = "Alice"\nage = 30\nprint("Name:", name, "Age:", age)`} language="python" className="mb-2" />
           <p className="tc2 mb-2">Create a string variable <CopyCode code="message" /> with any text value.</p>
           <p className="tc2 mb-2">Create an integer variable <CopyCode code="number" /> with any numeric value.</p>
-          <p className="tc2 mb-6">Use the <CopyCode code="print()" /> function to output both variables to the console. It can take multiple parameters separated by commas.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
+          <p className="tc2 mb-2">Use the <CopyCode code="print()" /> function to output both variables to the console.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
               initialCode={"# Create variables and print them\nmessage = \nnumber = \n# Use print() to display your variables"}
               initialDocumentName="test.py"
@@ -204,8 +200,7 @@ export default function Question2() {
               initialHDivider={60}
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2}
-              onCodeStartCallback={() => startCode('p2')}
-            />}
+              onCodeStartCallback={() => startCode('p2')}              cachedCode={submissionStates[`${questionName}_p2`]?.code? submissionStates[`${questionName}_p2`].code : undefined}            />}
           </div>
           <div className="mt-4">
             <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p2' ? '' : 'hidden'} ${(!validationStates['p2'] || validationStates['p2'] === 'pending') ? 'opacity-0' : validationStates['p2'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
@@ -215,18 +210,14 @@ export default function Question2() {
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Type Conversion</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="num_str" /> containing a number like "42".</p>
-          <p className="tc2 mb-2">Convert it to an integer using <CopyCode code="int()" /> and store in <CopyCode code="num_int" />.</p>
-          <p className="tc2 mb-2">Create an integer variable <CopyCode code="age" /> with any numeric value.</p>
-          <p className="tc2 mb-6">Convert it to a string using <CopyCode code="str()" /> and store in <CopyCode code="age_str" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Type Conversion"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2"><CopyCode code="int()" /> converts anything its given into an integer, <CopyCode code="str()" /> does the same for strings.</p>
+          <CodeBlock code={`num_int = int("42") # convert the string "42" to the number 42`} language="python" className="mb-2" />
+          <p className="tc2 mb-2">Convert <CopyCode code="num_str" /> to an integer using <CopyCode code="int()" /> and store in <CopyCode code="num_int" />.</p>
+          <p className="tc2 mb-2">Convert <CopyCode code="age" /> to a string using <CopyCode code="str()" /> and store in <CopyCode code="age_str" />.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Try setting num_str to a decimal value like "42.5" and see what error occurs.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
               initialCode={"# Convert between strings and integers\nnum_str = \"42\"\nnum_int = \nage = 25\nage_str = "}
               initialDocumentName="test.py"
@@ -236,8 +227,7 @@ export default function Question2() {
               initialHDivider={60}
               initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-            />}
+              onCodeStartCallback={() => startCode('p3')}              cachedCode={submissionStates[`${questionName}_p3`]?.code? submissionStates[`${questionName}_p3`].code : undefined}            />}
           </div>
           <div className="mt-4">
             <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>

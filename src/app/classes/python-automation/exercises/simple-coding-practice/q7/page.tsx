@@ -5,9 +5,10 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, deRepr, checkRequiredCode, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, deRepr, checkRequiredCode, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
@@ -36,20 +37,18 @@ export default function Question7() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -188,22 +187,18 @@ export default function Question7() {
         />
 
         {/* P1: Binary Conversion */}
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Binary Conversion</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create an integer variable <CopyCode code="number" /> with any value.</p>
-          <p className="tc2 mb-2">Use the built-in <CopyCode code="bin()" /> function to convert it to a binary string and store in <CopyCode code="bin_string" />.</p>
-          <p className="tc2 mb-6">The result will look like <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">'0b1010'</code> — the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0b</code> prefix indicates it is a binary number.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Binary Conversion"  partName="p1"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The built in <CopyCode code="bin()" /> function takes a decimal integer and returns its binary representation as a string.</p>
+          <p className="tc2 mb-2">Use <CopyCode code="bin()" /> to convert <CopyCode code="number"/> to a binary string and store in <CopyCode code="bin_string" />.</p>
+          <p className="tc2 mb-6">The result will look like <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">'0b1010'</code> - the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0b</code> prefix indicates it is a binary number.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
               initialCode={"# Convert an integer to a binary string\nnumber = 42\nbin_string = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1} onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -215,24 +210,21 @@ export default function Question7() {
         <div className="h-4"></div>
 
         {/* P2: Binary Validation */}
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Validating a Binary String</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">A valid binary string starts with <CopyCode code="'0b'" /> followed only by <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0</code>s and <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">1</code>s.</p>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="bin_string" /> with any value, then split it:</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="prefix" /> — first 2 characters using <CopyCode code="bin_string[:2]" /></p>
-          <p className="tc2 mb-4 ml-4">• <CopyCode code="binary_part" /> — remaining characters using <CopyCode code="bin_string[2:]" /></p>
-          <p className="tc2 mb-6">Combine checks using <CopyCode code="and" /> to set <CopyCode code="is_valid_binary" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> only when the prefix is <CopyCode code="'0b'" /> and the rest contains only <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0</code>s and <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">1</code>s. Hint: click on a string variable in the visualizer to look through the available methods for something useful.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Validating a Binary String"  partName="p2"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">A valid binary string starts with <CopyCode code="'0b'" /> followed only by <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0</code>s and <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">1</code>s.</p>
+          <p className="tc2 mb-2">The binary string <CopyCode code="bin_string" /> is split into:</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="prefix" /> - first 2 characters using <CopyCode code="bin_string[:2]" /></p>
+          <p className="tc2 mb-4 ml-4">• <CopyCode code="binary_part" /> - remaining characters using <CopyCode code="bin_string[2:]" /></p>
+          <p className="tc2 mb-2">Combine checks using <CopyCode code="and" /> to set <CopyCode code="is_valid_binary" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> only when the prefix is <CopyCode code="'0b'" /> and the rest contains only <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0</code>s and <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">1</code>s.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Use <CopyCode code="==" /> to validate the prefix, and <CopyCode code=".count()" /> to make sure the total count of binary characters is the same as the length of the binary part.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
               initialCode={"# Validate a binary string\nbin_string = '0b101010'\nprefix = bin_string[:2]\nbinary_part = bin_string[2:]\nis_valid_binary = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2} onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -244,22 +236,18 @@ export default function Question7() {
         <div className="h-4"></div>
 
         {/* P3: Hex Conversion */}
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Hexadecimal Conversion</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">Create an integer variable <CopyCode code="number" /> with any value.</p>
-          <p className="tc2 mb-2">Use the built-in <CopyCode code="hex()" /> function to convert it to a hexadecimal string and store in <CopyCode code="hex_string" />.</p>
-          <p className="tc2 mb-6">The result will look like <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">'0x2a'</code> — the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0x</code> prefix indicates it is a hexadecimal number.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Hexadecimal Conversion"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">The built in <CopyCode code="hex()" /> function takes a decimal integer and returns its hexadecimal representation as a string.</p>
+          <p className="tc2 mb-2">Use <CopyCode code="hex()" />  to convert <CopyCode code="number"/> to a hexadecimal string and store in <CopyCode code="hex_string" />.</p>
+          <p className="tc2 mb-6">The result will look like <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">'0x2a'</code> - the <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0x</code> prefix indicates it is a hexadecimal number.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde
               initialCode={"# Convert an integer to a hexadecimal string\nnumber = 42\nhex_string = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3} onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -271,24 +259,21 @@ export default function Question7() {
         <div className="h-4"></div>
 
         {/* P4: Hex Validation */}
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm">
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p4' ? null : 'p4')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Validating a Hexadecimal String</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p4`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p4'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p4' ? 'rotate-180' : ''}`} />
-          </div>
-          <p className="tc2 mb-2">A valid hexadecimal string starts with <CopyCode code="'0x'" /> followed only by digits <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0–9</code> and letters <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">a–f</code> (case insensitive).</p>
-          <p className="tc2 mb-2">Create a string variable <CopyCode code="hex_string" /> with any value, then split it:</p>
-          <p className="tc2 mb-1 ml-4">• <CopyCode code="prefix" /> — first 2 characters using <CopyCode code="hex_string[:2]" /></p>
-          <p className="tc2 mb-4 ml-4">• <CopyCode code="hex_part" /> — remaining characters using <CopyCode code="hex_string[2:]" /></p>
-          <p className="tc2 mb-6">Combine checks using <CopyCode code="and" /> to set <CopyCode code="is_valid_hex" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> only when the prefix is <CopyCode code="'0x'" /> and the rest contains only valid hex characters. Hint: convert to lowercase first with <CopyCode code=".lower()" />, then check each character is in <CopyCode code="'0123456789abcdef'" />.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
+          <QuestionHeader  title="Validating a Hexadecimal String"  partName="p4"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
+          <p className="tc3 mb-2">A valid hexadecimal string starts with <CopyCode code="'0x'" /> followed only by digits <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">0–9</code> and letters <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">a–f</code> (case insensitive).</p>
+          <p className="tc2 mb-2">The hexadecimal string <CopyCode code="hex_string" /> is split into:</p>
+          <p className="tc2 mb-1 ml-4">• <CopyCode code="prefix" /> - first 2 characters using <CopyCode code="hex_string[:2]" /></p>
+          <p className="tc2 mb-4 ml-4">• <CopyCode code="hex_part" /> - remaining characters using <CopyCode code="hex_string[2:]" /></p>
+          <p className="tc2 mb-2">Combine checks using <CopyCode code="and" /> to set <CopyCode code="is_valid_hex" /> to <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">True</code> only when the prefix is <CopyCode code="'0x'" /> and the rest contains only valid hex characters.</p>
+          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-2">Hint: convert to lowercase first with <CopyCode code=".lower()" />, then check each character is in <CopyCode code="'0123456789abcdef'" /> using <CopyCode code=".count()" /> or another method.</p>
+          <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p4' && <PythonIde
               initialCode={"# Validate a hexadecimal string\nhex_string = '0x1a3f'\nprefix = hex_string[:2]\nhex_part = hex_string[2:]\nis_valid_hex = "}
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true}
               initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP4} onCodeStartCallback={() => startCode('p4')}
+              cachedCode={submissionStates[`${questionName}_p4`]?.code? submissionStates[`${questionName}_p4`].code : undefined}
             />}
           </div>
           <div className="mt-4">

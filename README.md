@@ -3,6 +3,7 @@
 ### Lewis Bass
 Personal resume website with WAY too many features
 
+
 ## Overview
 Nervous Energy 2 is a feature-rich personal portfolio and resume website, designed to showcase skills, projects, and professional experience while implementing modern web technologies and best practices.
 

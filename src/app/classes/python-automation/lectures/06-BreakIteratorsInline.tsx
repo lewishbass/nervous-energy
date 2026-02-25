@@ -15,8 +15,10 @@ function BreakIteratorsInlineLecture(props: BreakIteratorsInlineLectureProps | n
       <section className="mb-4">
         <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
-          <li>Iterators</li>
-          <li>Generators</li>
+          <li>Break</li>
+          <li>Continue</li>
+          <li>Inline If</li>
+          <li>Inline For</li>
         </ul>
       </section>
     </LectureTemplate>

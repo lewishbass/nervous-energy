@@ -13,6 +13,7 @@ import {
 	VscSettingsGear,
 	VscClearAll,
 	VscTrash,
+	VscArchive,
 } from 'react-icons/vsc';
 import { useTheme } from 'next-themes';
 import { usePyodide, registerPyodideCompletions, registerPyodideSemanticTokens, definePythonThemes, resetPyodideContext, getVariableInfo } from '@/scripts/pyodide';
@@ -42,6 +43,7 @@ export type PythonIdeProps = {
 	initialWordWrap?: boolean;
 	onCodeStartCallback?: (code: string, pyodide: any) => void;
 	onCodeEndCallback?: (code: string, pyodide: any, error: string | null, vars: Record<string, VariableInfo>, stdout: string | null) => void;
+	cachedCode?: string;
 };
 
 // ---------- Component ----------
@@ -57,6 +59,7 @@ export default function PythonIde({
 	initialWordWrap=true,
 	onCodeStartCallback,
 	onCodeEndCallback,
+	cachedCode,
 }: PythonIdeProps) {
 	const [code, setCode] = useState(initialCode);
 	const [showLineNumbers, setShowLineNumbers] = useState(initialShowLineNumbers);
@@ -466,6 +469,7 @@ _json.dumps({
 		});
 		return result;
 	};
+	
 
 	// ---------- Render ----------
 
@@ -482,10 +486,26 @@ _json.dumps({
 
 				<ToolBtn icon={VscPlay} label={running ? 'Running…' : 'Run (Ctrl+Enter)'} accent="var(--khg)" onClick={() => { if (!running) runCode(code); }} isCompact={isCompact} />
 				<ToolBtn icon={VscDebugStepOver} label="Execute Next Line" accent="var(--khb)" isCompact={isCompact} />
-				<ToolBtn icon={VscDebugRestart} label="Restart" accent="var(--kho)" onClick={() => { resetPyodideContext(); setVariables({}); }} isCompact={isCompact} />
+				<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={() => { resetPyodideContext(); setVariables({}); }} isCompact={isCompact} />
 				<ToolBtn icon={VscDebugStop} label="Stop" accent="var(--khr)" isCompact={isCompact} />
 
-				<div className="w-px h-6 bg-gray-400/40 mx-1" />
+
+
+				{cachedCode && (
+				<>
+					<div className="w-px h-6 bg-gray-400/40 mx-1" />
+					<div className="h-6" />
+					<ToolBtn icon={VscArchive} label="Load Cached Code" onClick={() => {
+						if (cachedCode) {
+							setCode(cachedCode);
+							copyToClipboard(cachedCode, 'Cached code loaded to editor', false);
+						} else {
+							copyToClipboard('', 'No cached code found', false);
+						}
+					}} isCompact={isCompact} />
+				</>)}
+				
+				<div className="w-px h-6 bg-gray-400/40 mx-1.5" />
 				<div className="h-6 mx-auto" />
 
 				{!isCompact && <>
