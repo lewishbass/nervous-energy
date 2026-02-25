@@ -202,7 +202,7 @@ export default function Question4() {
 
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
           <QuestionHeader  title="Counting Vowels"  partName="p3"  questionName={questionName}  selectedQuestion={selectedQuestion}  setSelectedQuestion={setSelectedQuestion}  submissionStates={submissionStates}  validationStates={validationStates}/>
-          <p className="tc2 mb-2">Count the total number of vowels (a, e, i, o, u — upper and lower case) in <CopyCode code="text" /> and store the result in <CopyCode code="vowel_count" />.</p>
+          <p className="tc2 mb-2">Count the total number of vowels (a, e, i, o, u - upper and lower case) in <CopyCode code="text" /> and store the result in <CopyCode code="vowel_count" />.</p>
           <p className="mb-2 text-fuchsia-600 dark:text-fuchsia-400">Hint: use <CopyCode code=".count()" /> for each vowel and add these results together</p>
           <div className={`mt-6 w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p3' && <PythonIde

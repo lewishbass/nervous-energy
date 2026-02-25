@@ -256,7 +256,7 @@ _json.dumps({
 `);
 
 			const parsed = JSON.parse(resultJson);
-			// Errors are not streamed — display them from the result
+			// Errors are not streamed - display them from the result
 			if (parsed.error) {
 				execError = parsed.error.endsWith('\n') ? parsed.error.slice(0, -1) : parsed.error;
 				setTerminalLines(prev => {

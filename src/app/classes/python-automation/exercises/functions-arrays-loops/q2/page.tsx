@@ -4,9 +4,10 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
@@ -36,20 +37,18 @@ export default function Question2() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -209,12 +208,7 @@ _json.dumps({'verify': _verify})
         />
 
         <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Pass some tests</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Pass some tests" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">Test cases are used to verify that a program behaves correctly under specific conditions.</p>
             <p className="tc3 mb-2">Most questions won't explicitly tell you what cases you have to pass, it is up to you to imagine where your program might fail, and make it robust.</p>
           <p className="tc2 mb-2">Create a function <CopyCode code="aRatio"/> that returns the fraction of letters in a string that are 'a'.</p>
@@ -224,6 +218,7 @@ _json.dumps({'verify': _verify})
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1}
               onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -235,12 +230,7 @@ _json.dumps({'verify': _verify})
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Test a function</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Write some tests" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc2 mb-2">Given the function <CopyCode code='genEmail'/>, finish writing the test cases, so it passes them all.</p>
           <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p2' && <PythonIde
@@ -248,6 +238,7 @@ _json.dumps({'verify': _verify})
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={75} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2}
               onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -259,12 +250,7 @@ _json.dumps({'verify': _verify})
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Find a bug</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Find a bug" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">When designing test cases, it is important to cover both common cases and edge cases.</p>
           <p className="tc2 mb-2">The function <CopyCode code="getGrade"/> contains a bug. Write a test case that finds this bug and returns false.</p>
           <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[600px]' : 'h-0'}`}>
@@ -273,6 +259,7 @@ _json.dumps({'verify': _verify})
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
               onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">

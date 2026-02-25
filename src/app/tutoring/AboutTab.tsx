@@ -8,7 +8,7 @@ export default function AboutTab() {
 				<div className="flex flex-col md:flex-row gap-6 items-start">
 					<div className="flex-1 space-y-4 tc2">
 						<p className="text-lg leading-relaxed">
-							Teaching has been my passion since high school, and I&apos;ve been fortunate to share that passion with students throughout my academic journey and beyond. There&apos;s something incredibly rewarding about watching a concept click for a student—that moment when confusion transforms into understanding and confidence.
+							Teaching has been my passion since high school, and I&apos;ve been fortunate to share that passion with students throughout my academic journey and beyond. There&apos;s something incredibly rewarding about watching a concept click for a student-that moment when confusion transforms into understanding and confidence.
 						</p>
 						<Image
 							src="/images/pets/me_c.jpg"
@@ -18,7 +18,7 @@ export default function AboutTab() {
 							className="rounded-lg shadow-lg object-cover w-full md:hidden lg:hidden"
 						/>
 						<p className="text-lg leading-relaxed">
-							With a Bachelor&apos;s degree in Mathematics and another in Computer Engineering, plus a Master&apos;s degree in Machine Learning, I bring both depth and breadth to my tutoring sessions. But what truly drives me isn&apos;t just the credentials—it&apos;s the genuine joy I get from working with students of all ages and helping them discover their own potential.
+							With a Bachelor&apos;s degree in Mathematics and another in Computer Engineering, plus a Master&apos;s degree in Machine Learning, I bring both depth and breadth to my tutoring sessions. But what truly drives me isn&apos;t just the credentials-it&apos;s the genuine joy I get from working with students of all ages and helping them discover their own potential.
 						</p>
 						<Image
 							src="/images/pets/nutmeg_c.jpg"
@@ -28,7 +28,7 @@ export default function AboutTab() {
 							className="rounded-lg shadow-lg object-cover w-full md:hidden lg:hidden"
 						/>
 						<p className="text-lg leading-relaxed">
-							I&apos;ve organized tech summer camps, tutored students one-on-one throughout college, and continuously refined my teaching approach to meet each student where they are. Whether you&apos;re struggling with algebra, diving into calculus, exploring computer science, or curious about machine learning, I&apos;m here to make learning engaging, accessible, and—dare I say—fun!
+							I&apos;ve organized tech summer camps, tutored students one-on-one throughout college, and continuously refined my teaching approach to meet each student where they are. Whether you&apos;re struggling with algebra, diving into calculus, exploring computer science, or curious about machine learning, I&apos;m here to make learning engaging, accessible, and-dare I say-fun!
 						</p>
 						<p className="text-lg leading-relaxed">
 							When I&apos;m not teaching, you&apos;ll often find me with my loyal companion Nutmeg, who occasionally makes special appearances during virtual tutoring sessions (student morale booster guaranteed).

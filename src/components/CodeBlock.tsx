@@ -101,6 +101,9 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 				onClick={onClick}
 			>
 				<div className="relative rounded-md overflow-hidden max-w-[80vw] w-full print:shadow-none shadow-[2px_2px_5px_rgba(0,0,0,0.1)]">
+					{compact && (
+						<div className="absolute top-[5px] left-[8px] bg-gray-500/20 h-[calc(100%-10px)] w-[3px] z-100" />
+					)}
 					<div className="code-block-header" onClick={handleCopy}>
 						<button
 							className="copy-code-button"
@@ -157,7 +160,7 @@ interface AnimatedCodeBlockProps {
 	compact?: boolean;
 	/** Ordered sequence of 1-indexed line numbers to cycle through */
 	lines: number[];
-	/** 'onHover' — animates continuously while hovered; 'onClick' — advances one line per click */
+	/** 'onHover' - animates continuously while hovered; 'onClick' - advances one line per click */
 	scrollMode?: 'onHover' | 'onClick';
 	/** Delay in ms between line advances in onHover mode (default 700) */
 	interval?: number;

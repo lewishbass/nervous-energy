@@ -4,12 +4,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -35,20 +37,18 @@ export default function Question8() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -85,7 +85,7 @@ export default function Question8() {
 
         <div className="mt-6 flex items-center justify-between gap-4">
           <BackToAssignment assignmentPath={assignmentPath} />
-          <NextQuestion assignmentPath={assignmentPath} prevHref="q7" />
+          <NextQuestion assignmentPath={assignmentPath} prevHref="q7" nextHref='overview' />
         </div>
       </div>
     </>

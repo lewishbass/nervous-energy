@@ -60,8 +60,8 @@ export default function FunctionsArraysLoops() {
     { title: 'Q1-Intro To Functions', link: `${assignmentPath}/q1`, description: 'Define simple functions with parameters, return values, and call them.' },
     { title: 'Q2-Test Cases', link: `${assignmentPath}/q2`, description: 'Write functions and test cases, verify function behavior and correctness.' },
     { title: 'Q3-Making and Editing Arrays', link: `${assignmentPath}/q3`, description: 'Initialize arrays with values, modify elements, retrieve values.' },
-    { title: 'Q4-For Loops', link: `${assignmentPath}/q4`, description: 'Iterate over a fixed range using for loops, control loop flow.' },
-    { title: 'Q5-Iterating Over Arrays', link: `${assignmentPath}/q5`, description: 'Use for loops to traverse array elements.' },
+    { title: 'Q4-If Statements', link: `${assignmentPath}/q4`, description: 'Switch between two different code paths using if statements.' },
+    { title: 'Q5-For Loops', link: `${assignmentPath}/q5`, description: 'Use for loops to traverse array elements.' },
     { title: 'Q6-While Loops', link: `${assignmentPath}/q6`, description: 'Use while loops for condition-based iteration.' },
     { title: 'Q7-Sums, Min and Max, Fourier', link: `${assignmentPath}/q7`, description: 'Implement algorithms to perform array operations..' },
     { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Create arrays, loop over the elements, and apply all concepts learned.' },
@@ -107,6 +107,7 @@ export default function FunctionsArraysLoops() {
             'Combine functions, arrays, and loops to solve problems',
           ]}
           startHref={`${assignmentPath}/q1`}
+            endHref={`${assignmentPath}/overview`}
           questionList={questions}
           className="mb-8"
         />

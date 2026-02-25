@@ -243,6 +243,7 @@ export async function validateFunction (
     args: any[];
     expected: any;
     expectedError?: string | null;
+    expectedStdout?: string[] | null;
   }
 ): Promise<{ passed: boolean; message: string; }> {
   if (!pyodide) {
@@ -264,22 +265,30 @@ export async function validateFunction (
 
   try {
     const resultJson: string = await pyodide.runPythonAsync(`
-import json as _json, traceback as _tb
+import json as _json, traceback as _tb, sys as _sys, io as _io
 
 _fn = globals()[_test_func_name]
 _args = _test_args.to_py() if hasattr(_test_args, 'to_py') else list(_test_args)
 
 _test_error = None
 _test_result = None
+_test_stdout = ''
+_stdout_capture = _io.StringIO()
+_saved_stdout = _sys.stdout
+_sys.stdout = _stdout_capture
 try:
     _test_result = _fn(*_args)
 except Exception:
     _test_error = _tb.format_exc()
+finally:
+    _sys.stdout = _saved_stdout
+    _test_stdout = _stdout_capture.getvalue()
 
 _json.dumps({
     'result': repr(_test_result) if _test_result is not None else 'None',
     'result_type': type(_test_result).__name__ if _test_error is None else None,
     'error': _test_error,
+    'stdout': _test_stdout,
 })
 `);
 
@@ -303,7 +312,19 @@ _json.dumps({
       return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) raised an error: ${lastLine}` };
     }
 
-    // Compare the result to expected value
+    // Validate expected stdout
+    if (testCase.expectedStdout && testCase.expectedStdout.length > 0) {
+      const actualStdout: string = parsed.stdout ?? '';
+      for (const expected of testCase.expectedStdout) {
+        if (!actualStdout.includes(expected)) {
+          return {
+            passed: false,
+            message: `${funcName}(${testCase.args.join(', ')}) stdout missing expected output: "${expected}". Got: "${actualStdout.trim()}"`
+          };
+        }
+      }
+    }
+
     const actualValue = deRepr(parsed.result, parsed.result_type);
     const expectedValue = testCase.expected;
 
@@ -315,7 +336,7 @@ _json.dumps({
     } else if (actualValue !== expectedValue) {
       return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) returned ${parsed.result}, expected ${JSON.stringify(expectedValue)}.` };
     }
-    console.log('Test case passed:', { args: testCase.args, expected: testCase.expected, actual: actualValue });
+
     return { passed: true, message: `${funcName}(${testCase.args.join(', ')}) returned ${parsed.result} ✓` };
 
   } catch (e: unknown) {
@@ -338,7 +359,7 @@ _json.dumps({
 export async function runTestCases (
   pyodide: any,
   funcName: string,
-  cases: {args:any[]; expected: any; expectedError?: string | null;}[]
+  cases: { args: any[]; expected: any; expectedError?: string | null; expectedStdout?: string[] | null; }[]
 ):Promise<{passed: boolean; message: string, casesPassed: number}> {
 
   let firstFailureMessage: string | null = null;
@@ -612,3 +633,4 @@ export const sanitizeSubmissionState = (state: any) : 'downloading' | 'uploading
   }
   return 'idle';
 }
+

@@ -39,7 +39,7 @@ async function loadPyodideInstance() {
 		if (!(window as any).loadPyodide) {
 			// Remove any stale Pyodide script tags if version changed
 			if (versionChanged) {
-				console.log('[Pyodide] Version changed — removing stale script tags');
+        console.log('[Pyodide] Version changed - removing stale script tags');
 				document.querySelectorAll('script[data-pyodide]').forEach((s) => s.remove());
 			}
 
@@ -181,6 +181,8 @@ class _RTOut:
             self._cb(self._buf, self._type)
             self._hist.append(self._buf)
             self._buf = ''
+    def clear_history(self):
+        self._hist.clear()
 `);
     console.log('[Pyodide] Async execution helpers installed');
 
@@ -189,7 +191,7 @@ class _RTOut:
 			localStorage.setItem('pyodide-version', PYODIDE_VERSION);
 			console.log('[Pyodide] Version persisted to localStorage');
 		} catch {
-			console.warn('[Pyodide] Could not persist version — localStorage unavailable');
+      console.warn('[Pyodide] Could not persist version - localStorage unavailable');
 		}
 
 		console.log('[Pyodide] Initialization complete ✓');
@@ -370,13 +372,13 @@ const registerPyodideSemanticTokens = (
   pyodide: any,
 ) => {
   const tokenTypes = [
-    'namespace',  // 0 — module
-    'type',       // 1 — class
-    'function',   // 2 — function
-    'parameter',  // 3 — param
-    'variable',   // 4 — instance / statement
-    'property',   // 5 — property
-    'decorator',  // 6 — decorator
+    'namespace',  // 0 - module
+    'type',       // 1 - class
+    'function',   // 2 - function
+    'parameter',  // 3 - param
+    'variable',   // 4 - instance / statement
+    'property',   // 5 - property
+    'decorator',  // 6 - decorator
   ];
   const tokenModifiers = ['declaration', 'definition', 'defaultLibrary'];
 
@@ -465,7 +467,7 @@ const definePythonThemes = (monacoInstance: Monaco) => {
 		base: 'vs-dark',
 		inherit: true,
 		rules: [
-			// Semantic token types — VS Code Dark+ palette
+      // Semantic token types - VS Code Dark+ palette
 			{ token: 'namespace', foreground: '4EC9B0' },
 			{ token: 'type',      foreground: '4EC9B0' },
 			{ token: 'function',  foreground: 'DCDCAA' },

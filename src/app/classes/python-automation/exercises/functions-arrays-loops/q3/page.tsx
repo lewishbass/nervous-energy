@@ -4,9 +4,10 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, deRepr } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, deRepr } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
@@ -36,20 +37,18 @@ export default function Question3() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -73,7 +72,7 @@ export default function Question3() {
   };
 
   // P1: Create three arrays with different data types
-  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p1', 'failed', err.message, code); return; }
 
@@ -122,7 +121,7 @@ _json.dumps(_results)
   };
 
   // P2: Modify an existing array
-  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p2', 'failed', err.message, code); return; }
 
@@ -163,7 +162,7 @@ _json.dumps(_results)
   };
 
   // P3: Retrieve values from the array
-  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p3', 'failed', err.message, code); return; }
 
@@ -262,21 +261,16 @@ _json.dumps(_results)
 
         {/* P1: Create Arrays */}
         <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Create Arrays</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Create Arrays" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">An array (called a <CopyCode code="list"/> in Python) is an ordered collection of values.</p>
           <p className="tc3 mb-2">Create a list using square brackets <CopyCode code="[]"/> with values separated by commas.</p>
           <CodeBlock compact code={`my_numbers = [1, 2, 3, 4, 5]
 my_words = ["hello", "world"]`} language="python" className="my-4" />
           <p className="tc2 mb-2">Create three arrays, each with at least 3 elements:</p>
           <ul className="list-disc list-inside tc2 mb-6">
-            <li><CopyCode code="int_array"/> — containing integers</li>
-            <li><CopyCode code="float_array"/> — containing floats (e.g. <CopyCode code="1.5, 2.0"/>)</li>
-            <li><CopyCode code="string_array"/> — containing strings</li>
+            <li><CopyCode code="int_array" /> - containing integers</li>
+            <li><CopyCode code="float_array" /> - containing floats (e.g. <CopyCode code="1.5, 2.0" />)</li>
+            <li><CopyCode code="string_array" /> - containing strings</li>
           </ul>
           <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
             {selectedQuestion === 'p1' && <PythonIde
@@ -284,6 +278,7 @@ my_words = ["hello", "world"]`} language="python" className="my-4" />
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1}
               onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -296,12 +291,7 @@ my_words = ["hello", "world"]`} language="python" className="my-4" />
 
         {/* P2: Modify Arrays */}
         <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Modify Arrays</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Modify Arrays" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">Lists can be modified after creation. You can change elements, add new ones, reverse the order, and more.</p>
           <CodeBlock compact code={`nums = [1, 2, 3]
 nums[0] = 99       # set first element to 99 → [99, 2, 3]
@@ -321,6 +311,7 @@ nums.extend([7,8]) # add multiple items → [4, 3, 2, 99, 7, 8]`} language="pyth
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2}
               onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -333,12 +324,7 @@ nums.extend([7,8]) # add multiple items → [4, 3, 2, 99, 7, 8]`} language="pyth
 
         {/* P3: Retrieve Values */}
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Retrieve Values</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Retrieve Values" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">You can access elements by index, slice a sub-list, or remove items with <CopyCode code=".pop()"/>.</p>
           <CodeBlock compact code={`nums = [10, 20, 30, 40, 50, 60]
 element = nums[2]       # get third element → 30
@@ -356,6 +342,7 @@ last = nums.pop()       # remove & return last → 60`} language="python" classN
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
               onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -368,12 +355,7 @@ last = nums.pop()       # remove & return last → 60`} language="python" classN
 
         {/* P4: Loop Over Array */}
         <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p4' ? null : 'p4')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Loop Over an Array</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p4`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p4'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p4' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Loop Over an Array" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">A <CopyCode code="for"/> loop lets you visit each element in a list one at a time.</p>
           <CodeBlock compact code={`fruits = ["apple", "banana", "cherry"]
 for fruit in fruits:
@@ -385,6 +367,7 @@ for fruit in fruits:
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={60} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP4}
               onCodeStartCallback={() => startCode('p4')}
+              cachedCode={submissionStates[`${questionName}_p4`]?.code ? submissionStates[`${questionName}_p4`].code : undefined}
             />}
           </div>
           <div className="mt-4">

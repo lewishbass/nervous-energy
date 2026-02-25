@@ -4,14 +4,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
 import { CodeBlock } from '@/components/CodeBlock';
-import test from 'node:test';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -37,20 +37,18 @@ export default function Question1() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -167,12 +165,7 @@ export default function Question1() {
         />
 
         <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p1' ? null : 'p1')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Define and Call</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p1`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p1'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p1' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Define and Call" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">A function is a re-usable block of code that takes variables and returns results.</p>
 					<p className="tc3 mb-2">Use the <CopyCode code="def"/> keyword to name your function.</p>
 					<p className="tc3 mb-2">The input parameters are listed in parentheses after the function name.</p>
@@ -190,6 +183,7 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP1}
               onCodeStartCallback={() => startCode('p1')}
+              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -201,12 +195,7 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p2' ? null : 'p2')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Test Cases</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p2`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p2'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p2' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Test Cases" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">Test cases are a way to verify that your function works correctly. They check how it performs on different inputs, and checks the output against expected values.</p>
           <p className="tc3 mb-2">Tests focus on edge cases, where weird values might break your function.</p>
           <p className="tc3 mb-2">This is how your programs are graded in this class and the real world.</p>
@@ -217,6 +206,7 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP2}
               onCodeStartCallback={() => startCode('p2')}
+              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
             />}
           </div>
           <div className="mt-4">
@@ -228,12 +218,7 @@ b = double(5) # passes 5 to our function, and stores the returned value in b`} l
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
-          <div onClick={() => setSelectedQuestion(selectedQuestion === 'p3' ? null : 'p3')} className="cursor-pointer flex flex-row items-center mb-4 gap-2">
-            <h2 className="text-xl font-semibold tc1 mr-auto">Multiple Parameters</h2>
-            <CloudIndicator state={sanitizeSubmissionState(submissionStates[`${questionName}_p3`] || 'idle')} />
-            <FaCarrot className={`text-green-400 dark:text-green-600 text-2xl transition-opacity duration-300 ${validationStates['p3'] === 'passed' ? 'opacity-100' : 'opacity-0'}`} />
-            <FaAngleDown className={`text-gray-400 dark:text-gray-600 text-xl transition-transform duration-300 ${selectedQuestion !== 'p3' ? 'rotate-180' : ''}`} />
-          </div>
+          <QuestionHeader title="Multiple Parameters" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <p className="tc3 mb-2">Functions can take and return multiple values.</p>
           <p className="tc3 mb-2">After the <CopyCode code="def"/> keyword, inside the parentheses you can list multiple parameters separated by commas. </p>
           <p className="tc3 mb-2">List multiple variables after the <CopyCode code="return"/> keyword separated by commas, and catch the output in multiple variables.</p>
@@ -252,6 +237,7 @@ result_sum, result_diff = math_ops(5, 3) # call the function, and catch both out
               initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
               onCodeEndCallback={validateCodeP3}
               onCodeStartCallback={() => startCode('p3')}
+              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
             />}
           </div>
           <div className="mt-4">

@@ -4,12 +4,14 @@ import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
+import QuestionHeader from '../../exercise-components/QuestionHeader';
 import PythonIde from '@/components/coding/PythonIde';
 import { useEffect, useState } from 'react';
-import { validateVariable, validateError, submitQuestionToBackend, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState } from '../../exercise-components/ExerciseUtils';
 import RandomBackground from '@/components/backgrounds/RandomBackground';
 import CopyCode from '../../exercise-components/CopyCode';
 import { useAuth } from '@/context/AuthContext';
+import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -35,20 +37,18 @@ export default function Question5() {
 
   const { isLoggedIn, username, token } = useAuth();
 
-  const setResult = (part: string, state: 'passed' | 'failed', message: string, code: string) => {
-    setValidationMessages(prev => ({ ...prev, [part]: message }));
-    setValidationStates(prev => ({ ...prev, [part]: state }));
-    if (isLoggedIn && username && token) {
-      const partKey = `${questionName}_${part}`;
-      setSubmissionStates(prev => ({ ...prev, [partKey]: 'uploading' }));
-      submitQuestionToBackend(username, token, code, className, assignmentName, partKey, state === 'passed' ? 'passed' : 'failed', message)
-        .then(res => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: res.submissionState === 'submitted' ? { resultStatus: state === 'passed' ? 'passed' : 'failed' } : null }));
-        }).catch(() => {
-          setSubmissionStates(prev => ({ ...prev, [partKey]: null }));
-        });
-    }
-  };
+  const setResult = createSetResult({
+    setValidationMessages,
+    setValidationStates,
+    setSubmissionStates,
+    submissionStates,
+    isLoggedIn,
+    username,
+    token,
+    className,
+    assignmentName,
+    questionName
+  });
 
   useEffect(() => {
     if (!isLoggedIn || !username || !token) return;
@@ -76,9 +76,15 @@ export default function Question5() {
       <RandomBackground seed={2} density={0.5} />
       <div className="p-6 max-w-4xl mx-auto backdrop-blur bg-white/20 dark:bg-black/20 min-h-[100vh]">
         <AssignmentOverview
-          title="Q5 - Iterating Over Arrays"
+          title="Q5 - For Loops"
           description="Use for loops to traverse array elements."
-          objectives={[]}
+          objectives={[
+            "Iterate over a range, array and string printing each element",
+            "Use break to stop a for loop when a condition is met",
+            "Count the number of times a specific element appears in an array",
+            "Use break and continue statements in loops",
+            "Skip some iterations of a loop using continue",
+          ]}
         />
 
         {/* TODO: Add question parts */}

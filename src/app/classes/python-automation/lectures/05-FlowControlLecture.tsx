@@ -63,7 +63,7 @@ function FlowControlLecture(props: FlowControlLectureProps | null) {
         <h3 className="lecture-section-header">Program Flow</h3>
         <div className="lecture-header-decorator" />
         <p className="lecture-paragraph">
-          By default, Python executes code <span className="lecture-bold">sequentially</span> — one line after another, top to bottom. <span className="lecture-bold">Flow control</span> statements allow you to change this behavior by making decisions, repeating actions, or skipping sections of code based on conditions.
+          By default, Python executes code <span className="lecture-bold">sequentially</span> - one line after another, top to bottom. <span className="lecture-bold">Flow control</span> statements allow you to change this behavior by making decisions, repeating actions, or skipping sections of code based on conditions.
         </p>
         <p className="lecture-paragraph">
           There are three fundamental flow patterns in programming:
@@ -222,12 +222,12 @@ print("Liftoff!")
         <p className="lecture-paragraph">
           If the condition never becomes <code className="lecture-code-inline">False</code>, you create an <span className="lecture-bold">infinite loop</span>. You can use the break command <code className="lecture-code-inline">Ctrl+C</code> in the terminal to kill programs stuck in this loop.
         </p>
-        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="infinite loop — avoid this!" lines={[1, 2]} scrollMode="onClick"
+        <AnimatedCodeBlock className="lecture-codeblock" language="python" caption="infinite loop - avoid this!" lines={[1, 2]} scrollMode="onClick"
           code={`while True:
     print("Help, I'm stuck!")`} />
 
         <p className="lecture-paragraph">
-          <span className="lecture-bold">When to use while loops:</span> Use <code className="lecture-code-inline">while</code> when you don't know in advance how many iterations you need — for example, reading user input until a valid response is given, or processing data until a condition is met.
+          <span className="lecture-bold">When to use while loops:</span> Use <code className="lecture-code-inline">while</code> when you don't know in advance how many iterations you need - for example, reading user input until a valid response is given, or processing data until a condition is met.
         </p>
       </section>
 
@@ -258,11 +258,11 @@ for char in message:
           The <code className="lecture-code-inline">range()</code> function generates a sequence of numbers and is commonly used for repeating an action a specific number of times. By default it starts aat 0 and counts up to but not including the stop value, but you can also specify a different start and a step value <code className="lecture-code-inline">range(start, stop, step)</code>:
         </p>
         <CodeBlock className="lecture-codeblock" language="python" caption="for loop with range()"
-          code={`# range(stop) — 0 to stop-1
+          code={`# range(stop) - 0 to stop-1
 for i in range(5):
     print(i, end=" ")   # 0 1 2 3 4
 
-# range(start, stop) — start to stop-1
+# range(start, stop) - start to stop-1
 for i in range(2, 6):
     print(i, end=" ")   # 2 3 4 5
 
