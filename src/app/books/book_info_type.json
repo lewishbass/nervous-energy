@@ -14,5 +14,9 @@
       "cover_file":"Cover file location",
       "book_file":"Book file location",
       "book_series": "Book series name",
-      "reading_order": "Book point in series"
+      "reading_order": "Book point in series",
+      "kobo_link": "link to where to buy ebook, usually kobo",
+      "thriftbooks_link": "link to hard copy, usually thriftbooks",
+      "google_books_link": "link to google books page",
+
 }

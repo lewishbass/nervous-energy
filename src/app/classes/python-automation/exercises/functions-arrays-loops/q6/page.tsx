@@ -79,7 +79,8 @@ export default function Question6() {
           title="Q6 - While Loops"
           description="Use while loops for condition-based iteration."
           objectives={[
-						''
+						"Use while loops to stop at a condition",
+            
 					]}
         />
         {/* Part Descriptions, parts contain mechanics descriptions , code examples, objectives and hints(fuchsia)

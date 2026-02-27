@@ -8,6 +8,7 @@ import Discussion from "@/components/messages/Discussion";
 import { FaBook, FaTablet, FaDownload, FaStar, FaCheck, FaArrowLeft } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import ReactDOM from "react-dom";
 
 interface Book {
 	paragraph1: string;
@@ -33,41 +34,37 @@ interface Book {
 function BookContent() {
 	const searchParams = useSearchParams();
 	const isbn = searchParams.get("ISBN");
-	const [book, setBook] = useState<Book | null>(null);
+
+	const foundBook = isbn ? bookData.find((b: Book) => b.ISBN === isbn) ?? null : null;
+	const initialBook: Book | null = foundBook ? {
+		author: foundBook.author || "N/A",
+		title: foundBook.title || "N/A",
+		year: Number(foundBook.year),
+		wordcount: Number(foundBook.wordcount),
+		good_score: Number(foundBook.good_score),
+		n_good_ratings: Number(foundBook.n_good_ratings),
+		sold: foundBook.sold || "N/A",
+		ISBN: foundBook.ISBN || "N/A",
+		book_series: foundBook.book_series || undefined,
+		reading_order: foundBook.reading_order || undefined,
+		trivia: foundBook.trivia || "N/A",
+		paragraph1: foundBook.paragraph1 || "N/A",
+		paragraph2: foundBook.paragraph2 || "N/A",
+		genre: foundBook.genre || "N/A",
+		cover_file: foundBook.cover_file || "N/A",
+		book_file: foundBook.book_file || "N/A",
+		kobo_link: foundBook.kobo_link || undefined,
+		thriftbooks_link: foundBook.thriftbooks_link || undefined,
+	} : null;
+
+	const [book, setBook] = useState<Book | null>(initialBook);
 	const [shopType, setShopType] = useState<"kobo" | "thriftbooks">("kobo");
 	const [isRead, setIsRead] = useState(false);
 	const [isLoadingReadStatus, setIsLoadingReadStatus] = useState(false);
 	const { isLoggedIn, username, token } = useAuth();
 
 	const router = useRouter();
-
-	useEffect(() => {
-		if (isbn) {
-			const foundBook = bookData.find((b: Book) => b.ISBN === isbn);
-			if (foundBook) {
-				setBook({
-					author: foundBook.author || "N/A",
-					title: foundBook.title || "N/A",
-					year: Number(foundBook.year),
-					wordcount: Number(foundBook.wordcount),
-					good_score: Number(foundBook.good_score),
-					n_good_ratings: Number(foundBook.n_good_ratings),
-					sold: foundBook.sold || "N/A",
-					ISBN: foundBook.ISBN || "N/A",
-					book_series: foundBook.book_series || undefined,
-					reading_order: foundBook.reading_order || undefined,
-					trivia: foundBook.trivia || "N/A",
-					paragraph1: foundBook.paragraph1 || "N/A",
-					paragraph2: foundBook.paragraph2 || "N/A",
-					genre: foundBook.genre || "N/A",
-					cover_file: foundBook.cover_file || "N/A",
-					book_file: foundBook.book_file || "N/A",
-					kobo_link: foundBook.kobo_link || undefined,
-					thriftbooks_link: foundBook.thriftbooks_link || undefined,
-				});
-			}
-		}
-	}, [isbn]);
+	const coverFile = book ? book.cover_file.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp") : "";
 
 	// Fetch book read status when logged in and book is loaded
 	useEffect(() => {
@@ -182,8 +179,8 @@ function BookContent() {
 				<div className="flex-shrink-0 ml-4 hidden sm:block">
 					<div className="relative w-40 md:w-48 rounded-lg overflow-hidden shadow-lg" style={{ aspectRatio: '2/3' }}>
 						<Image
-							src={`/${book.cover_file}`}
-							alt={`Cover of ${book.title}`}
+							src={`../${coverFile}`}
+							alt={`${book.title}`}
 							className="object-cover"
 							fill
 							sizes="(max-width: 768px) 160px, 192px"
@@ -294,6 +291,8 @@ function BookContent() {
 }
 
 export default function BooksPage() {
+
+
 	return (
 		<Suspense fallback={
 			<div className="min-h-screen flex items-center justify-center">

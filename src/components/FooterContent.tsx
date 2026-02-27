@@ -1,6 +1,11 @@
 import Link from 'next/link';
-import { FaGithub, FaTwitter, FaLinkedin, FaEnvelope, FaHeart } from 'react-icons/fa';
-import { BiSolidCoffee } from "react-icons/bi";
+
+
+import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
+import { FaTwitter } from '@react-icons/all-files/fa/FaTwitter';
+import { FaLinkedin } from '@react-icons/all-files/fa/FaLinkedin';
+import { FaEnvelope } from '@react-icons/all-files/fa/FaEnvelope';
+import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 
 import { copyToClipboard } from '@/scripts/clipboard';
 
@@ -138,7 +143,11 @@ export default function FooterContent(props: FooterContentProps) {
               © {currentYear} Nervous Energy. All rights reserved.
             </p>
             <p>
-							Made with <FaHeart className="inline text-red-400 mb-1" size={16} /> and <BiSolidCoffee className="inline text-brown-400 mb-0.5" size={16} /> by{' '}
+              Made with <FaHeart className="inline text-red-400 mb-1" size={16} /> and
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 20 20" fill="currentColor" className="inline text-amber-800 mb-0.5 w-4 h-4">
+                <path d="M.5 11.22V1.65c0-.64.53-1.16 1.17-1.16h8.63c.65 0 1.17.52 1.17 1.16v.71h2.87q.76 0 1.32.56.56.55.56 1.31V8q0 .8-.56 1.33-.55.57-1.32.56h-2.87v1.33a4.3 4.3 0 0 1-4.31 4.3H4.8a4.3 4.3 0 0 1-4.3-4.3M11.5 7.95h1.9c.54.01.96-.42.95-.95V5.1a.85.85 0 0 0-.81-.82H11.5z" />
+              </svg>
+              by{' '}
               <a 
                 href="https://lewisbass.org" 
                 target="_blank" 

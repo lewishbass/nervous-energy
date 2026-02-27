@@ -14,6 +14,7 @@
     "@colyseus/sdk": "^0.17.26",
     "@monaco-editor/react": "^4.7.0",
     "@netlify/functions": "^2.8.2",
+    "@react-icons/all-files": "^4.1.0",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-converter": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",

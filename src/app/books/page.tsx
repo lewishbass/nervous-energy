@@ -12,10 +12,18 @@ import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import bookData from "./book_info.json";
 import "./books.css";
 import { useAuth } from "@/context/AuthContext";
-import { FaBook, FaTablet, FaDownload, FaListUl, FaSearch, FaArrowRight, FaCheck } from "react-icons/fa"; // Import icons for shop types
 import { AnimatePresence, motion } from "framer-motion";
-import { BsFillGridFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+
+
+import { BsFillGridFill } from "@react-icons/all-files/bs/BsFillGridFill";
+import { FaBook } from "@react-icons/all-files/fa/FaBook";
+import { FaTablet } from "@react-icons/all-files/fa/FaTablet";
+import { FaDownload } from "@react-icons/all-files/fa/FaDownload";
+import { FaListUl } from "@react-icons/all-files/fa/FaListUl";
+import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
+import { FaArrowRight } from "@react-icons/all-files/fa/FaArrowRight";
+import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
 
 interface Book {
   paragraph1: string;
@@ -38,21 +46,27 @@ interface Book {
   thriftbooks_link?: string;
 }
 
+const loadFromStorage = (key: string, defaultValue: string) => {
+  if (typeof window === "undefined") return defaultValue;
+  const storedValue = localStorage.getItem(key);
+  return storedValue ? storedValue : defaultValue;
+};
+
 export default function Books() {
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<string>("title");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<string>(() => loadFromStorage("booksSortBy", "title"));
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => loadFromStorage("booksSortOrder", "asc") as "asc" | "desc");
   const [gridColumns, setGridColumns] = useState<number>(3); // Default to 3 columns
   const bookRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [shopType, setShopType] = useState<"kobo" | "thriftbooks">("kobo"); // Default to Kobo
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid"); // Add view mode state
+  const [shopType, setShopType] = useState<"kobo" | "thriftbooks">(() => loadFromStorage("booksShopType", "kobo") as "kobo" | "thriftbooks"); // Default to Kobo
+  const [viewMode, setViewMode] = useState<"grid" | "list">(() => loadFromStorage("booksViewMode", "grid") as "grid" | "list"); // Add view mode state
 
   const [booksRead, setBooksRead] = useState<Record<string, boolean>>({});
 
   const [inFiltered, setInFiltered] = useState<Record<string, boolean>>({});
 
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(() => loadFromStorage("booksSearchQuery", ""));
 
   const dataRef = useRef<Book[]>([]); // Store the original data
 
@@ -101,6 +115,15 @@ export default function Books() {
   }, [isLoggedIn, username, token]);
 
   useEffect(() => {
+    //store sort, search and view mode in local storage
+    localStorage.setItem("booksSortBy", sortBy);
+    localStorage.setItem("booksSortOrder", sortOrder);
+    localStorage.setItem("booksViewMode", viewMode);
+    localStorage.setItem("booksSearchQuery", searchQuery);
+    localStorage.setItem("booksShopType", shopType);
+  }, [sortBy, sortOrder, viewMode, searchQuery]);
+
+  useEffect(() => {
     // Initialize books from the imported data
     const cleanedBooks: Book[] = bookData.map((book: Book) => ({
       author: book.author || "N/A",
@@ -128,10 +151,6 @@ export default function Books() {
     dataRef.current = cleanedBooks; // Store the original data
   }, []);
 
-  useEffect(() => {
-    // print book list when changed
-    // dataRef.current = [...books]
-  }, [books]);
 
 
   //book sorting effect
@@ -452,6 +471,7 @@ export default function Books() {
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-100">
           {books.map((book, index) => {
+            const thumbnailPath = book.cover_file.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
             const isSelected = selectedBook === index;
             const isReadBook = booksRead[book.ISBN] === true;
             return (
@@ -468,7 +488,7 @@ export default function Books() {
                 {/* Full-size Book Cover */}
                 <div className="book-cover">
                   <Image
-                    src={`./${book.cover_file}`}
+                    src={`./${thumbnailPath}`}
                     alt={`Cover of ${book.title}`}
                     className="object-cover w-full h-full"
                     fill
@@ -633,6 +653,7 @@ export default function Books() {
           {books.map((book, index) => {
             const isSelected = selectedBook === index;
             const isReadBook = booksRead[book.ISBN] === true;
+            const thumbnailPath = book.cover_file.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
             return (
               <div
                 key={index}
@@ -649,7 +670,7 @@ export default function Books() {
                   {/* Book Cover */}
                   <div className="relative w-14 md:w-24 h-64 h-auto flex-shrink-0">
                     <Image
-                      src={`./${book.cover_file}`}
+                      src={`./${thumbnailPath}`}
                       alt={`Cover of ${book.title}`}
                       className="object-cover w-full h-full"
                       fill

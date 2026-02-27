@@ -576,7 +576,7 @@
         "kobo_link": "https://www.audible.com/pd/Not-Till-We-Are-Lost-Audiobook/B0CW23CC7L",
         "thriftbooks_link": "https://www.thriftbooks.com/browse/?b.search=not%20til%20we%20are%20lost",
         "google_books_link": "https://www.google.com/books/edition/Not_Till_We_Are_Lost/Skwu0QEACAAJ"
-        }, {
+    }, {
         "paragraph1": "In a dying future Earth, a political exile is sent to a remote prison where survival is uncertain and the world’s last secrets are revealed.",
         "paragraph2": "Stefan Advani, a scholar and political dissident, is condemned to the prison city of Salt, surrounded by a lethal wilderness. As he navigates the brutal society of inmates and the dangers outside, Stefan reflects on humanity’s decline, the mysteries of the world’s last city, and the strange creatures that now roam the land. The novel explores themes of survival, memory, and the meaning of civilization at the end of time.",
         "author": "Adrian Tchaikovsky",
@@ -596,5 +596,45 @@
         "kobo_link": "https://www.kobo.com/us/en/ebook/cage-of-souls-3",
         "thriftbooks_link": "https://www.thriftbooks.com/w/cage-of-souls_adrian-tchaikovsky",
         "google_books_link": "https://books.google.com/books/about/Cage_of_Souls.html?id=CyqiEAAAQBAJ"
+    }, {
+        "paragraph1": "A runaway superintelligence enslaves thousands of worlds, leaving stranded children and a desperate rescue mission as civilisation's last hope.",
+        "paragraph2": "When researchers from the human civilisation Straumli Realm accidentally awaken a godlike entity called the Blight from an ancient archive, it enslaves hundreds of worlds and spreads unstoppably across the Beyond. Two children, Jefri and Johanna, survive a crash-landing on a primitive world inhabited by the Tines - dog-like creatures who form group minds and live in medieval kingdoms - where they are captured and used as tools in a ruthless local power struggle. Meanwhile, librarian Ravna Bergsndot and the enigmatic reconstructed human Pham Nuwen race across the galaxy aboard a merchant vessel, pursued by the Blight's fleets and anti-human fanatics, seeking the countermeasure hidden aboard the children's wreck that may be all that stands between civilisation and annihilation.",
+        "author": "Vernor Vinge",
+        "year": 1992,
+        "title": "A Fire Upon the Deep",
+        "ISBN": "978-0812515282",
+        "wordcount": 200849,
+        "genre": "Science Fiction, Space Opera",
+        "sold": "Hundreds of thousands",
+        "good_score": 4.13,
+        "n_good_ratings": 67016,
+        "trivia": "Won the Hugo Award for Best Novel in 1993, sharing it with Connie Willis's Doomsday Book - the only year the Hugo was awarded to two novels simultaneously.",
+        "cover_file": "books/covers/A_Fire_Upon_the_Deep_-_Vernor_Vinge_cover.jpg",
+        "book_file": "books/A_Fire_Upon_the_Deep_-_Vernor_Vinge.epub",
+        "book_series": "Zones of Thought",
+        "reading_order": "1",
+        "kobo_link": "https://www.kobo.com/ww/en/ebook/a-fire-upon-the-deep",
+        "thriftbooks_link": "https://www.thriftbooks.com/w/a-fire-upon-the-deep-by-vernor-vinge/253568/",
+        "google_books_link": "https://books.google.com/books/about/A_Fire_Upon_the_Deep.html?id=Qn9RPgAACAAJ"
+    }, {
+        "paragraph1": "Two rival factions race to make first contact with an alien world, only to turn violently on each other.",
+        "paragraph2": "The Qeng Ho, free-trading voyagers with millennia of interstellar culture, and the Emergents, a ruthless society that uses a virus called Focus to turn selected humans into brilliant but enslaved specialists, both arrive at the OnOff star to await the reawakening of the Spiders - an arachnid civilisation on the verge of their own industrial revolution. After the Emergents launch a devastating ambush, Pham Nuwen - a legendary Qeng Ho figure operating undercover - must orchestrate a long-game conspiracy to free his people, while below on Arachna the Spiders themselves are quietly uncovering the truth about the watchers in their sky.",
+        "author": "Vernor Vinge",
+        "year": 1999,
+        "title": "A Deepness in the Sky",
+        "ISBN": "978-0812536355",
+        "wordcount": 257901,
+        "genre": "Science Fiction, Space Opera",
+        "sold": "Hundreds of thousands",
+        "good_score": 4.32,
+        "n_good_ratings": 35223,
+        "trivia": "Won the Hugo, Campbell Memorial, and Prometheus Awards in 2000, and is set 20,000 years before A Fire Upon the Deep, serving as a prequel centred on Pham Nuwen.",
+        "cover_file": "books/covers/A_Deepness_in_the_Sky_-_Vernor_Vinge_cover.jpg",
+        "book_file": "books/A_Deepness_in_the_Sky_-_Vernor_Vinge.epub",
+        "book_series": "Zones of Thought",
+        "reading_order": "2",
+        "kobo_link": "https://www.kobo.com/us/en/ebook/a-deepness-in-the-sky-1",
+        "thriftbooks_link": "https://www.thriftbooks.com/w/a-deepness-in-the-sky_vernor-vinge/259581/",
+        "google_books_link": "https://books.google.com/books/about/A_Deepness_in_the_Sky.html?id=GUUvxumMf6kC"
     }
 ]
