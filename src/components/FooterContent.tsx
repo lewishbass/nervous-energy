@@ -127,7 +127,7 @@ export default function FooterContent(props: FooterContentProps) {
                   placeholder="Email"
                   className="flex-1 px-4 py-2 text-sm bg-transparent border-none rounded-full focus:outline-none tc4 w-2 "
                 />
-                <button title="register for newsletter" className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg1 text-white hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full">
+                <button title="register for newsletter" className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg1 tc6 hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full">
                   <FaEnvelope size={14} />
                   {/*TODO: Add newsletter functionality*/}
                 </button>

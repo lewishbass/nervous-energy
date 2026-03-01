@@ -27,10 +27,20 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { login, register, isLoading, error } = useAuth();
 
-  // Track modal open event
+  // Track modal open event and clear search params
   useEffect(() => {
     if (isOpen) {
       analytics.track('modal_open', { modalType: 'auth' });
+      
+      // Clear openAuth from search params
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('openAuth')) {
+        params.delete('openAuth');
+        const newUrl = params.toString() 
+          ? `${window.location.pathname}?${params.toString()}`
+          : window.location.pathname;
+        window.history.replaceState(null, '', newUrl);
+      }
     }
   }, [isOpen]);
 

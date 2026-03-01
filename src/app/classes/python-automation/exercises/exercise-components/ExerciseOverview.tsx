@@ -13,6 +13,7 @@ import './ExerciseOverview.css';
 import { copyToClipboard } from '@/scripts/clipboard';
 import NextQuestion from './NextQuestion';
 import { FaArrowUp } from 'react-icons/fa6';
+import SignInButton from '@/components/SignInButton';
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
 
@@ -247,6 +248,15 @@ export default function ExerciseOverview({
             </button>
           </div>
         </div>
+
+        {/* Login Prompt */}
+        {!isLoggedIn && (
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-4 mb-6 print:hidden">
+            <p className="tc2 text-sm">
+              Please <SignInButton variant='outline' size='sm' inline andRegister /> to view saved progress.
+            </p>
+          </div>
+        )}
 
         {/* Navigation List */}
         <div className="bg1 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-800 mb-8 print:hidden">

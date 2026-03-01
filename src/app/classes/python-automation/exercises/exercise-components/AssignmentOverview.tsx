@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { FaArrowRight } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import SignInButton from '@/components/SignInButton';
 
 type Props = {
   title: string;
@@ -32,10 +34,12 @@ export default function AssignmentOverview({
     if (status === 'in-progress') return 'text-yellow-500 dark:text-yellow-400';
     return '';
   };
+	const { isLoading, isLoggedIn, username } = useAuth();
 
   return (
     <div className={`mb-6 ${className}`}>
 			<h3 className="text-4xl font-bold tc1 ml-3 mb-2">{title}</h3>
+			{!isLoading && (isLoggedIn ? <span className="text-green-600 dark:text-green-400">Progress saved as: {username}</span> : <span className="text-red-600 dark:text-red-400"><SignInButton variant='secondary' size='sm' inline andRegister /> to save your progress</span>)}
 			{description && <p className="tc2 mb-4 text-lg">{description}</p>}
 
 			{objectives && <ul className="tc3 mt-3 list-disc list-inside space-y-1 mx-4 rounded-lg ">

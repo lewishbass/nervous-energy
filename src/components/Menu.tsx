@@ -185,7 +185,7 @@ export default function Menu({
               openProfileModal();
             }}
           >
-            <FaUser className="w-5 h-5" />
+            <FaUser className={`w-5 h-5 ${isLoggedIn ? 'text-green-600 dark:text-green-300' : ''}`} />
           </button>
         </div>
 

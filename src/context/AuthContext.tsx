@@ -283,7 +283,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check for existing auth on mount
   useEffect(() => {
+    
     const checkAuth = async () => {
+      setIsLoading(true);
       const storedToken = localStorage.getItem('authToken');
       const storedUserData = localStorage.getItem('userData');
       if (storedToken && storedUserData) {
@@ -303,6 +305,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           logout(); // Clear potentially corrupted auth data
         }
       }
+      setIsLoading(false);
+
     };
     checkAuth();
   }, []);
@@ -326,6 +330,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return acc;
           }, {} as Record<string, SubToken>);
         });
+
+
 
 
         const isValid = await verifyToken(username, token);

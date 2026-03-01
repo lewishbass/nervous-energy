@@ -98,8 +98,10 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]analytics display
 - [ ]analytics map
 
-- [ ]tai translation
+- [ ]Siamese translation
 - [ ]mandarin translation
+- [ ]add "foobar (var)" syntax to code include validation
+ 
 
 // add schema for managing game lobbies and P2P connections
 // since netlify serverless functions are stateless, this schema is used to manage game lobbies and P2P connections

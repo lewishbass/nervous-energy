@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 import { QuestionComponent, SlideQuestionComponent, TextQuestionComponent, CheckboxQuestionComponent, RadioQuestionComponent } from '../exercise-components/questionparts';
+import SignInButton from '@/components/SignInButton';
 
 
 const SUBMIT_ROUTE = '/.netlify/functions/classwork';
@@ -119,7 +120,7 @@ export default function IntroSurvey() {
   if (!isLoggedIn) {
     return (
       <div className="p-6 max-w-4xl mx-auto mb-20">
-        <p className="tc1 text-2xl">Please <span className="font-bold hover:opacity-70 cursor-pointer text-indigo-500 bg-green-300 p-2 px-3 rounded-full transition-all duration-300" onClick={() => router.push('/classes/python-automation/exercises/intro-survey?openAuth=true')}>log in / register</span> to access the survey.</p>
+        <p className="tc1 text-2xl">Please <SignInButton size='lg' inline andRegister /> to access the survey.</p>
         
       </div>
     );

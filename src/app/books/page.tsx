@@ -8,7 +8,7 @@
 // books and covers stored in public folder
 
 import Image from "next/image";
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useEffect, useRef, KeyboardEvent, useMemo, useCallback, memo } from "react";
 import bookData from "./book_info.json";
 import "./books.css";
 import { useAuth } from "@/context/AuthContext";
@@ -24,6 +24,7 @@ import { FaListUl } from "@react-icons/all-files/fa/FaListUl";
 import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 import { FaArrowRight } from "@react-icons/all-files/fa/FaArrowRight";
 import { FaCheck } from "@react-icons/all-files/fa/FaCheck";
+import { sort } from "d3";
 
 interface Book {
   paragraph1: string;
@@ -46,6 +47,264 @@ interface Book {
   thriftbooks_link?: string;
 }
 
+// Helpers for thumbnail paths
+const getThumbnailPath = (coverFile: string) =>
+  coverFile.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
+
+const getTinyPath = (coverFile: string) =>
+  coverFile.replace("/covers/", "/covers/tiny/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
+
+// Memoized grid card — only re-renders when its own props change
+const BookGridCard = memo(function BookGridCard({
+  book, index, isSelected, isReadBook, isLoggedIn, isLoadingRead, shopType,
+  onCardClick, onToggleShop, onToggleRead, onNavigate, cardRef,
+}: {
+  book: Book; index: number; isSelected: boolean; isReadBook: boolean;
+  isLoggedIn: boolean; isLoadingRead: boolean; shopType: "kobo" | "thriftbooks";
+  onCardClick: () => void; onToggleShop: (e: React.MouseEvent) => void;
+  onToggleRead: (book: Book, e: React.MouseEvent) => void;
+  onNavigate: (isbn: string) => void; cardRef: (el: HTMLDivElement | null) => void;
+}) {
+  const thumbnailPath = getThumbnailPath(book.cover_file);
+  return (
+    <div
+      ref={cardRef}
+      className={`book-card ${isSelected ? "selected" : ""}`}
+      onClick={onCardClick}
+      tabIndex={0}
+    >
+      <div className="book-cover">
+        <Image
+          src={`./${thumbnailPath}`}
+          alt={`Cover of ${book.title}`}
+          className="object-cover w-full h-full"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={index < 6}
+          loading={index < 6 ? undefined : "lazy"}
+        />
+      </div>
+      {isReadBook && (
+        <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
+          <FaCheck className="text-white text-sm" />
+        </div>
+      )}
+      <div className={`book-overlay ${isSelected ? "book-overlay-expanded" : "book-overlay-collapsed"}`}>
+        <div className="flex justify-between items-start mb-[-6]">
+          <h2
+            className={`book-title tc1 flex items-center transition-all duration-200 ${isSelected ? "hover:opacity-50" : "pointer-events-none"}`}
+            onClick={(e) => { if (isSelected) onNavigate(book.ISBN); e.stopPropagation(); }}
+          >
+            {book.title}
+            <FaArrowRight className={`ml-2 ${isSelected ? "opacity-100" : "opacity-0"} transition-all duration-300`} />
+          </h2>
+          {book.good_score && (
+            <span className="book-rating w-content whitespace-nowrap">★ {book.good_score.toFixed(1)}</span>
+          )}
+        </div>
+        <p className="book-author tc2">By {book.author}</p>
+        {book.book_series && (
+          <p className="book-series tc3">
+            {book.book_series}
+            {book.reading_order && <span> (#{book.reading_order})</span>}
+          </p>
+        )}
+        <p className="book-metadata tc3">{book.genre} • {book.year}</p>
+        <p className="book-description tc2">{book.paragraph1}</p>
+        <AnimatePresence>
+          {isSelected && (
+            <motion.div
+              key="expanded-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 space-y-3"
+            >
+              <p className="book-description tc2">{book.paragraph2}</p>
+              <div className="book-detail-section">
+                <div>
+                  <span className="book-detail-label tc2">Words: </span>
+                  <span className="book-detail-value tc3">{book.wordcount.toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="book-detail-label tc2">ISBN: </span>
+                  <span className="book-detail-value tc3">{book.ISBN}</span>
+                </div>
+                <div>
+                  <span className="book-detail-label tc2">Ratings: </span>
+                  <span className="book-detail-value tc3">{book.n_good_ratings.toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="book-detail-label tc2 hover:underline cursor-pointer group" onClick={(e) => { onNavigate(book.ISBN); e.stopPropagation(); }}>
+                    Discussion
+                    <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
+                  </span>
+                </div>
+              </div>
+              <div className="book-trivia">
+                <span className="book-detail-label tc1">Trivia: </span>
+                <span className="book-detail-value tc2">{book.trivia}</span>
+              </div>
+              <div className="flex flex-row mt-6 items-center">
+                {isLoggedIn && (
+                  <>
+                    <a href={`/${book.book_file}`} download className="book-download-button" onClick={(e) => e.stopPropagation()}>
+                      <FaDownload className="mr-2 inline" /> EPUB
+                    </a>
+                    <button
+                      onClick={(e) => onToggleRead(book, e)}
+                      disabled={isLoadingRead}
+                      className={`ml-2 px-3 py-2 rounded-md transition-all flex items-center justify-start font-medium cursor-pointer min-w-22 ${isReadBook ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-600 text-white hover:bg-gray-700"} ${isLoadingRead ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <FaCheck className="mr-2" /> {isLoadingRead ? "..." : isReadBook ? "Read" : "Mark"}
+                    </button>
+                  </>
+                )}
+                <div className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden" style={{ backgroundColor: "var(--khg)", borderRadius: "0.375rem" }}>
+                  <div className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10" style={{ backgroundColor: "var(--khp)" }} onClick={onToggleShop}>
+                    <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: shopType === "kobo" ? 1 : 0, transitionDelay: shopType !== "kobo" ? "0.1s" : "" }} />
+                    <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: shopType === "kobo" ? 0 : 1, transitionDelay: shopType === "kobo" ? "0.1s" : "" }} />
+                  </div>
+                  <a href={book[`${shopType}_link`] || "#"} target="_blank" rel="noopener noreferrer" className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]" onClick={(e) => e.stopPropagation()}>
+                    Shop
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+});
+
+// Memoized list item — uses tiny thumbnails for the small cover
+const BookListItem = memo(function BookListItem({
+  book, index, isSelected, isReadBook, isLoggedIn, isLoadingRead, shopType,
+  onCardClick, onToggleShop, onToggleRead, onNavigate, cardRef,
+}: {
+  book: Book; index: number; isSelected: boolean; isReadBook: boolean;
+  isLoggedIn: boolean; isLoadingRead: boolean; shopType: "kobo" | "thriftbooks";
+  onCardClick: () => void; onToggleShop: (e: React.MouseEvent) => void;
+  onToggleRead: (book: Book, e: React.MouseEvent) => void;
+  onNavigate: (isbn: string) => void; cardRef: (el: HTMLDivElement | null) => void;
+}) {
+  const tinyPath = getTinyPath(book.cover_file);
+  return (
+    <div
+      ref={cardRef}
+      className={`outline-none bg2 overflow-hidden cursor-pointer transition-all duration-300 ${isSelected ? "shadow-[inset_10px_4px_10px_-1px_rgba(0,0,0,0.2),inset_10px_-4px_10px_-1px_rgba(0,0,0,0.2)] brightness-110" : "dark:brightness-60 brightness-100 dark:hover:brightness-75 hover:brightness-105"}`}
+      onClick={onCardClick}
+      tabIndex={0}
+    >
+      <div className="flex flex-row">
+        <div className="relative w-14 md:w-24 h-64 h-auto flex-shrink-0">
+          <Image
+            src={`./${tinyPath}`}
+            alt={`Cover of ${book.title}`}
+            className="object-cover w-full h-full"
+            fill
+            sizes="96px"
+            priority={index < 10}
+            loading={index < 10 ? undefined : "lazy"}
+          />
+          {isReadBook && (
+            <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
+              <FaCheck className="text-white text-sm" />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 p-3">
+          <div className="flex justify-between items-start">
+            <div className="flex flex-wrap items-end">
+              <h2 className="text-2xl font-bold tc1 mr-1 truncate">{book.title}</h2>
+              <span className="text-lg tc2 truncate">By {book.author}</span>
+            </div>
+            {book.good_score && (
+              <span className="bg-yellow-500 text-white px-2 py-1 rounded text-sm font-semibold whitespace-nowrap ml-2">
+                ★ {book.good_score.toFixed(1)}
+              </span>
+            )}
+          </div>
+          <p className="text-sm tc3 mb-3 hidden sm:block">
+            {book.book_series && (
+              <span className="text-sm tc3">
+                {book.book_series}
+                {book.reading_order && <span> (#{book.reading_order})</span>}
+                &nbsp;•&nbsp;
+              </span>
+            )}
+            {book.year} • {book.wordcount.toLocaleString()} words • {book.genre}
+          </p>
+          <p className="tc2 mb-0">{book.paragraph1}</p>
+          <AnimatePresence>
+            {isSelected && (
+              <motion.div
+                key="expanded-content"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-3"
+              >
+                <p className="tc2 mt-3">{book.paragraph2}</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                  <div>
+                    <span className="font-semibold tc2">ISBN: </span>
+                    <span className="tc3">{book.ISBN}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold tc2">Ratings: </span>
+                    <span className="tc3">{book.n_good_ratings.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold tc2 hover:underline cursor-pointer group" onClick={(e) => { onNavigate(book.ISBN); e.stopPropagation(); }}>
+                      Discussion
+                      <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-row justify-between items-center mt-2">
+                  <div className="p-3 bg3 rounded">
+                    <span className="font-semibold tc1">Trivia: </span>
+                    <span className="tc2">{book.trivia}</span>
+                  </div>
+                  <div className="ml-3 flex flex-row items-center gap-3 pt-2">
+                    {isLoggedIn && (
+                      <>
+                        <a href={`/${book.book_file}`} download className="book-download-button" onClick={(e) => e.stopPropagation()}>
+                          <FaDownload className="mr-2 inline" /> EPUB
+                        </a>
+                        <button
+                          onClick={(e) => onToggleRead(book, e)}
+                          disabled={isLoadingRead}
+                          className={`px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${isReadBook ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-600 text-white hover:bg-gray-700"} ${isLoadingRead ? "opacity-50 cursor-not-allowed" : ""}`}
+                        >
+                          <FaCheck className="mr-2" /> {isLoadingRead ? "..." : isReadBook ? "Read" : "Mark"}
+                        </button>
+                      </>
+                    )}
+                    <div className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden" style={{ backgroundColor: "var(--khg)", borderRadius: "0.375rem" }}>
+                      <div className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10" style={{ backgroundColor: "var(--khp)" }} onClick={onToggleShop}>
+                        <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: shopType === "kobo" ? 1 : 0, transitionDelay: shopType !== "kobo" ? "0.1s" : "" }} />
+                        <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: shopType === "kobo" ? 0 : 1, transitionDelay: shopType === "kobo" ? "0.1s" : "" }} />
+                      </div>
+                      <a href={book[`${shopType}_link`] || "#"} target="_blank" rel="noopener noreferrer" className="pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]" onClick={(e) => e.stopPropagation()}>
+                        Shop
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const loadFromStorage = (key: string, defaultValue: string) => {
   if (typeof window === "undefined") return defaultValue;
   const storedValue = localStorage.getItem(key);
@@ -53,79 +312,23 @@ const loadFromStorage = (key: string, defaultValue: string) => {
 };
 
 export default function Books() {
-  const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<string>(() => loadFromStorage("booksSortBy", "title"));
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => loadFromStorage("booksSortOrder", "asc") as "asc" | "desc");
-  const [gridColumns, setGridColumns] = useState<number>(3); // Default to 3 columns
+  const [gridColumns, setGridColumns] = useState<number>(3);
   const bookRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [shopType, setShopType] = useState<"kobo" | "thriftbooks">(() => loadFromStorage("booksShopType", "kobo") as "kobo" | "thriftbooks"); // Default to Kobo
-  const [viewMode, setViewMode] = useState<"grid" | "list">(() => loadFromStorage("booksViewMode", "grid") as "grid" | "list"); // Add view mode state
-
+  const [shopType, setShopType] = useState<"kobo" | "thriftbooks">(() => loadFromStorage("booksShopType", "kobo") as "kobo" | "thriftbooks");
+  const [viewMode, setViewMode] = useState<"grid" | "list">(() => loadFromStorage("booksViewMode", "grid") as "grid" | "list");
   const [booksRead, setBooksRead] = useState<Record<string, boolean>>({});
-
-  const [inFiltered, setInFiltered] = useState<Record<string, boolean>>({});
-
   const [searchQuery, setSearchQuery] = useState<string>(() => loadFromStorage("booksSearchQuery", ""));
-
-  const dataRef = useRef<Book[]>([]); // Store the original data
-
   const { isLoggedIn, username, token } = useAuth();
-
   const animationTimeout = useRef<NodeJS.Timeout | null>(null);
-
   const router = useRouter();
-
   const [isLoadingReadStatus, setIsLoadingReadStatus] = useState<Record<string, boolean>>({});
 
-  const fetchReadStatus = async () => {
-    if (!isLoggedIn || !username || !token) return;
-    try {
-      const response = await fetch('/.netlify/functions/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'getBooksRead',
-          username,
-          token,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error fetching read status: ${response.statusText}`);
-      }
-      const data = await response.json();
-      if (data.booksRead) {
-        const bookDict = data.booksRead.map((item: { ISBN: string; }) => ({
-          [item.ISBN]: true,
-        })).reduce((acc: Record<string, boolean>, curr: Record<string, boolean>) => {
-          return { ...acc, ...curr };
-        }, {});
-        setBooksRead(bookDict);
-      }
-    } catch (error) {
-
-      console.error("Error fetching read status:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchReadStatus();
-  }, [isLoggedIn, username, token]);
-
-  useEffect(() => {
-    //store sort, search and view mode in local storage
-    localStorage.setItem("booksSortBy", sortBy);
-    localStorage.setItem("booksSortOrder", sortOrder);
-    localStorage.setItem("booksViewMode", viewMode);
-    localStorage.setItem("booksSearchQuery", searchQuery);
-    localStorage.setItem("booksShopType", shopType);
-  }, [sortBy, sortOrder, viewMode, searchQuery]);
-
-  useEffect(() => {
-    // Initialize books from the imported data
-    const cleanedBooks: Book[] = bookData.map((book: Book) => ({
+  // One-time cleaned data from JSON — no state or effect needed
+  const cleanedBooks = useMemo<Book[]>(() =>
+    bookData.map((book: Book) => ({
       author: book.author || "N/A",
       title: book.title || "N/A",
       year: Number(book.year),
@@ -144,176 +347,184 @@ export default function Books() {
       book_file: book.book_file || "N/A",
       kobo_link: book.kobo_link || undefined,
       thriftbooks_link: book.thriftbooks_link || undefined,
-    }));
-    console.log("Cleaned books:", cleanedBooks);
+    })),
+    []);
 
-    setBooks(cleanedBooks);
-    dataRef.current = cleanedBooks; // Store the original data
-  }, []);
-
-
-
-  //book sorting effect
-  useEffect(() => {
-    // Sort books when sortBy or sortOrder changes
-    const sortedBooks = [...dataRef.current].sort((a, b) => {
+  // Derived sorted + filtered books — replaces sort effect, filter effect, books state, inFiltered state, and dataRef
+  const displayedBooks = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    let filtered = cleanedBooks;
+    if (query) {
+      filtered = cleanedBooks.filter((book) =>
+        book.title.toLowerCase().includes(query) ||
+        book.author.toLowerCase().includes(query) ||
+        book.book_series?.toLowerCase().includes(query) ||
+        book.year.toString().includes(query)
+      );
+    }
+    return [...filtered].sort((a, b) => {
       const valueA = a[sortBy as keyof Book];
       const valueB = b[sortBy as keyof Book];
-
-      // Handle undefined values
       if (valueA === undefined) return sortOrder === "asc" ? -1 : 1;
       if (valueB === undefined) return sortOrder === "asc" ? 1 : -1;
-
-      // Handle different data types
       if (typeof valueA === "string" && typeof valueB === "string") {
-        return sortOrder === "asc"
-          ? valueA.localeCompare(valueB)
-          : valueB.localeCompare(valueA);
+        return sortOrder === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
       } else if (typeof valueA === "number" && typeof valueB === "number") {
         return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
       }
-
-      // Convert to string for mixed types
       return sortOrder === "asc"
         ? String(valueA).localeCompare(String(valueB))
         : String(valueB).localeCompare(String(valueA));
     });
+  }, [cleanedBooks, sortBy, sortOrder, searchQuery]);
 
-    // Update the books state with sorted array
-    setBooks(sortedBooks);
-
-    console.log(`Sorted books by ${sortBy} in ${sortOrder} order`);
-    console.log(
-      "Sorted book titles:",
-      sortedBooks.map((book: Book) => book.title).join("\n")
-    );
-  }, [sortBy, sortOrder]);
-
-  //book filtering effect
+  // Fetch read status from API
   useEffect(() => {
-    const filteredStatus: Record<string, boolean> = {};
-
-    dataRef.current.forEach((book) => {
-
-      const query = searchQuery.toLowerCase().trim();
-
-      if (query === "") {
-        filteredStatus[book.ISBN] = true;
-        return;
+    if (!isLoggedIn || !username || !token) return;
+    (async () => {
+      try {
+        const response = await fetch('/.netlify/functions/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'getBooksRead', username, token }),
+        });
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+        const data = await response.json();
+        if (data.booksRead) {
+          setBooksRead(
+            data.booksRead.reduce((acc: Record<string, boolean>, item: { ISBN: string }) => {
+              acc[item.ISBN] = true;
+              return acc;
+            }, {} as Record<string, boolean>)
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching read status:", error);
       }
-      else if (
-        book.title.toLowerCase().includes(query) ||
-        book.author.toLowerCase().includes(query) ||
-        book.book_series?.toLowerCase().includes(query) ||
-        book.year.toString().includes(query)) {
-        filteredStatus[book.ISBN] = true;
-      }
-      else {
-        filteredStatus[book.ISBN] = false;
-      }
+    })();
+  }, [isLoggedIn, username, token]);
 
-    });
-    setInFiltered(prev => ({ ...filteredStatus }));
-  }, [searchQuery]);
-
+  // Persist preferences to localStorage
   useEffect(() => {
-    // Detect grid layout based on screen size
+    localStorage.setItem("booksSortBy", sortBy);
+    localStorage.setItem("booksSortOrder", sortOrder);
+    localStorage.setItem("booksViewMode", viewMode);
+    localStorage.setItem("booksSearchQuery", searchQuery);
+    localStorage.setItem("booksShopType", shopType);
+  }, [sortBy, sortOrder, viewMode, searchQuery, shopType]);
+
+  // Detect grid columns from screen width
+  useEffect(() => {
     const updateGridColumns = () => {
       const width = window.innerWidth;
-      if (width < 768) {
-        setGridColumns(1); // Mobile: 1 column
-      } else if (width < 1024) {
-        setGridColumns(2); // Tablet: 2 columns
-      } else {
-        setGridColumns(3); // Desktop: 3 columns
-      }
+      setGridColumns(width < 768 ? 1 : width < 1024 ? 2 : 3);
     };
-
-    // Set initial value
     updateGridColumns();
-
-    // Add event listener for window resize
     window.addEventListener("resize", updateGridColumns);
-
-    // Clean up
     return () => window.removeEventListener("resize", updateGridColumns);
   }, []);
 
-  const handleSort = (criteria: string) => {
-    if (sortBy === criteria) {
-      // Toggle sort order if clicking the same criteria
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(criteria);
-      setSortOrder("asc");
+  // Scroll selected book into view
+  useEffect(() => {
+    if (selectedBook !== null && bookRefs.current[selectedBook]) {
+      const delay = viewMode === "list" ? 100 : 0;
+      if (animationTimeout.current) clearTimeout(animationTimeout.current);
+      animationTimeout.current = setTimeout(() => {
+        bookRefs.current[selectedBook]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, delay);
     }
+    return () => { if (animationTimeout.current) clearTimeout(animationTimeout.current); };
+  }, [selectedBook, viewMode]);
+
+  // Stable callbacks — won't cause child re-renders on every parent render
+  const handleSort = (criteria: string) => {
+    console.log("Sorting by:", sortBy, "->", criteria, "Current order:", sortOrder);
+    setSortBy((prev) => {
+      if (prev === criteria) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortOrder("asc");
+      }
+      return criteria;
+    });
   };
 
-  const handleBookClick = (index: number) => {
-    setSelectedBook(selectedBook === index ? null : index);
-  };
+  const handleBookClick = useCallback((index: number) => {
+    setSelectedBook((prev) => (prev === index ? null : index));
+  }, []);
 
+  const toggleShopType = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShopType((prev) => (prev === "kobo" ? "thriftbooks" : "kobo"));
+  }, []);
 
+  const toggleReadStatus = useCallback(async (book: Book, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isLoggedIn || !username || !token) return;
+    setIsLoadingReadStatus((prev) => ({ ...prev, [book.ISBN]: true }));
+    try {
+      const response = await fetch('/.netlify/functions/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'markBookRead', username, token,
+          ISBN: book.ISBN, title: book.title,
+          mark: !booksRead[book.ISBN],
+        }),
+      });
+      if (response.ok) {
+        setBooksRead((prev) => ({ ...prev, [book.ISBN]: !prev[book.ISBN] }));
+      }
+    } catch (error) {
+      console.error('Error updating read status:', error);
+    } finally {
+      setIsLoadingReadStatus((prev) => ({ ...prev, [book.ISBN]: false }));
+    }
+  }, [isLoggedIn, username, token, booksRead]);
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+  const navigateToBook = useCallback((isbn: string) => {
+    router.push(`/books/focus?ISBN=${isbn}`);
+  }, [router]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
     if (selectedBook === null) return;
-
+    const len = displayedBooks.length;
     switch (e.key) {
       case "ArrowRight":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
-          //list mode
-          if (viewMode === "list") {
-            return Math.min(prev + 1, books.length - 1);
-          }
-          // Move right, but stay in the same row
+          if (viewMode === "list") return Math.min(prev + 1, len - 1);
           const currentRow = Math.floor(prev / gridColumns);
-          const lastIndexInRow = Math.min(
-            (currentRow + 1) * gridColumns - 1,
-            books.length - 1
-          );
-          return prev < lastIndexInRow ? prev + 1 : prev;
+          const lastInRow = Math.min((currentRow + 1) * gridColumns - 1, len - 1);
+          return prev < lastInRow ? prev + 1 : prev;
         });
         break;
       case "ArrowLeft":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
-          //list mode
-          if (viewMode === "list") {
-            return Math.max(prev - 1, 0);
-          }
-          // Move left, but stay in the same row
-          const currentRow = Math.floor(prev / gridColumns);
-          const firstIndexInRow = currentRow * gridColumns;
-          return prev > firstIndexInRow ? prev - 1 : prev;
+          if (viewMode === "list") return Math.max(prev - 1, 0);
+          const firstInRow = Math.floor(prev / gridColumns) * gridColumns;
+          return prev > firstInRow ? prev - 1 : prev;
         });
         break;
       case "ArrowDown":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
-          //list mode
-          if (viewMode === "list") {
-            return Math.min(prev + 1, books.length - 1);
-          }
-          // Move down to the next row (same column)
-          const newIndex = prev + gridColumns;
-          return newIndex < books.length ? newIndex : prev;
+          if (viewMode === "list") return Math.min(prev + 1, len - 1);
+          const next = prev + gridColumns;
+          return next < len ? next : prev;
         });
         break;
       case "ArrowUp":
         e.preventDefault();
         setSelectedBook((prev) => {
           if (prev === null) return prev;
-          //list mode
-          if (viewMode === "list") {
-            return Math.max(prev - 1, 0);
-          }
-          // Move up to the previous row (same column)
-          const newIndex = prev - gridColumns;
-          return newIndex >= 0 ? newIndex : prev;
+          if (viewMode === "list") return Math.max(prev - 1, 0);
+          const next = prev - gridColumns;
+          return next >= 0 ? next : prev;
         });
         break;
       case "Escape":
@@ -321,67 +532,7 @@ export default function Books() {
         setSelectedBook(null);
         break;
     }
-  };
-
-  useEffect(() => {
-    // Scroll selected book into view when changed
-    if (selectedBook !== null && bookRefs.current[selectedBook]) {
-      // Add delay in list mode to allow expansion animation to complete
-      const delay = viewMode === "list" ? 100 : 0;
-      if (animationTimeout.current) {
-        clearTimeout(animationTimeout.current);
-      }
-      animationTimeout.current = setTimeout(() => {
-        bookRefs.current[selectedBook]?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }, delay);
-
-    }
-
-    return () => {
-      if (animationTimeout.current) {
-        clearTimeout(animationTimeout.current);
-      }
-    };
-  }, [selectedBook, viewMode]);
-
-  const toggleShopType = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShopType(shopType === "kobo" ? "thriftbooks" : "kobo");
-  };
-
-  const toggleReadStatus = async (book: Book, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!isLoggedIn || !username || !token) return;
-
-    setIsLoadingReadStatus(prev => ({ ...prev, [book.ISBN]: true }));
-    try {
-      const response = await fetch('/.netlify/functions/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'markBookRead',
-          username,
-          token,
-          ISBN: book.ISBN,
-          title: book.title,
-          mark: !booksRead[book.ISBN]
-        })
-      });
-
-      if (response.ok) {
-        setBooksRead(prev => ({ ...prev, [book.ISBN]: !prev[book.ISBN] }));
-      } else {
-        console.error('Failed to update read status');
-      }
-    } catch (error) {
-      console.error('Error updating read status:', error);
-    } finally {
-      setIsLoadingReadStatus(prev => ({ ...prev, [book.ISBN]: false }));
-    }
-  };
+  }, [selectedBook, displayedBooks.length, viewMode, gridColumns]);
 
   return (
     <div
@@ -396,35 +547,35 @@ export default function Books() {
       <div className="mb-6 p-4 bg2 rounded-lg shadow flex flex-wrap gap-2 relative items-center">
         <span className="tc1 font-medium mr-2 my-auto">Sort by:</span>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "title" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "title" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("title")}
         >
           Title {sortBy === "title" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "author" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "author" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("author")}
         >
           Author {sortBy === "author" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "book_series" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "book_series" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("book_series")}
         >
           Series {sortBy === "book_series" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "good_score" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "good_score" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("good_score")}
         >
           Rating {sortBy === "good_score" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "wordcount" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "wordcount" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("wordcount")}
         >
@@ -432,7 +583,7 @@ export default function Books() {
           {sortBy === "wordcount" && (sortOrder === "asc" ? "↑" : "↓")}
         </button>
         <button
-          className={`px-3 py-1 rounded-md ${sortBy === "year" ? "bg-blue-600 text-white" : "bg3 tc1"
+          className={`active:opacity-50 transition-opacity duration-150 cursor-pointer px-3 py-1 rounded-md ${sortBy === "year" ? "bg-blue-600 text-white" : "bg3 tc1"
             }`}
           onClick={() => handleSort("year")}
         >
@@ -470,346 +621,46 @@ export default function Books() {
       {/* Book Cards - Grid View */}
       {viewMode === "grid" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-100">
-          {books.map((book, index) => {
-            const thumbnailPath = book.cover_file.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
-            const isSelected = selectedBook === index;
-            const isReadBook = booksRead[book.ISBN] === true;
-            return (
-              <div
-                key={index}
-                ref={(el) => {
-                  if (el) bookRefs.current[index] = el;
-                }}
-                className={`book-card ${isSelected ? "selected" : ""}`}
-                onClick={() => handleBookClick(index)}
-                tabIndex={0}
-                style={{ display: inFiltered[book.ISBN] === false ? "none" : "block" }}
-              >
-                {/* Full-size Book Cover */}
-                <div className="book-cover">
-                  <Image
-                    src={`./${thumbnailPath}`}
-                    alt={`Cover of ${book.title}`}
-                    className="object-cover w-full h-full"
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
-                  />
-
-                </div>
-                {/* Read Status Indicator */}
-                {isReadBook && (
-                  <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
-                    <FaCheck className="text-white text-sm" />
-                  </div>
-                )}
-
-                {/* Overlay with Book Info */}
-                <div
-                  className={`book-overlay ${isSelected
-                    ? "book-overlay-expanded"
-                    : "book-overlay-collapsed"
-                    }`}
-                >
-                  <div className="flex justify-between items-start mb-[-6]">
-                    <h2 className={`book-title tc1 flex items-center transition-all duration-200 ${isSelected ? 'hover:opacity-50' : 'pointer-events-none'}`}
-                      onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>{book.title}<FaArrowRight className={`ml-2 ${isSelected ? 'opacity-100' : 'opacity-0'} transition-all duration-300`} /></h2>
-                    {book.good_score && (
-                      <span className="book-rating w-content whitespace-nowrap">
-                        ★ {book.good_score.toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="book-author tc2">By {book.author}</p>
-                  {book.book_series && (
-                    <p className="book-series tc3">
-                      {book.book_series}
-                      {book.reading_order && <span> (#{book.reading_order})</span>}
-                    </p>
-                  )}
-                  <p className="book-metadata tc3">
-                    {book.genre} • {book.year}
-                  </p>
-
-                  {/* Always visible description */}
-                  <p className="book-description tc2">{book.paragraph1}</p>
-
-                  {/* Expanded content */}
-                  <AnimatePresence>
-                    {isSelected && (
-                      <motion.div
-                        key="expanded-content"
-                        initial={{ opacity: 0, }}
-                        animate={{ opacity: 1, }}
-                        exit={{ opacity: 0, }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-4 space-y-3"
-                      >
-                        <p className="book-description tc2">{book.paragraph2}</p>
-
-                        <div className="book-detail-section">
-                          <div>
-                            <span className="book-detail-label tc2">Words: </span>
-                            <span className="book-detail-value tc3">
-                              {book.wordcount.toLocaleString()}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="book-detail-label tc2">ISBN: </span>
-                            <span className="book-detail-value tc3">
-                              {book.ISBN}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="book-detail-label tc2">Ratings: </span>
-                            <span className="book-detail-value tc3">
-                              {book.n_good_ratings.toLocaleString()}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="book-detail-label tc2 hover:underline cursor-pointer group" onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>
-                              Discussion
-                              <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="book-trivia">
-                          <span className="book-detail-label tc1">Trivia: </span>
-                          <span className="book-detail-value tc2">
-                            {book.trivia}
-                          </span>
-                        </div>
-
-                        {/* Download button */}
-                        <div className="flex flex-row mt-6 items-center">
-                          {isLoggedIn && (
-                            <>
-                              <a
-                                href={`/${book.book_file}`}
-                                download
-                                className="book-download-button"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <FaDownload className="mr-2 inline" /> EPUB
-                              </a>
-                              
-                              <button
-                                onClick={(e) => toggleReadStatus(book, e)}
-                                disabled={isLoadingReadStatus[book.ISBN]}
-                                className={`ml-2 px-3 py-2 rounded-md transition-all flex items-center justify-start font-medium cursor-pointer min-w-22 ${
-                                  isReadBook
-                                    ? "bg-green-600 text-white hover:bg-green-700"
-                                    : "bg-gray-600 text-white hover:bg-gray-700"
-                                } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              >
-                                <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
-                              </button>
-                            </>
-                          )}
-
-                          <div
-                            className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
-                            style={{
-                              backgroundColor: "var(--khg)",
-                              borderRadius: "0.375rem",
-                            }}
-                          >
-                            <div
-                              className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
-                              style={{
-                                backgroundColor: "var(--khp)",
-                              }}
-                              onClick={toggleShopType}
-                            >
-                              <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
-                              <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
-                            </div>
-                            <a
-                              href={book[`${shopType}_link`] || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className=" pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Shop
-                            </a>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            );
-          })}
+          {displayedBooks.map((book, index) => (
+            <BookGridCard
+              key={book.ISBN}
+              book={book}
+              index={index}
+              isSelected={selectedBook === index}
+              isReadBook={booksRead[book.ISBN] === true}
+              isLoggedIn={isLoggedIn}
+              isLoadingRead={isLoadingReadStatus[book.ISBN] || false}
+              shopType={shopType}
+              onCardClick={() => handleBookClick(index)}
+              onToggleShop={toggleShopType}
+              onToggleRead={toggleReadStatus}
+              onNavigate={navigateToBook}
+              cardRef={(el) => { bookRefs.current[index] = el; }}
+            />
+          ))}
         </div>
       )}
 
       {/* Book List - List View */}
       {viewMode === "list" && (
         <div className="space-y-0 mb-100 rounded-xl overflow-hidden">
-          {books.map((book, index) => {
-            const isSelected = selectedBook === index;
-            const isReadBook = booksRead[book.ISBN] === true;
-            const thumbnailPath = book.cover_file.replace("/covers/", "/covers/thumbnail/").replace(".jpg", ".webp").replace(".jpeg", ".webp");
-            return (
-              <div
-                key={index}
-                ref={(el) => {
-                  if (el) bookRefs.current[index] = el;
-                }}
-                className={` outline-none bg2  overflow-hidden cursor-pointer transition-all duration-300 ${isSelected ? "shadow-[inset_10px_4px_10px_-1px_rgba(0,0,0,0.2),inset_10px_-4px_10px_-1px_rgba(0,0,0,0.2)] brightness-110" : "dark:brightness-60 brightness-100 dark:hover:brightness-75 hover:brightness-105"
-                  }`}
-                onClick={() => handleBookClick(index)}
-                tabIndex={0}
-                style={{ display: inFiltered[book.ISBN] === false ? "none" : "block" }}
-              >
-                <div className="flex flex-row">
-                  {/* Book Cover */}
-                  <div className="relative w-14 md:w-24 h-64 h-auto flex-shrink-0">
-                    <Image
-                      src={`./${thumbnailPath}`}
-                      alt={`Cover of ${book.title}`}
-                      className="object-cover w-full h-full"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 192px"
-                      priority
-                    />
-                    {/* Read Status Indicator */}
-                    {isReadBook && (
-                      <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1.5 shadow-lg">
-                        <FaCheck className="text-white text-sm" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Book Info */}
-                  <div className="flex-1 p-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex flex-wrap items-end">
-                        <h2 className="text-2xl font-bold tc1 mr-1 truncate">{book.title}</h2>
-                        <span className="text-lg tc2 truncate">By {book.author}</span>
-                      </div>
-                      {book.good_score && (
-                        <span className="bg-yellow-500 text-white px-2 py-1 rounded text-sm font-semibold whitespace-nowrap ml-2">
-                          ★ {book.good_score.toFixed(1)}
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-sm tc3 mb-3 hidden sm:block">
-                    {book.book_series && (
-                        <span className="text-sm tc3">
-                        {book.book_series}
-                          {book.reading_order && <span> (#{book.reading_order})</span>}
-                          &nbsp;•&nbsp;
-                        </span>
-                      )}
-                      {book.year} • {book.wordcount.toLocaleString()} words • {book.genre}
-                    </p>
-
-                    <p className="tc2 mb-0">{book.paragraph1}</p>
-
-                    <AnimatePresence>
-                      {isSelected && (
-                        <motion.div
-                          key="expanded-content"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="space-y-3"
-                        >
-                          <p className="tc2 mt-3">{book.paragraph2}</p>
-
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-                            <div>
-                              <span className="font-semibold tc2">ISBN: </span>
-                              <span className="tc3">{book.ISBN}</span>
-                            </div>
-                            <div>
-                              <span className="font-semibold tc2">Ratings: </span>
-                              <span className="tc3">{book.n_good_ratings.toLocaleString()}</span>
-                            </div>
-                            <div>
-                              <span className="font-semibold tc2 hover:underline cursor-pointer group" onClick={(e) => { if (isSelected) router.push(`/books/focus?ISBN=${book.ISBN}`); e.stopPropagation(); }}>
-                                Discussion
-                                <FaArrowRight className="inline ml-1 -translate-y-[1.5px] group-hover:translate-x-[2px] transition-transform" />
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-row justify-between items-center mt-2">
-                          <div className="p-3 bg3 rounded">
-                            <span className="font-semibold tc1">Trivia: </span>
-                            <span className="tc2">{book.trivia}</span>
-                            </div>
-                            <div className="ml-3 flex flex-row items-center gap-3 pt-2">
-                              {isLoggedIn && (
-                                <>
-                                  <a
-                                    href={`/${book.book_file}`}
-                                    download
-                                    className="book-download-button"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <FaDownload className="mr-2 inline" /> EPUB
-                                  </a>
-
-                                  <button
-                                    onClick={(e) => toggleReadStatus(book, e)}
-                                    disabled={isLoadingReadStatus[book.ISBN]}
-                                    className={`px-3 py-2 rounded-md transition-all flex items-center justify-center font-medium ${isReadBook
-                                      ? "bg-green-600 text-white hover:bg-green-700"
-                                      : "bg-gray-600 text-white hover:bg-gray-700"
-                                      } ${isLoadingReadStatus[book.ISBN] ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                  >
-                                    <FaCheck className="mr-2" /> {isLoadingReadStatus[book.ISBN] ? '...' : (isReadBook ? "Read" : "Mark")}
-                                  </button>
-                                </>
-                              )}
-
-                              <div
-                                className="flex items-stretch ml-auto font-weight-[500] text-white user-select-none overflow-hidden"
-                                style={{
-                                  backgroundColor: "var(--khg)",
-                                  borderRadius: "0.375rem",
-                                }}
-                              >
-                                <div
-                                  className="shop-toggle-icon flex items-center justify-center cursor-pointer ml-0 mr-0 w-10"
-                                  style={{
-                                    backgroundColor: "var(--khp)",
-                                  }}
-                                  onClick={toggleShopType}
-                                >
-                                  <FaTablet className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 1 : 0, transitionDelay: (shopType !== 'kobo') ? "0.1s" : "" }} />
-                                  <FaBook className="absolute text-white transition-opacity duration-200" style={{ opacity: (shopType === 'kobo') ? 0 : 1, transitionDelay: (shopType === 'kobo') ? "0.1s" : "" }} />
-                                </div>
-                                <a
-                                  href={book[`${shopType}_link`] || "#"}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="pl-2 pr-3 pt-[0.5rem] pb-[0.5rem]"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  Shop
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-
-
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {displayedBooks.map((book, index) => (
+            <BookListItem
+              key={book.ISBN}
+              book={book}
+              index={index}
+              isSelected={selectedBook === index}
+              isReadBook={booksRead[book.ISBN] === true}
+              isLoggedIn={isLoggedIn}
+              isLoadingRead={isLoadingReadStatus[book.ISBN] || false}
+              shopType={shopType}
+              onCardClick={() => handleBookClick(index)}
+              onToggleShop={toggleShopType}
+              onToggleRead={toggleReadStatus}
+              onNavigate={navigateToBook}
+              cardRef={(el) => { bookRefs.current[index] = el; }}
+            />
+          ))}
         </div>
       )}
     </div>

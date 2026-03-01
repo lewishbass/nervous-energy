@@ -20,6 +20,6 @@ export const classes: ClassInfo[] = [
         endDate: '2026-04-22',
         location: 'Henrico County Adult Education Center',
         imagePath: '/images/classes/Python-Automation.svg',
-        status: 'upcoming'
+        status: 'ongoing'
     }
 ];
