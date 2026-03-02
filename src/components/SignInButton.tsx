@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { FaUser } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -17,7 +17,7 @@ interface SignInButtonProps {
 	inline?: boolean;
 }
 
-const SignInButton: React.FC<SignInButtonProps> = ({
+const SignInButtonInner: React.FC<SignInButtonProps> = ({
   variant = 'primary',
   size = 'md',
   showIcon = true,
@@ -110,5 +110,11 @@ const SignInButton: React.FC<SignInButtonProps> = ({
     </button>
   );
 };
+
+const SignInButton: React.FC<SignInButtonProps> = (props) => (
+  <Suspense fallback={null}>
+    <SignInButtonInner {...props} />
+  </Suspense>
+);
 
 export default SignInButton;
