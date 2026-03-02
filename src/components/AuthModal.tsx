@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ModalTemplate from './modals/ModalTemplate';
 import { useAuth } from '@/context/AuthContext';
 import { FaCheck, FaTimes, FaCog } from 'react-icons/fa';
@@ -10,10 +11,7 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
+const AuthModalInner: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
@@ -27,22 +25,24 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const { login, register, isLoading, error } = useAuth();
 
+  const searchParams = useSearchParams();
+
   // Track modal open event and clear search params
   useEffect(() => {
     if (isOpen) {
       analytics.track('modal_open', { modalType: 'auth' });
-      
+
       // Clear openAuth from search params
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('openAuth')) {
+      if (searchParams.has('openAuth')) {
+        const params = new URLSearchParams(searchParams.toString());
         params.delete('openAuth');
-        const newUrl = params.toString() 
+        const newUrl = params.toString()
           ? `${window.location.pathname}?${params.toString()}`
           : window.location.pathname;
         window.history.replaceState(null, '', newUrl);
       }
     }
-  }, [isOpen]);
+  }, [isOpen, searchParams]);
 
   useEffect(() => {
     if (isOpen) {
@@ -386,5 +386,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
     </ModalTemplate>
   );
 };
+
+const AuthModal: React.FC<AuthModalProps> = (props) => (
+  <Suspense fallback={null}>
+    <AuthModalInner {...props} />
+  </Suspense>
+);
 
 export default AuthModal;
