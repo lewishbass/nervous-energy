@@ -1,15 +1,14 @@
 'use client';
-import { FaAngleDown, FaCarrot } from 'react-icons/fa6';
 import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
 import QuestionHeader from '../../exercise-components/QuestionHeader';
-import PythonIde from '@/components/coding/PythonIde';
-import { useEffect, useState } from 'react';
-import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
-import RandomBackground from '@/components/backgrounds/RandomBackground';
+import QuestionPart, { Mechanics, CodeExample, Objectives, Hints } from '../../exercise-components/QuestionPart';
 import CopyCode from '../../exercise-components/CopyCode';
+import { useEffect, useState } from 'react';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
+import RandomBackground from '@/components/backgrounds/RandomBackground';
 import { useAuth } from '@/context/AuthContext';
 import { CodeBlock } from '@/components/CodeBlock';
 
@@ -71,7 +70,7 @@ export default function Question2() {
     setValidationMessages(prev => { const n = { ...prev }; delete n[part]; return n; });
   };
 
-  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p1', 'failed', err.message, code); return; }
     
@@ -98,7 +97,7 @@ export default function Question2() {
     }
   };
 
-  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p2', 'failed', err.message, code); return; }
     
@@ -123,7 +122,7 @@ export default function Question2() {
     setResult('p2', 'passed', 'All test cases passed!', code);
   };
 
-  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p3', 'failed', err.message, code); return; }
 
@@ -207,66 +206,72 @@ _json.dumps({'verify': _verify})
           ]}
         />
 
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Pass some tests" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Test cases are used to verify that a program behaves correctly under specific conditions.</p>
-            <p className="tc3 mb-2">Most questions won't explicitly tell you what cases you have to pass, it is up to you to imagine where your program might fail, and make it robust.</p>
-          <p className="tc2 mb-2">Create a function <CopyCode code="aRatio"/> that returns the fraction of letters in a string that are 'a'.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p1' && <PythonIde
-              initialCode={"# Create the function aRatio that returns the fraction of 'a's in a string\n\n\n# It needs to pass these the following test cases:\ntest1 = ( aRatio('banana') == 3/6 )\ntest2 = ( aRatio('blueberry') == 0 )\ntest3 = ( aRatio('') == 0 )\ntest4 = ( aRatio('aaaaa') == 1 )"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP1}
-              onCodeStartCallback={() => startCode('p1')}
-              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p1' ? '' : 'hidden'} ${(!validationStates['p1'] || validationStates['p1'] === 'pending') ? 'opacity-0' : validationStates['p1'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p1'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p1'}
+            initialCode={"# Create the function aRatio that returns the fraction of 'a's in a string\ndef aRatio(text : str):\n    # your code here\n\n# It needs to pass these the following test cases:\ntest1 = ( aRatio('banana') == 3/6 )\ntest2 = ( aRatio('blueberry') == 0 )\ntest3 = ( aRatio('') == 0 )\ntest4 = ( aRatio('aaaaa') == 1 )"}
+            cachedCode={submissionStates[`${questionName}_p1`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p1'] || null}
+            validationMessage={validationMessages['p1']}
+            onCodeStart={() => startCode('p1')}
+            onCodeEnd={validateCodeP1}
+          >
+            <Mechanics>Test cases are used to verify that a program behaves correctly under specific conditions. Most questions won&apos;t explicitly tell you what cases you have to pass, it is up to you to imagine where your program might fail, and make it robust.
+              <br/> They compare the result of a function <CopyCode code="aRatio('banana')"/> to the expected result <CopyCode code="3/6"/>. If the function returns a different value, the test case fails and returns False.
+            </Mechanics>
+            <Objectives>Create a function <CopyCode code="aRatio"/> that returns the fraction of letters in a string that are &apos;a&apos;.
+            <ul className="list-disc list-inside mb-2 space-y-1">
+              <li>Function named <CopyCode code="aRatio" /> takes in a string <CopyCode code="text" /></li>
+              <li>Return the count of <CopyCode code={`"a"`} /> elements divided by the total length of the string</li>
+            </ul>
+            </Objectives>
+            <Hints>Use the strings <CopyCode code=".count('a')"/> method to get the count of 'a's </Hints>
+            <Hints>Use <CopyCode code="len()"/> get the total number of characters in the string.</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Write some tests" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc2 mb-2">Given the function <CopyCode code='genEmail'/>, finish writing the test cases, so it passes them all.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p2' && <PythonIde
-              initialCode={"# DO NOT EDIT: given a domain and username, generates an email address\ndef genEmail(username, domain):\n    return username + '@' + domain\n\n\n# Complete the test cases to verify that genEmail works correctly\ntest1 = ( genEmail('alice', 'example.com') == )\ntest2 = ( genEmail('aaron', 'gmail.com') == )\ntest3 = ( genEmail('bob', 'yahoo.com') == )"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={75} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP2}
-              onCodeStartCallback={() => startCode('p2')}
-              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p2' ? '' : 'hidden'} ${(!validationStates['p2'] || validationStates['p2'] === 'pending') ? 'opacity-0' : validationStates['p2'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p2'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p2'}
+            initialCode={"# DO NOT EDIT: given a domain and username, generates an email address\ndef genEmail(username, domain):\n    return username + '@' + domain\n\n\n# Complete the test cases to verify that genEmail works correctly\ntest1 = ( genEmail('alice', 'example.com') == )\ntest2 = ( genEmail('aaron', 'gmail.com') == )\ntest3 = ( genEmail('bob', 'yahoo.com') == )"}
+            cachedCode={submissionStates[`${questionName}_p2`]?.code}
+            initialVDivider={100}
+            initialHDivider={75}
+            validationState={validationStates['p2'] || null}
+            validationMessage={validationMessages['p2']}
+            onCodeStart={() => startCode('p2')}
+            onCodeEnd={validateCodeP2}
+          >
+            <Mechanics>Each test case uses the comparison operator <CopyCode code="=="/> to compare the actual result of the function call with the expected value.
+            <CodeExample  code={`genEmail('john', 'aol.com') == 'john@aol.com'`}/>
+            </Mechanics>
+            <Objectives>The function <CopyCode code="genEmail"/>, already works. Finish each test case expression by adding the expected result of the function call.</Objectives>
+            <Hints>The expected result of <CopyCode code="genEmail('alice', 'example.com')"/> is <CopyCode code="'alice@example.com'"/>, so its test case is <CopyCode code="test1 = ( genEmail('alice', 'example.com') == 'alice@example.com' )"/>.</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Find a bug" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">When designing test cases, it is important to cover both common cases and edge cases.</p>
-          <p className="tc2 mb-2">The function <CopyCode code="getGrade"/> contains a bug. Write a test case that finds this bug and returns false.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[600px]' : 'h-0'}`}>
-            {selectedQuestion === 'p3' && <PythonIde
-              initialCode={"# DO NOT EDIT: converts grade number to\n# A (100- 90)\n# B ( 90- 80)\n# C ( 80- 70)\n# D ( 70- 60)\n# F ( 60- 00)\ndef getGrade(score):\n    if score >= 90:\n        return 'A'\n    elif score >= 80:\n        return 'B'\n    elif score >= 70:\n        return 'C'\n    elif score <= 60:\n        return 'D'\n    else:\n        return 'F'\n\n\n# Write a test case that fails due to the bug in getGrade\ntest1 = ( getGrade("}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p3'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p3'}
+            initialCode={"# DO NOT EDIT: converts grade number to\n# A (100- 90)\n# B ( 90- 80)\n# C ( 80- 70)\n# D ( 70- 60)\n# F ( 60- 00)\ndef getGrade(score):\n    if score >= 90:\n        return 'A'\n    elif score >= 80:\n        return 'B'\n    elif score >= 70:\n        return 'C'\n    elif score <= 60:\n        return 'D'\n    else:\n        return 'F'\n\n\n# Write a test case that fails due to the bug in getGrade\ntest1 = ( getGrade("}
+            cachedCode={submissionStates[`${questionName}_p3`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p3'] || null}
+            validationMessage={validationMessages['p3']}
+            onCodeStart={() => startCode('p3')}
+            onCodeEnd={validateCodeP3}
+          >
+            <Mechanics>When designing test cases, it is important to cover both common cases and edge cases.</Mechanics>
+            <Objectives>The function <CopyCode code="getGrade"/> contains a bug. Write a test case that finds this bug and returns false.</Objectives>
+            <Hints>Find which input triggers the bug, and write a test case using that input and its <b>CORRECT</b> output.</Hints>
+            <Hints>The function returns 'D' for any score less than 60, but it should return 'F'`.</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
 
         <div className="mt-6 flex items-center justify-between gap-4">

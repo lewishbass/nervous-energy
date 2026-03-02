@@ -6,7 +6,7 @@ import { BagLecture, BagLectureIcon } from '../../lectures/03-BagLecture';
 import { ListLecture, ListLectureIcon } from '../../lectures/04-ListLecture';
 import { FlowControlLecture, FlowControlLectureIcon } from '../../lectures/05-FlowControlLecture';
 import { IntroToMLLecture, IntroToMLLectureIcon } from '../../lectures/06.5-IntroToML';
-import { StringsLecture, StringsLectureIcon } from '../../lectures/07-StringsLecture';
+import { TupleSetDict, TupleSetDictIcon } from '../../lectures/07-TupleSetDict';
 import { ListOperationsLecture, ListOperationsLectureIcon } from '../../lectures/08-ListOperationsLecture';
 import { BreaksInlineLecture, BreaksInlineLectureIcon } from '../../lectures/06-BreaksInline';
 import { FunctionsLecture, FunctionsLectureIcon } from '../../lectures/09-FunctionsLecture';
@@ -39,8 +39,8 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: ListLectureIcon, lecture: ListLecture, index: 3, classNumber: 2 },
 	{ finished: true, icon: FlowControlLectureIcon, lecture: FlowControlLecture, index: 4, classNumber: 3 },
 	{ finished: true, icon: BreaksInlineLectureIcon, lecture: BreaksInlineLecture, index: 5, classNumber: 4 },
-	{ finished: false, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 5 },
-	{ finished: false, icon: StringsLectureIcon, lecture: StringsLecture, index: 7, classNumber: 5 },
+	{ finished: true, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 5 },
+	{ finished: true, icon: TupleSetDictIcon, lecture: TupleSetDict, index: 7, classNumber: 5 },
 	{ finished: false, icon: ListOperationsLectureIcon, lecture: ListOperationsLecture, index: 8, classNumber: 6 },
 	{ finished: false, icon: FunctionsLectureIcon, lecture: FunctionsLecture, index: 9, classNumber: 8 },
 	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 10, classNumber: 9 },

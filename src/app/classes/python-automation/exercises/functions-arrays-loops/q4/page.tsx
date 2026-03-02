@@ -1,17 +1,15 @@
 'use client';
-import { FaAngleDown, FaCarrot } from 'react-icons/fa6';
 import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
 import QuestionHeader from '../../exercise-components/QuestionHeader';
-import PythonIde from '@/components/coding/PythonIde';
-import { useEffect, useState } from 'react';
-import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
-import RandomBackground from '@/components/backgrounds/RandomBackground';
+import QuestionPart, { Mechanics, CodeExample, Objectives, Hints } from '../../exercise-components/QuestionPart';
 import CopyCode from '../../exercise-components/CopyCode';
+import { useEffect, useState } from 'react';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
+import RandomBackground from '@/components/backgrounds/RandomBackground';
 import { useAuth } from '@/context/AuthContext';
-import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -214,127 +212,112 @@ export default function Question4() {
         />
 
         {/* P1: If / Else */}
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px', }}>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="If / Else" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">If statements take a boolean value, and execute the following block of code only if it is true.</p>
-          <p className="tc3 mb-2">When followed by an <CopyCode code="else" /> statement, the block of code following the else will be executed if the condition is false.</p>
-          <CodeBlock compact code={`oxygen_level = 15
-if oxygen_level > 19.5 and oxygen_level < 23.5:
-    print("Air is safe")
-else:
-    print("Time to fix your air supply!")`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Use an <CopyCode code="if" /> and <CopyCode code="else" /> statement to create a function that advises the user to wear pants or shorts:</p>
-          <ul className="list-disc list-inside tc2 mb-6 space-y-1">
-            <li>Function named <CopyCode code="whatToWear" /> takes in a variable <CopyCode code="temp" /></li>
-            <li>If <CopyCode code="temp" /> is greater than 45, print <CopyCode code={`"shorts"`} /></li>
-            <li>Otherwise, print <CopyCode code={`"pants"`} /></li>
-          </ul>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p1' && <PythonIde
-              initialCode={"# whatToWear prints \"shorts\" if temp > 45 else \"pants\"\ndef whatToWear(temp):\n    # your code here\n"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP1}
-              onCodeStartCallback={() => startCode('p1')}
-              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p1' ? '' : 'hidden'} ${(!validationStates['p1'] || validationStates['p1'] === 'pending') ? 'opacity-0' : validationStates['p1'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p1'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p1'}
+            initialCode={"# whatToWear prints \"shorts\" if temp > 45 else \"pants\"\ndef whatToWear(temp):\n    # your code here\n"}
+            cachedCode={submissionStates[`${questionName}_p1`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p1'] || null}
+            validationMessage={validationMessages['p1']}
+            onCodeStart={() => startCode('p1')}
+            onCodeEnd={validateCodeP1}
+          >
+            <Mechanics>If statements take a boolean value, and execute the following block of code only if it is true. When followed by an <CopyCode code="else" /> statement, the block of code following the else will be executed if the condition is false.
+            <CodeExample code={`oxygen_level = 15\nif oxygen_level > 19.5 and oxygen_level < 23.5:\n    print("Air is safe")\nelse:\n    print("Time to fix your air supply!")`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Use an <CopyCode code="if" /> and <CopyCode code="else" /> statement to create a function that advises the user to wear pants or shorts:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="whatToWear" /> takes in a variable <CopyCode code="temp" /></li>
+                <li>If <CopyCode code="temp" /> is greater than 45, print <CopyCode code={`"shorts"`} /></li>
+                <li>Otherwise, print <CopyCode code={`"pants"`} /></li>
+              </ul>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P2: Modifying Variables with If */}
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px', }}>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Modifying Variables with If" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Code executed inside the if block can modify variables.</p>
-          <CodeBlock compact code={`if oxygen_level < 19.5:
-    oxygen_level += 0.1  # PUMP IN SOME MORE AIR`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function that doubles or halves the input variable and returns it:</p>
-          <ul className="list-disc list-inside tc2 mb-6 space-y-1">
-            <li>Function named <CopyCode code="doubleOrHalf" /> takes in a variable <CopyCode code="value" /> and a string <CopyCode code="action" /></li>
-            <li>If <CopyCode code="action" /> is <CopyCode code={`"double"`} />, double the value</li>
-            <li>If <CopyCode code="action" /> is <CopyCode code={`"half"`} />, halve the value</li>
-            <li>Return the result</li>
-          </ul>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p2' && <PythonIde
-              initialCode={'# doubleOrHalf doubles or halves the value based on the action string "double" or "half"\ndef doubleOrHalf(value, action):\n    # your code here\n'}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP2}
-              onCodeStartCallback={() => startCode('p2')}
-              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p2' ? '' : 'hidden'} ${(!validationStates['p2'] || validationStates['p2'] === 'pending') ? 'opacity-0' : validationStates['p2'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p2'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p2'}
+            initialCode={'# doubleOrHalf doubles or halves the value based on the action string "double" or "half"\ndef doubleOrHalf(value, action):\n    # your code here\n'}
+            cachedCode={submissionStates[`${questionName}_p2`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p2'] || null}
+            validationMessage={validationMessages['p2']}
+            onCodeStart={() => startCode('p2')}
+            onCodeEnd={validateCodeP2}
+          >
+            <Mechanics>Code executed inside the if block can modify variables.
+            <CodeExample code={`if oxygen_level < 19.5:\n    oxygen_level += 0.1  # PUMP IN SOME MORE AIR`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function that doubles or halves the input variable and returns it:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="doubleOrHalf" /> takes in a variable <CopyCode code="value" /> and a string <CopyCode code="action" /></li>
+                <li>If <CopyCode code="action" /> is <CopyCode code={`"double"`} />, double the value</li>
+                <li>If <CopyCode code="action" /> is <CopyCode code={`"half"`} />, halve the value</li>
+                <li>Return the result</li>
+              </ul>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P3: If / Elif / Else */}
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px', }}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="If / Elif / Else" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Sometimes we want to branch into more than just 2 paths. <CopyCode code="elif" /> statements act like else, executing when a previous if is false, but also check their own conditions, and activate following else statements on false.</p>
-          <CodeBlock compact code={`if atmospheres < 0.47:
-    spaceship.warn("Low pressure detected, pumping in air")
-elif atmospheres > 2.0:
-    spaceship.warn("Critical pressure detected, emergency venting!")
-else:
-    spaceship.warn("pressure is normal")`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function that categorizes a number as <CopyCode code={`"negative"`} />, <CopyCode code={`"zero"`} />, or <CopyCode code={`"positive"`} />:</p>
-          <ul className="list-disc list-inside tc2 mb-2 space-y-1">
-            <li>Function named <CopyCode code="categorizeNumber" /> takes in a variable <CopyCode code="num" /></li>
-            <li>If <CopyCode code="num" /> {'<'} 0, return <CopyCode code={`"negative"`} /></li>
-            <li>If <CopyCode code="num" /> {'>'} 0, return <CopyCode code={`"positive"`} /></li>
-            <li>Otherwise, return <CopyCode code={`"zero"`} /></li>
-          </ul>
-          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-6">Hint: you can put return statements inside if blocks, they will exit the function immediately.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p3' && <PythonIde
-              initialCode={"# categorizeNumber returns \"negative\", \"zero\", or \"positive\"\ndef categorizeNumber(num):\n    # your code here\n"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p3'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p3'}
+            initialCode={"# categorizeNumber returns \"negative\", \"zero\", or \"positive\"\ndef categorizeNumber(num):\n    # your code here\n"}
+            cachedCode={submissionStates[`${questionName}_p3`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p3'] || null}
+            validationMessage={validationMessages['p3']}
+            onCodeStart={() => startCode('p3')}
+            onCodeEnd={validateCodeP3}
+          >
+            <Mechanics>Sometimes we want to branch into more than just 2 paths. <CopyCode code="elif" /> statements act like else, executing when a previous if is false, but also check their own conditions, and activate following else statements on false.
+            <CodeExample code={`if atmospheres < 0.47:\n    spaceship.warn("Low pressure detected, pumping in air")\nelif atmospheres > 2.0:\n    spaceship.warn("Critical pressure detected, emergency venting!")\nelse:\n    spaceship.status("pressure is normal")`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function that categorizes a number as <CopyCode code={`"negative"`} />, <CopyCode code={`"zero"`} />, or <CopyCode code={`"positive"`} />:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="categorizeNumber" /> takes in a variable <CopyCode code="num" /></li>
+                <li>If <CopyCode code="num" /> {'<'} 0, return <CopyCode code={`"negative"`} /></li>
+                <li>If <CopyCode code="num" /> {'>'} 0, return <CopyCode code={`"positive"`} /></li>
+                <li>Otherwise, return <CopyCode code={`"zero"`} /></li>
+              </ul>
+            </Objectives>
+            <Hints>you can put return statements inside if blocks, they will exit the function immediately.</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P4: Inline If */}
-        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px', }}>
+        <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Inline If" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Inline if statements use the pattern <CopyCode code="value_if_true if condition else value_if_false" /> to assign a value based on a condition in a single line of code.</p>
-          <CodeBlock compact code={`air_locks = "sealed" if in_space else "open"`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function that uses an inline if statement to return the smaller of two numbers:</p>
-          <ul className="list-disc list-inside tc2 mb-6 space-y-1">
-            <li>Function named <CopyCode code="smallerNumber" /> takes in variables <CopyCode code="a" /> and <CopyCode code="b" /></li>
-            <li>Returns the smaller number using an inline if statement</li>
-          </ul>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p4' && <PythonIde
-              initialCode={"# smallerNumber returns the smaller of a and b using an inline if\ndef smallerNumber(a, b):\n    # use an inline if statement\n"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP4}
-              onCodeStartCallback={() => startCode('p4')}
-              cachedCode={submissionStates[`${questionName}_p4`]?.code ? submissionStates[`${questionName}_p4`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p4' ? '' : 'hidden'} ${(!validationStates['p4'] || validationStates['p4'] === 'pending') ? 'opacity-0' : validationStates['p4'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p4'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p4'}
+            initialCode={"# smallerNumber returns the smaller of a and b using an inline if\ndef smallerNumber(a, b):\n    # use an inline if statement\n"}
+            cachedCode={submissionStates[`${questionName}_p4`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p4'] || null}
+            validationMessage={validationMessages['p4']}
+            onCodeStart={() => startCode('p4')}
+            onCodeEnd={validateCodeP4}
+          >
+            <Mechanics>Inline if statements use the pattern <CopyCode code="value_if_true if condition else value_if_false" /> to assign a value based on a condition in a single line of code.
+            <CodeExample code={`air_locks = "sealed" if in_space else "open"`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function that uses an inline if statement to return the smaller of two numbers:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="smallerNumber" /> takes in variables <CopyCode code="a" /> and <CopyCode code="b" /></li>
+                <li>Returns the smaller number using an inline if statement</li>
+              </ul>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
 
         <div className="mt-6 flex items-center justify-between gap-4">

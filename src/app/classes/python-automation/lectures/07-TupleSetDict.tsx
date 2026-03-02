@@ -8,7 +8,7 @@ interface StringsLectureProps {
   exitFSCallback?: () => void;
 }
 
-function StringsLecture(props: StringsLectureProps | null) {
+function TupleSetDict(props: StringsLectureProps | null) {
 	const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
@@ -35,11 +35,11 @@ interface StringsLectureIconProps {
 	onClick?: () => void;
 }
 
-function StringsLectureIcon(props: StringsLectureIconProps | null) {
+function TupleSetDictIcon(props: StringsLectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
     <LectureIcon title="Strings and IO" summary="Master string operations." displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 
-export { StringsLecture, StringsLectureIcon };
+export { TupleSetDict, TupleSetDictIcon };

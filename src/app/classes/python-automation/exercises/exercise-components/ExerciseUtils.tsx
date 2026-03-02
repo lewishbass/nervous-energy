@@ -244,6 +244,8 @@ export async function validateFunction (
     expected: any;
     expectedError?: string | null;
     expectedStdout?: string[] | null;
+    restrictedStdout?: string [] | null; // strings that should not appear in stdout
+    stdoutStrictOrder?: boolean;
   }
 ): Promise<{ passed: boolean; message: string; }> {
   if (!pyodide) {
@@ -312,15 +314,44 @@ _json.dumps({
       return { passed: false, message: `${funcName}(${testCase.args.join(', ')}) raised an error: ${lastLine}` };
     }
 
-    // Validate expected stdout
-    if (testCase.expectedStdout && testCase.expectedStdout.length > 0) {
+    // Validate restricted stdout
+    if (testCase.restrictedStdout && testCase.restrictedStdout.length > 0) {
       const actualStdout: string = parsed.stdout ?? '';
-      for (const expected of testCase.expectedStdout) {
-        if (!actualStdout.includes(expected)) {
+      for (const restricted of testCase.restrictedStdout) {
+        if (actualStdout.includes(restricted)) {
           return {
             passed: false,
-            message: `${funcName}(${testCase.args.join(', ')}) stdout missing expected output: "${expected}". Got: "${actualStdout.trim()}"`
+            message: `${funcName}(${testCase.args.join(', ')}) should not contain: "${restricted}". Got: "${actualStdout.trim()}"`
           };
+        }
+      }
+    }
+
+    // Validate expected stdout
+    if (testCase.expectedStdout && testCase.expectedStdout.length > 0) {
+      if(testCase.stdoutStrictOrder){
+        const actualStdout: string = parsed.stdout ?? '';
+        let remaining = actualStdout;
+        for (const expected of testCase.expectedStdout) {
+          const idx = remaining.indexOf(expected);
+          if (idx === -1) {
+            return {
+              passed: false,
+              message: `${funcName}(${testCase.args.join(', ')}) stdout missing expected output in order: "${expected}". Got: "${actualStdout.trim()}"`
+            };
+          }
+          remaining = remaining.slice(idx + expected.length);
+        }
+      }
+      else{
+        const actualStdout: string = parsed.stdout ?? '';
+        for (const expected of testCase.expectedStdout) {
+          if (!actualStdout.includes(expected)) {
+            return {
+              passed: false,
+              message: `${funcName}(${testCase.args.join(', ')}) stdout missing expected output: "${expected}". Got: "${actualStdout.trim()}"`
+            };
+          }
         }
       }
     }
@@ -341,7 +372,9 @@ _json.dumps({
 
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
-    return { passed: false, message: `Error testing ${funcName}(${testCase.args.join(', ')}): ${msg}` };
+    const lines = msg.split('\n');
+    const lastLine = lines[lines.length - 1];
+    return { passed: false, message: `Error testing ${funcName}(${testCase.args.join(', ')}): ${lastLine}` };
   }
 }
 
@@ -359,7 +392,7 @@ _json.dumps({
 export async function runTestCases (
   pyodide: any,
   funcName: string,
-  cases: { args: any[]; expected: any; expectedError?: string | null; expectedStdout?: string[] | null; }[]
+  cases: { args: any[]; expected: any; expectedError?: string | null; expectedStdout?: string[] | null; restrictedStdout?: string[] | null; stdoutStrictOrder?: boolean }[]
 ):Promise<{passed: boolean; message: string, casesPassed: number}> {
 
   let firstFailureMessage: string | null = null;

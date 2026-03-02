@@ -94,11 +94,11 @@ function RootLayoutContent({
   // Store and load page state
   useEffect(() => {
     const handleBeforeUnload = () => {
-      localStorage.setItem('isMenuOpen', JSON.stringify(isMenuOpen));
+      //localStorage.setItem('isMenuOpen', JSON.stringify(isMenuOpen));
       localStorage.setItem('isMessageModalOpen', JSON.stringify(isMessageModalOpen));
       localStorage.setItem('isProfileModalOpen', JSON.stringify(isProfileModalOpen));
       localStorage.setItem('isNotificationModalOpen', JSON.stringify(isNotificationModalOpen));
-      localStorage.setItem('scrollPosition', JSON.stringify(window.scrollY));
+      //localStorage.setItem('scrollPosition', JSON.stringify(window.scrollY));
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -109,15 +109,15 @@ function RootLayoutContent({
   }, [isMenuOpen, isMessageModalOpen, isProfileModalOpen, isNotificationModalOpen]);
 
   useEffect(() => {
-    const savedMenuState = localStorage.getItem('isMenuOpen');
+    //const savedMenuState = localStorage.getItem('isMenuOpen');
     const savedMessageModalState = localStorage.getItem('isMessageModalOpen');
     const savedProfileModalState = localStorage.getItem('isProfileModalOpen');
     const savedNotificationModalState = localStorage.getItem('isNotificationModalOpen');
-    const savedScrollPosition = localStorage.getItem('scrollPosition');
+    //const savedScrollPosition = localStorage.getItem('scrollPosition');
 
-    if (savedMenuState !== null && savedMenuState === 'true') {
+    /*if (savedMenuState !== null && savedMenuState === 'true') {
       setIsMenuOpen(JSON.parse(savedMenuState));
-    }
+    }*/
     if (savedMessageModalState !== null) {
       setIsMessageModalOpen(JSON.parse(savedMessageModalState));
     }
@@ -127,9 +127,9 @@ function RootLayoutContent({
     if (savedNotificationModalState !== null) {
       setIsNotificationModalOpen(JSON.parse(savedNotificationModalState));
     }
-    if (savedScrollPosition !== null) {
+    /*if (savedScrollPosition !== null) {
       window.scrollTo(0, JSON.parse(savedScrollPosition));
-    }
+    }*/
   }, []);
 
   return (
@@ -163,7 +163,7 @@ function RootLayoutContent({
           }`} 
           style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)' }}
         >
-          <div className="flex-1">
+          <div className="flex-1 min-h-screen">
             {children}
           </div>
           {/*footer content*/}

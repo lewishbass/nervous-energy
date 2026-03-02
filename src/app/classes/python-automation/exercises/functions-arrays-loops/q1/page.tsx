@@ -1,17 +1,15 @@
 'use client';
-import { FaAngleDown, FaCarrot } from 'react-icons/fa6';
 import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
 import QuestionHeader from '../../exercise-components/QuestionHeader';
-import PythonIde from '@/components/coding/PythonIde';
-import { useEffect, useState } from 'react';
-import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
-import RandomBackground from '@/components/backgrounds/RandomBackground';
+import QuestionPart, { Mechanics, CodeExample, Objectives, Hints } from '../../exercise-components/QuestionPart';
 import CopyCode from '../../exercise-components/CopyCode';
+import { useEffect, useState } from 'react';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, checkRequiredCode, runTestCases } from '../../exercise-components/ExerciseUtils';
+import RandomBackground from '@/components/backgrounds/RandomBackground';
 import { useAuth } from '@/context/AuthContext';
-import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -71,7 +69,7 @@ export default function Question1() {
     setValidationMessages(prev => { const n = { ...prev }; delete n[part]; return n; });
   };
 
-  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP1 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p1', 'failed', err.message, code); return; }
     const funcDeclared  = checkRequiredCode(code, ['def increment']);
@@ -108,7 +106,7 @@ export default function Question1() {
     setResult('p1', 'passed', funcValidation.message, code);
   };
 
-  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP2 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p2', 'failed', err.message, code); return; }
 
@@ -133,7 +131,7 @@ export default function Question1() {
     setResult('p2', 'passed', funcValidation.message, code);
   };
 
-  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>) => {
+  const validateCodeP3 = async (code: string, pyodide: any, error: string | null, vars: Record<string, any>, stdout: string | null) => {
     const err = validateError(error);
     if (!err.passed) { setResult('p3', 'failed', err.message, code); return; }
     // test swap(a, b) returns b, a
@@ -164,87 +162,80 @@ export default function Question1() {
 					]}
         />
 
-        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Define and Call" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">A function is a re-usable block of code that takes variables and returns results.</p>
-					<p className="tc3 mb-2">Use the <CopyCode code="def"/> keyword to name your function.</p>
-					<p className="tc3 mb-2">The input parameters are listed in parentheses after the function name.</p>
-					<p className="tc3 mb-2">The <CopyCode code="return"/> keyword is used to return a value from a function.</p>
-          <p className="mb-2 text-fuchsia-600 dark:text-fuchsia-400">The indented block after the line with <CopyCode code="def"/> statement ending with a colon <CopyCode code=":"/> tells Python what is in the function.</p>
-					<CodeBlock compact code={`def double(a): # function named double that takes one parameter a
+          <QuestionPart
+            isActive={selectedQuestion === 'p1'}
+            initialCode={"# Create a function named increment\n\n\n# Call your function and store the result in a variable"}
+            cachedCode={submissionStates[`${questionName}_p1`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p1'] || null}
+            validationMessage={validationMessages['p1']}
+            onCodeStart={() => startCode('p1')}
+            onCodeEnd={validateCodeP1}
+          >
+            <Mechanics>
+              A function is a re-usable block of code that takes variables and returns results. Use the <CopyCode code="def"/> keyword to name your function. The input parameters are listed in parentheses after the function name. The <CopyCode code="return"/> keyword is used to return a value from a function. The indented block after the line with <CopyCode code="def"/> statement ending with a colon <CopyCode code=":"/> tells Python what is in the function.
+            <CodeExample code={`def double(a): # function named double that takes one parameter a
 		output = a * 2 # multiply a by 2 and store in variable output
 		return output # return the value of output
-b = double(5) # passes 5 to our function, and stores the returned value in b`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Define a function named <CopyCode code="increment"/> that takes one parameter and returns that parameter plus 1.</p>
-          <p className="tc2 mb-6">Then call your function and store the results in a variable.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p1' && <PythonIde
-              initialCode={"# Create a function named increment\n\n\n# Call your function and store the result in a variable"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP1}
-              onCodeStartCallback={() => startCode('p1')}
-              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p1' ? '' : 'hidden'} ${(!validationStates['p1'] || validationStates['p1'] === 'pending') ? 'opacity-0' : validationStates['p1'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p1'] || '\u00A0'}
-            </div>
-          </div>
+b = double(5) # passes 5 to our function, and stores the returned value in b`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Define a function named <CopyCode code="increment"/> that takes one parameter and returns that parameter plus 1.</p>
+              <p className="mb-2">Then call your function and store the results in a variable.</p>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Test Cases" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Test cases are a way to verify that your function works correctly. They check how it performs on different inputs, and checks the output against expected values.</p>
-          <p className="tc3 mb-2">Tests focus on edge cases, where weird values might break your function.</p>
-          <p className="tc3 mb-2">This is how your programs are graded in this class and the real world.</p>
-          <p className="tc2 mb-2">Implement the function <CopyCode code="foobar"/> that passes the provided test cases.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p2' && <PythonIde
-              initialCode={"# Create a function named foobar\n\n\n# foobar should pass the following test cases\ntest1 = ( foobar(1) == 4 )\ntest2 = ( foobar(2) == 2 )\ntest3 = ( foobar(3) == 0 )"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP2}
-              onCodeStartCallback={() => startCode('p2')}
-              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p2' ? '' : 'hidden'} ${(!validationStates['p2'] || validationStates['p2'] === 'pending') ? 'opacity-0' : validationStates['p2'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p2'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p2'}
+            initialCode={"# Create a function named foobar\n\n\n# foobar should pass the following test cases\ntest1 = ( foobar(1) == 4 )\ntest2 = ( foobar(2) == 2 )\ntest3 = ( foobar(3) == 0 )"}
+            cachedCode={submissionStates[`${questionName}_p2`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p2'] || null}
+            validationMessage={validationMessages['p2']}
+            onCodeStart={() => startCode('p2')}
+            onCodeEnd={validateCodeP2}
+          >
+            <Mechanics>
+              Test cases are a way to verify that your function works correctly. They check how it performs on different inputs, and checks the output against expected values. Tests focus on edge cases, where weird values might break your function. This is how your programs are graded in this class and the real world.
+            </Mechanics>
+            <Objectives>
+              Implement the function <CopyCode code="foobar"/> that passes the provided test cases.
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
-        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm" style={{maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px',}}>
+        <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px' }}>
           <QuestionHeader title="Multiple Parameters" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Functions can take and return multiple values.</p>
-          <p className="tc3 mb-2">After the <CopyCode code="def"/> keyword, inside the parentheses you can list multiple parameters separated by commas. </p>
-          <p className="tc3 mb-2">List multiple variables after the <CopyCode code="return"/> keyword separated by commas, and catch the output in multiple variables.</p>
-          <CodeBlock compact code={`def math_ops(a, b): # this function requires both a and b to work
+          <QuestionPart
+            isActive={selectedQuestion === 'p3'}
+            initialCode={"# Create a swap function\n\n\n# Test your swap function"}
+            cachedCode={submissionStates[`${questionName}_p3`]?.code}
+            initialVDivider={100}
+            validationState={validationStates['p3'] || null}
+            validationMessage={validationMessages['p3']}
+            onCodeStart={() => startCode('p3')}
+            onCodeEnd={validateCodeP3}
+          >
+            <Mechanics>
+              Functions can take and return multiple values. After the <CopyCode code="def"/> keyword, inside the parentheses you can list multiple parameters separated by commas. List multiple variables after the <CopyCode code="return"/> keyword separated by commas, and catch the output in multiple variables.
+            <CodeExample code={`def math_ops(a, b): # this function requires both a and b to work
   sum = a + b
   diff = a - b
   return sum, diff
 
-result_sum, result_diff = math_ops(5, 3) # call the function, and catch both outputs`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function named <CopyCode code="swap"/> that takes two parameters and returns them in reverse order.</p>
-          <p className="tc2 mb-6">e.g. <CopyCode code="swap(1, 2)"/> should return <CopyCode code="2, 1"/>.</p>
-
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p3' && <PythonIde
-              initialCode={"# Create a swap function\n\n\n# Test your swap function"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p3'] || '\u00A0'}
-            </div>
-          </div>
+result_sum, result_diff = math_ops(5, 3) # call the function, and catch both outputs`} />
+            </Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function named <CopyCode code="swap"/> that takes two parameters and returns them in reverse order.</p>
+              <p className="mb-2">e.g. <CopyCode code="swap(1, 2)"/> should return <CopyCode code="2, 1"/>.</p>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
 
         <div className="mt-6 flex items-center justify-between gap-4">

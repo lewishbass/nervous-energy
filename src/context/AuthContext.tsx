@@ -4,6 +4,11 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { usePathname } from 'next/navigation';
 import { analytics } from './Analytics';
 
+
+export type Language = 'en' | 'zh' | 'th';
+export const LANGUAGES: Language[] = ['en', 'th', 'zh'];
+
+
 interface UserProfile {
   firstName?: string;
   lastName?: string;
@@ -30,6 +35,8 @@ interface AuthContextType {
   register: (username: string, password: string, profile?: Partial<UserProfile>) => Promise<boolean>;
   logout: () => void;
   getSubToken: (category: string) => Promise<string | null>;
+  language: Language;
+  setLanguage: (lang: Language) => void;
 }
 
 interface SubToken {
@@ -51,6 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
+
+  const [language, setLanguage] = useState<Language>('en');
 
   const [subtokens, setSubtokens] = useState<Record<string, SubToken>>({});
 
@@ -283,6 +292,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Check for existing auth on mount
   useEffect(() => {
+    //load language from localStorage
+    const storedLanguage = localStorage.getItem('language');
+    if (storedLanguage === 'en' || storedLanguage === 'zh' || storedLanguage === 'th') {
+      setLanguage(storedLanguage as Language);
+    }
     
     const checkAuth = async () => {
       setIsLoading(true);
@@ -366,7 +380,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       register,
       logout,
-      getSubToken
+      getSubToken,
+      language,
+      setLanguage
     }}>
       {children}
     </AuthContext.Provider>

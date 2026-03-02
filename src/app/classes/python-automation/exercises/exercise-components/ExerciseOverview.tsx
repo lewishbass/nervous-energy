@@ -107,6 +107,7 @@ export default function ExerciseOverview({
   const [showMechanics, setShowMechanics] = useState(false);
   const [showHints, setShowHints] = useState(false);
   const [showCodeExamples, setShowCodeExamples] = useState(false);
+  const [showObjectives, setShowObjectives] = useState(true);
 
   const allPartNames = questions.flatMap(q =>
     q.parts.map(p => `${q.id}_${p.id}`)
@@ -218,6 +219,15 @@ export default function ExerciseOverview({
               className="flex items-center gap-2 px-4 py-2 transition-all duration-300 rounded-lg not-active:bg3 border-2 border-[var(--kho)] bg-slate-100 dark:bg-slate-800 active:bg-[var(--kho)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40 active:text-white active:border-white/30 select-none cursor-pointer"
             >
               Copy All Code
+            </button>
+            <button
+              onClick={() => setShowObjectives(v => !v)}
+              className={`select-none cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-300 ${showObjectives
+                ? 'bg-[var(--khy)] text-gray-600 border-white/30'
+                : 'bg-slate-100 dark:bg-slate-800 border-[var(--khy)] text-black/80 hover:text-black/40 dark:text-white/80 dark:hover:text-white/40'
+                }`}
+            >
+              {showObjectives ? 'Hide Objectives' : 'Show Objectives'}
             </button>
             <button
               onClick={() => setShowMechanics(v => !v)}
@@ -339,7 +349,7 @@ export default function ExerciseOverview({
                     </button>
 
                     {/* Objectives */}
-                    {p.objectives.length > 0 && (
+                    {showObjectives && p.objectives.length > 0 && (
                       <ul className="ml-4 list-inside mb-1">
                         {p.objectives.map((obj, i) => (
                           <li key={i} className="tc2 text-sm print:text-xs">{obj}</li>

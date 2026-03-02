@@ -1,17 +1,15 @@
 'use client';
-import { FaAngleDown, FaCarrot } from 'react-icons/fa6';
 import AssignmentOverview from '../../exercise-components/AssignmentOverview';
 import BackToAssignment from '../../exercise-components/BackToAssignment';
 import NextQuestion from '../../exercise-components/NextQuestion';
 import QuestionBorderAnimation from '../../exercise-components/QuestionBorderAnimation';
 import QuestionHeader from '../../exercise-components/QuestionHeader';
-import PythonIde from '@/components/coding/PythonIde';
-import { useEffect, useState } from 'react';
-import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, CloudIndicator, sanitizeSubmissionState, checkRequiredCode, runTestCases, deRepr } from '../../exercise-components/ExerciseUtils';
-import RandomBackground from '@/components/backgrounds/RandomBackground';
+import QuestionPart, { Mechanics, CodeExample, Objectives, Hints } from '../../exercise-components/QuestionPart';
 import CopyCode from '../../exercise-components/CopyCode';
+import { useEffect, useState } from 'react';
+import { validateVariable, validateError, createSetResult, getQuestionSubmissionStatus, checkRequiredCode, runTestCases, deRepr } from '../../exercise-components/ExerciseUtils';
+import RandomBackground from '@/components/backgrounds/RandomBackground';
 import { useAuth } from '@/context/AuthContext';
-import { CodeBlock } from '@/components/CodeBlock';
 
 const className = 'python-automation';
 const assignmentName = 'functions-arrays-loops';
@@ -267,127 +265,123 @@ export default function Question5() {
         {/* P1: Iterate over range, array, and string */}
         <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="For Loops" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">Strings, arrays and ranges all automatically feed <CopyCode code="for" /> loops their elements one at a time.</p>
-          <CodeBlock compact code={`for c in "ymca":
-    print(c, end='-')  # prints y-m-c-a-`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create 3 <CopyCode code="for" /> loops, each printing every element in:</p>
-          <ul className="list-disc list-inside tc2 mb-6 space-y-1">
-            <li>An array (e.g. <CopyCode code='[10, 20, 30]' />)</li>
-            <li>A string (e.g. <CopyCode code='"hello"' />)</li>
-            <li>A range (e.g. <CopyCode code='range(5)' />)</li>
-          </ul>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p1' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p1' && <PythonIde
-              initialCode={"# Print each element in an array\nmy_array = [10, 20, 30]\n\n\n# Print each character in a string\nmy_string = \"hello\"\n\n\n# Print each number in a range\n\n"}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={60} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP1}
-              onCodeStartCallback={() => startCode('p1')}
-              cachedCode={submissionStates[`${questionName}_p1`]?.code ? submissionStates[`${questionName}_p1`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p1' ? '' : 'hidden'} ${(!validationStates['p1'] || validationStates['p1'] === 'pending') ? 'opacity-0' : validationStates['p1'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p1'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p1'}
+            initialCode={"# Print each element in an array\nmy_array = [10, 20, 30]\n\n\n# Print each character in a string\nmy_string = \"hello\"\n\n\n# Print each number in a range\n\n"}
+            cachedCode={submissionStates[`${questionName}_p1`]?.code}
+            initialVDivider={60}
+            validationState={validationStates['p1'] || null}
+            validationMessage={validationMessages['p1']}
+            onCodeStart={() => startCode('p1')}
+            onCodeEnd={validateCodeP1}
+          >
+            <Mechanics>Strings, arrays and ranges all automatically feed <CopyCode code="for" /> loops their elements one at a time.
+            <CodeExample code={`for c in "ymca":
+    print(c, end='-')  # prints y-m-c-a-`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create 3 <CopyCode code="for" /> loops, each printing every element in:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>An array (e.g. <CopyCode code='[10, 20, 30]' />)</li>
+                <li>A string (e.g. <CopyCode code='"hello"' />)</li>
+                <li>A range (e.g. <CopyCode code='range(5)' />)</li>
+              </ul>
+            </Objectives>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P2: Break */}
         <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Break" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2"><CopyCode code="break" /> statements immediately terminate a loop, skipping the rest of the block and any remaining iterations.</p>
-          <CodeBlock compact code={`a = [1, 2, 3, 4, 5]
+          <QuestionPart
+            isActive={selectedQuestion === 'p2'}
+            initialCode={'# duckGame returns all elements up to and including "goose"\ndef duckGame(arr):\n     #your code here'}
+            cachedCode={submissionStates[`${questionName}_p2`]?.code}
+            initialVDivider={60}
+            validationState={validationStates['p2'] || null}
+            validationMessage={validationMessages['p2']}
+            onCodeStart={() => startCode('p2')}
+            onCodeEnd={validateCodeP2}
+          >
+            <Mechanics><CopyCode code="break" /> statements immediately terminate a loop, skipping the rest of the block and any remaining iterations.
+            <CodeExample code={`a = [1, 2, 3, 4, 5]
 for num in a:
     if num == 4:
         break
     print(num)
-# 1, 2, 3`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function <CopyCode code="duckGame" /> that takes an array and returns all elements up to and including <CopyCode code={`"goose"`} />:</p>
-          <ul className="list-disc list-inside tc2 mb-6 space-y-1">
-            <li>Function named <CopyCode code="duckGame" /> takes in a variable <CopyCode code="a" /></li>
-            <li>Use a <CopyCode code="for" /> loop to iterate over the array</li>
-            <li>Add each element to a result list</li>
-            <li>If the element is <CopyCode code={`"goose"`} />, <CopyCode code="break" /> out of the loop</li>
-            <li>Return the result list</li>
-          </ul>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p2' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p2' && <PythonIde
-              initialCode={'# duckGame returns all elements up to and including "goose"\ndef duckGame(a):\n     #your code here'}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={60} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP2}
-              onCodeStartCallback={() => startCode('p2')}
-              cachedCode={submissionStates[`${questionName}_p2`]?.code ? submissionStates[`${questionName}_p2`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p2' ? '' : 'hidden'} ${(!validationStates['p2'] || validationStates['p2'] === 'pending') ? 'opacity-0' : validationStates['p2'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p2'] || '\u00A0'}
-            </div>
-          </div>
+# 1, 2, 3`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function <CopyCode code="duckGame" /> that takes an array and returns all elements up to <span className="tc1 font-bold">and including</span> <CopyCode code={`"goose"`} />:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="duckGame" /> takes in a list <CopyCode code="arr" /></li>
+                <li>Use a <CopyCode code="for" /> loop to iterate over the array</li>
+                <li>Add each element to a result list</li>
+                <li>If the element is <CopyCode code={`"goose"`} />, add it to the result and <CopyCode code="break" /> out of the loop</li>
+                <li>Return the result list</li>
+              </ul>
+            </Objectives>
+            <Hints>Create an empty list <CopyCode code="result = []" />, and append each element to it the lists <CopyCode code=".append()" /> method.</Hints>
+            <Hints>Append each element to the result, and then check if it's "goose". If so, break.</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P3: Count Ducks */}
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Count Ducks" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">How many ducks are in your row?</p>
-          <p className="tc2 mb-2">Create a function <CopyCode code="countDucks" /> that returns the number of times the string <CopyCode code={`"duck"`} /> appears in an array:</p>
-          <ul className="list-disc list-inside tc2 mb-2 space-y-1">
-            <li>Function named <CopyCode code="countDucks" /> takes in a variable <CopyCode code="row" /></li>
-            <li>Use a <CopyCode code="for" /> loop to iterate over <CopyCode code="row" /></li>
-            <li>Return the count of <CopyCode code={`"duck"`} /> elements</li>
-          </ul>
-          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-6">Hint: create a counter variable, and increment it using <CopyCode code="count += 1" /></p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p3' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p3' && <PythonIde
-              initialCode={'# countDucks returns the number of times "duck" appears in an array\ndef countDucks(row):\n    # your code here\n'}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP3}
-              onCodeStartCallback={() => startCode('p3')}
-              cachedCode={submissionStates[`${questionName}_p3`]?.code ? submissionStates[`${questionName}_p3`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p3' ? '' : 'hidden'} ${(!validationStates['p3'] || validationStates['p3'] === 'pending') ? 'opacity-0' : validationStates['p3'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p3'] || '\u00A0'}
-            </div>
-          </div>
+          <QuestionPart
+            isActive={selectedQuestion === 'p3'}
+            initialCode={'# countDucks returns the number of times "duck" appears in an array\ndef countDucks(row):\n    # your code here\n'}
+            cachedCode={submissionStates[`${questionName}_p3`]?.code}
+            validationState={validationStates['p3'] || null}
+            validationMessage={validationMessages['p3']}
+            onCodeStart={() => startCode('p3')}
+            onCodeEnd={validateCodeP3}
+          >
+            <Objectives>
+              <p className="mb-2">How many ducks are in your row?</p>
+              <p className="mb-2">Create a function <CopyCode code="countDucks" /> that returns the number of times the string <CopyCode code={`"duck"`} /> appears in an array:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="countDucks" /> takes in a variable <CopyCode code="row" /></li>
+                <li>Use a <CopyCode code="for" /> loop to iterate over <CopyCode code="row" /></li>
+                <li>Return the count of <CopyCode code={`"duck"`} /> elements</li>
+              </ul>
+            </Objectives>
+            <Hints>create a counter variable <CopyCode code="count = 0" />, and increment it using <CopyCode code="count += 1" /></Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
         <div className="h-4"></div>
 
         {/* P4: Continue */}
         <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px', }}>
           <QuestionHeader title="Continue" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
-          <p className="tc3 mb-2">When <CopyCode code="continue" /> statements are called, they skip the rest of the current block, but continue with the next iteration of the loop.</p>
-          <CodeBlock compact code={`for p in pokemon:
+          <QuestionPart
+            isActive={selectedQuestion === 'p4'}
+            initialCode={'# clip raises any number below min_val up to min_val, using continue to skip the rest\ndef clip(numbers, min_val):\n    # your code here\n'}
+            cachedCode={submissionStates[`${questionName}_p4`]?.code}
+            validationState={validationStates['p4'] || null}
+            validationMessage={validationMessages['p4']}
+            onCodeStart={() => startCode('p4')}
+            onCodeEnd={validateCodeP4}
+          >
+            <Mechanics>When <CopyCode code="continue" /> statements are called, they skip the rest of the current block, but continue with the next iteration of the loop.
+            <CodeExample code={`for p in pokemon:
     if p.type() != "fire":
-        continue
-    p.name("just a lil guy")
-    p.addToBackpack()`} language="python" className="my-4" />
-          <p className="tc2 mb-2">Create a function called <CopyCode code="clip" /> that takes an array of numbers and a <CopyCode code="min_val" />:</p>
-          <ul className="list-disc list-inside tc2 mb-2 space-y-1">
-            <li>Function named <CopyCode code="clip" /> takes in <CopyCode code="numbers" /> and <CopyCode code="min_val" /></li>
-            <li>Loop through the array by index using <CopyCode code="range(len(numbers))" /></li>
-            <li>If a number is greater than or equal to <CopyCode code="min_val" />, skip it using <CopyCode code="continue" /></li>
-            <li>Otherwise, set that element to <CopyCode code="min_val" /></li>
-            <li>Return the modified array</li>
-          </ul>
-          <p className="text-fuchsia-600 dark:text-fuchsia-400 mb-6">Hint: use <CopyCode code="for i in range(len(numbers)):" /> to loop by index so you can modify elements in place.</p>
-          <div className={`w-full rounded-lg overflow-hidden ${selectedQuestion === 'p4' ? 'h-[500px]' : 'h-0'}`}>
-            {selectedQuestion === 'p4' && <PythonIde
-              initialCode={'# clip raises any number below min_val up to min_val, using continue to skip the rest\ndef clip(numbers, min_val):\n    # your code here\n'}
-              initialDocumentName="test.py" initialShowLineNumbers={false} initialIsCompact={true} initialVDivider={100} initialHDivider={60} initialPersistentExec={false}
-              onCodeEndCallback={validateCodeP4}
-              onCodeStartCallback={() => startCode('p4')}
-              cachedCode={submissionStates[`${questionName}_p4`]?.code ? submissionStates[`${questionName}_p4`].code : undefined}
-            />}
-          </div>
-          <div className="mt-4">
-            <div className={`p-3 rounded transition-all duration-300 ${selectedQuestion === 'p4' ? '' : 'hidden'} ${(!validationStates['p4'] || validationStates['p4'] === 'pending') ? 'opacity-0' : validationStates['p4'] === 'failed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-              {validationMessages['p4'] || '\u00A0'}
-            </div>
-          </div>
+        continue  # skip non-fire pokemon
+    p.addToBackpack()`} /></Mechanics>
+            <Objectives>
+              <p className="mb-2">Create a function called <CopyCode code="clip" /> that clips an array of numbers to <CopyCode code="min_val" />:</p>
+              <ul className="list-disc list-inside mb-2 space-y-1">
+                <li>Function named <CopyCode code="clip" /> takes in <CopyCode code="numbers" /> and <CopyCode code="min_val" /></li>
+                <li>Loop through the array by index using <CopyCode code="range(len(numbers))" /></li>
+                <li>If a number is greater than or equal to <CopyCode code="min_val" />, skip it using <CopyCode code="continue" /></li>
+                <li>Otherwise, set that element to <CopyCode code="min_val" /></li>
+                <li>Return the modified array</li>
+              </ul>
+            </Objectives>
+            <Hints>use <CopyCode code="for i in range(len(numbers)):" /> to loop by index so you can modify elements in place <CopyCode code="numbers[i] = min_val" />.</Hints>
+            <Hints>Check if each number should be skipped <CopyCode code="if numbers[i] > min_val:" /> and <CopyCode code="continue" /> to skip it, then clip un-skipped numbers</Hints>
+          </QuestionPart>
         </QuestionBorderAnimation>
 
         <div className="mt-6 flex items-center justify-between gap-4">

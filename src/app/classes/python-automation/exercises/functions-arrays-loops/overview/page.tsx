@@ -81,12 +81,25 @@ result_sum, result_diff = math_ops(5, 3) # call the function, and catch both out
 					"Test cases are used to verify that a program behaves correctly under specific conditions",
 					"Most questions won't explicitly tell you what cases you have to pass - it is up to you to imagine where your program might fail and make it robust",
 				],
+				hints: [
+					"Use the string's `.count('a')` method to get the count of 'a's",
+					"Use `len()` to get the total number of characters in the string",
+				],
 			},
 			{
 				id: 'p2',
 				title: 'Write some tests',
 				objectives: [
 					'Given the function `genEmail`, finish writing the test cases so it passes them all',
+				],
+				mechanics: [
+					"Each test case uses the `==` operator to compare the actual result of the function call with the expected value",
+				],
+				hints: [
+					"The expected result of `genEmail('alice', 'example.com')` is `'alice@example.com'`",
+				],
+				codeExamples: [
+					`genEmail('john', 'aol.com') == 'john@aol.com'`,
 				],
 			},
 			{
@@ -97,6 +110,10 @@ result_sum, result_diff = math_ops(5, 3) # call the function, and catch both out
 				],
 				mechanics: [
 					'When designing test cases, it is important to cover both common cases and edge cases',
+				],
+				hints: [
+					'Find which input triggers the bug, and write a test case using that input and its CORRECT output',
+					"The function returns 'D' for any score less than 60, but it should return 'F'",
 				],
 			},
 		],
@@ -120,8 +137,7 @@ result_sum, result_diff = math_ops(5, 3) # call the function, and catch both out
 					'Create a list using square brackets `[]` with values separated by commas',
 				],
 				codeExamples: [
-					`my_numbers = [1, 2, 3, 4, 5]
-my_words = ["hello", "world"]`,
+					`my_numbers = [1, 2, 3, 4, 5]\nmy_words = ["hello", "world"]`,
 				],
 			},
 			{
@@ -243,7 +259,7 @@ else:
 elif atmospheres > 2.0:
     spaceship.warn("Critical pressure detected, emergency venting!")
 else:
-    spaceship.warn("pressure is normal")`,
+    spaceship.status("pressure is normal")`,
 				],
 			},
 			{
@@ -267,10 +283,71 @@ else:
 		title: 'Q5 - For Loops',
 		description: 'Use for loops to traverse array elements.',
 		parts: [
-			{ id: 'p1', title: 'Iterate Over a Range', objectives: ['Iterate over a range, array and string printing each element'] },
-			{ id: 'p2', title: 'Break', objectives: ['Use break to stop a for loop when a condition is met'] },
-			{ id: 'p3', title: 'Continue', objectives: ['Skip some iterations of a loop using continue'] },
-			{ id: 'p4', title: 'Count Elements', objectives: ['Count the number of times a specific element appears in an array'] },
+			{
+				id: 'p1',
+				title: 'For Loops',
+				objectives: [
+					'Create 3 `for` loops, each printing every element in an array, a string, and a range',
+				],
+				mechanics: [
+					'Strings, arrays and ranges all automatically feed `for` loops their elements one at a time',
+				],
+				codeExamples: [
+					`for c in "ymca":\n    print(c, end='-')  # prints y-m-c-a-`,
+				],
+			},
+			{
+				id: 'p2',
+				title: 'Break',
+				objectives: [
+					'Create a function `duckGame` that takes an array and returns all elements up to and including "goose"',
+				],
+				mechanics: [
+					'`break` statements immediately terminate a loop, skipping the rest of the block and any remaining iterations',
+				],
+				hints: [
+					'Create an empty list `result = []`, and append each element to it using the list\'s `.append()` method',
+					'Append each element to the result, and then check if it\'s "goose". If so, break',
+				],
+				codeExamples: [
+					`a = [1, 2, 3, 4, 5]
+for num in a:
+    if num == 4:
+        break
+    print(num)
+# 1, 2, 3`,
+				],
+			},
+			{
+				id: 'p3',
+				title: 'Count Ducks',
+				objectives: [
+					'Create a function `countDucks` that returns the number of times "duck" appears in an array',
+				],
+				hints: [
+					'Create a counter variable `count = 0`, and increment it using `count += 1`',
+				],
+			},
+			{
+				id: 'p4',
+				title: 'Continue',
+				objectives: [
+					'Create a function `clip` that raises any number below `min_val` up to `min_val`, using `continue` to skip elements that don\'t need clipping',
+				],
+				mechanics: [
+					'When `continue` is called, it skips the rest of the current block but continues with the next iteration',
+				],
+				hints: [
+					'Use `for i in range(len(numbers)):` to loop by index so you can modify elements in place',
+					'Check if each number should be skipped with `if numbers[i] >= min_val:` and `continue` to skip it',
+				],
+				codeExamples: [
+					`for p in pokemon:
+    if p.type() != "fire":
+        continue  # skip non-fire pokemon
+    p.addToBackpack()`,
+				],
+			},
 		],
 	},
 	{
@@ -278,21 +355,119 @@ else:
 		title: 'Q6 - While Loops',
 		description: 'Use while loops for condition-based iteration.',
 		parts: [
-			{ id: 'p1', title: 'Basic While Loop', objectives: [] },
-			{ id: 'p2', title: 'While with Break', objectives: [] },
-			{ id: 'p3', title: 'While with Continue', objectives: [] },
-			{ id: 'p4', title: 'Nested Loops', objectives: [] },
+			{
+				id: 'p1',
+				title: 'Powers of Two',
+				objectives: [
+					'Create a function `powersOfTwo` that prints all powers of two less than `maxValue`',
+				],
+				mechanics: [
+					'While loops use the syntax `while condition:` and execute the block until the condition is false',
+				],
+				hints: [
+					'Start with `n = 1` then `print(n)` and multiply n by 2 each loop',
+					'Use `while n < maxValue:` to stop when n exceeds the max value',
+				],
+				codeExamples: [
+					`i = 0\nwhile i < 5:\n    print(i)\n    i += 1\n# 0 1 2 3 4`,
+				],
+			},
+			{
+				id: 'p2',
+				title: 'TakeOff',
+				objectives: [
+					'Create a function `takeOff` that accelerates a `SpaceShip` object until it runs out of fuel',
+				],
+				mechanics: [
+					'The `SpaceShip` class has `.speed`, `.fuel`, and `.accelerate()` method',
+				],
+				hints: [
+					'Use `while spaceship.fuel > 0:` to check fuel level',
+				],
+			},
+			{
+				id: 'p3',
+				title: 'Event Loop',
+				objectives: [
+					'Create a function `programLoop` that prints events from a `UserInput` object until the "escape" event',
+				],
+				mechanics: [
+					'Use `while True:` to create an indefinite loop and `break` to exit when needed',
+					'The `UserInput` class returns events with its `.getEvent()` method',
+				],
+				hints: [
+					'Use `if event == "escape":` to check for the escape event and `break` to exit',
+					'Check if you should break AFTER you print the event',
+				],
+			},
+			{
+				id: 'p4',
+				title: 'Record Local Requests',
+				objectives: [
+					'Create a function `recordLocalRequests` that collects local IPs (starting with "10.0") from a `WebPort` until "10.0.0.67" is received',
+				],
+				mechanics: [
+					'The `WebPort` class returns IP addresses with its `.listen()` method',
+				],
+				hints: [
+					'Create an empty list `localRequests = []` and append local requests using `.append()`',
+					'Use the string\'s `.startswith("10.0")` method to check if an IP is local',
+				],
+			},
 		],
 	},
 	{
 		id: 'q7',
-		title: 'Q7 - Sums, Min and Max, Fourier',
+		title: 'Q7 - Sums, Min and Max, Fibonacci',
 		description: 'Implement algorithms to perform array operations.',
 		parts: [
-			{ id: 'p1', title: 'Sum of Array', objectives: [] },
-			{ id: 'p2', title: 'Min and Max', objectives: [] },
-			{ id: 'p3', title: 'Average', objectives: [] },
-			{ id: 'p4', title: 'Fourier Series', objectives: [] },
+			{
+				id: 'p1',
+				title: 'Sum Array',
+				objectives: [
+					'Create a function `sumArray` that returns the sum of the elements in an array using a `for` loop',
+				],
+				hints: [
+					'Use `for a in arr:` to iterate through each element',
+					'Create a `total = 0` variable, and add each element to total inside the loop',
+				],
+			},
+			{
+				id: 'p2',
+				title: 'Min Array',
+				objectives: [
+					'Create a function `minArray` that returns the minimum element in a non-empty array using a `for` loop',
+				],
+				hints: [
+					'Create a `min_value` variable to track the minimum value so far',
+					'Initialize `min_value` to the first element with `min_value = arr[0]`',
+				],
+			},
+			{
+				id: 'p3',
+				title: 'Max Array',
+				objectives: [
+					'Create a function `maxArray` that returns the maximum element in a non-empty array using a `for` loop',
+				],
+				hints: [
+					'This is very similar to Min Array — just change the comparison direction',
+				],
+			},
+			{
+				id: 'p4',
+				title: 'Fibonacci',
+				objectives: [
+					'Create a function `fibonacci` that returns a list containing the first `n` terms of the Fibonacci sequence',
+				],
+				mechanics: [
+					'The Fibonacci sequence starts with 0, 1 and each subsequent number is the sum of the two preceding ones: 0, 1, 1, 2, 3, 5, 8...',
+				],
+				hints: [
+					'Use `arr[-1]` and `arr[-2]` to access the last two elements of the array',
+					'Start with `arr = [0, 1]` and use a `for` loop to append new Fibonacci numbers',
+					'Handle the edge cases for n=0 and n=1 before the loop with early `return` statements',
+				],
+			},
 		],
 	},
 	{
@@ -300,10 +475,71 @@ else:
 		title: 'Q8 - Review',
 		description: 'Create arrays, loop over the elements, and apply all concepts learned.',
 		parts: [
-			{ id: 'p1', title: 'Create and Modify Arrays', objectives: [] },
-			{ id: 'p2', title: 'Loop and Transform', objectives: [] },
-			{ id: 'p3', title: 'Functions with Arrays', objectives: [] },
-			{ id: 'p4', title: 'Putting It All Together', objectives: [] },
+			{
+				id: 'p1',
+				title: 'Find the bug',
+				objectives: [
+					'The function `addFirstThree` contains a bug - write a test case that finds this bug and returns false',
+				],
+				mechanics: [
+					'Test cases check a function\'s output against its expected output to verify correctness',
+				],
+				hints: [
+					'Find which input triggers the bug, and write a test case using that input and its CORRECT output',
+					'The function exits too early on arrays that are only 3 elements long',
+				],
+				codeExamples: [
+					`def add(a, b):\n    return a + b\ntest1 = ( add(2, 3) == 5 )\ntest2 = ( add(-1, 1) == 0 )`,
+				],
+			},
+			{
+				id: 'p2',
+				title: 'Number Stats',
+				objectives: [
+					'Create a function `numStats` that prints whether a number is even/odd, positive/negative/zero, integer/decimal, and a multiple of 5 or not',
+				],
+				mechanics: [
+					'`if` statements execute a block of code if a condition is true; `else` executes if the condition is false',
+				],
+				hints: [
+					'Use `n % 2 == 0` to check even, `n % 5 == 0` to check multiples of 5',
+					'Use `n == int(n)` to check if a number is an integer',
+				],
+				codeExamples: [
+					`if n % 2 == 0:\n    print("even")\nelse:\n    print("odd")`,
+				],
+			},
+			{
+				id: 'p3',
+				title: 'Weighted Sum',
+				objectives: [
+					'Create a function `weightedSum` that returns the sum of each element multiplied by its index, using `enumerate`',
+				],
+				mechanics: [
+					'The `enumerate` function can be used to get both the index and element while looping',
+				],
+				hints: [
+					'Create a `total = 0` variable, and add `index * element` to it in each iteration',
+					'Use `for index, element in enumerate(arr):` to loop with both index and value',
+				],
+				codeExamples: [
+					`for index, element in enumerate(["zero", "one", "two"]):\n    print(index, element)\n# 0 zero\n# 1 one\n# 2 two`,
+				],
+			},
+			{
+				id: 'p4',
+				title: 'Fibonacci Greater Than',
+				objectives: [
+					'Create a function `fibbGTT` that returns the first Fibonacci number greater than `n` using a `while` loop',
+				],
+				mechanics: [
+					'While loops execute until a condition is false',
+				],
+				hints: [
+					'Start with `a, b = 0, 1` and use `a, b = b, a + b` to generate the next Fibonacci number',
+					'Use `while b <= n:` to keep generating until b exceeds n, then return `b`',
+				],
+			},
 		],
 	},
 ];

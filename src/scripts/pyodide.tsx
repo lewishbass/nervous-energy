@@ -299,14 +299,14 @@ import jedi, json as _json
 
 _result = '[]'
 
-past_code = '\\n'.join(_run_history) + ('\\n' if _run_history else '')
-complete_line = _jedi_line + past_code.count('\\n')  # adjust line number for past code
+_past_code = '\\n'.join(_run_history) + ('\\n' if _run_history else '')
+_complete_line = _jedi_line + _past_code.count('\\n')  # adjust line number for past code
 try:
-    _script = jedi.Script(past_code + _jedi_src)
-    _comps  = _script.complete(complete_line, _jedi_col)
+    _script = jedi.Script(_past_code + _jedi_src)
+    _comps  = _script.complete(_complete_line, _jedi_col)
     _result = _json.dumps([
         {'label': c.name, 'kind': c.type, 'detail': c.description}
-        for c in _comps[:50]
+        for c in _comps[:50] if not c.name.startswith('_')
     ])
 except Exception:
     pass

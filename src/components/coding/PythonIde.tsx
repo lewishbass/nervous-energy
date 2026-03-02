@@ -41,6 +41,7 @@ export type PythonIdeProps = {
 	initialHDivider?: number;
 	initialPersistentExec?: boolean;
 	initialWordWrap?: boolean;
+	setupCode?: string;
 	onCodeStartCallback?: (code: string, pyodide: any) => void;
 	onCodeEndCallback?: (code: string, pyodide: any, error: string | null, vars: Record<string, VariableInfo>, stdout: string | null) => void;
 	cachedCode?: string;
@@ -57,6 +58,7 @@ export default function PythonIde({
 	initialHDivider = 50,
 	initialPersistentExec = false,
 	initialWordWrap=true,
+	setupCode = '',
 	onCodeStartCallback,
 	onCodeEndCallback,
 	cachedCode,
@@ -100,7 +102,7 @@ export default function PythonIde({
 	const { pyodide, loading: pyodideLoading, error: pyodideError } = usePyodide();
 	const pyodideRef = useRef(pyodide);
 	const [monacoInstance, setMonacoInstance] = useState<Monaco | null>(null);
-	const runCodeRef = useRef<((code: string) => Promise<void>) | null>(null);
+	const runCodeRef = useRef<((code: string, skipSetup?: boolean, doCallbacks?: boolean) => Promise<void>) | null>(null);
 
 	// ---------- File helpers (localStorage) ----------
 
@@ -135,6 +137,13 @@ export default function PythonIde({
 
 	useEffect(() => {
 		pyodideRef.current = pyodide;
+		// run setup code and caputure vars
+		if (pyodide && setupCode) {
+			pyodide.globals.set('_setup_code', setupCode);
+			pyodide.runPythonAsync(`
+
+				`);
+		}
 	}, [pyodide]);
 
 	// Auto-scroll terminal on new output
@@ -146,16 +155,14 @@ export default function PythonIde({
 
 	// ---------- Run code ----------
 
-	const runCode = useCallback(async (codeToRun: string) => {
+	const runCode = useCallback(async (codeToRun: string, skipSetup: boolean = false, doCallbacks: boolean = true) => {
 		if (!pyodideRef.current) {
 			setTerminalLines(prev => [...prev, { text: 'Pyodide is still loading…', type: 'error' as const }]);
 			return;
 		}
 
-		
-
 		setRunning(true);
-		onCodeStartCallback?.(codeToRun, pyodideRef.current);
+		if(doCallbacks)onCodeStartCallback?.(codeToRun, pyodideRef.current);
 		setTerminalLines(prev => [...prev, { text: `>> python${isCompact ? '' : ' ' + (documentName || 'playground')}`, type: 'info' as const }]);
 
 		if (!persistentExec) {
@@ -172,9 +179,11 @@ export default function PythonIde({
 				setTerminalLines(prev => [...prev, { text, type: type as 'stdout' | 'stderr' | 'info' | 'error' }]);
 			});
 
-
-			pyodideRef.current.globals.set('_user_code', codeToRun);
+			// Only prepend setupCode for user runs, not when running setup itself
+			const fullCode = (!skipSetup && setupCode && !persistentExec) ? setupCode + "\n\n" + codeToRun : codeToRun;
+			pyodideRef.current.globals.set('_user_code', fullCode);
 			pyodideRef.current.globals.set('_expanded_vars', getExpandedVariables());
+			console.log('expanded vars', getExpandedVariables());
 
 			const resultJson: string = await pyodideRef.current.runPythonAsync(`
 import sys as _sys, json as _json, traceback as _tb, textwrap as _textwrap
@@ -197,9 +206,11 @@ async def __async_exec_wrapper(__globals):
     
     # Get all expanded variables and their children to update their values
     _expanded_vars_refs = {{}}
+    
     for _path_str in _expanded_vars:
+        print("expanding", _path_str)
         _parts = _path_str.split('.')
-        _obj = __globals.get(_parts[0])
+        _obj = __globals.get(_parts[0], locals().get(_parts[0]))
         for _attr in _parts[1:]:
             if _obj is None:
                 break
@@ -254,7 +265,6 @@ _json.dumps({
 		'stdout': _rt_stdout._hist,
 })
 `);
-
 			const parsed = JSON.parse(resultJson);
 			// Errors are not streamed - display them from the result
 			if (parsed.error) {
@@ -303,17 +313,27 @@ _json.dumps({
 			const msg = e instanceof Error ? e.message : String(e);
 			execError = msg;
 			setTerminalLines(prev => [...prev, { text: msg, type: 'error' as const }]);
-		} finally {
+		} finally {persistentExec
 			setRunning(false);
 			setTerminalLines(prev => [...prev, { text: '>> ', type: 'info' as const }]);
-			onCodeEndCallback?.(codeToRun, pyodideRef.current, execError, validationVars, execStdout);
+			if(doCallbacks)onCodeEndCallback?.(codeToRun, pyodideRef.current, execError, validationVars, execStdout);
 		}
-	}, [variables, documentName, isCompact, persistentExec, onCodeStartCallback, onCodeEndCallback]);
+	}, [variables, documentName, isCompact, persistentExec, setupCode, onCodeStartCallback, onCodeEndCallback]);
 
 	// Update the ref whenever runCode changes
 	useEffect(() => {
 		runCodeRef.current = runCode;
 	}, [runCode]);
+
+	// Run setup code once when pyodide becomes ready
+	useEffect(() => {
+		if (!pyodide || !setupCode) return;
+		// Small delay to ensure context is initialized
+		const timer = setTimeout(() => {
+			runCodeRef.current?.('', false, false);
+		}, 100);
+		return () => clearTimeout(timer);
+	}, [pyodide, setupCode]);
 
 	// ---------- Horizontal drag handler ----------
 	const onHMouseDown = useCallback(() => setHDragging(true), []);
@@ -486,7 +506,7 @@ _json.dumps({
 
 				<ToolBtn icon={VscPlay} label={running ? 'Running…' : 'Run (Ctrl+Enter)'} accent="var(--khg)" onClick={() => { if (!running) runCode(code); }} isCompact={isCompact} />
 				<ToolBtn icon={VscDebugStepOver} label="Execute Next Line" accent="var(--khb)" isCompact={isCompact} />
-				<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={() => { resetPyodideContext(); setVariables({}); }} isCompact={isCompact} />
+				<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={() => { resetPyodideContext(); runCodeRef.current?.('', false, false); }} isCompact={isCompact} />
 				<ToolBtn icon={VscDebugStop} label="Stop" accent="var(--khr)" isCompact={isCompact} />
 
 
@@ -603,7 +623,7 @@ _json.dumps({
 										fontLigatures: true,
 										lineNumbers: showLineNumbers ? 'on' : 'off',
 										roundedSelection: true,
-										scrollBeyondLastLine: false,
+										scrollBeyondLastLine: true,
 										automaticLayout: true,
 										padding: { top: 12 },
 										cursorBlinking: 'smooth',

@@ -20,9 +20,11 @@ import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useClickAway } from '@/hooks/useClickAway';
 import SearchExpand from './SearchExpand';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, Language, LANGUAGES } from '@/context/AuthContext';
 import { toys } from '@/data/toys';
-import { link } from 'fs';
+import Flag from "react-world-flags";
+
+
 
 const PROFILE_ROUTE = '/.netlify/functions/profile';
 
@@ -51,7 +53,13 @@ export default function Menu({
   const [newChats, setNewChats] = useState<boolean>(false);
   const [newNotifications, setNewNotifications] = useState<boolean>(false);
 
-  const { username, isLoggedIn } = useAuth();
+  const { username, isLoggedIn, language, setLanguage } = useAuth();
+
+  const lan2country: Record<Language, string> = {
+    'en': '840',
+    'th': '764',
+    'zh': '156',
+  }
 
   useClickAway(menuRef, () => {
     if (isOpen) {
@@ -253,6 +261,18 @@ export default function Menu({
           )}
         </div>
       </div>
+      {/* language flags/}
+        <div className="flex justify-center mt-2 mx-4 rounded-lg overflow-hidden ">
+          {LANGUAGES.map(lang => (
+            <div key={lang} 
+            onClick={() => setLanguage(lang as Language)}
+            style={{ filter : language === lang ? 'grayscale(0%)' : 'grayscale(40%)' }}
+            className={`flex-grow hover:z-100 hover:scale-110 hover:opacity-100 transition-all duration-300 cursor-pointer ${lang === language ? 'opacity-100' : 'opacity-50'}`} 
+            >
+             <Flag code={lan2country[lang as keyof typeof lan2country]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+         </div>
       {/* Dark Mode Toggle with Version Label */}
       <div className="p-6">
         <button
@@ -265,6 +285,7 @@ export default function Menu({
           </div>
           <span className="text-lg">Dark Mode</span>
         </button>
+        
         {backendVersion && (
           <div className="text-xs text-right opacity-35 mb-[-16] mt-[-0] tc1">
             Backend v{backendVersion}
@@ -274,6 +295,7 @@ export default function Menu({
           </div>
         )}
       </div>
+      
     </div>
   );
 }
