@@ -4,6 +4,7 @@ import { LectureTemplate, LectureIcon } from './LectureTemplate';
 import { CodeBlock } from '@/components/CodeBlock';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import { LectureEquation } from './lecture-components/LectureEquation';
+import { GraphVisualizer, linkedListGraph, binaryTreeGraph, heapGraph } from './lecture-components/GraphVisualizer';
 
 import Prism from 'prismjs';
 
@@ -37,7 +38,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
       {/* Title */}
       <section className="lecture-section mini-scroll">
         <h2 className="tc1 lecture-big-title">Advanced Data Structures</h2>
-        <h3 className="tc2 lecture-section-header">Performance, algorithms, and beyond lists</h3>
+        <h3 className="tc2 lecture-section-header">Performance, Algorithms, Accessing and Modifying</h3>
       </section>
 
       {/* Table of contents */}
@@ -228,15 +229,15 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
             <tbody>
               <tr className="lecture-table-row">
                 <td className="lecture-table-header">Directed</td>
-                <td className="lecture-table-cell">Edges represent a one-way relationship — twitter follower, web page link, supply chain</td>
+                <td className="lecture-table-cell">Edges represent a one-way relationship - twitter follower, web page link, supply chain</td>
               </tr>
               <tr className="lecture-table-row">
                 <td className="lecture-table-header">Undirected</td>
-                <td className="lecture-table-cell">Relation between nodes is symmetric — facebook friend, neighbors, classmates</td>
+                <td className="lecture-table-cell">Relation between nodes is symmetric - facebook friend, neighbors, classmates</td>
               </tr>
               <tr className="">
                 <td className="lecture-table-header">Weighted</td>
-                <td className="lecture-table-cell">Edges have weights representing distance, strength, or cost — physical distance, travel time, similarity</td>
+                <td className="lecture-table-cell">Edges have weights representing distance, strength, or cost - physical distance, travel time, similarity</td>
               </tr>
             </tbody>
           </table>
@@ -335,6 +336,37 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
             </tbody>
           </table>
         </div>
+
+        <div className="mb-4 mx-auto">
+          <GraphVisualizer
+            graph={{
+              nodes: [
+                { id: 'alice',  label: 'Alice',  x: 50, y: 15 },
+                { id: 'bob',    label: 'Bob',    x: 15, y: 45 },
+                { id: 'carol',  label: 'Carol',  x: 85, y: 45 },
+                { id: 'dave',   label: 'Dave',   x: 10, y: 85 },
+                { id: 'eve',    label: 'Eve',    x: 50, y: 88 },
+                { id: 'frank',  label: 'Frank',  x: 90, y: 85 },
+              ],
+              edges: [
+                { source: 'alice', target: 'bob',   directed: true },
+                { source: 'alice', target: 'carol',  directed: true },
+                { source: 'bob',   target: 'alice',  directed: true },
+                { source: 'bob',   target: 'dave',   directed: true },
+                { source: 'carol', target: 'frank',  directed: true },
+                { source: 'carol', target: 'bob',    directed: true },
+                { source: 'dave',  target: 'eve',    directed: true },
+                { source: 'eve',   target: 'alice',  directed: true },
+                { source: 'eve',   target: 'carol',  directed: true },
+                { source: 'frank', target: 'alice',  directed: true },
+              ],
+            }}
+            height={280}
+            nodeRadius={32}
+            fontSize={13}
+            caption="A directed graph of Twitter follows - arrows show who follows whom"
+          />
+        </div>
       </section>
       
       {/* ── Linked Lists ── */}
@@ -348,6 +380,15 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
           Each node has a value and a directed edge to the next node in the list.
           They can be traversed by starting at the head and following the edges one by one until you reach the desired element.
         </p>
+
+          <div className="mb-4 mx-auto">
+            <GraphVisualizer
+              graph={linkedListGraph([3, 7, 1, 9, 4])}
+              height={120}
+              directed
+              caption="A linked list - the highlighted node is the head"
+            />
+          </div>
       </section>
 
       {/* ── Binary Trees ── */}
@@ -359,6 +400,15 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
           A <span className="lecture-bold">binary tree</span> is a <span className="lecture-bold">directed tree</span> graph and a data structure used to sort and store data.
           It is like a linked list, but each node has two children instead of one.
         </p>
+
+          <div className="mb-4 mx-auto">
+            <GraphVisualizer
+              graph={binaryTreeGraph([50, 25, 75, 12, 37, 62, 87])}
+              height={260}
+              directed
+              caption="A balanced binary search tree - left children are less, right children are greater"
+            />
+          </div>
 
         <div className="mb-4 mx-auto">
           <span className="lecture-link">Definitions</span>
@@ -478,6 +528,15 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <p className="lecture-paragraph">
           The shape of the tree depends on the order the values are added. If you add values from a pre-sorted list, you will end up with a lopsided tree that is essentially a linked list, and searching for values will take <span className="lecture-equation-inline"><MathJax inline>{'\\( O(n) \\)'}</MathJax></span> time instead of <span className="lecture-equation-inline"><MathJax inline>{'\\( O(\\log n) \\)'}</MathJax></span>.
         </p>
+
+          <div className="mb-4 mx-auto">
+            <GraphVisualizer
+              graph={binaryTreeGraph([1, 2, 3, 4, 5])}
+              height={300}
+              directed
+              caption="A lopsided tree built from sorted input - degenerates into a linked list"
+            />
+          </div>
       </section>
 
       {/* ── Heaps ── */}
@@ -493,6 +552,15 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
           Instead of requiring the left and right child to be greater and less than the parent, it requires that they are <span className="lecture-bold">both less than the parent</span>.
           This means that the largest value is always at the root of the tree.
         </p>
+
+          <div className="mb-4 mx-auto">
+            <GraphVisualizer
+              graph={heapGraph([4, 10, 3, 5, 1, 8, 7])}
+              height={250}
+              directed
+              caption="A max heap - the highlighted root always holds the largest value"
+            />
+          </div>
 
         <div className="mb-4 mx-auto">
           <span className="lecture-link">Add Value Algorithm</span>
@@ -579,13 +647,13 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <div className="lecture-header-decorator" />
 
         <p className="lecture-paragraph">
-          If you have a dataset you want to store and access by a key — for example, students have a <span className="lecture-bold">name</span> and an <span className="lecture-bold">SSN</span> — you want to find a student&#39;s name given their SSN, i.e. index the information by SSN.
+          If you have a dataset you want to store and access by a key - for example, students have a <span className="lecture-bold">name</span> and an <span className="lecture-bold">SSN</span> - you want to find a student&#39;s name given their SSN, i.e. index the information by SSN.
         </p>
 
         <p className="lecture-paragraph">
-          You could store the data in an unordered list, but searching for a student would require iterating over each student — <span className="lecture-equation-inline"><MathJax inline>{'\\( O(n) \\)'}</MathJax></span>:
+          You could store the data in an unordered list, but searching for a student would require iterating over each student - <span className="lecture-equation-inline"><MathJax inline>{'\\( O(n) \\)'}</MathJax></span>:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="linear search — O(n)"
+        <CodeBlock className="lecture-codeblock" language="python" caption="linear search - O(n)"
           code={`def findStudent(ssn):
     for i in range(len(students)):
         if students[i].ssn == ssn:
@@ -595,7 +663,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <p className="lecture-paragraph">
           If you sort the list by SSN, you can use binary search to find a student in <span className="lecture-equation-inline"><MathJax inline>{'\\( O(\\log n) \\)'}</MathJax></span> time:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="binary search — O(log n)"
+        <CodeBlock className="lecture-codeblock" language="python" caption="binary search - O(log n)"
           code={`def findStudent(ssn):
     left, right = 0, len(students) - 1
     while left <= right:
@@ -611,7 +679,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <p className="lecture-paragraph">
           Each SSN is unique, so you could use it to directly represent an index in a very long (mostly empty) list. This works in <span className="lecture-equation-inline"><MathJax inline>{'\\( O(1) \\)'}</MathJax></span> time, but requires a huge amount of memory:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="direct indexing — O(1) but huge memory"
+        <CodeBlock className="lecture-codeblock" language="python" caption="direct indexing - O(1) but huge memory"
           code={`def findStudent(ssn):
     return students[ssn]`} />
 
@@ -624,7 +692,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
           <MathJax inline>{'\\( \\text{hash}(ssn) = ssn \\bmod 1000 \\)'}</MathJax>
         </LectureEquation>
 
-        <CodeBlock className="lecture-codeblock" language="python" caption="hash table lookup — O(1)"
+        <CodeBlock className="lecture-codeblock" language="python" caption="hash table lookup - O(1)"
           code={`def findStudent(ssn):
     index = ssn % 1000
     return students[index]`} />
@@ -642,7 +710,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <p className="lecture-paragraph">
           <span className="lecture-bold">1. Chaining (Buckets):</span> Instead of storing a single student at each index, store a list or <span className="lecture-bold">bucket</span> of students:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="collision handling — chaining"
+        <CodeBlock className="lecture-codeblock" language="python" caption="collision handling - chaining"
           code={`def findStudent(ssn):
     index = ssn % 1000
     bucket = students[index]
@@ -658,7 +726,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         <p className="lecture-paragraph">
           <span className="lecture-bold">2. Open Addressing:</span> When you go to insert a student at <code className="lecture-code-inline">students[index]</code>, check if the index is already occupied. If it is, find the next open index and insert the student there. When you search, if the index is occupied by a different student, keep searching until you find the right student or an empty index:
         </p>
-        <CodeBlock className="lecture-codeblock" language="python" caption="collision handling — open addressing"
+        <CodeBlock className="lecture-codeblock" language="python" caption="collision handling - open addressing"
           code={`def findStudent(ssn):
     index = ssn % 1000
     while students[index] is not None:
@@ -681,7 +749,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
 
         <p className="lecture-paragraph">
           In our student/SSN scenario, mapping the SSN onto the index of a small array is easy. But what if a student walks into the office and wants to know their lunch money balance?
-          You ask the student for their SSN to look them up in the system, and they immediately reply — <span className="lecture-bold">&ldquo;My what?&rdquo;</span>
+          You ask the student for their SSN to look them up in the system, and they immediately reply - <span className="lecture-bold">&ldquo;My what?&rdquo;</span>
         </p>
 
         <p className="lecture-paragraph">
@@ -747,12 +815,12 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         </p>
 
         <p className="lecture-paragraph">
-          This isn&#39;t just a hypothetical with students and lunch money — hash maps are used to map domain names to IP addresses, manage filesystems, stock market data, banking, medical records, government data...
+          This isn&#39;t just a hypothetical with students and lunch money - hash maps are used to map domain names to IP addresses, manage filesystems, stock market data, banking, medical records, government data...
           If unprotected, a single person could take down shopping platforms, traffic lights, or stall a whole area&#39;s internet by sending lots of colliding requests.
         </p>
 
         <p className="lecture-paragraph">
-          To protect against this, dictionaries that use hash tables keep a <span className="lecture-bold">secret key</span> that is used to <span className="lecture-bold">salt</span> the hash function — affecting it randomly — so that even if the attacker knows what function you use, they can&#39;t easily create collisions.
+          To protect against this, dictionaries that use hash tables keep a <span className="lecture-bold">secret key</span> that is used to <span className="lecture-bold">salt</span> the hash function - affecting it randomly - so that even if the attacker knows what function you use, they can&#39;t easily create collisions.
         </p>
       </section>
     </LectureTemplate>

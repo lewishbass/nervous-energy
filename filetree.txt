@@ -11,16 +11,19 @@
 │       └── results.txt
 ├── docs
 │   └── conversation-api.md
+├── messages
 ├── netlify
 │   ├── functions
 │   │   ├── analytics.ts
 │   │   ├── arxive_fetch.ts
 │   │   ├── auth.ts
+│   │   ├── classwork.ts
 │   │   ├── conv.ts
 │   │   ├── keys.ts
 │   │   ├── msc_fetch.ts
 │   │   ├── profile.ts
 │   │   ├── social.ts
+│   │   ├── thread.ts
 │   │   └── version.ts
 │   ├── lib
 │   │   ├── backendutils.ts
@@ -28,44 +31,149 @@
 │   │   └── transcript.ts
 │   └── models
 │       ├── Article.ts
+│       ├── AssignmentSubmission.ts
 │       ├── Conversation.ts
 │       ├── Session.ts
+│       ├── Thread.ts
 │       └── User.ts
 ├── public
 │   ├── books
 │   │   ├── covers
-│   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.jpeg
-│   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.jpeg
-│   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.jpeg
-│   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.jpeg
-│   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.jpg
-│   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.jpg
-│   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.jpg
-│   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.jpg
-│   │   │   ├── Cage_of_Souls_2019_cover.jpg
-│   │   │   ├── Consider Phlebas - Iain M. Banks_cover.jpeg
-│   │   │   ├── Excession - Iain M. Banks_cover.jpg
-│   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.jpeg
-│   │   │   ├── Inversions - Iain M. Banks_cover.jpg
-│   │   │   ├── Look to Windward - Iain M. Banks_cover.jpg
-│   │   │   ├── Matter - Iain M. Banks_cover.jpeg
-│   │   │   ├── Player of Games, The - Iain M. Banks_cover.jpg
-│   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.jpeg
-│   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.jpeg
-│   │   │   ├── Robot_Series_0_3_The_Complete_Robot.jpg
-│   │   │   ├── Robot_Series_0_4_Robot_Dreams.jpg
-│   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.jpg
-│   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.jpg
-│   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.jpeg
-│   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.jpeg
-│   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.jpeg
-│   │   │   ├── State of the Art, The - Iain M. Banks_cover.jpg
-│   │   │   ├── Surface Detail - Iain M. Banks_cover.jpg
-│   │   │   └── Use of Weapons - Iain M. Banks_cover.jpg
+│   │   │   ├── compress
+│   │   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.webp
+│   │   │   │   ├── A_Deepness_in_the_Sky_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── A_Fire_Upon_the_Deep_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_5_Not_Til_We_are_Lost_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Cage_of_Souls_2019_cover.webp
+│   │   │   │   ├── Consider Phlebas - Iain M. Banks_cover.webp
+│   │   │   │   ├── Excession - Iain M. Banks_cover.webp
+│   │   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Inversions - Iain M. Banks_cover.webp
+│   │   │   │   ├── Look to Windward - Iain M. Banks_cover.webp
+│   │   │   │   ├── Matter - Iain M. Banks_cover.webp
+│   │   │   │   ├── Player of Games, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_3_The_Complete_Robot.webp
+│   │   │   │   ├── Robot_Series_0_4_Robot_Dreams.webp
+│   │   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── State of the Art, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Surface Detail - Iain M. Banks_cover.webp
+│   │   │   │   └── Use of Weapons - Iain M. Banks_cover.webp
+│   │   │   ├── full
+│   │   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.jpeg
+│   │   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.jpeg
+│   │   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.jpeg
+│   │   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.jpeg
+│   │   │   │   ├── A_Deepness_in_the_Sky_-_Vernor_Vinge_cover.jpg
+│   │   │   │   ├── A_Fire_Upon_the_Deep_-_Vernor_Vinge_cover.jpg
+│   │   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.jpg
+│   │   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.jpg
+│   │   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.jpg
+│   │   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.jpg
+│   │   │   │   ├── Bobiverse_5_Not_Til_We_are_Lost_-_Dennis_E_Taylor.jpg
+│   │   │   │   ├── Cage_of_Souls_2019_cover.jpg
+│   │   │   │   ├── Consider Phlebas - Iain M. Banks_cover.jpeg
+│   │   │   │   ├── Excession - Iain M. Banks_cover.jpg
+│   │   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.jpeg
+│   │   │   │   ├── Inversions - Iain M. Banks_cover.jpg
+│   │   │   │   ├── Look to Windward - Iain M. Banks_cover.jpg
+│   │   │   │   ├── Matter - Iain M. Banks_cover.jpeg
+│   │   │   │   ├── Player of Games, The - Iain M. Banks_cover.jpg
+│   │   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.jpeg
+│   │   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.jpeg
+│   │   │   │   ├── Robot_Series_0_3_The_Complete_Robot.jpg
+│   │   │   │   ├── Robot_Series_0_4_Robot_Dreams.jpg
+│   │   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.jpg
+│   │   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.jpg
+│   │   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.jpeg
+│   │   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.jpeg
+│   │   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.jpeg
+│   │   │   │   ├── State of the Art, The - Iain M. Banks_cover.jpg
+│   │   │   │   ├── Surface Detail - Iain M. Banks_cover.jpg
+│   │   │   │   └── Use of Weapons - Iain M. Banks_cover.jpg
+│   │   │   ├── thumbnail
+│   │   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.webp
+│   │   │   │   ├── A_Deepness_in_the_Sky_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── A_Fire_Upon_the_Deep_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_5_Not_Til_We_are_Lost_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Cage_of_Souls_2019_cover.webp
+│   │   │   │   ├── Consider Phlebas - Iain M. Banks_cover.webp
+│   │   │   │   ├── Excession - Iain M. Banks_cover.webp
+│   │   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Inversions - Iain M. Banks_cover.webp
+│   │   │   │   ├── Look to Windward - Iain M. Banks_cover.webp
+│   │   │   │   ├── Matter - Iain M. Banks_cover.webp
+│   │   │   │   ├── Player of Games, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_3_The_Complete_Robot.webp
+│   │   │   │   ├── Robot_Series_0_4_Robot_Dreams.webp
+│   │   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── State of the Art, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Surface Detail - Iain M. Banks_cover.webp
+│   │   │   │   └── Use of Weapons - Iain M. Banks_cover.webp
+│   │   │   ├── tiny
+│   │   │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne_cover.webp
+│   │   │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children_cover.webp
+│   │   │   │   ├── A_Deepness_in_the_Sky_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── A_Fire_Upon_the_Deep_-_Vernor_Vinge_cover.webp
+│   │   │   │   ├── Bobiverse_1_We_Are_Legion_We_Are_Bob_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_2_For_We_Are_Many_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_3_All_These_Worlds_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_4_Heavens_River_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Bobiverse_5_Not_Til_We_are_Lost_-_Dennis_E_Taylor.webp
+│   │   │   │   ├── Cage_of_Souls_2019_cover.webp
+│   │   │   │   ├── Consider Phlebas - Iain M. Banks_cover.webp
+│   │   │   │   ├── Excession - Iain M. Banks_cover.webp
+│   │   │   │   ├── Hydrogen Sonata, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Inversions - Iain M. Banks_cover.webp
+│   │   │   │   ├── Look to Windward - Iain M. Banks_cover.webp
+│   │   │   │   ├── Matter - Iain M. Banks_cover.webp
+│   │   │   │   ├── Player of Games, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Robot_Series_0_1_I_Robot_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_2_The_Rest_of_the_Robots_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_0_3_The_Complete_Robot.webp
+│   │   │   │   ├── Robot_Series_0_4_Robot_Dreams.webp
+│   │   │   │   ├── Robot_Series_0_5_Robot_Visions_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_0_6_The_Positronic_Man_-_Isaac_Asimov.webp
+│   │   │   │   ├── Robot_Series_1_The_Caves_of_Steel_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_2_The_Naked_Sun_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── Robot_Series_3_The_Robots_of_Dawn_-_Isaac_Asimov_coverr.webp
+│   │   │   │   ├── State of the Art, The - Iain M. Banks_cover.webp
+│   │   │   │   ├── Surface Detail - Iain M. Banks_cover.webp
+│   │   │   │   └── Use of Weapons - Iain M. Banks_cover.webp
+│   │   │   └── rescale.ipynb
 │   │   ├── (Ringworld, Bk 1) Niven, Larry - Ringworld.epub
 │   │   ├── (Ringworld, Bk 2) Niven, Larry - The Ringworld Engineers.epub
 │   │   ├── (Ringworld, Bk 3) Niven, Larry - The Ringworld Throne.epub
 │   │   ├── (Ringworld, Bk 4) Niven, Larry - Ringworld_s Children.epub
+│   │   ├── A_Deepness_in_the_Sky_-_Vernor_Vinge.epub
+│   │   ├── A_Fire_Upon_the_Deep_-_Vernor_Vinge.epub
 │   │   ├── Cage_of_Souls_2019.epub
 │   │   ├── Consider Phlebas - Iain M. Banks.epub
 │   │   ├── Excession - Iain M. Banks.epub
@@ -90,6 +198,7 @@
 │   │   ├── Taylor_Dennis_E_-_Bobiverse_2_-_For_We_Are_Many.epub
 │   │   ├── Taylor_Dennis_E_-_Bobiverse_3_-_All_These_Worlds.epub
 │   │   ├── Taylor_Dennis_E_-_Bobiverse_4_-_Heaven_39_s_River.epub
+│   │   ├── Taylor_Dennis_E_-_Bobiverse_5_-_Not_Til_We_Are_Lost.epub
 │   │   └── Use of Weapons - Iain M. Banks.epub
 │   ├── images
 │   │   ├── caving
@@ -120,6 +229,18 @@
 │   │   │   │   ├── cave4.jpg
 │   │   │   │   └── cave5.jpg
 │   │   │   └── cave-shirt.jpg
+│   │   ├── classes
+│   │   │   ├── python-automation
+│   │   │   │   ├── 3d_regression.png
+│   │   │   │   ├── Anaconda.svg
+│   │   │   │   ├── Guido_van_Rossum.webp
+│   │   │   │   ├── impact_rate.png
+│   │   │   │   ├── Jupyter_logo.svg
+│   │   │   │   ├── observed_value.webp
+│   │   │   │   ├── python-icon.svg
+│   │   │   │   └── Standard-ASCII-Table_large.webp
+│   │   │   ├── Python-Automation.svg
+│   │   │   └── Python-logo-notext.svg
 │   │   ├── mc
 │   │   │   ├── Acacia_Hanging_Sign.png
 │   │   │   ├── Allium.png
@@ -181,7 +302,7 @@
 │   │   ├── pets
 │   │   │   ├── aster_c.jpg
 │   │   │   ├── kuiper_c.jpg
-│   │   │   ├── me_c.jpg
+│   │   │   ├── me_c.webp
 │   │   │   ├── nutmeg_c.jpg
 │   │   │   └── scottie_c.jpg
 │   │   ├── store
@@ -195,7 +316,77 @@
 │   │   └── gilbert.jpg
 │   ├── papers
 │   │   ├── A_Survey_on_Latent_Reasoning.pdf
+│   │   ├── BackpropZipCode.pdf
+│   │   ├── CascadingImageSegmentation.pdf
+│   │   ├── CellTrackingBenchmark.pdf
+│   │   ├── DeepSegmentation.pdf
+│   │   ├── ImageNet.pdf
+│   │   ├── U-Net.pdf
 │   │   └── VideoDirectorGPT.pdf
+│   ├── sounds
+│   │   └── correct.mp3
+│   ├── tanks
+│   │   ├── bg
+│   │   │   ├── city.svg
+│   │   │   ├── desert.svg
+│   │   │   ├── forest.svg
+│   │   │   ├── mountains.svg
+│   │   │   ├── none.svg
+│   │   │   └── sky.svg
+│   │   ├── items
+│   │   │   ├── air_strike.svg
+│   │   │   ├── atom_bomb.svg
+│   │   │   ├── ball_v2.svg
+│   │   │   ├── ball.svg
+│   │   │   ├── fuel.svg
+│   │   │   ├── hot_shower.svg
+│   │   │   ├── large_ball_v2.svg
+│   │   │   ├── large_ball.svg
+│   │   │   ├── missile.svg
+│   │   │   ├── parachutes.svg
+│   │   │   ├── repair_kit.svg
+│   │   │   ├── shield.svg
+│   │   │   ├── shower.svg
+│   │   │   ├── small_atom_bomb.svg
+│   │   │   ├── small_ball_v2.svg
+│   │   │   ├── small_ball.svg
+│   │   │   ├── small_missile.svg
+│   │   │   ├── strong_shield.svg
+│   │   │   ├── super_shield.svg
+│   │   │   ├── teleport.svg
+│   │   │   ├── upgrade_armor.svg
+│   │   │   ├── upgrade_energy.svg
+│   │   │   ├── upgrade_engine.svg
+│   │   │   ├── upgrade_hill_mov.svg
+│   │   │   ├── volcano_bomb.svg
+│   │   │   └── weak_shield.svg
+│   │   ├── props
+│   │   │   ├── cloud.svg
+│   │   │   ├── explosion.svg
+│   │   │   ├── fire.svg
+│   │   │   ├── forest-tree.svg
+│   │   │   ├── fuel.svg
+│   │   │   ├── health.svg
+│   │   │   ├── mountain-tree.svg
+│   │   │   ├── parachutes.svg
+│   │   │   ├── repair_kit.svg
+│   │   │   ├── sun.svg
+│   │   │   ├── tank.svg
+│   │   │   └── teleport.svg
+│   │   ├── sounds
+│   │   │   ├── aim.mp3
+│   │   │   ├── bang.mp3
+│   │   │   ├── boom.mp3
+│   │   │   ├── click.mp3
+│   │   │   ├── crack.mp3
+│   │   │   ├── doors.mp3
+│   │   │   ├── fire.mp3
+│   │   │   └── kaboom.mp3
+│   │   ├── arrow.svg
+│   │   ├── FullLogo.svg
+│   │   ├── menu_s.webp
+│   │   ├── mf.otf
+│   │   └── shop_s.webp
 │   ├── file.svg
 │   ├── filter.svg
 │   ├── FullLogo.svg
@@ -216,11 +407,159 @@
 │   │   ├── analytics
 │   │   │   └── page.tsx
 │   │   ├── books
+│   │   │   ├── focus
+│   │   │   │   └── page.tsx
 │   │   │   ├── book_info_type.json
 │   │   │   ├── book_info.json
 │   │   │   ├── books.css
 │   │   │   └── page.tsx
+│   │   ├── classes
+│   │   │   ├── python-automation
+│   │   │   │   ├── exercises
+│   │   │   │   │   ├── cli-todo-manager
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── code-optimization
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── data-structures
+│   │   │   │   │   │   ├── q1
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q2
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q3
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q4
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q5
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q6
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q7
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q8
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── exercise-components
+│   │   │   │   │   │   ├── AssignmentOverview.tsx
+│   │   │   │   │   │   ├── BackToAssignment.tsx
+│   │   │   │   │   │   ├── CopyCode.tsx
+│   │   │   │   │   │   ├── ExerciseOverview.css
+│   │   │   │   │   │   ├── ExerciseOverview.tsx
+│   │   │   │   │   │   ├── ExerciseUtils.tsx
+│   │   │   │   │   │   ├── NextQuestion.tsx
+│   │   │   │   │   │   ├── QuestionBorderAnimation.css
+│   │   │   │   │   │   ├── QuestionBorderAnimation.tsx
+│   │   │   │   │   │   ├── QuestionHeader.tsx
+│   │   │   │   │   │   ├── QuestionPart.tsx
+│   │   │   │   │   │   └── questionparts.tsx
+│   │   │   │   │   ├── expense-tracker
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── final-project
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── final-project-proposal
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── functions-arrays-loops
+│   │   │   │   │   │   ├── overview
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q1
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q2
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q3
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q4
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q5
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q6
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q7
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q8
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── intro-survey
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── simple-coding-practice
+│   │   │   │   │   │   ├── overview
+│   │   │   │   │   │   │   ├── overview.css
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q1
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q2
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q3
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q4
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q5
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q6
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q7
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   ├── q8
+│   │   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── text-analyzer
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── unit-1-quiz
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── unit-4-quiz
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── lectures
+│   │   │   │   │   ├── lecture-components
+│   │   │   │   │   │   ├── GraphVisualizer.tsx
+│   │   │   │   │   │   ├── LectureEquation.tsx
+│   │   │   │   │   │   └── TreeVisuzlizer.tsx
+│   │   │   │   │   ├── 01-SetupLecture.tsx
+│   │   │   │   │   ├── 02-VariablesLecture.tsx
+│   │   │   │   │   ├── 03-BagLecture.tsx
+│   │   │   │   │   ├── 04-ListLecture.tsx
+│   │   │   │   │   ├── 05-FlowControlLecture.tsx
+│   │   │   │   │   ├── 06-BreaksInline.tsx
+│   │   │   │   │   ├── 06.5-IntroToML.tsx
+│   │   │   │   │   ├── 07-TupleSetDict.tsx
+│   │   │   │   │   ├── 08-MoreDataStructures.tsx
+│   │   │   │   │   ├── 09-SortingLecture.tsx
+│   │   │   │   │   ├── 10-ClassesLecture.tsx
+│   │   │   │   │   ├── 11-FilesLecture.tsx
+│   │   │   │   │   ├── 12-FileSystemLecture.tsx
+│   │   │   │   │   ├── 12-RecursionLecture.tsx
+│   │   │   │   │   ├── 13-InterfacesLecture.tsx
+│   │   │   │   │   ├── 14-PackagingLecture.tsx
+│   │   │   │   │   ├── 15-ProjectLecture.tsx
+│   │   │   │   │   ├── 16-InlineLogicLecture.tsx
+│   │   │   │   │   ├── 17-DecoratorsLecture.tsx
+│   │   │   │   │   ├── DummyLecture.tsx
+│   │   │   │   │   ├── lecture.css
+│   │   │   │   │   └── LectureTemplate.tsx
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── DiscussionsTab
+│   │   │   │   │   │   └── DiscussionsTab.tsx
+│   │   │   │   │   ├── ExercisesTab
+│   │   │   │   │   │   ├── AdminStats.tsx
+│   │   │   │   │   │   ├── ExercisesTab.tsx
+│   │   │   │   │   │   └── GenericGraph.tsx
+│   │   │   │   │   ├── LecturesTab
+│   │   │   │   │   │   ├── EntranceMap.tsx
+│   │   │   │   │   │   ├── LectureInfo.ts
+│   │   │   │   │   │   └── LecturesTab.tsx
+│   │   │   │   │   ├── ScheduleTab
+│   │   │   │   │   │   ├── ScheduleInfo.ts
+│   │   │   │   │   │   ├── ScheduleTab.tsx
+│   │   │   │   │   │   └── UnitModal.tsx
+│   │   │   │   │   └── SyllabusTab
+│   │   │   │   │       ├── EntranceMap.tsx
+│   │   │   │   │       └── SyllabusTab.tsx
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
 │   │   ├── events
+│   │   │   ├── tabs
+│   │   │   │   ├── BirdsTab.tsx
+│   │   │   │   ├── PreviousTab.tsx
+│   │   │   │   ├── UpcomingTab.tsx
+│   │   │   │   └── WeatherTab.tsx
 │   │   │   └── page.tsx
 │   │   ├── friends
 │   │   │   └── page.tsx
@@ -230,6 +569,9 @@
 │   │   │   └── page.tsx
 │   │   ├── papers
 │   │   │   ├── latent-reasoning
+│   │   │   │   └── page.tsx
+│   │   │   ├── u-net
+│   │   │   │   ├── page.module.css
 │   │   │   │   └── page.tsx
 │   │   │   ├── videodirectorGPT
 │   │   │   │   └── page.tsx
@@ -258,9 +600,35 @@
 │   │   │   ├── one-step-learning-rate
 │   │   │   │   ├── OneStepDemo.tsx
 │   │   │   │   └── page.tsx
+│   │   │   ├── python-playground
+│   │   │   │   └── page.tsx
 │   │   │   ├── stars
 │   │   │   │   ├── page.tsx
 │   │   │   │   └── StarsGameComponent.tsx
+│   │   │   ├── tanks
+│   │   │   │   ├── tankgame
+│   │   │   │   │   ├── scenes
+│   │   │   │   │   │   ├── MainScene
+│   │   │   │   │   │   │   ├── projectiles
+│   │   │   │   │   │   │   │   ├── atom_bombs.ts
+│   │   │   │   │   │   │   │   ├── balls.ts
+│   │   │   │   │   │   │   │   ├── hot_shower.ts
+│   │   │   │   │   │   │   │   ├── missile.ts
+│   │   │   │   │   │   │   │   ├── projectilelist.ts
+│   │   │   │   │   │   │   │   ├── shower.ts
+│   │   │   │   │   │   │   │   ├── small_missile.ts
+│   │   │   │   │   │   │   │   └── volcano_bomb.ts
+│   │   │   │   │   │   │   ├── Dashboard.ts
+│   │   │   │   │   │   │   ├── Projectile.ts
+│   │   │   │   │   │   │   ├── Tank.ts
+│   │   │   │   │   │   │   └── Terrain.ts
+│   │   │   │   │   │   ├── MainScene.tsx
+│   │   │   │   │   │   ├── MenuScene.ts
+│   │   │   │   │   │   └── ShopScene.ts
+│   │   │   │   │   └── TankGame.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── RoomModal.tsx
+│   │   │   │   └── social.tsx
 │   │   │   ├── video-classification
 │   │   │   │   └── page.tsx
 │   │   │   ├── wikipedia-visualizer
@@ -284,8 +652,12 @@
 │   │   ├── backgrounds
 │   │   │   ├── CircleAnimmation.tsx
 │   │   │   ├── LineAnimation.tsx
+│   │   │   ├── RandomBackground.tsx
 │   │   │   ├── SquareAnimation.tsx
+│   │   │   ├── StarBackground.tsx
 │   │   │   └── TriangleAnimation.tsx
+│   │   ├── coding
+│   │   │   └── PythonIde.tsx
 │   │   ├── generics
 │   │   │   ├── ChangePasswordForm.tsx
 │   │   │   ├── DateEdit.tsx
@@ -299,6 +671,7 @@
 │   │   │   └── paper_link.tsx
 │   │   ├── messages
 │   │   │   ├── CreateMessageModal.tsx
+│   │   │   ├── Discussion.tsx
 │   │   │   ├── MessageBubble.tsx
 │   │   │   └── MessageModal.tsx
 │   │   ├── modals
@@ -310,16 +683,21 @@
 │   │   │   ├── StockWidget.tsx
 │   │   │   └── WeatherWidget.tsx
 │   │   ├── AuthModal.tsx
+│   │   ├── CodeBlock.tsx
 │   │   ├── ColorProgressBar.tsx
 │   │   ├── DragCard.tsx
+│   │   ├── FooterContent.tsx
 │   │   ├── HeadMetadata.tsx
+│   │   ├── LoadingSpinner.tsx
 │   │   ├── Menu.tsx
 │   │   ├── Navbar.tsx
-│   │   └── SearchExpand.tsx
+│   │   ├── SearchExpand.tsx
+│   │   └── SignInButton.tsx
 │   ├── context
 │   │   ├── Analytics.tsx
 │   │   └── AuthContext.tsx
 │   ├── data
+│   │   ├── classes.ts
 │   │   ├── papers.ts
 │   │   ├── shopProducts.ts
 │   │   └── toys.ts
@@ -328,12 +706,19 @@
 │   ├── scripts
 │   │   ├── clipboard.tsx
 │   │   ├── enumber.tsx
+│   │   ├── popups.tsx
+│   │   ├── pyodide.tsx
+│   │   ├── rainbowtext.tsx
+│   │   ├── relativetime.tsx
 │   │   └── sourceButtons.tsx
 │   └── styles
 │       ├── buttons.css
+│       ├── code.css
+│       ├── popups.css
 │       ├── sliders.css
 │       └── toggles.css
 ├── .eslintrc.json
+├── deno.lock
 ├── eslint.config.js
 ├── eslint.config.mjs
 ├── filetree.txt

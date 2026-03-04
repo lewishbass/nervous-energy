@@ -417,3 +417,9 @@
 .slideshow .lecture-equation-inline {
   font-size: 1.5vw;
 }
+
+/* Graph Visualizer — expand to fill available space in slideshow mode */
+.slideshow .recharts-responsive-container {
+  width: 80vw !important;
+  min-height: 200px;
+}
