@@ -10,6 +10,7 @@ import { IoSend } from 'react-icons/io5';
 import { Client } from 'colyseus.js';
 
 import RoomModal, { RoomOptions } from './RoomModal';
+import { set } from 'mongoose';
 
 interface Lobby {
 	id: string;
@@ -95,7 +96,11 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 	const [isDragging, setIsDragging] = useState(false);
 	const [chatMessage, setChatMessage] = useState('');
 
+	const [getLobbyError, setGetLobbyError] = useState<string | null>(null);
+
 	const [roomFetchStatus, setRoomFetchStatus] = useState<'idle' | 'fetching' | 'success' | 'error'>('idle');
+
+	const [roomConnectionStatus, setRoomConnectionStatus] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
 	const [rooms, setRooms] = useState<Room[]>([{
 		clients: 0,
@@ -184,7 +189,8 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 			const newPosition = ((e.clientY - rect.top) / rect.height) * 100;
 
 			// Clamp between 20% and 80%
-			setDividerPosition(Math.min(Math.max(newPosition, 0), 100));
+			const clampPosition = newPosition < 10 ? 0 : newPosition > 90 ? 100 : newPosition;
+			setDividerPosition(clampPosition);
 		};
 
 		const handleMouseUp = () => {
@@ -205,8 +211,16 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 	const getLobbies = async () => {
 		// Fetch lobbies from server
 		setRoomFetchStatus('fetching');
+		setGetLobbyError(null);
+		if (!isLoggedIn) {
+			setTimeout(() => setRoomFetchStatus('error'), 100);
+			setGetLobbyError('Log in to fetch lobbies');
+			console.error('User must be logged in to fetch lobbies');
+			return;
+		}
 		if (!client) {
-			setTimeout(() => setRoomFetchStatus('error'), 3000);
+			setTimeout(() => setRoomFetchStatus('error'), 100);
+			setGetLobbyError('No client available');
 			console.error('No client available to fetch lobbies');
 			return;
 		}
@@ -223,6 +237,71 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 		});
 	};
 
+	// get lobbies on client change, and every 30 seconds
+	useEffect(() => {
+		getLobbies();
+		const interval = setInterval(getLobbies, 30000);
+		return () => clearInterval(interval);
+	}, [client]);
+
+	const attemptRoomJoin = (roomId: string) => {
+		if (!isLoggedIn) {
+			setGetLobbyError('Log in to join rooms');
+			console.error('User must be logged in to join rooms');
+			return;
+		}
+		if (!client) {
+			setGetLobbyError('No client available to join rooms');
+			console.error('No client available to join rooms');
+			return;
+		}
+
+		setSelectedLobby(roomId);
+
+		setRoomConnectionStatus('connecting');
+		client.join(roomId).then((room: Room) => {
+			console.log('Joined room:', room);
+			setRoomConnectionStatus('connected');
+			// You can navigate to the game screen or update the UI accordingly
+		}).catch((error: any) => {
+			console.error('Error joining room:', error);
+			setRoomConnectionStatus('error');
+			setGetLobbyError('Failed to join room');
+		});
+	}
+
+	const attemptRoomLeave = () => {
+		if (!client) {
+			setGetLobbyError('No client available to leave rooms');
+			console.error('No client available to leave rooms');
+			return;
+		}
+		if (roomConnectionStatus !== 'connected') {
+			setGetLobbyError('Not connected to any room');
+
+			console.error('Not connected to any room');
+			return;
+		}
+
+		client.leave(selectedLobby).then(() => {
+			console.log('Left room:', selectedLobby);
+			setRoomConnectionStatus('idle');
+			setSelectedLobby(null);
+			// You can navigate back to the lobby screen or update the UI accordingly
+		})
+			.catch((error: any) => {
+				console.error('Error leaving room:', error);
+				setGetLobbyError('Failed to leave room');
+			});
+	}
+	const handleLobbyClick = (roomId: string) => {
+		if (selectedLobby === roomId && roomConnectionStatus == 'connected') {
+			attemptRoomLeave();
+		}
+		else {
+			attemptRoomJoin(roomId);
+		}
+	}
 
 
 	if (lobbiesCollapsed && playersCollapsed) {
@@ -253,10 +332,12 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 				</div>
 				<div className="overflow-y-scroll mini-scroll transition-all duration-300 flex-grow bg1" style={{ maxHeight: lobbiesCollapsed ? '0' : playersCollapsed ? '800px' : '400px' }}>
 					<div className="space-y-2 p-4">
+						{getLobbyError && <div className="text-red-500 text-sm font-normal -mt-2 mb-2">{getLobbyError}</div>}
+
 						{rooms.map((lobby) => (
 							<div
 								key={lobby.roomId}
-								onClick={() => setSelectedLobby(lobby.roomId)}
+								onClick={() => handleLobbyClick(lobby.roomId)}
 								className={`p-3 rounded-xl cursor-pointer transition-all duration-300 ${selectedLobby === lobby.roomId
 										? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 outline-2 outline-blue-500/50'
 										: 'bg2 opacity-50 hover:opacity-80 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10'
@@ -294,7 +375,7 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 			</div>
 
 			{/* Current Lobby Players & Chat */}
-			{selectedLobby && (
+			{true && (
 				<div className={`bg2 rounded-3xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col transition-all ${playersCollapsed ? 'flex-grow-0' : 'flex-grow'}`}>
 					<div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-green-500/10 to-emerald-500/10 cursor-pointer select-none" onClick={() => setPlayersCollapsed(!playersCollapsed)} >
 						<h3 className="text-xl font-bold tc1 flex items-center">
@@ -330,7 +411,7 @@ export default function Social({ username, subToken, isLoggedIn, client }: Socia
 						{/* Draggable Divider */}
 						<div
 							onMouseDown={handleDividerMouseDown}
-							className={`select-none h-1 bg-gradient-to-r from-green-500/30 to-emerald-500/30 hover:from-green-500/50 hover:to-emerald-500/50 cursor-ns-resize flex items-center justify-center group ${isDragging ? 'from-green-500/70 to-emerald-500/70' : ''}`}
+							className={`select-none ${dividerPosition <= 10 || dividerPosition >= 90 ? 'h-2' : 'h-1'} bg-gradient-to-r from-green-500/30 to-emerald-500/30 hover:from-green-500/50 hover:to-emerald-500/50 cursor-ns-resize flex items-center justify-center group ${isDragging ? 'from-green-500/70 to-emerald-500/70' : ''}`}
 						>
 							<div className="w-12 h-1 bg-green-500/50 rounded-full group-hover:bg-green-500/70 transition-all" />
 						</div>

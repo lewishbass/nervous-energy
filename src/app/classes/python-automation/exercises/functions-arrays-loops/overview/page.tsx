@@ -553,7 +553,7 @@ export default function OverviewPage() {
 			questions={questions}
 			title="Ex2: Functions, Arrays & Loops - Overview"
 			subtitle="Python for Automation and Scripting"
-			unitLabel="Unit 1: Core Programming Concepts"
+			unitLabel="Unit 2: Flow Control"
 			backgroundSeed={10}
 		/>
 	);

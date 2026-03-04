@@ -1,43 +1,42 @@
 import React from 'react';
 import {LectureTemplate, LectureIcon} from './LectureTemplate';
 
-interface ListOperationsLectureProps {
+interface RecursionLectureProps {
   displayMode?: 'scrollable' | 'slideshow';
   className?: string;
   style?: React.CSSProperties;
   exitFSCallback?: () => void;
 }
 
-function ListOperationsLecture(props: ListOperationsLectureProps | null) {
+function RecursionLecture(props: RecursionLectureProps | null) {
 	const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
       <section className="mb-4">
         <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
-          <li>Advanced list operations</li>
-          <li>Sorting Algorithms</li>
-          <li>List comprehensions</li>
-          <li>Introduction to NumPy arrays</li>
-          <li>Performance considerations</li>
+          <li>Understanding recursion</li>
+          <li>Simple Tree Traversal</li>
+          <li></li>
+          <li>Binary file operations</li>
         </ul>
       </section>
     </LectureTemplate>
   );
 }
 
-interface ListOperationsLectureIconProps {
+interface RecursionLectureIconProps {
 	displayMode?: 'list' | 'card';
 	className?: string;
 	style?: React.CSSProperties;
 	onClick?: () => void;
 }
 
-function ListOperationsLectureIcon(props: ListOperationsLectureIconProps | null) {
+function RecursionLectureIcon(props: RecursionLectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="List Operations and Arrays" summary="Advanced techniques for working with collections." displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="Recursion" summary="Understand and implement recursive functions in Python." displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 
-export { ListOperationsLecture, ListOperationsLectureIcon };
+export { RecursionLecture, RecursionLectureIcon };

@@ -370,3 +370,50 @@
   font-size: 1.4vw;
   padding: 0.3rem 0.6rem;
 }
+
+/* Equations (block) */
+.scrollview .lecture-equation {
+  width: 100%;
+  text-align: center;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
+  background: rgba(181, 213, 214, 0.1);
+  border-radius: 0.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  line-height: 2;
+  box-sizing: border-box;
+}
+
+.slideshow .lecture-equation {
+  width: 100%;
+  text-align: center;
+  padding: 2rem 2.5rem;
+  margin: 1.5rem 0;
+  font-size: 2vw;
+  background: rgba(181, 213, 214, 0.1);
+  border-radius: 1rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  line-height: 2;
+  box-sizing: border-box;
+}
+
+.dark .lecture-equation {
+  background: rgba(43, 43, 78, 0.25);
+}
+
+/* Equations (inline) */
+.lecture-equation-inline {
+  display: inline;
+  vertical-align: baseline;
+}
+
+.scrollview .lecture-equation-inline {
+  font-size: 1rem;
+}
+
+.slideshow .lecture-equation-inline {
+  font-size: 1.5vw;
+}

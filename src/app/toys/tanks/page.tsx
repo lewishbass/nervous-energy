@@ -16,7 +16,7 @@ import { useAuth } from '@/context/AuthContext';
 
 import { Client, Room } from '@colyseus/sdk'
 const TANKS_SERVER_ENDPOINT = "tanks.lewisbass.org";
-
+3
 const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 	ssr: false,
 	loading: () => <LoadingSpinner className="h-full" text="Loading Tank Game..." size="lg" />,
@@ -117,7 +117,14 @@ export default function TanksPage() {
 	}
 
 	const connectColyseus = async () => {
-		setClient(new Client(`http://${TANKS_SERVER_ENDPOINT}`));
+		const client = new Client(`wss://${TANKS_SERVER_ENDPOINT}`);
+		if (client) {
+			setClient(client);
+			console.log('Colyseus client initialized');
+		}
+		else {
+			console.error('Failed to initialize Colyseus client');
+		}
 	}
 
 	return (
@@ -210,7 +217,7 @@ export default function TanksPage() {
 						<FaBook />
 						How to Play
 					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 						<div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-6 rounded-xl">
 							<h3 className="text-xl font-bold tc1 mb-3 flex items-center gap-2">
 								<FaGamepad />
@@ -251,6 +258,17 @@ export default function TanksPage() {
 								<li>• Capture control points</li>
 								<li>• Work with your team</li>
 								<li>• Top the leaderboard</li>
+							</ul>
+						</div>
+						<div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 p-6 rounded-xl">
+							<h3 className="text-xl font-bold tc1 mb-3 flex items-center gap-2">
+								<GiCrossedSwords />
+								Multiplayer
+							</h3>
+							<ul className="tc2 space-y-2">
+								<li className="text-red-500">• Multiplayer is WIP</li>
+								<li>• Expand the multiplayer tab in the bottom left</li>
+								<li>• Find and join public rooms</li>
 							</ul>
 						</div>
 					</div>

@@ -7,6 +7,14 @@ import { MainScene } from "./scenes/MainScene"
 import { ShopScene } from "./scenes/ShopScene"
 import { MenuScene } from './scenes/MenuScene'
 
+
+// TODO:
+// - teleport
+// - air strike
+// - parachute
+// - repair kit
+// - shield
+
 interface PhaserGameProps {
 	width?: number
 	height?: number

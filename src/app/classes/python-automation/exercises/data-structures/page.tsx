@@ -10,11 +10,11 @@ import RandomBackground from '@/components/backgrounds/RandomBackground';
 import BackToAssignment from '../exercise-components/BackToAssignment';
 
 const className = 'python-automation';
-const assignmentName = 'functions-arrays-loops';
+const assignmentName = 'data-structures';
 
 const questionPartMap: Record<string, string[]> = {
   q1: ['p1', 'p2', 'p3'],
-  q2: ['p1', 'p2', 'p3'],
+  q2: ['p1', 'p2', 'p3', 'p4'],
   q3: ['p1', 'p2', 'p3', 'p4'],
   q4: ['p1', 'p2', 'p3', 'p4'],
   q5: ['p1', 'p2', 'p3', 'p4'],
@@ -35,7 +35,7 @@ function computeQuestionStatus(qName: string, states: Record<string, any>): stri
   return 'in-progress';
 }
 
-export default function FunctionsArraysLoops() {
+export default function DataStructures() {
   const router = useRouter();
   const { isLoggedIn, username, token } = useAuth();
   const [questionStatuses, setQuestionStatuses] = useState<Record<string, string>>({});
@@ -54,22 +54,22 @@ export default function FunctionsArraysLoops() {
     });
   }, [isLoggedIn, username, token]);
 
-  const assignmentPath = 'functions-arrays-loops';
+  const assignmentPath = 'data-structures';
 
   const questions: { title: string; link: string; description: string; status?: string }[] = [
-    { title: 'Q1-Intro To Functions', link: `${assignmentPath}/q1`, description: 'Define simple functions with parameters, return values, and call them.' },
-    { title: 'Q2-Test Cases', link: `${assignmentPath}/q2`, description: 'Write functions and test cases, verify function behavior and correctness.' },
-    { title: 'Q3-Making and Editing Arrays', link: `${assignmentPath}/q3`, description: 'Initialize arrays with values, modify elements, retrieve values.' },
-    { title: 'Q4-If Statements', link: `${assignmentPath}/q4`, description: 'Switch between two different code paths using if statements.' },
-    { title: 'Q5-For Loops', link: `${assignmentPath}/q5`, description: 'Use for loops to traverse array elements.' },
-    { title: 'Q6-While Loops', link: `${assignmentPath}/q6`, description: 'Use while loops for condition-based iteration.' },
-    { title: 'Q7-Sums, Min and Max, Fourier', link: `${assignmentPath}/q7`, description: 'Implement algorithms to perform array operations..' },
-    { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Create arrays, loop over the elements, and apply all concepts learned.' },
+    { title: 'Q1-Tuples', link: `${assignmentPath}/q1`, description: 'Pack and unpack tuples, use the asterisk operator, and combine tuples with functions.' },
+    { title: 'Q2-Dictionaries', link: `${assignmentPath}/q2`, description: 'Create, edit, and access dictionaries using keys and values.' },
+    { title: 'Q3-Stacks and Queues', link: `${assignmentPath}/q3`, description: 'Implement and use stack (LIFO) and queue (FIFO) data structures.' },
+    { title: 'Q4-Linked Lists', link: `${assignmentPath}/q4`, description: 'Build linked lists and perform traversal, insertion, and deletion operations.' },
+    { title: 'Q5-Tree Traversal', link: `${assignmentPath}/q5`, description: 'Construct binary trees and implement in-order, pre-order, and post-order traversal.' },
+    { title: 'Q6-Heap Sort', link: `${assignmentPath}/q6`, description: 'Build a heap and use it to sort data efficiently.' },
+    { title: 'Q7-Hash Tables', link: `${assignmentPath}/q7`, description: 'Implement a hash table with collision handling and key-value lookups.' },
+    { title: 'Q8-Review', link: `${assignmentPath}/q8`, description: 'Apply all data structure concepts learned to solve a multi-part problem.' },
   ].map(q => ({ ...q, status: questionStatuses[q.link.split('/').pop()!] }));
 
   return (
     <>
-    <RandomBackground seed={10} density={0.5} />
+    <RandomBackground seed={11} density={0.5} />
     <div className="p-6 max-w-4xl mx-auto mb-20 min-h-screen">
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
@@ -82,9 +82,9 @@ export default function FunctionsArraysLoops() {
             onClick={() => router.push('/classes/python-automation')}
           />
           <div className="backdrop-blur-sm rounded-lg">
-            <h1 className="text-4xl font-bold tc1">Functions, Arrays & Loops</h1>
+            <h1 className="text-4xl font-bold tc1">Data Structures</h1>
             <p className="tc2 text-lg mt-2">Python for Automation and Scripting</p>
-              <p className="tc3 text-sm">Unit 2: Flow Control</p>
+            <p className="tc3 text-sm">Unit 3: The Data Structures Toolbox</p>
           </div>
         </div>
       </div>
@@ -96,18 +96,20 @@ export default function FunctionsArraysLoops() {
       </div>
 
       <div className="bg1 rounded-lg p-8 pt-4 shadow-sm border border-gray-200 dark:border-gray-800">
-        <AssignmentOverview 
-          title="Functions, Arrays & Loops"
-          description="Master the fundamental building blocks of programming by learning to write reusable functions, organize data in arrays, and control program flow with loops."
-          objectives={[
-            'Define and call functions with parameters and return values',
-            'Create and manipulate arrays and access elements by index',
-            'Use for loops to iterate over fixed ranges and arrays',
-            'Use while loops for condition-based iteration',
-            'Combine functions, arrays, and loops to solve problems',
-          ]}
+        <AssignmentOverview
+          title="Data Structures"
+          description="Explore the essential data structures used in programming, from simple tuples and dictionaries to linked lists, trees, heaps, and hash tables."
+            /*objectives={[
+            'Pack and unpack tuples and use the asterisk operator',
+            'Create and manipulate dictionaries with key-value pairs',
+            'Implement stacks and queues using lists',
+            'Build and traverse linked lists',
+            'Perform tree traversal algorithms',
+            'Sort data using a heap and understand heap operations',
+            'Implement a hash table with basic collision handling',
+          ]}*/
           startHref={`${assignmentPath}/q1`}
-            endHref={`${assignmentPath}/overview`}
+          endHref={`${assignmentPath}/overview`}
           questionList={questions}
           className="mb-8"
         />
