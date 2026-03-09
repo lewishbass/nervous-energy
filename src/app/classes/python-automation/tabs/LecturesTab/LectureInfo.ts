@@ -41,7 +41,7 @@ export const lectureList: LecturePair[] = [
 	//{ finished: true, icon: IntroToMLLectureIcon, lecture: IntroToMLLecture, index: 6.5, classNumber: 5 },
 	{ finished: true, icon: TupleSetDictIcon, lecture: TupleSetDict, index: 7, classNumber: 5 },
 	{ finished: true, icon: MoreDataStructuresIcon, lecture: MoreDataStructures, index: 8, classNumber: 6 },
-	{ finished: false, icon: SortingLectureIcon, lecture: SortingLecture, index: 9, classNumber: 7 },
+	{ finished: true, icon: SortingLectureIcon, lecture: SortingLecture, index: 9, classNumber: 7 },
 	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 10, classNumber: 8 },
 	{ finished: false, icon: RecursionLectureIcon, lecture: RecursionLecture, index: 11, classNumber: 9 },
 	{ finished: false, icon: FilesLectureIcon, lecture: FilesLecture, index: 11, classNumber: 10 },

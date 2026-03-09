@@ -17,34 +17,14 @@ export default function ResumePage() {
 				<TriangleAnimation
 					radiusRange={[300, 1200]}
 					seed={456}
-					style={{ opacity: 0.5 }}
+					style={{ opacity: 0.75 }}
+					doAnimation={false}
+					depth={6}
 				/>
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 p-6 max-w-4xl mx-auto backdrop-blur-sm min-h-screen tc2 pb-200">
-				{/*<div className="mb-6 flex justify-between items-center">
-					<Link
-						href="/"
-						className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-x-[-2px] transition-all duration-200 shadow-md"
-						style={{ background: "var(--khg)" }}
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-						</svg>
-						Home
-					</Link>
-
-					<div className="flex gap-2">
-						<DownloadButton
-							relativePath="src/app/resume/page.tsx"
-							fileName="resume_page.tsx"
-						/>
-						<GitHubButton
-							relativePath="src/app/resume/page.tsx"
-						/>
-					</div>
-				</div>*/}
+			<div className="relative z-10 p-6 max-w-4xl mx-auto bg-white/50 dark:bg-black/50 backdrop-blur-sm min-h-screen tc2 pb-200">
 
 				{/* Header */}
 				<h1 className="text-4xl font-bold mb-1 tc1">Lewis Bass</h1>
@@ -73,7 +53,7 @@ export default function ResumePage() {
 				{/* Career Goals */}
 				<div className="prose dark:prose-invert max-w-none">
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Career Goals</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#ff0000] via-[#ff000000] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#ff0000ff] via-[#ff000000] to-[#ff000000] rounded-full"></div>
 					<div className="be">
 						<p className="tc2 text-lg">
 							Experienced AI/ML researcher looking to turn my extensive knowledge of Mathematics and Computing theory into practical experience; to contribute to innovative solutions and expand expertise in project frameworks and state-of-the-art ML/AI technologies.
@@ -82,7 +62,7 @@ export default function ResumePage() {
 
 					{/* Education */}
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Education</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#ff7f00] via-[#ff7f0000] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#ff7f00] via-[#ff7f0000] to-[#00000000] rounded-full"></div>
 					<div className="be">
 						<div className="space-y-4">
 							<div className="flex justify-between items-start flex-wrap gap-2">
@@ -111,9 +91,22 @@ export default function ResumePage() {
 
 					{/* Work Experience */}
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Work Experience</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#ffff00] via-[#ffff0000] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#ffff00] via-[#ffff0000] to-[#00000000] rounded-full"></div>
 					<div className="be">
 						<div className="space-y-6">
+							<div>
+								<div className="flex justify-between items-start flex-wrap gap-2 mb-2">
+									<h3 className="text-xl font-semibold tc1">Python Instructor</h3>
+									<span className="tc2 italic">2026</span>
+								</div>
+								<ul className="list-disc pl-6 tc2 space-y-1">
+									<li>Instructing a Python programming course at Henrico County Public Schools.</li>
+									<li>Developing curriculum, lectures and interactive Python programming exercises.</li>
+									<li>
+										<a href="https://lewisbass.org/classes/python-automation" target="_blank" rel="noopener noreferrer" className="tc1 hover:underline">Course Link</a>
+									</li>
+								</ul>
+							</div>
 							<div>
 								<div className="flex justify-between items-start flex-wrap gap-2 mb-2">
 									<h3 className="text-xl font-semibold tc1">CO-Lead Designer / Instructor CEED</h3>
@@ -152,7 +145,7 @@ export default function ResumePage() {
 
 					{/* Publication */}
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Publication</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#00ff00] via-[#00ff0000] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#00ff00] via-[#00ff0000] to-[#00000000] rounded-full"></div>
 					<div className="be">
 						<div className="flex justify-between items-start flex-wrap gap-2 mb-2">
 							<h3 className="text-xl font-semibold tc1">Improving Solvation Predictions with Machine Learning</h3>
@@ -175,7 +168,7 @@ export default function ResumePage() {
 
 					{/* Course Experience */}
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Course Experience</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#0000ff] via-[#0000ff00] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#0000ff] via-[#0000ff00] to-[#00000000] rounded-full"></div>
 					<div className="be">
 						<div className="grid md:grid-cols-2 gap-6">
 							<div>
@@ -199,7 +192,7 @@ export default function ResumePage() {
 
 					{/* Skills */}
 					<h2 className="text-2xl font-semibold mt-8 mb-0 tc1">Skills</h2>
-					<div className="m-0 mb-3 min-h-[4px] w-[75%] bg-gradient-to-r from-[#4b0082] via-[#4b008200] to-[#00000000] rounded-full"></div>
+					<div className="m-0 mb-3 min-h-[4px] w-full bg-gradient-to-r from-[#4b0082] via-[#4b008200] to-[#00000000] rounded-full"></div>
 					<div className="be">
 						<div className="space-y-4">
 							<div>
@@ -225,7 +218,7 @@ export default function ResumePage() {
 							<div>
 								<h3 className="text-lg font-semibold tc1 mb-2">Practical</h3>
 								<div className="flex flex-wrap gap-2">
-									{['Tutoring/Instructing', 'Soldering', 'FPV Piloting', 'Cycling', 'Running', 'Swimming'].map((skill) => (
+									{['Caving', 'Lifting', 'Tutoring/Instructing', 'Soldering', 'FPV Piloting', 'Swimming'].map((skill) => (
 										<span key={skill} className="px-3 py-1 rounded-full text-sm bg-purple-500/20 tc1 border border-purple-500/30">
 											{skill}
 										</span>

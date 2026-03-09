@@ -8,6 +8,8 @@ interface TriangleAnimationProps {
 	style?: React.CSSProperties; // Additional styles
 	seed?: number; // Seed for random generation
 	strokeWidth?: number;
+	doAnimation?: boolean; // Whether to animate the triangles
+	depth?: number; // Depth of the Sierpinski triangle (default: 4)
 }
 
 interface Triangle {
@@ -28,6 +30,8 @@ const TriangleAnimation: React.FC<TriangleAnimationProps> = ({
 	style = {},
 	seed = 42,
 	strokeWidth = 8,
+	doAnimation = true,
+	depth = 4,
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [triangles, setTriangles] = useState<Triangle[]>([]);
@@ -74,7 +78,7 @@ const TriangleAnimation: React.FC<TriangleAnimationProps> = ({
 					animationDelay: seededRandom(0, 10, seed + seedOffset + 7)*10,
 					opacity: seededRandom(0.1, 0.3, seed + seedOffset + 8),
 					rotation,
-					serpdepth: seededRandom(1, Math.floor(3*Math.sqrt(size/maxSize)), seed + seedOffset + 9),
+					serpdepth: seededRandom(3, depth * Math.floor(2 * Math.sqrt(size / maxSize)), seed + seedOffset + 9),
 				});
 			}
 		}
@@ -180,15 +184,15 @@ const TriangleAnimation: React.FC<TriangleAnimationProps> = ({
 					return (
 						<polygon
 							key={index}
-							points={getTrianglePoints(centerX, centerY, triangle.size, 4)}
+							points={getTrianglePoints(centerX, centerY, triangle.size, Math.floor(triangle.serpdepth))}
 							fill="none"
-							opacity={0}
+							opacity={doAnimation ? 0 : 1}
 							stroke={triangle.color}
 							strokeWidth={strokeWidth}
-							strokeDasharray={`${triangle.size * 3 * 1.5**6}`}
-							strokeDashoffset={triangle.size * 3 * 1.5**5}
+							strokeDasharray={doAnimation ? `${triangle.size * 3 * 1.5 ** 6}` : 'none'}
+							strokeDashoffset={doAnimation ? `${triangle.size * 3 * 1.5 ** 5}` : 'none'}
 							style={{
-								animation: `dash ${triangle.animationDuration}s ease 0.2s forwards, fade-in ${triangle.animationDuration/64}s ease 0.2s forwards`,
+								animation: doAnimation ? `dash ${triangle.animationDuration}s ease 0.2s forwards, fade-in ${triangle.animationDuration / 64}s ease 0.2s forwards` : 'none',
 								animationDelay: `${triangle.animationDelay}s`,
 								strokeLinejoin: "round",
 								strokeLinecap: "round",

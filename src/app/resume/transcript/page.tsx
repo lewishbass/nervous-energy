@@ -267,14 +267,15 @@ export default function TranscriptPage() {
 			{/* Background animation */}
 			<div className="absolute inset-0 -z-10 invert dark:invert-0">
 				<LineAnimation
-					spacing={200}
+					spacing={400}
 					seed={456}
 					style={{ opacity: 0.5 }}
+					doAnimation={false}
 				/>
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 p-6 max-w-6xl mx-auto backdrop-blur-sm min-h-screen tc2">
+			<div className="relative z-10 p-6 max-w-6xl mx-auto backdrop-blur-sm bg-white/50 dark:bg-black/50 min-h-screen tc2">
 				<div className="mb-6 flex justify-between items-center">
 					<Link
 						href="/resume"

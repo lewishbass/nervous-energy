@@ -197,6 +197,18 @@
   color:#ddd;
 }
 
+.scrollview .lecture-small{
+  font-weight: 500;
+  font-size: 0.65rem;
+}
+
+.slideshow .lecture-small{
+  font-weight: 700;
+  font-size: 0.75vw;
+}
+
+
+
 /* Links */
 .scrollview .lecture-link {
   font-weight: 700;

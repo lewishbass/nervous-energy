@@ -9,7 +9,24 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['react-icons'],
   },
-
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /\.raw.py$/i,
+      use: 'raw-loader',
+    });
+    return config;
+  },
+  turbopack: {
+    resolveAlias: {
+      '@': './src',
+    },
+    rules: {
+      '*.raw.py': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
 };
 
 export default nextConfig;

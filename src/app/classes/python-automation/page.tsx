@@ -137,7 +137,12 @@ function PythonAutomationContent() {
           <div className="mb-0 w-full rounded-full h-[4px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
         </div>
         <ul className="list-disc space-y-2 marker:text-purple-500 pl-6">
+          <li>Infinite Exercise: wok backwards from blocks, input/output examples</li>
+          <li>Turtle environment for exercises</li>
           <li>Discussion latex and codeblocks rendering</li>
+          <li>Code debug mode</li>
+          <li>Code terminate button</li>
+          
 
         </ul>
         <div className="my-2 mt-6">
