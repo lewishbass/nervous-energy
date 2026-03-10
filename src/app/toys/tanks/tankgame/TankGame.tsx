@@ -14,6 +14,7 @@ import { MenuScene } from './scenes/MenuScene'
 // - parachute
 // - repair kit
 // - shield
+// - AI
 
 interface PhaserGameProps {
 	width?: number

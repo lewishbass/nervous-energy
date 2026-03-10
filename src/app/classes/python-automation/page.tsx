@@ -131,17 +131,43 @@ function PythonAutomationContent() {
         />
       </div>
       {/* Sidebar */}
-      {showSidebar && <div className="w-60 h-[80vh] ml-auto mr-0 tc2 backdrop-blur-[12px]">
+      {showSidebar && <div className="w-70 h-[80vh] ml-auto mr-0 tc2 backdrop-blur-[12px]">
         <div className="my-2">
           <h2 className="text-xl font-semibold tc1 px-2">Dev TODO</h2>
           <div className="mb-0 w-full rounded-full h-[4px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
         </div>
         <ul className="list-disc space-y-2 marker:text-purple-500 pl-6">
-          <li>Infinite Exercise: wok backwards from blocks, input/output examples</li>
-          <li>Turtle environment for exercises</li>
-          <li>Discussion latex and codeblocks rendering</li>
-          <li>Code debug mode</li>
-          <li>Code terminate button</li>
+          <li>Port Pyodide to Web Worker
+            <ul className="list-disc space-y-1 marker:text-purple-500/70 pl-6 mt-1">
+              <li>Code debug mode</li>
+              <li>Code terminate button</li>
+              <li>Live variable updates</li>
+            </ul>
+          </li>
+          <li>Infinite Exercise
+            <ul className="list-disc space-y-1 marker:text-purple-500/70 pl-6 mt-1">
+              <li>Problems start with instructions and finished code</li>
+              <li>Use AST to remove code and add placeholders based on difficulty</li>
+              <li>Problems have list of included concepts to filter by</li>
+            </ul>
+          </li>
+          <li>Turtle environment for exercises
+            <ul className="list-disc space-y-1 marker:text-purple-500/70 pl-6 mt-1">
+              <li>Turtle Class</li>
+              <li>Special Turtle Viewer</li>
+            </ul>
+          </li>
+          <li>Other custom visualizers
+            <ul className="list-disc space-y-1 marker:text-purple-500/70 pl-6 mt-1">
+              <li>Sorting algorithm (bar list)</li>
+              <li>Graph visualizer (for binary tree / linked list)</li>
+              <li>Image editing</li>
+              <li>Dataframe</li>
+              <li>Matplotlib-ish graphs</li>
+            </ul>
+          </li>
+
+          <li>Animate Graph visualizer</li>
           
 
         </ul>
@@ -161,6 +187,10 @@ function PythonAutomationContent() {
           <li>Lecture Styles and Nav Links</li>
           <li>Start Lecture Content</li>
           <li>Start Exercise Content</li>
+          <li>Web based python editor with pyodide</li>
+          <li>Pyodide problems with auto-verification</li>
+          <li>Sorting algorithm visualization</li>
+          <li>Discussion latex and codeblocks rendering</li>
         </ul>
       </div>}
 

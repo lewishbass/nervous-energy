@@ -3,9 +3,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { FaArrowRotateRight, FaPlus, FaRegThumbsUp, FaThumbsUp } from "react-icons/fa6";
 import { useAuth } from '@/context/AuthContext';
 
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
+import { CodeBlock } from '../CodeBlock';
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm'; // Import the plugin
+import remarkMath from 'remark-math';
 import relTimeFormat from '@/scripts/relativetime';
+import rehypeKatex from 'rehype-katex';
 
 const THREADS_ROUTE = "/.netlify/functions/thread";
 
@@ -534,6 +539,34 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     '#9544ff',
   ]
 
+  const mathJaxConfig = {
+    tex: {
+      inlineMath: [['$', '$']],
+      displayMath: [['$$', '$$']]
+    }
+  }
+
+  const formatThreadContent = (content: string) => {
+    // adds markdown, code blocks, and latex rendering
+    return <MathJaxContext config={mathJaxConfig}>
+      {content.split(/```/g).map((part, index) => {
+        if (index % 2 == 0) { // add mathjac context and mathjax section
+          return <MathJax>
+            <ReactMarkdown key={index} remarkPlugins={[remarkGfm]} >
+              {part}
+            </ReactMarkdown >
+          </MathJax>
+        } else {
+          const language = part.split('\n')[0].trim();
+          return <div className="w-full flex justify-center">
+            <CodeBlock className="max-w-[90%]" key={index} language={language} code={part.split('\n').slice(1).join('\n')} />
+          </div>
+        }
+      })}
+    </MathJaxContext>
+
+  }
+
   const renderThread = (threadID: string, depth: number = 0, isBase: boolean = false, commentIndex: number = 0) => {
     const thread = threadData[threadID];
     if (!thread) return null;
@@ -548,7 +581,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
 
           <div className="flex items-center gap-3 mb-3 align-middle">
 
-            <p className="text-lg mb-4 tc2 mr-auto">{thread.content}</p>
+            <div className="text-lg mb-4 tc2 mr-auto">{formatThreadContent(thread.content)}</div>
             {isLoggedIn && userId === thread.creatorId && (
               <>
                 <button
@@ -647,9 +680,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
           </h3>
           <div className="mb-2 tc2">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {thread.content}
-            </ReactMarkdown>
+            {formatThreadContent(thread.content)}
           </div>
           <div className="text-sm tc3 mb-2">
             {isLoggedIn && <span

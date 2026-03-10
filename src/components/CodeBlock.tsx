@@ -25,13 +25,14 @@ interface CodeBlockProps {
 		style?: React.CSSProperties;
 		filename?: string;
 		compact?: boolean;
-		highlightLine?: number | number[] | null;
+	highlightLine?: number | number[] | null;
+	key?: React.Key;
 		onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
 		onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 		onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false, highlightLine = -1, onMouseEnter, onMouseLeave, onClick }: CodeBlockProps) {
+export function CodeBlock({ code, language = 'python', caption, className = '', style = {}, filename, compact = false, highlightLine = -1, onMouseEnter, onMouseLeave, onClick, key }: CodeBlockProps) {
 	const codeRef = useRef<HTMLElement>(null);
 	const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -94,6 +95,7 @@ export function CodeBlock({ code, language = 'python', caption, className = '', 
 
 		return (
 			<div
+				key={key}
 				className={`flex flex-col justify-center items-center mb-3 ${className}`}
 				style={style}
 				onMouseEnter={onMouseEnter}
@@ -164,6 +166,7 @@ interface AnimatedCodeBlockProps {
 	scrollMode?: 'onHover' | 'onClick';
 	/** Delay in ms between line advances in onHover mode (default 700) */
 	interval?: number;
+	key?: React.Key;
 }
 
 export function AnimatedCodeBlock({
@@ -177,6 +180,7 @@ export function AnimatedCodeBlock({
 	lines,
 	scrollMode = 'onHover',
 	interval = 700,
+	key,
 }: AnimatedCodeBlockProps) {
 	const [highlightLine, setHighlightLine] = useState<number | null>(null);
 	const idxRef = useRef<number>(-1);
@@ -224,7 +228,8 @@ export function AnimatedCodeBlock({
 		: {};
 
 	return (
-			<CodeBlock
+		<CodeBlock
+			key={key}
 				code={code}
 				language={language}
 				caption={caption}
