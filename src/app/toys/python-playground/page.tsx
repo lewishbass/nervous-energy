@@ -344,11 +344,13 @@ export default function PythonPlayground() {
 
 	// ---- file management ----
 	const listFiles = useCallback((): Record<string, string> => {
+		if (typeof window === 'undefined') return {};
 		const files = localStorage.getItem('pyodide_files');
 		return files ? JSON.parse(files) : {};
 	}, []);
 
 	const saveFile = useCallback(() => {
+		if (typeof window === 'undefined') return;
 		const content = codeRef.current;
 		const saveLocation = `pyodide_file_${documentName}`;
 		localStorage.setItem(saveLocation, content);
@@ -373,6 +375,7 @@ export default function PythonPlayground() {
 	}, [saveFile, listFiles]);
 
 	const loadFile = useCallback((name: string) => {
+		if (typeof window === 'undefined') return;
 		const files = listFiles();
 		const content = localStorage.getItem(files[name]);
 		if (content !== null) {
@@ -383,6 +386,7 @@ export default function PythonPlayground() {
 	}, [listFiles]);
 
 	const deleteFile = useCallback((name: string) => {
+		if (typeof window === 'undefined') return;
 		const files = listFiles();
 		localStorage.removeItem(files[name]);
 		delete files[name];
