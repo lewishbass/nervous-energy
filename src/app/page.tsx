@@ -272,7 +272,7 @@ export default function Home() {
 							<tr className="text-xl">
 								<th className="font-normal px-1"><span className="wg flex items-center nowrap"><SiReact className="text-2xl text-cyan-500 mr-1" /> React</span></th>
 								<th className="font-normal px-1"><span className="wg flex items-center nowrap"><SiNodedotjs className="text-2xl text-green-500 mr-1" /> Node.js</span></th>
-								<th className="font-normal px-1"><span className="wg flex items-center nowrap bg-gradient-to-b from-blue-600 to-purple-500 bg-clip-text text-transparent"><SiNextdotjs className="text-2xl text-black mr-1 " /> Next.js</span></th>
+								<th className="font-normal px-1"><span className="wg flex items-center nowrap bg-gradient-to-b from-blue-600 to-purple-500 bg-clip-text text-transparent"><SiNextdotjs className="text-2xl tc1 mr-1 " /> Next.js</span></th>
 							</tr>
 
 							<tr>

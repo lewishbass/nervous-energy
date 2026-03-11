@@ -34,6 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
+, "public/workers/python_editor.worker.js", "public/workers/python_kernel.worker.js"
   ],
   "exclude": [
     "node_modules"

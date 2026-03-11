@@ -163,7 +163,7 @@ function RootLayoutContent({
           }`} 
           style={{ boxShadow: theme === 'dark' ? '10px 0 20px rgba(0, 0, 0, 0.5)' : '10px 0 20px rgba(0, 0, 0, 0.125)' }}
         >
-          <div className="flex-1 min-h-screen">
+          <div className="flex-1 min-h-[calc(100vh - 4rem)] ">
             {children}
           </div>
           {/*footer content*/}
