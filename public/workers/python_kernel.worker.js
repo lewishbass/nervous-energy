@@ -59,11 +59,15 @@ importScripts("https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js");
 let pyodide = null;
 let initialized = false;
 let currentTaskId = null;
+let executing = false;
 
 // flow control state
 let paused = false;
 let stepping = false;   // when true, execute one trace then pause
 let stopped = false;     // hard stop flag
+
+// pending expands to resolve after execution ends
+let pendingExpands = [];
 
 const PIP_INSTALL_DILL = `
 import micropip as _mp
@@ -145,6 +149,7 @@ def _trace_function(frame, event, arg):
         return _trace_function
 
     if event not in ('line', 'call', 'return'):
+        _time.sleep(_sleep_time/2)
         return _trace_function
 
     # collect frame stack up to the wrapper
@@ -153,6 +158,12 @@ def _trace_function(frame, event, arg):
     while f and f.f_code.co_name != '_exec_wrapper':
         frames.append(f)
         f = f.f_back
+
+    # pick up any pending expand/collapse requests from JS
+    _pending = _js_get_pending_expands()
+    if _pending and len(_pending) > 0:
+        for _p in _pending:
+            _expanded_variables.add(_p)
 
     expanded = globals().get('_expanded_variables', set())
     frame_summaries = []
@@ -168,17 +179,19 @@ def _trace_function(frame, event, arg):
         "frameSummaries": frame_summaries,
     }))
 
+    if _stopped:
+        raise KeyboardInterrupt("Execution stopped by user")
+
     # blocking sleep for visible stepping
     while _paused and not _stopped:
         if _stepping:
             _stepping = False
             break
         _time.sleep(0.05)
+    else:
+        _time.sleep(_sleep_time)
 
-    if _stopped:
-        raise KeyboardInterrupt("Execution stopped by user")
 
-    _time.sleep(_sleep_time)
     return _trace_function
 `;
 
@@ -254,6 +267,13 @@ async function init() {
       const data = JSON.parse(jsonStr);
       self.postMessage({ type: "trace", taskId: currentTaskId, ...data });
     });
+
+    // callback for Python trace to pick up pending JS-side expand paths
+    pyodide.globals.set('_js_get_pending_expands', () => {
+      if (pendingExpands.length === 0) return [];
+      const paths = pendingExpands.splice(0);
+      return paths;
+    });
     pyodide.globals.set('_js_print_cb', (text, stype) => {
       self.postMessage({ type: stype, taskId: currentTaskId, text });
     });
@@ -273,17 +293,23 @@ _sys.stderr = _rt_stderr
   }
 }
 
-const handleExecuteRequest = async (code, codeId, codeContext) => {
+const handleExecuteRequest = async (code, codeId, codeContext, startPaused = false) => {
   if (!initialized) {
     self.postMessage({ type: "error", taskId: currentTaskId, text: "Worker not initialized for execution" });
     return;
   }
 
-  // reset flow control
-  paused = false;
-  stepping = false;
+  // reset flow control, optionally starting in paused+stepping state
   stopped = false;
-  pyodide.runPython(`_paused = False; _stepping = False; _stopped = False`);
+  if (startPaused) {
+    paused = true;
+    stepping = true;
+    pyodide.runPython(`_paused = True; _stepping = True; _stopped = False`);
+  } else {
+    paused = false;
+    stepping = false;
+    pyodide.runPython(`_paused = False; _stepping = False; _stopped = False`);
+  }
 
   if (codeContext === 'system') {
     // system code runs without tracing
@@ -300,6 +326,7 @@ const handleExecuteRequest = async (code, codeId, codeContext) => {
   pyodide.runPython('_rt_stdout.clear_history(); _rt_stderr.clear_history()');
 
   // user code: run with tracing
+  executing = true;
   const startTime = Date.now();
   let execError = null;
   let dillBytes = null;
@@ -339,12 +366,14 @@ _dill_bytes = _dill.dumps(_dill_ns)
     const msg = err.message || String(err);
     // KeyboardInterrupt from stop is not an error
     if (msg.includes('Execution stopped by user')) {
+      executing = false;
       self.postMessage({ type: "execution_stopped", taskId: currentTaskId, codeId });
       return;
     }
     execError = msg;
   }
 
+  executing = false;
   const elapsed = Date.now() - startTime;
 
   // build final variable summary
@@ -416,11 +445,45 @@ const handleFlowControl = (action, newSpeed) => {
 const handleExpandCollapse = (path, action) => {
   if (!initialized) return;
   if (action === 'expand') {
-    pyodide.runPython(`_expanded_variables.add(${JSON.stringify(path)})`);
+    if (executing) {
+      // can't call Python synchronously during execution —
+      // just queue it; the next trace will include the children,
+      // and we'll also resolve pending expands when execution completes
+      pendingExpands.push(path);
+      // update the Python set via a flag the trace function reads
+      // The set is already updated via the trace loop reading globals
+      self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: true });
+    } else {
+      // not executing — resolve children immediately
+      try {
+        pyodide.runPython(`_expanded_variables.add(${JSON.stringify(path)})`);
+        pyodide.globals.set('_expand_path', path);
+        const json = pyodide.runPythonAsync(`
+_expand_var = None
+_expand_parts = _expand_path.split('.')
+if _expand_parts[0] in globals():
+    _expand_var = globals()[_expand_parts[0]]
+    for _p in _expand_parts[1:]:
+        _expand_var = getattr(_expand_var, _p)
+if _expand_var is not None:
+    _json.dumps(_summarise_variable(_expand_var, _expand_path, _expanded_variables))
+else:
+    '{}'
+`);
+        const children = JSON.parse(json);
+        self.postMessage({ type: "variableinfo", taskId: currentTaskId, path, children });
+      } catch (e) {
+        self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: true });
+      }
+    }
   } else {
-    pyodide.runPython(`_expanded_variables.discard(${JSON.stringify(path)})`);
+    if (!executing) {
+      pyodide.runPythonAsync(`_expanded_variables.discard(${JSON.stringify(path)})`);
+    }
+    // remove from pending if queued
+    pendingExpands = pendingExpands.filter(p => p !== path);
+    self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: false });
   }
-  self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: action === 'expand' });
 };
 
 self.onmessage = async (event) => {
@@ -447,7 +510,7 @@ self.onmessage = async (event) => {
   }
 
   if (type === "execute") {
-    handleExecuteRequest(code, codeId, codeContext);
+    handleExecuteRequest(code, codeId, codeContext, event.data.startPaused || false);
   } else if (type === "flow_control") {
     handleFlowControl(flowAction, newSpeed);
   } else if (type === "expand" || type === "collapse") {

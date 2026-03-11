@@ -124,13 +124,76 @@ export default function ToolbarPanel({
 				<ToolBtn icon={VscDebugPause} label="Pause" accent="var(--khy)" onClick={onPause} isCompact={isCompact} />
 			)}
 
-			<ToolBtn icon={VscDebugStepOver} label="Step" accent="var(--khb)" onClick={onStep} disabled={!running} isCompact={isCompact} />
-			<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={onRestart} isCompact={isCompact} />
+			<ToolBtn icon={VscDebugStepOver} label="Step" accent="var(--khb)" onClick={onStep} isCompact={isCompact} />
+			<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={onRestart} disabled={running} isCompact={isCompact} />
 			<ToolBtn icon={VscDebugStop} label="Stop" accent="var(--khr)" onClick={onStop} disabled={!running} isCompact={isCompact} />
 
 			{/* Speed slider */}
 			<div className="flex items-center gap-1 ml-2 text-xs tc2 select-none">
 				<span className="opacity-60 whitespace-nowrap font-courier">{speed.toFixed(1)}s</span>
+				<style>{`
+					.speed-slider {
+						-webkit-appearance: none;
+						appearance: none;
+						width: 4rem;
+						height: 12px;
+						cursor: pointer;
+						padding: 0;
+						background: transparent;
+					}
+					.speed-slider::-webkit-slider-runnable-track {
+						background: transparent;
+						border: 2px solid #000;
+						height: 14px;
+						border-radius: 6px;
+					}
+					.speed-slider::-webkit-slider-thumb {
+						-webkit-appearance: none;
+						appearance: none;
+						background: #000;
+						border: none;
+						border-radius: 50%;
+						width: 12px;
+						height: 12px;
+						cursor: pointer;
+						margin-top: -1px;
+					}
+					.speed-slider::-moz-range-track {
+						background: transparent;
+						border: 1px solid #000;
+						height: 12px;
+						border-radius: 6px;
+					}
+					.speed-slider::-moz-range-progress {
+						background: transparent;
+						border: none;
+					}
+					.speed-slider::-moz-range-thumb {
+						background: #000;
+						border: none;
+						border-radius: 50%;
+						width: 12px;
+						height: 12px;
+						cursor: pointer;
+					}
+					.speed-slider::-moz-focus-outer {
+						border: none;
+					}
+					
+						.dark .speed-slider::-webkit-slider-runnable-track {
+							border-color: #e5e7eb;
+						}
+						.dark .speed-slider::-webkit-slider-thumb {
+							background: #f3f4f6;
+						}
+						.dark .speed-slider::-moz-range-track {
+							border-color: #e5e7eb;
+						}
+						.dark .speed-slider::-moz-range-thumb {
+							background: #f3f4f6;
+						}
+					
+				`}</style>
 				<input
 					type="range"
 					min={0}
@@ -138,7 +201,7 @@ export default function ToolbarPanel({
 					step={0.1}
 					value={speed}
 					onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
-					className="w-16 accent-blue-500"
+					className="speed-slider"
 					title="Trace speed (seconds between steps)"
 				/>
 			</div>

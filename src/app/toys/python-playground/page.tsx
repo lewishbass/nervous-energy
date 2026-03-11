@@ -157,6 +157,53 @@ export default function PythonPlayground() {
 				setPaused(false);
 				highlightLine(null);
 				setTerminalLines(prev => [...prev, { text: 'Execution stopped.', type: 'info' }]);
+			} else if (responseType === 'variableinfo') {
+				const path = data.path as string;
+				const children = data.children as Record<string, VariableSummary>;
+				// merge children into existing frames
+				setFrames(prev => prev.map(frame => {
+					const parts = path.split('.');
+					const baseName = parts[0];
+					if (!frame.locals[baseName]) return frame;
+
+					const updatedLocals = { ...frame.locals };
+					// rebuild the base var with children merged in
+					const childTree = buildVariableTree(children);
+					// the childTree should have the base var with children attached
+					if (childTree[baseName]) {
+						updatedLocals[baseName] = {
+							...updatedLocals[baseName],
+							expanded: true,
+							children: childTree[baseName].children,
+						};
+					} else {
+						// nested expand — walk to the parent and attach
+						let parent = updatedLocals[baseName] = { ...updatedLocals[baseName] };
+						for (let i = 1; i < parts.length; i++) {
+							if (parent.children?.[parts[i]]) {
+								parent.children = { ...parent.children };
+								parent.children[parts[i]] = { ...parent.children[parts[i]] };
+								if (i === parts.length - 1) {
+									// attach children from the flat response
+									const subTree = buildVariableTree(children);
+									const leaf = subTree[parts[0]];
+									// walk subTree to find the expanded node
+									let src = leaf;
+									for (let j = 1; j <= i && src?.children; j++) {
+										src = src.children[parts[j]];
+									}
+									if (src) {
+										parent.children[parts[i]].expanded = true;
+										parent.children[parts[i]].children = src.children;
+									}
+								}
+								parent = parent.children[parts[i]];
+							} else break;
+						}
+					}
+
+					return { ...frame, locals: updatedLocals };
+				}));
 			} else if (responseType === 'flow') {
 				const state = data.state as string;
 				if (state === 'paused') setPaused(true);
@@ -216,7 +263,32 @@ export default function PythonPlayground() {
 
 	const handlePause = useCallback(() => sendFlowControl('pause'), [sendFlowControl]);
 	const handleResume = useCallback(() => sendFlowControl('resume'), [sendFlowControl]);
-	const handleStep = useCallback(() => sendFlowControl('step'), [sendFlowControl]);
+	const handleStep = useCallback(async () => {
+		if (!running) {
+			// start program in paused mode, then step once
+			const workerId = await ensureKernel();
+			if (!workerId) return;
+			setRunning(true);
+			setPaused(true);
+			setTerminalLines(prev => [...prev, { text: `>> python ${documentName} (stepping)`, type: 'info' as const }]);
+
+			if (!persistentExec) {
+				pyodidePool.messageWorker(workerId, { type: 'reset' });
+				setFrames([]);
+			}
+
+			const codeId = `step-${Date.now()}`;
+			pyodidePool.messageWorker(workerId, {
+				type: 'execute',
+				code: codeRef.current,
+				codeId,
+				codeContext: 'user',
+				startPaused: true,
+			});
+		} else {
+			sendFlowControl('step');
+		}
+	}, [running, ensureKernel, documentName, persistentExec, sendFlowControl]);
 	const handleStop = useCallback(() => sendFlowControl('stop'), [sendFlowControl]);
 
 	const handleRestart = useCallback(async () => {
@@ -240,15 +312,34 @@ export default function PythonPlayground() {
 		if (workerId) {
 			pyodidePool.messageWorker(workerId, { type: expand ? 'expand' : 'collapse', path });
 		}
-		// optimistically toggle in local state
-		setFrames(prev => prev.map(frame => {
-			const updated = { ...frame, locals: { ...frame.locals } };
-			const parts = path.split('.');
-			if (parts.length === 1 && updated.locals[parts[0]]) {
-				updated.locals[parts[0]] = { ...updated.locals[parts[0]], expanded: expand };
-			}
-			return updated;
-		}));
+		if (!expand) {
+			// optimistically collapse in local state
+			setFrames(prev => prev.map(frame => {
+				const parts = path.split('.');
+				const baseName = parts[0];
+				if (!frame.locals[baseName]) return frame;
+				const updatedLocals = { ...frame.locals };
+				if (parts.length === 1) {
+					updatedLocals[baseName] = { ...updatedLocals[baseName], expanded: false, children: undefined };
+				} else {
+					// walk to parent and collapse the target
+					let parent = updatedLocals[baseName] = { ...updatedLocals[baseName] };
+					for (let i = 1; i < parts.length; i++) {
+						if (parent.children?.[parts[i]]) {
+							parent.children = { ...parent.children };
+							parent.children[parts[i]] = { ...parent.children[parts[i]] };
+							if (i === parts.length - 1) {
+								parent.children[parts[i]].expanded = false;
+								parent.children[parts[i]].children = undefined;
+							}
+							parent = parent.children[parts[i]];
+						} else break;
+					}
+				}
+				return { ...frame, locals: updatedLocals };
+			}));
+		}
+		// expand is handled by the variableinfo response from the kernel
 	}, []);
 
 	// ---- file management ----
@@ -278,6 +369,7 @@ export default function PythonPlayground() {
 			}
 		}
 		codeRef.current = '';
+		monacoRef.current?.setValue('');
 	}, [saveFile, listFiles]);
 
 	const loadFile = useCallback((name: string) => {
@@ -286,7 +378,7 @@ export default function PythonPlayground() {
 		if (content !== null) {
 			codeRef.current = content;
 			setDocumentName(name);
-			// force editor to update via re-key later (or user can just re-open)
+			monacoRef.current?.setValue(content);
 		}
 	}, [listFiles]);
 
@@ -354,11 +446,12 @@ export default function PythonPlayground() {
 			>
 				<DraggableDivider
 					direction="vertical"
-					initialPosition={55}
+					initialPosition={100}
 					edgeSize={[15, 15]}
 					collapseEnd={true}
 					color="orange"
 					className="flex-grow overflow-hidden"
+
 				>
 					{/* Editor */}
 					<EditorPanel
