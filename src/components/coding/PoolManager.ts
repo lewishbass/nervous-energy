@@ -57,8 +57,8 @@ class PyodidePoolManager{
 
 	/* --- Semantic Promises --- */
 	async requestSemantic(taskId: string, code: string): Promise<unknown> {
-
 		if (this.semanticLocks.has(taskId)) {
+			console.warn(`Semantic request already in progress for task ${taskId}`);
 			return Promise.reject(new Error("Semantic request already in progress for this task"));
 		}
 		this.semanticLocks.add(taskId);
@@ -73,6 +73,7 @@ class PyodidePoolManager{
 
 		if (!workerInfo) {
 			this.semanticLocks.delete(taskId);
+			console.warn(`Failed to obtain editor worker for semantic request for task ${taskId}`);
 			return Promise.reject(new Error("Failed to obtain editor worker"));
 		}
 
@@ -95,6 +96,7 @@ class PyodidePoolManager{
 	}
 
 	fulfillSemantic(taskId: string, result: unknown) {
+		console.log(`Fulfilling semantic request for task ${taskId} with result:`, result);
 		const pending = this.semanticPromises.get(taskId);
 		if (!pending) return;
 
@@ -208,7 +210,7 @@ class PyodidePoolManager{
 		// check if ready msesage
 		if (responseType === 'ready' && workerInfo.status === 'init') {
 			workerInfo.status = 'idle';
-			console.log(`Worker ${workerInfo.name} with id ${workerInfo.workerId} is ready and now idle`);
+			// console.log(`Worker ${workerInfo.name} with id ${workerInfo.workerId} is ready and now idle`);
 			this.notifyWorkerList();
 			const initPromise = this.initPromises.get(workerInfo.workerId);
 			if (initPromise) {
@@ -286,13 +288,14 @@ class PyodidePoolManager{
 		this.notifyWorkerList();
 		return new Promise<WorkerInfo>((resolve, reject) => {
 			const timeoutId = setTimeout(() => {
-				reject(new Error("Semantic request timed out"));
-			}, 10000); // 10 seconds timeout
+				reject(new Error("createWorker timed out waiting for worker to initialize"));
+			}, 30000); // 30 seconds timeout
 			this.initPromises.set(newWorkerInfo.workerId, { resolve, reject });
 		});
 	}	
 
 	async allocateWorker(taskId: string, type: WorkerJob = 'kernel', newName?: string, workerId?: string): Promise<WorkerInfo | null> {
+		console.log("allocateWorker called with taskId:", taskId, "type:", type, "newName:", newName, "workerId:", workerId);
 		if (workerId) { // attempt to allocate specific worker
 			const workerInfo = this.workers.get(workerId);
 			if (workerInfo && workerInfo.status === 'idle' && workerInfo.type === type) {
@@ -355,6 +358,26 @@ class PyodidePoolManager{
 			workerInfo.worker.terminate();
 			this.workers.delete(workerId);
 			console.log(`Worker with id ${workerId} deleted from pool`);
+
+			// reject any pending promises for this worker
+			this.semanticPromises.forEach((pending, taskId) => {
+				if (pending.workerId === workerId) {
+					clearTimeout(pending.timeoutId);
+					this.semanticLocks.delete(taskId);
+					pending.reject(new Error("Worker was deleted before fulfilling semantic request"));
+					this.semanticPromises.delete(taskId);
+				}
+			});
+			this.completionPromises.forEach((pending, taskId) => {
+				if (pending.workerId === workerId) {
+					clearTimeout(pending.timeoutId);
+					this.completionLocks.delete(taskId);
+					pending.reject(new Error("Worker was deleted before fulfilling completion request"));
+					this.completionPromises.delete(taskId);
+				}
+			});
+
+			// update list
 			this.notifyWorkerList();
 		} else {
 			console.warn(`Worker to delete with id ${workerId} not found in pool`);
@@ -367,15 +390,21 @@ class PyodidePoolManager{
 			const messageAndId = { id: workerInfo.taskId ?? null, ...message };
 			workerInfo.worker.postMessage(messageAndId);
 			console.log(`Sent message to worker ${workerInfo.name} with id ${workerId}:`, messageAndId);
+			return true;
 		} else {
-			console.warn(`Worker to message with id ${workerId} not found in pool`);
+			return false;
+
 		}
 	}
 
 	/* --- Worker Listing --- */
 
+	checkWorkerStatus(workerId: string): WorkerInfo | null {
+		const workerInfo = this.workers.get(workerId);
+		return workerInfo ? workerInfo : null;
+	}
+
 	getAllWorkers(): WorkerInfoPublic[] {
-		console.log(`Getting all workers. Total count: ${this.workers.size}`);
 		return Array.from(this.workers.values()).map(({ worker: _w, ...rest }) => rest as WorkerInfoPublic);
 	}
 

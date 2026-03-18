@@ -71,8 +71,8 @@ export default function DraggableDivider({
 	}, [isDragging, isHorizontal, edgeSize]);
 
 	const dividerThickness = isHorizontal
-		? isCollapsed ? 'w-3' : isDragging ? 'w-1.75' : 'w-1.5'
-		: isCollapsed ? 'h-3' : isDragging ? 'h-1.75' : 'h-1.5';
+		? isCollapsed ? 'w-3' : isDragging ? 'w-1.5' : 'w-1.5'
+		: isCollapsed ? 'h-3' : isDragging ? 'h-1.5' : 'h-1.5';
 
 	const cursorClass = isHorizontal ? 'cursor-ew-resize' : 'cursor-ns-resize';
 

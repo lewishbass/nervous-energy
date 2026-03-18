@@ -122,7 +122,7 @@ export default function WorkerPanel( { className = '', style = {} }: WorkerPanel
 											</span>
 										</div>
 										{workerInfo.taskId && (
-										<p className="text-xs text-gray-600 dark:text-gray-400 mt-1 break-words">ID: {workerInfo.taskId}</p>
+										<p className="text-xs text-gray-600 dark:text-gray-400 mt-1 break-words truncate">ID: {workerInfo.taskId}</p>
 										)}
 									</div>
 									<div className="flex gap-1">
@@ -212,7 +212,7 @@ export default function WorkerPanel( { className = '', style = {} }: WorkerPanel
 			</div>
 
 			{/* ---- Pool Output ---- */}
-			<div className="h-full flex flex-col bg-white dark:bg-gray-950">
+			<div className="h-full flex flex-col">
 				{/* ---- Pool Output header ---- */}
 				<div className="px-3 py-2 bg-gradient-to-r from-orange-500/10 to-red-500/10 dark:from-orange-600/20 dark:to-red-600/20 border-b border-gray-300 dark:border-gray-700 flex-shrink-0 backdrop-blur-sm flex flex-row items-center justify-between">
 					<h3 className="text-sm font-bold text-gray-900 dark:text-gray-50 select-none">Pool Output</h3>

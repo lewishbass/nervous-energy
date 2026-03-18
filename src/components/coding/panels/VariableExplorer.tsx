@@ -1,8 +1,3 @@
-import { useRef, useEffect } from 'react';
-import { VscClearAll } from 'react-icons/vsc';
-import DraggableDivider from '@/components/DraggableDivider';
-
-
 // Variable summary shape as returned by the kernel worker
 export type VariableSummary = {
 	name: string;
@@ -22,33 +17,20 @@ export type FrameData = {
 	locals: Record<string, VariableSummary>;
 };
 
-type TerminalLine = { text: string; type: 'stdout' | 'stderr' | 'info' | 'error' };
-
 type VariableExplorerProps = {
 	frames: FrameData[];
-	terminalLines: TerminalLine[];
-	onClearTerminal: () => void;
 	onExpandCollapse: (path: string, expand: boolean) => void;
 	isCompact?: boolean;
 };
 
 export default function VariableExplorer({
 	frames,
-	terminalLines,
-	onClearTerminal,
 	onExpandCollapse,
 	isCompact = false,
 }: VariableExplorerProps) {
-	const terminalRef = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		if (terminalRef.current) {
-			terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-		}
-	}, [terminalLines]);
-
-	const renderVariable = (v: VariableSummary, index: number, path: string[] = [], depth: number = 0): React.ReactNode => {
-		const fullPath = [...path, v.name].join('.');
+	const renderVariable = (v: VariableSummary, index: number, path: string[] = [], frame: FrameData, depth: number = 0): React.ReactNode => {
+		const fullPath = frame.name + '|' + [...path, v.name].join('.');
 		const displayValue = v.repr ?? v.json ?? '<unknown>';
 		return (
 			<>
@@ -58,7 +40,7 @@ export default function VariableExplorer({
 					onClick={() => onExpandCollapse(fullPath, !v.expanded)}
 				>
 					<td
-						title={v.name}
+						title={fullPath}
 						className={`flex flex-row items-end py-1.5 pl-2 pr-3 text-blue-600 dark:text-blue-400 ${v.callable ? 'opacity-80' : 'font-semibold'} whitespace-nowrap`}
 					>
 						{path.map((p, i) => (
@@ -78,7 +60,7 @@ export default function VariableExplorer({
 					</td>
 				</tr>
 				{v.expanded && v.children && Object.values(v.children).map((child, i) => (
-					renderVariable(child, i, [...path, v.name], depth + 1)
+					renderVariable(child, i, [...path, v.name], frame, depth + 1)
 				))}
 			</>
 		);
@@ -87,83 +69,46 @@ export default function VariableExplorer({
 	const hasVariables = frames.some(f => Object.keys(f.locals).length > 0);
 
 	return (
-		<DraggableDivider
-						direction="vertical"
-						initialPosition={55}
-						edgeSize={[15, 15]}
-						collapseEnd={true} collapseStart={true}
-						color="green"
-						className="flex-grow overflow-hidden"
-					>
-			{/* ---- Variables section ---- */}
-			<div className="flex-1 overflow-hidden flex flex-col min-h-0 h-full">
-				{!isCompact && (
-					<div className="px-3 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 backdrop-blur-sm">
-						<h3 className="text-sm font-bold tc1 select-none">Variables</h3>
-					</div>
-				)}
-				<div className={`flex-grow bg2 px-${isCompact ? '1' : '2'} py-${isCompact ? '0' : '2'} tc1 overflow-auto mini-scroll`}>
-					{!hasVariables ? (
-						<p className="opacity-40 text-sm select-none p-3">Run code to inspect variables.</p>
-					) : (
-						frames.map((frame, frameIdx) => (
-							<div key={frame.name + frameIdx} className="mb-3">
-								{frames.length > 1 && (
-									<div className="text-xs font-bold tc2 uppercase tracking-wide px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded mb-1 select-none">
-										{frame.name === '<module>' ? 'Global' : frame.name}
-									</div>
+		<div className="flex-1 overflow-hidden flex flex-col min-h-0 h-full">
+			{!isCompact && (
+				<div className="px-3 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 backdrop-blur-sm">
+					<h3 className="text-sm font-bold tc1 select-none">Variables</h3>
+				</div>
+			)}
+			<div className={`flex-grow bg2 px-${isCompact ? '1' : '2'} py-${isCompact ? '0' : '2'} tc1 overflow-auto mini-scroll`}>
+				{!hasVariables ? (
+					<p className="opacity-40 text-sm select-none p-3">Run code to inspect variables.</p>
+				) : (
+							<table className="w-full text-sm font-mono">
+								{!isCompact && (
+									<thead>
+										<tr className="border-b border-gray-300 dark:border-gray-600 text-left">
+											<th className="w-1/4 pb-1.5 pl-2 pr-3 font-semibold tc2 text-xs uppercase tracking-wide">Name</th>
+											<th className="w-1/4 pb-1.5 pr-3 font-semibold tc2 text-xs uppercase tracking-wide">Type</th>
+											<th className="pb-1.5 font-semibold tc2 text-xs uppercase tracking-wide">Value</th>
+										</tr>
+									</thead>
 								)}
-								<table className="w-full text-sm font-mono">
-									{!isCompact && frameIdx === 0 && (
-										<thead>
-											<tr className="border-b border-gray-300 dark:border-gray-600 text-left">
-												<th className="w-1/4 pb-1.5 pl-2 pr-3 font-semibold tc2 text-xs uppercase tracking-wide">Name</th>
-												<th className="w-1/4 pb-1.5 pr-3 font-semibold tc2 text-xs uppercase tracking-wide">Type</th>
-												<th className="pb-1.5 font-semibold tc2 text-xs uppercase tracking-wide">Value</th>
+								<tbody>
+									{
+									frames.map((frame, frameIdx) => (
+										<>
+											<tr key={frame.name + '_frame_' + frameIdx}>
+												<td colSpan={3}>
+													<div className="bg-gray-100 dark:bg-gray-800 py-1.5 px-2 text-sm font-semibold tc2 lg mt-4">
+													{frame.name === '<module>' ? 'Global' : frame.name}
+													</div>
+												</td>
 											</tr>
-										</thead>
-									)}
-									<tbody>
-										{Object.values(frame.locals).map((v, i) => renderVariable(v, i))}
-									</tbody>
-								</table>
-							</div>
-						))
-					)}
-				</div>
-			</div>
-
-			{/* ---- Terminal section ---- */}
-			<div className="flex-1 overflow-hidden flex flex-col min-h-0 border-t border-gray-200 dark:border-gray-700 h-full">
-				{!isCompact && (
-					<div className="px-3 py-1.5 bg-gradient-to-r from-orange-500/10 to-red-500/10 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 flex items-center gap-2 backdrop-blur-sm">
-						<h3 className="text-sm font-bold tc1 select-none">Terminal</h3>
-						<button
-							title="Clear Terminal"
-							onClick={onClearTerminal}
-							className="ml-auto p-1 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer select-none tc2"
-						>
-							<VscClearAll className="w-4 h-4" />
-						</button>
-					</div>
+											{Object.values(frame.locals).map((v, i) => renderVariable(v, i, [], frame))}
+									</>
+									)).reverse()
+								}
+								</tbody>
+							</table>
+					
 				)}
-				<div ref={terminalRef} className="flex-grow bg3 p-3 font-mono text-sm overflow-auto mini-scroll pb-20">
-					{terminalLines.length === 0 ? (
-						<span className="opacity-60 select-none text-green-600 dark:text-green-400" />
-					) : (
-						terminalLines.map((line, i) => (
-							<div key={i} className={`whitespace-pre-wrap ${
-								line.type === 'error' ? 'text-red-500 dark:text-red-400' :
-								line.type === 'stderr' ? 'text-yellow-600 dark:text-yellow-400' :
-								line.type === 'info' ? 'opacity-50 text-gray-500 dark:text-gray-400' :
-								'text-green-600 dark:text-green-400'
-							}`}>
-								{line.text}
-							</div>
-						))
-					)}
-				</div>
 			</div>
-		</DraggableDivider>
+		</div>
 	);
 }

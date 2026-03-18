@@ -84,6 +84,7 @@ _paused = False
 _stepping = False
 _stopped = False
 _run_history = []
+_frame_stack = []
 `;
 
 const LOCAL_SUMMARY_SCRIPT = `
@@ -139,7 +140,7 @@ def _summarize_frame(locals_dict, expanded_vars):
 
 const TRACE_SCRIPT = `
 def _trace_function(frame, event, arg):
-    global _paused, _stepping, _stopped
+    global _paused, _stepping, _stopped, _frame_stack
 
     if _stopped:
         raise KeyboardInterrupt("Execution stopped by user")
@@ -159,24 +160,22 @@ def _trace_function(frame, event, arg):
         frames.append(f)
         f = f.f_back
 
-    # pick up any pending expand/collapse requests from JS
-    _pending = _js_get_pending_expands()
-    if _pending and len(_pending) > 0:
-        for _p in _pending:
-            _expanded_variables.add(_p)
+    _frame_stack = frames
 
     expanded = globals().get('_expanded_variables', set())
     frame_summaries = []
     frame_names = []
     for fr in frames:
+        frame_expanded = {k.split('|')[1] for k in expanded if k.startswith(fr.f_code.co_name)}
         frame_names.append(fr.f_code.co_name)
-        frame_summaries.append(_summarize_frame(fr.f_locals, expanded))
+        frame_summaries.append(_summarize_frame(fr.f_locals, frame_expanded))
 
     line = frame.f_lineno
     _js_trace_cb(_json.dumps({
         "line": line,
         "frameNames": frame_names,
         "frameSummaries": frame_summaries,
+        "expanded_variables": list(expanded),
     }))
 
     if _stopped:
@@ -235,7 +234,7 @@ if '_user_vars' in dir():
             del globals()[_k]
 _user_vars = {}
 _current_code_filename = None
-_expanded_variables = set()
+#_expanded_variables = set()
 _paused = False
 _stepping = False
 _stopped = False
@@ -248,12 +247,7 @@ async function init() {
   try {
     pyodide = await loadPyodide();
     // initial stdout/stderr before _RTOut is ready (init phase only)
-    pyodide.setStdout({
-      batched: (text) => self.postMessage({ type: "stdout", taskId: currentTaskId, text }),
-    });
-    pyodide.setStderr({
-      batched: (text) => self.postMessage({ type: "stderr", taskId: currentTaskId, text }),
-    });
+  
     await pyodide.loadPackage(['micropip']);
     await pyodide.runPythonAsync(PIP_INSTALL_DILL);
     await pyodide.runPythonAsync(INIT_PYTHON_SCRIPT);
@@ -315,7 +309,9 @@ const handleExecuteRequest = async (code, codeId, codeContext, startPaused = fal
     // system code runs without tracing
     try {
       const result = await pyodide.runPythonAsync(code);
-      self.postMessage({ type: "execution_complete", taskId: currentTaskId, codeId, error: null, result: result != null ? String(result) : null });
+      const stdout = pyodide.globals.get('_rt_stdout')._hist.toJs();
+      const stderr = pyodide.globals.get('_rt_stderr')._hist.toJs();
+      self.postMessage({ type: "execution_complete", taskId: currentTaskId, codeId, error: null, result: result != null ? String(result) : null, stdout, stderr });
     } catch (err) {
       self.postMessage({ type: "execution_error", taskId: currentTaskId, codeId, error: err.message });
     }
@@ -396,10 +392,8 @@ _json.dumps(_final)
   let stdoutHist = [];
   let stderrHist = [];
   try {
-    const pyStdout = pyodide.globals.get('_rt_stdout');
-    const pyStderr = pyodide.globals.get('_rt_stderr');
-    stdoutHist = pyStdout._hist.toJs();
-    stderrHist = pyStderr._hist.toJs();
+    stdoutHist = pyodide.globals.get('_rt_stdout')._hist.toJs();
+    stderrHist = pyodide.globals.get('_rt_stderr')._hist.toJs();
   } catch (e) { /* best-effort */ }
 
   self.postMessage({
@@ -443,52 +437,43 @@ const handleFlowControl = (action, newSpeed) => {
 };
 
 const handleExpandCollapse = (path, action) => {
-  if (!initialized) return;
-  if (action === 'expand') {
-    if (executing) {
-      // can't call Python synchronously during execution —
-      // just queue it; the next trace will include the children,
-      // and we'll also resolve pending expands when execution completes
-      pendingExpands.push(path);
-      // update the Python set via a flag the trace function reads
-      // The set is already updated via the trace loop reading globals
-      self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: true });
-    } else {
-      // not executing — resolve children immediately
-      try {
-        pyodide.runPython(`_expanded_variables.add(${JSON.stringify(path)})`);
-        pyodide.globals.set('_expand_path', path);
-        const json = pyodide.runPythonAsync(`
-_expand_var = None
-_expand_parts = _expand_path.split('.')
-if _expand_parts[0] in globals():
-    _expand_var = globals()[_expand_parts[0]]
-    for _p in _expand_parts[1:]:
-        _expand_var = getattr(_expand_var, _p)
-if _expand_var is not None:
-    _json.dumps(_summarise_variable(_expand_var, _expand_path, _expanded_variables))
-else:
-    '{}'
-`);
-        const children = JSON.parse(json);
-        self.postMessage({ type: "variableinfo", taskId: currentTaskId, path, children });
-      } catch (e) {
-        self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: true });
-      }
-    }
-  } else {
-    if (!executing) {
-      pyodide.runPythonAsync(`_expanded_variables.discard(${JSON.stringify(path)})`);
-    }
-    // remove from pending if queued
-    pendingExpands = pendingExpands.filter(p => p !== path);
-    self.postMessage({ type: "expand_ack", taskId: currentTaskId, path, expanded: false });
+  if (!initialized) {
+    self.postMessage({ type: "error", taskId: currentTaskId, text: "Worker not initialized for expand/collapse" });
+    return;
   }
+  pyodide.globals.set('_single_expand_path', path);
+  pyodide.globals.set('_is_expand', action === 'expand');
+  pyodide.runPythonAsync(`
+_target_frame, _target_var = _single_expand_path.split('|')
+_var_parts = _target_var.split('.')
+_var_info  = None
+
+_frame = None
+for f in _frame_stack:
+    if f.f_code.co_name == _target_frame:
+        _frame = f
+        break
+
+if _is_expand:
+    _expanded_variables.add(_single_expand_path)
+else:
+    _expanded_variables.discard(_single_expand_path)
+_frame_expanded = {k.split('|')[1] for k in _expanded_variables if k.startswith(_target_frame + '|')}
+
+if _frame is not None:
+    _frame_info = _summarize_frame(_frame.f_locals, _frame_expanded)
+else:
+    _frame_info = {}
+
+_json.dumps({"frameSummary":_frame_info, "expanded_variables": list(_expanded_variables), "frame_expanded": list(_frame_expanded), "target_frame": _target_frame, "target_var": _target_var})
+
+    `).then((result) => {
+    self.postMessage({ type: "variableinfo", taskId: currentTaskId, ...JSON.parse(result) });
+  });
 };
 
 self.onmessage = async (event) => {
   const { type, code, taskId, codeId, codeContext, flowAction, newSpeed, path, action } = event.data;
-
   // allow lock/unlock even before init
   if (type === "lock") {
     currentTaskId = taskId;

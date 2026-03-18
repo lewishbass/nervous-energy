@@ -6,6 +6,7 @@ import WorkerPanel from '@/components/coding/panels/WorkerPanel';
 import EditorPanel from '@/components/coding/panels/EditorPanel';
 import ToolbarPanel from '@/components/coding/panels/ToolbarPanel';
 import VariableExplorer, { type FrameData, type VariableSummary } from '@/components/coding/panels/VariableExplorer';
+import TerminalPane from '@/components/coding/panels/TerminalPane';
 import DraggableDivider from '@/components/DraggableDivider';
 import { pyodidePool, type OutputEntry } from '@/components/coding/PoolManager';
 import { copyToClipboard } from '@/scripts/clipboard';
@@ -78,30 +79,26 @@ export default function PythonPlayground() {
 	}, []);
 
 	// ---- helper: build nested VariableSummary tree from flat kernel dict ----
-	const buildVariableTree = useCallback((flat: Record<string, VariableSummary>): Record<string, VariableSummary> => {
+	const buildVariableTree = useCallback((flat: Record<string, VariableSummary>, parent?: string): Record<string, VariableSummary> => {
 		const base: Record<string, VariableSummary> = {};
-		// first pass: insert base vars
+
+		if (!flat || Object.keys(flat).length === 0) return base;
+
 		for (const [path, v] of Object.entries(flat)) {
-			if (!path.includes('.')) {
-				const name = path;
-				base[name] = { ...v, name };
+			const isDirectChild = parent
+				? path.startsWith(parent + '.') && !path.slice(parent.length + 1).includes('.')
+				: !path.includes('.');
+
+			if (isDirectChild) {
+				const name = parent ? path.slice(parent.length + 1) : path;
+				const childEntries = Object.entries(flat).filter(([p]) => p.startsWith(path + '.'));
+				const children = childEntries.length > 0
+					? buildVariableTree(Object.fromEntries(childEntries), path)
+					: undefined;
+				base[name] = { ...v, name, children, expanded: childEntries.length > 0 };
 			}
 		}
-		// second pass: attach children
-		for (const [path, v] of Object.entries(flat)) {
-			if (!path.includes('.')) continue;
-			const parts = path.split('.');
-			const varName = parts[parts.length - 1];
-			let parent = base[parts[0]];
-			if (!parent) continue;
-			for (let i = 1; i < parts.length - 1; i++) {
-				if (!parent.children?.[parts[i]]) break;
-				parent = parent.children[parts[i]];
-			}
-			if (!parent.children) parent.children = {};
-			parent.children[varName] = { ...v, name: varName };
-			parent.expanded = true;
-		}
+
 		return base;
 	}, []);
 
@@ -158,52 +155,17 @@ export default function PythonPlayground() {
 				highlightLine(null);
 				setTerminalLines(prev => [...prev, { text: 'Execution stopped.', type: 'info' }]);
 			} else if (responseType === 'variableinfo') {
-				const path = data.path as string;
-				const children = data.children as Record<string, VariableSummary>;
-				// merge children into existing frames
-				setFrames(prev => prev.map(frame => {
-					const parts = path.split('.');
-					const baseName = parts[0];
-					if (!frame.locals[baseName]) return frame;
-
-					const updatedLocals = { ...frame.locals };
-					// rebuild the base var with children merged in
-					const childTree = buildVariableTree(children);
-					// the childTree should have the base var with children attached
-					if (childTree[baseName]) {
-						updatedLocals[baseName] = {
-							...updatedLocals[baseName],
-							expanded: true,
-							children: childTree[baseName].children,
-						};
-					} else {
-						// nested expand — walk to the parent and attach
-						let parent = updatedLocals[baseName] = { ...updatedLocals[baseName] };
-						for (let i = 1; i < parts.length; i++) {
-							if (parent.children?.[parts[i]]) {
-								parent.children = { ...parent.children };
-								parent.children[parts[i]] = { ...parent.children[parts[i]] };
-								if (i === parts.length - 1) {
-									// attach children from the flat response
-									const subTree = buildVariableTree(children);
-									const leaf = subTree[parts[0]];
-									// walk subTree to find the expanded node
-									let src = leaf;
-									for (let j = 1; j <= i && src?.children; j++) {
-										src = src.children[parts[j]];
-									}
-									if (src) {
-										parent.children[parts[i]].expanded = true;
-										parent.children[parts[i]].children = src.children;
-									}
-								}
-								parent = parent.children[parts[i]];
-							} else break;
-						}
-					}
-
-					return { ...frame, locals: updatedLocals };
-				}));
+				console.log("Received variable info:", data);
+				const frameSummary = data.frameSummary as Record<string, VariableSummary> | undefined;
+				const targetFrame = data.target_frame as string | undefined;
+				if (frameSummary && targetFrame) {
+					console.log("Updating variables for frame:", targetFrame, frameSummary);
+					setFrames(prev => prev.map(frame => {
+						if (frame.name !== targetFrame) return frame;
+						console.log("Updating frame with new variable info:", frame.name, buildVariableTree(frameSummary));
+						return { ...frame, locals: buildVariableTree(frameSummary) };
+					}));
+				}
 			} else if (responseType === 'flow') {
 				const state = data.state as string;
 				if (state === 'paused') setPaused(true);
@@ -221,13 +183,23 @@ export default function PythonPlayground() {
 
 	// ---- ensure kernel worker exists ----
 	const ensureKernel = useCallback(async () => {
-		if (kernelWorkerIdRef.current) return kernelWorkerIdRef.current;
-		const worker = await pyodidePool.allocateWorker(taskId, 'kernel', 'Playground Kernel');
-		if (worker) {
+		try {
+			if (!kernelWorkerIdRef.current) throw new Error("No kernel worker ID in ref");
+			const workerStatus = pyodidePool.checkWorkerStatus(kernelWorkerIdRef.current);
+			if (!workerStatus) throw new Error(`Kernel worker with id ${kernelWorkerIdRef.current} is not in pool`);
+			if (workerStatus.status !== 'allocated') throw new Error(`Kernel worker with id ${kernelWorkerIdRef.current} is not allocated (status: ${workerStatus.status})`);
+			if (workerStatus.taskId !== taskId) throw new Error(`Kernel worker with id ${kernelWorkerIdRef.current} is allocated to a different task (taskId: ${workerStatus.taskId}, expected: ${taskId})`);
+			return kernelWorkerIdRef.current;
+		} catch (e) {
+			console.warn("Kernel worker check failed, will attempt to allocate a new worker. Error:", e);
+			const worker = await pyodidePool.allocateWorker(taskId, 'kernel', 'Playground Kernel');
+			if (!worker) {
+				console.error("Failed to allocate kernel worker");
+				return null;
+			}
 			kernelWorkerIdRef.current = worker.workerId;
 			return worker.workerId;
 		}
-		return null;
 	}, [taskId]);
 
 	// ---- actions ----
@@ -450,7 +422,7 @@ export default function PythonPlayground() {
 			>
 				<DraggableDivider
 					direction="vertical"
-					initialPosition={100}
+					initialPosition={50}
 					edgeSize={[15, 15]}
 					collapseEnd={true}
 					color="orange"
@@ -470,14 +442,26 @@ export default function PythonPlayground() {
 				</DraggableDivider>
 
 				{/* Variable Explorer + Terminal */}
-
-				<VariableExplorer
-					frames={frames}
-					terminalLines={terminalLines}
-					onClearTerminal={() => setTerminalLines([])}
-					onExpandCollapse={handleExpandCollapse}
-					isCompact={isCompact}
-				/>
+				<DraggableDivider
+					direction="vertical"
+					initialPosition={50}
+					edgeSize={[15, 15]}
+					collapseEnd={true}
+					collapseStart={true}
+					color="green"
+					className="flex-grow overflow-hidden"
+				>
+					<VariableExplorer
+						frames={frames}
+						onExpandCollapse={handleExpandCollapse}
+						isCompact={isCompact}
+					/>
+					<TerminalPane
+						terminalLines={terminalLines}
+						onClearTerminal={() => setTerminalLines([])}
+						isCompact={isCompact}
+					/>
+				</DraggableDivider>
 			</DraggableDivider>
 		</div>
 	);
