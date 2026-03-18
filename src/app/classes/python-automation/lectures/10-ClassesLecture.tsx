@@ -693,7 +693,7 @@ interface ClassesLectureIconProps {
 function ClassesLectureIcon(props: ClassesLectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="Classes and Error Handling" summary="Introduction to OOP in python" displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="Classes" summary="Introduction to OOP in python" displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 

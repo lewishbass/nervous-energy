@@ -11,14 +11,14 @@ import { MoreDataStructures, MoreDataStructuresIcon } from '../../lectures/08-Mo
 import { BreaksInlineLecture, BreaksInlineLectureIcon } from '../../lectures/06-BreaksInline';
 import { SortingLecture, SortingLectureIcon } from '../../lectures/09-SortingLecture';
 import { ClassesLecture, ClassesLectureIcon } from '../../lectures/10-ClassesLecture';
-import { FilesLecture, FilesLectureIcon } from '../../lectures/11-FilesLecture';
-import { RecursionLecture, RecursionLectureIcon } from '../../lectures/12-RecursionLecture';
-import { FileSystemLecture, FileSystemLectureIcon } from '../../lectures/12-FileSystemLecture';
-import { InterfacesLecture, InterfacesLectureIcon } from '../../lectures/13-InterfacesLecture';
-import { PackagingLecture, PackagingLectureIcon } from '../../lectures/14-PackagingLecture';
-import { ProjectLecture, ProjectLectureIcon } from '../../lectures/15-ProjectLecture';
-import { InlineLogicLecture, InlineLogicLectureIcon } from '../../lectures/16-InlineLogicLecture';
-import { DecoratorsLecture, DecoratorsLectureIcon } from '../../lectures/17-DecoratorsLecture';
+import { RecursionLecture, RecursionLectureIcon } from '../../lectures/11-RecursionLecture';
+import { FilesLecture, FilesLectureIcon } from '../../lectures/12-FilesLecture';
+import { FileSystemLecture, FileSystemLectureIcon } from '../../lectures/13-FileSystemLecture';
+import { InterfacesLecture, InterfacesLectureIcon } from '../../lectures/15-InterfacesLecture';
+import { PackagingLecture, PackagingLectureIcon } from '../../lectures/17-PackagingLecture';
+import { ProjectLecture, ProjectLectureIcon } from '../../lectures/16-ProjectLecture';
+import { InlineLogicLecture, InlineLogicLectureIcon } from '../../lectures/17-InlineLogicLecture';
+import { DecoratorsLecture, DecoratorsLectureIcon } from '../../lectures/18-DecoratorsLecture';
 
 
 export type LecturePair = {
@@ -42,9 +42,9 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: TupleSetDictIcon, lecture: TupleSetDict, index: 7, classNumber: 5 },
 	{ finished: true, icon: MoreDataStructuresIcon, lecture: MoreDataStructures, index: 8, classNumber: 6 },
 	{ finished: true, icon: SortingLectureIcon, lecture: SortingLecture, index: 9, classNumber: 7 },
-	{ finished: false, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 10, classNumber: 8 },
+	{ finished: true, icon: ClassesLectureIcon, lecture: ClassesLecture, index: 10, classNumber: 8 },
 	{ finished: false, icon: RecursionLectureIcon, lecture: RecursionLecture, index: 11, classNumber: 9 },
-	{ finished: false, icon: FilesLectureIcon, lecture: FilesLecture, index: 11, classNumber: 10 },
+	{ finished: true, icon: FilesLectureIcon, lecture: FilesLecture, index: 11, classNumber: 10 },
 	{ finished: false, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 12, classNumber: 11 },
 	{ finished: false, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 13, classNumber: 12 },
 	{ finished: false, icon: PackagingLectureIcon, lecture: PackagingLecture, index: 14, classNumber: 13 },

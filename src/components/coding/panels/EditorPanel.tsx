@@ -13,6 +13,7 @@ type EditorPanelProps = {
 	wordWrap: boolean;
 	handleEditorMount: OnMount;
 	localsRef?: React.RefObject<unknown>; // dill dump of locals for completion provider, parent executes code and provides updated locals to editor panel for 
+	preCode?: string; // code to execute before user's code on each run, e.g. for setting up imports or helper functions
 };
 
 // Module-level singleton — prevents re-registering across React re-renders/remounts
@@ -72,6 +73,7 @@ export default function EditorPanel({
 	wordWrap,
 	handleEditorMount,
 	localsRef,
+	preCode,
 }: EditorPanelProps) {
 	const { theme } = useTheme();
 	const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -79,6 +81,7 @@ export default function EditorPanel({
 	onCodeChangeRef.current = onCodeChange; // always fresh, no re-render
 
 	const [showLineNumbers, setShowLineNumbers] = useState<boolean>(true);
+	//const [collapsePreCode, setCollapsePreCode] = useState<boolean>(false);
 
 	console.log('editor panel render')
 
@@ -141,6 +144,23 @@ export default function EditorPanel({
 					/>
 				</div>
 			)}
+			{/*<div>
+				{preCode && (
+					<div
+						className={`px-3 py-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 backdrop-blur-sm cursor-pointer select-none ${collapsePreCode ? 'line-clamp-1' : ''}`}
+						onClick={() => setCollapsePreCode(!collapsePreCode)}
+						title="Click to expand/collapse pre-code"
+					>
+						{collapsePreCode ? (
+							<></>
+						) : (
+							<p className="mt-1 text-sm opacity-70 whitespace-pre-wrap">{preCode}</p>
+						)}
+					</div>
+				)}
+			</div>
+			<div className="flex-grow overflow-hidden relative bg1">
+			</div>*/}
 			<div className="flex-grow overflow-hidden relative bg1">
 				<div
 					className="absolute top-0 left-0 w-2 h-full z-100 hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer select-none bg-gray-200/20 dark:bg-gray-800/20"

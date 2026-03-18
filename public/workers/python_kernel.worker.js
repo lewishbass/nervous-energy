@@ -69,6 +69,9 @@ let stopped = false;     // hard stop flag
 // pending expands to resolve after execution ends
 let pendingExpands = [];
 
+// when true, reset context after current execution stops
+let pendingReset = false;
+
 const PIP_INSTALL_DILL = `
 import micropip as _mp
 await _mp.install("dill")
@@ -170,12 +173,21 @@ def _trace_function(frame, event, arg):
         frame_names.append(fr.f_code.co_name)
         frame_summaries.append(_summarize_frame(fr.f_locals, frame_expanded))
 
+    _arg_repr = None
+    try:
+        _arg_repr = repr(arg)
+        _arg_repr = _arg_repr[:200]
+    except:
+        _arg_repr = '<error>'
+
     line = frame.f_lineno
     _js_trace_cb(_json.dumps({
         "line": line,
         "frameNames": frame_names,
         "frameSummaries": frame_summaries,
         "expanded_variables": list(expanded),
+        "event": event,
+        "arg": _arg_repr,
     }))
 
     if _stopped:
@@ -363,7 +375,13 @@ _dill_bytes = _dill.dumps(_dill_ns)
     // KeyboardInterrupt from stop is not an error
     if (msg.includes('Execution stopped by user')) {
       executing = false;
-      self.postMessage({ type: "execution_stopped", taskId: currentTaskId, codeId });
+      if (pendingReset) {
+        pendingReset = false;
+        resetPyodideContext();
+        self.postMessage({ type: "flow", taskId: currentTaskId, state: "reset" });
+      } else {
+        self.postMessage({ type: "execution_stopped", taskId: currentTaskId, codeId });
+      }
       return;
     }
     execError = msg;
@@ -431,6 +449,16 @@ const handleFlowControl = (action, newSpeed) => {
     paused = false;
     pyodide.runPython('_stopped = True; _paused = False');
     self.postMessage({ type: "flow", taskId: currentTaskId, state: "stopped" });
+  } else if (action === 'reset') {
+    if (executing) {
+      pendingReset = true;
+      stopped = true;
+      paused = false;
+      pyodide.runPython('_stopped = True; _paused = False');
+    } else {
+      resetPyodideContext();
+      self.postMessage({ type: "flow", taskId: currentTaskId, state: "reset" });
+    }
   } else if (action === 'speed' && typeof newSpeed === 'number') {
     pyodide.runPython(`_sleep_time = ${newSpeed}`);
   }
@@ -500,9 +528,6 @@ self.onmessage = async (event) => {
     handleFlowControl(flowAction, newSpeed);
   } else if (type === "expand" || type === "collapse") {
     handleExpandCollapse(path, type);
-  } else if (type === "reset") {
-    resetPyodideContext();
-    self.postMessage({ type: "flow", taskId: currentTaskId, state: "reset" });
   } else {
     self.postMessage({ type: "error", taskId: currentTaskId, text: `kernel unhandled message type: ${type}` });
   }

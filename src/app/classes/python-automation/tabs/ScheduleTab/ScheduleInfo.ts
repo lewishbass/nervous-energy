@@ -218,24 +218,25 @@ export const assignments: AssignmentInfo[] = [
 		finished: true
 	},
 	{
+		name: 'Coding Practice',
+		description: 'Rapid fire coding practice',
+		link: 'coding-practice',
+		uuid: 'd4e5f6g7-h8i9-0123-defg-hi4567890123',
+		startClassIndex: 8,
+		endClassIndex: 11,
+		type: 'exercise',
+		finished: true
+	},
+	{
 		name: 'Data Structures',
 		description: 'Develop a grade tracking system using lists and dictionaries to store student information, calculate averages, identify top performers, and generate grade distributions.',
 		link: 'data-structures',
 		uuid: 'c3d4e5f6-g7h8-9012-cdef-gh3456789012',
-		startClassIndex: 6,
-		endClassIndex: 9,
+		startClassIndex: 11,
+		endClassIndex: 14,
 		type: 'project'
 	},
-	{
-		name: 'TMP-Quiz 1',
-		description: 'Assessment covering lists, dictionaries, sets, tuples, and basic numpy operations.',
-		link: 'unit-1-quiz',
-		uuid: 'd4e5f6g7-h8i9-0123-defg-hi4567890123',
-		startClassIndex: 8,
-		endClassIndex: 9,
-		type: 'quiz'
-	},
-	{
+	/*{
 		name: 'TMP-Text Statistics Analyzer',
 		description: 'Build a tool that reads text input and uses functions to calculate word count, sentence count, reading time, most common words, and readability scores.',
 		link: 'text-analyzer',
@@ -297,7 +298,7 @@ export const assignments: AssignmentInfo[] = [
 		startClassIndex: 17,
 		endClassIndex: 19,
 		type: 'exercise'
-	}
+	}*/
 ];
 
 export const classSessions: ClassSessionInfo[] = [

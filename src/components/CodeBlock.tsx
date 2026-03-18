@@ -16,6 +16,8 @@ import 'prismjs/components/prism-cpp';
 import 'prismjs/components/prism-java';
 import 'prismjs/plugins/line-numbers/prism-line-numbers';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+import 'prismjs/components/prism-json';
+
 
 interface CodeBlockProps {
 		code: string;

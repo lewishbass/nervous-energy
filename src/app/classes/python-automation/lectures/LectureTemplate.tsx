@@ -89,7 +89,7 @@ const LectureTemplate: React.FC<LectureTemplateProps> = ({
 		// Render as a fullscreen slideshow view
 		return (
 			<div className={`${className} select-none fixed max-w-[100vw] max-h-[100vh] min-w-[100vw] min-h-[100vh] inset-0 z-[70] slideshow bg1`} style={style} onClick={(e) => { e.stopPropagation(); nextSlide(); }}>
-				<RandomBackground seed={currentSlideIndex} density={1} />
+				<RandomBackground seed={currentSlideIndex} density={1} doAnimation={false} />
 				{React.Children.toArray(children)[currentSlideIndex]}
 			</div>
 		);

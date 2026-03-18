@@ -1,0 +1,61 @@
+{
+  "value": 50,
+  "left": {
+    "value": 30,
+    "left": {
+      "value": 20,
+      "left": {
+        "value": 10,
+        "left": null,
+        "right": null
+      },
+      "right": {
+        "value": 25,
+        "left": null,
+        "right": null
+      }
+    },
+    "right": {
+      "value": 40,
+      "left": {
+        "value": 35,
+        "left": null,
+        "right": null
+      },
+      "right": {
+        "value": 45,
+        "left": null,
+        "right": null
+      }
+    }
+  },
+  "right": {
+    "value": 70,
+    "left": {
+      "value": 60,
+      "left": {
+        "value": 55,
+        "left": null,
+        "right": null
+      },
+      "right": {
+        "value": 65,
+        "left": null,
+        "right": null
+      }
+    },
+    "right": {
+      "value": 80,
+      "left": {
+        "value": 75,
+        "left": null,
+        "right": null
+      },
+      "right": {
+        "value": 90,
+        "left": null,
+        "right": null
+      }
+    }
+  }
+}

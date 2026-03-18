@@ -125,8 +125,8 @@ export default function ToolbarPanel({
 			)}
 
 			<ToolBtn icon={VscDebugStepOver} label="Step" accent="var(--khb)" onClick={onStep} isCompact={isCompact} />
-			<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={onRestart} disabled={running} isCompact={isCompact} />
-			<ToolBtn icon={VscDebugStop} label="Stop" accent="var(--khr)" onClick={onStop} disabled={!running} isCompact={isCompact} />
+			<ToolBtn icon={VscDebugRestart} label="Restart Environment" accent="var(--kho)" onClick={onRestart} disabled={false} isCompact={isCompact} />
+			{/*<ToolBtn icon={VscDebugStop} label="Stop" accent="var(--khr)" onClick={onStop} disabled={!running} isCompact={isCompact} />*/}
 
 			{/* Speed slider */}
 			<div className="flex items-center gap-1 ml-2 text-xs tc2 select-none">
@@ -145,7 +145,7 @@ export default function ToolbarPanel({
 						background: transparent;
 						border: 2px solid #000;
 						height: 14px;
-						border-radius: 6px;
+						border-radius: 60px;
 					}
 					.speed-slider::-webkit-slider-thumb {
 						-webkit-appearance: none;
@@ -162,7 +162,7 @@ export default function ToolbarPanel({
 						background: transparent;
 						border: 1px solid #000;
 						height: 12px;
-						border-radius: 6px;
+						border-radius: 60px;
 					}
 					.speed-slider::-moz-range-progress {
 						background: transparent;
@@ -197,10 +197,10 @@ export default function ToolbarPanel({
 				<input
 					type="range"
 					min={0}
-					max={2}
-					step={0.1}
-					value={speed}
-					onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
+					max={1}
+					step={0.01}
+					value={(speed / 3) ** (1 / 1.5)}
+					onChange={(e) => onSpeedChange(3 * (parseFloat(e.target.value)) ** 1.5)}
 					className="speed-slider"
 					title="Trace speed (seconds between steps)"
 				/>
