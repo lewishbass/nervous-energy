@@ -7,7 +7,7 @@ import { FaAngleDown, FaX } from 'react-icons/fa6';
 export function Mechanics({ children }: { children: ReactNode }) {
   return (
     <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-800/30 rounded border-l-4 border-amber-600 dark:border-amber-400">
-      <p className="text-amber-900 dark:text-amber-100">{children}</p>
+      <div className="text-amber-900 dark:text-amber-100">{children}</div>
     </div>
   );
 }

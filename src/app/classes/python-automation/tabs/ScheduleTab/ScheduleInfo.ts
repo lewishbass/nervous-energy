@@ -225,7 +225,7 @@ export const assignments: AssignmentInfo[] = [
 		startClassIndex: 8,
 		endClassIndex: 11,
 		type: 'exercise',
-		finished: true
+		finished: false
 	},
 	{
 		name: 'Data Structures',
@@ -234,7 +234,8 @@ export const assignments: AssignmentInfo[] = [
 		uuid: 'c3d4e5f6-g7h8-9012-cdef-gh3456789012',
 		startClassIndex: 11,
 		endClassIndex: 14,
-		type: 'project'
+		type: 'project',
+		finished: true
 	},
 	/*{
 		name: 'TMP-Text Statistics Analyzer',
