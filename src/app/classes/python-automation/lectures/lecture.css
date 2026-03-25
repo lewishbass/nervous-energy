@@ -435,3 +435,92 @@
   width: 80vw !important;
   min-height: 200px;
 }
+
+/* Exercise List */
+.scrollview .lecture-exercise-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.slideshow .lecture-exercise-list {
+  list-style: none;
+  padding: 0;
+  margin: 1vw 0 2vw 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2vw;
+}
+
+.scrollview .lecture-exercise-item {
+  padding: 0.6rem 1rem;
+  border-left: 3px solid rgba(99, 102, 241, 0.65);
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 0 8px 8px 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.slideshow .lecture-exercise-item {
+  padding: 1vw 1.5vw;
+  border-left: 0.35vw solid rgba(99, 102, 241, 0.65);
+  background: rgba(99, 102, 241, 0.04);
+  border-radius: 0 0.8vw 0.8vw 0;
+  color: #333;
+  font-size: 1.5vw;
+  line-height: 1.6;
+}
+
+.dark .lecture-exercise-item {
+  background: rgba(99, 102, 241, 0.08);
+  color: #bbb;
+}
+
+/* Solutions Divider */
+.scrollview .lecture-solutions-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.slideshow .lecture-solutions-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+  margin: 3vw 0 1vw 0;
+}
+
+.lecture-solutions-divider::before,
+.lecture-solutions-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(75, 85, 99, 0.25);
+}
+
+.scrollview .lecture-solutions-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.slideshow .lecture-solutions-label {
+  font-size: 0.9vw;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.dark .lecture-solutions-label {
+  color: #9ca3af;
+}

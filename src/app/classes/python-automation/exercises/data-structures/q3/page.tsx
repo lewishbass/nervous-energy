@@ -265,7 +265,7 @@ _json.dumps(_expected)
         />
 
         <QuestionBorderAnimation validationState={validationStates['p1'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p1' ? 'fit-content' : '110px' }}>
-          <QuestionHeader title="Part 1" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
+          <QuestionHeader title="Implement a stack using a list" partName="p1" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <QuestionPart isActive={selectedQuestion === 'p1'} initialCode={'# Use a stack to reverse this list\narr = [1, 2, 3, 4, 5]'} cachedCode={submissionStates[`${questionName}_p1`]?.code} initialVDivider={100} validationState={validationStates['p1'] || null} validationMessage={validationMessages['p1']} onCodeStart={() => startCode('p1')} onCodeEnd={validateCodeP1}
             setupCode={`
 class _CustomClass(type):
@@ -295,7 +295,7 @@ class Stack(metaclass=_CustomClass):
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p2'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p2' ? 'fit-content' : '110px' }}>
-          <QuestionHeader title="Part 2" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
+          <QuestionHeader title="Push and pop elements from a stack" partName="p2" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <QuestionPart isActive={selectedQuestion === 'p2'} initialCode={'# print each item in the queue, then add it to the back, iterate over the queue TWICE'} cachedCode={submissionStates[`${questionName}_p2`]?.code} initialVDivider={100} validationState={validationStates['p2'] || null} validationMessage={validationMessages['p2']} onCodeStart={() => startCode('p2')} onCodeEnd={validateCodeP2}
             setupCode={`
 class _CustomClass(type):
@@ -332,7 +332,7 @@ queue.enqueue(5)`}>
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p3'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p3' ? 'fit-content' : '110px' }}>
-          <QuestionHeader title="Part 3" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
+          <QuestionHeader title="Evaluate if a parenthesis sequence is valid using a stack" partName="p3" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <QuestionPart isActive={selectedQuestion === 'p3'} initialCode={'# finish this function that checks if a sequence of brackets is valid\ndef check_brackets(input):\n    # your code here'} cachedCode={submissionStates[`${questionName}_p3`]?.code} initialVDivider={100} validationState={validationStates['p3'] || null} validationMessage={validationMessages['p3']} onCodeStart={() => startCode('p3')} onCodeEnd={validateCodeP3} 
             setupCode={`
 class _CustomClass(type):
@@ -377,7 +377,7 @@ class Stack(metaclass=_CustomClass):
         <div className="h-4"></div>
 
         <QuestionBorderAnimation validationState={validationStates['p4'] || null} className="bg1 rounded-lg p-8 shadow-sm overflow-hidden" style={{ maxHeight: selectedQuestion === 'p4' ? 'fit-content' : '110px' }}>
-          <QuestionHeader title="Part 4" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
+          <QuestionHeader title="Remove every nth element from a queue until one remains" partName="p4" questionName={questionName} selectedQuestion={selectedQuestion} setSelectedQuestion={setSelectedQuestion} submissionStates={submissionStates} validationStates={validationStates} />
           <QuestionPart isActive={selectedQuestion === 'p4'} initialCode={'# remove and print every third element until it is empty'} cachedCode={submissionStates[`${questionName}_p4`]?.code} initialVDivider={60} validationState={validationStates['p4'] || null} validationMessage={validationMessages['p4']} onCodeStart={() => startCode('p4')} onCodeEnd={validateCodeP4} setupCode={`
 class _CustomClass(type):
     def __repr__(cls):

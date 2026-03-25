@@ -46,7 +46,7 @@ export const lectureList: LecturePair[] = [
 	{ finished: false, icon: RecursionLectureIcon, lecture: RecursionLecture, index: 11, classNumber: 9 },
 	{ finished: true, icon: FilesLectureIcon, lecture: FilesLecture, index: 11, classNumber: 10 },
 	{ finished: true, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 12, classNumber: 11 },
-	{ finished: false, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 13, classNumber: 12 },
+	{ finished: true, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 13, classNumber: 12 },
 	{ finished: false, icon: PackagingLectureIcon, lecture: PackagingLecture, index: 14, classNumber: 13 },
 	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 15, classNumber: 14 },
 	{ finished: false, icon: ProjectLectureIcon, lecture: ProjectLecture, index: 16, classNumber: 15 },
