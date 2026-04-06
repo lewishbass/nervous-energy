@@ -350,7 +350,7 @@ export default function ScheduleTab() {
                     onClick={() => handleUnitClick(classinfo.unitNumber)}
                     style={{ verticalAlign: 'top' }}
                   >
-                    <div className="border-l-[3px] sm:border-l-[4px] border-solid border backdrop-blur-[3px] hover:opacity-70 active:opacity-50 transition-all duration-300"
+                    <div className="border-l-[3px] sm:border-l-[4px] border-solid border backdrop-blur-[3px] hover:opacity-80 active:opacity-65 transition-all duration-300"
                       style={{
                         backgroundColor: `${unitColors[classinfo.unitNumber % unitColors.length]}70`,
                         borderColor: `${unitColors[classinfo.unitNumber % unitColors.length]}80`,

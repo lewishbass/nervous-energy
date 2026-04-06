@@ -1,42 +1,42 @@
 import React from 'react';
 import {LectureTemplate, LectureIcon} from './LectureTemplate';
 
-interface PackagingLectureProps {
+interface Exercises1LectureProps {
   displayMode?: 'scrollable' | 'slideshow';
   className?: string;
   style?: React.CSSProperties;
   exitFSCallback?: () => void;
 }
 
-function PackagingLecture(props: PackagingLectureProps | null) {
+function Exercises1Lecture(props: Exercises1LectureProps | null) {
 	const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
       <section className="mb-4">
-        <h3 className="text-xl font-semibold tc1 mb-2">What You'll Learn</h3>
+        <h3 className="text-xl font-semibold tc1 mb-2">Exercises 1</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
-          <li>Packaging Python projects</li>
-          <li>Using setuptools and pip</li>
-          <li>Creating distributable packages</li>
-          <li>Version management</li>
+         
+          <li>TicTacToe</li>
+          <li>Robot</li>
+          <li>Maze</li>
         </ul>
       </section>
     </LectureTemplate>
   );
 }
 
-interface PackagingLectureIconProps {
+interface Exercises1LectureIconProps {
 	displayMode?: 'list' | 'card';
 	className?: string;
 	style?: React.CSSProperties;
 	onClick?: () => void;
 }
 
-function PackagingLectureIcon(props: PackagingLectureIconProps | null) {
+function Exercises1LectureIcon(props: Exercises1LectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="Packing and Distributing Code" summary="Share your Python projects with the world." displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="Exercises 1" summary="Walk through simple exercises combining multiple concepts." displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 
-export { PackagingLecture, PackagingLectureIcon };
+export { Exercises1Lecture, Exercises1LectureIcon };

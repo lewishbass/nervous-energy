@@ -165,7 +165,7 @@ export const scheduleDates: Date[] = [
 	new Date(2026, 2, 18, 18, 0, 0),
 	new Date(2026, 2, 23, 18, 0, 0),
 	new Date(2026, 2, 25, 18, 0, 0),
-	new Date(2026, 2, 30, 18, 0, 0),
+	//new Date(2026, 2, 30, 18, 0, 0),
 
 	// April (month index 3)
 	new Date(2026, 3, 6, 18, 0, 0),
@@ -173,7 +173,8 @@ export const scheduleDates: Date[] = [
 	new Date(2026, 3, 13, 18, 0, 0),
 	new Date(2026, 3, 15, 18, 0, 0),
 	new Date(2026, 3, 20, 18, 0, 0),
-	new Date(2026, 3, 22, 18, 0, 0)
+	new Date(2026, 3, 22, 18, 0, 0),
+	new Date(2026, 3, 27, 18, 0, 0)
 ];
 
 export const unitColors: string[] = [
