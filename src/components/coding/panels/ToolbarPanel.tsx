@@ -130,7 +130,7 @@ export default function ToolbarPanel({
 
 			{/* Speed slider */}
 			<div className="flex items-center gap-1 ml-2 text-xs tc2 select-none">
-				<span className="opacity-60 whitespace-nowrap font-courier">{speed.toFixed(1)}s</span>
+				<span className="opacity-60 whitespace-nowrap font-courier">{speed.toFixed(2)}s</span>
 				<style>{`
 					.speed-slider {
 						-webkit-appearance: none;
@@ -198,7 +198,7 @@ export default function ToolbarPanel({
 					type="range"
 					min={0}
 					max={1}
-					step={0.01}
+					step={0.002}
 					value={(speed / 3) ** (1 / 1.5)}
 					onChange={(e) => onSpeedChange(3 * (parseFloat(e.target.value)) ** 1.5)}
 					className="speed-slider"

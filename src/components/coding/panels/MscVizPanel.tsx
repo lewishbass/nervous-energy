@@ -1,5 +1,6 @@
 'use client';
 import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { FaArrowRight } from 'react-icons/fa6';
 
 /* ---- types ---- */
 type Point = { x: number; y: number };
@@ -70,16 +71,18 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 		const robotFirstDrawnRef = useRef<Set<string>>(new Set());
 		const actionHistoryRef = useRef<RobotAction[]>([]);
 		const hasAnyRobotRef = useRef(false);
+		const showArrowsRef = useRef(true);
 
 		/* state only for placeholder text */
 		const [hasRobots, setHasRobots] = useState(false);
+		const [showArrows, setShowArrows] = useState(true);
 
 		/* ---- draw the static grid/axes on the paths canvas ---- */
 		const drawGrid = useCallback((ctx: CanvasRenderingContext2D, W: number, H: number) => {
 			ctx.strokeStyle = '#333';
 			ctx.lineWidth = 0.5;
 			const tickCount = 10;
-			for (let i = 0; i <= tickCount; i++) {
+			for (let i = 1; i < tickCount; i++) {
 				const vx = WORLD_MIN_X + (RANGE_X * i) / tickCount;
 				const cx = toX(vx, W);
 				ctx.beginPath(); ctx.moveTo(cx, PAD); ctx.lineTo(cx, H - PAD); ctx.stroke();
@@ -100,20 +103,16 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 			ctx.fillStyle = '#888';
 			ctx.font = '10px monospace';
 			ctx.textAlign = 'center';
-			for (let i = 0; i <= tickCount; i++) {
+			for (let i = 0; i <= tickCount; i+=2) {
 				const val = WORLD_MIN_X + (RANGE_X * i) / tickCount;
 				ctx.fillText(val.toFixed(0), toX(val, W), H - PAD + 14);
 			}
 			ctx.textAlign = 'right';
-			for (let i = 0; i <= tickCount; i++) {
+			for (let i = 0; i <= tickCount; i+=2) {
 				const val = WORLD_MIN_Y + (RANGE_Y * i) / tickCount;
 				ctx.fillText(val.toFixed(0), PAD - 5, toY(val, H) + 3);
 			}
 
-			/* plot border */
-			ctx.strokeStyle = '#555';
-			ctx.lineWidth = 1;
-			ctx.strokeRect(PAD, PAD, W - 2 * PAD, H - 2 * PAD);
 		}, []);
 
 		/* ---- redraw overlay canvas (robot positions + heading + legend) ---- */
@@ -145,12 +144,27 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 				const headingLen = 18;
 				const hx = cx + Math.cos(state.angle) * headingLen;
 				const hy = cy - Math.sin(state.angle) * headingLen;
-				ctx.strokeStyle = color;
+				ctx.strokeStyle = '#fff';
 				ctx.lineWidth = 2.5;
 				ctx.beginPath();
 				ctx.moveTo(cx, cy);
 				ctx.lineTo(hx, hy);
 				ctx.stroke();
+
+				/* arrowhead on heading line */
+				const headArrowLen = 8;
+				const headArrowWidth = 4;
+				const headArrowOffset = 6;
+				const ax = hx + headArrowOffset * Math.cos(state.angle);
+				const ay = hy - headArrowOffset * Math.sin(state.angle);
+
+				ctx.fillStyle = '#fff';
+				ctx.beginPath();
+				ctx.moveTo(ax, ay);
+				ctx.lineTo(ax - headArrowLen * Math.cos(state.angle) + headArrowWidth * Math.sin(state.angle), ay + headArrowLen * Math.sin(state.angle) + headArrowWidth * Math.cos(state.angle));
+				ctx.lineTo(ax - headArrowLen * Math.cos(state.angle) - headArrowWidth * Math.sin(state.angle), ay + headArrowLen * Math.sin(state.angle) - headArrowWidth * Math.cos(state.angle));
+				ctx.closePath();
+				ctx.fill();
 
 				/* position dot */
 				ctx.fillStyle = color;
@@ -201,20 +215,22 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 			ctx.stroke();
 
 			/* arrowhead */
-			const ax = toX(to.x, W) - toX(from.x, W);
-			const ay = toY(to.y, H) - toY(from.y, H);
-			const len = Math.sqrt(ax * ax + ay * ay);
-			if (len > 8) {
-				const ux = ax / len, uy = ay / len;
-				const headLen = 7;
-				const tx = toX(to.x, W), ty = toY(to.y, H);
-				ctx.fillStyle = color;
-				ctx.beginPath();
-				ctx.moveTo(tx, ty);
-				ctx.lineTo(tx - headLen * ux + 3 * uy, ty - headLen * uy - 3 * ux);
-				ctx.lineTo(tx - headLen * ux - 3 * uy, ty - headLen * uy + 3 * ux);
-				ctx.closePath();
-				ctx.fill();
+			if (showArrowsRef.current) {
+				const ax = toX(to.x, W) - toX(from.x, W);
+				const ay = toY(to.y, H) - toY(from.y, H);
+				const len = Math.sqrt(ax * ax + ay * ay);
+				if (len > 8) {
+					const ux = ax / len, uy = ay / len;
+					const headLen = 7;
+					const tx = toX(to.x, W), ty = toY(to.y, H);
+					ctx.fillStyle = color;
+					ctx.beginPath();
+					ctx.moveTo(tx, ty);
+					ctx.lineTo(tx - headLen * ux + 3 * uy, ty - headLen * uy - 3 * ux);
+					ctx.lineTo(tx - headLen * ux - 3 * uy, ty - headLen * uy + 3 * ux);
+					ctx.closePath();
+					ctx.fill();
+				}
 			}
 
 			/* start dot (first segment of a robot) */
@@ -266,20 +282,22 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 				ctx.lineTo(toX(to.x, W), toY(to.y, H));
 				ctx.stroke();
 
-				const ax = toX(to.x, W) - toX(from.x, W);
-				const ay = toY(to.y, H) - toY(from.y, H);
-				const len = Math.sqrt(ax * ax + ay * ay);
-				if (len > 8) {
-					const ux = ax / len, uy = ay / len;
-					const headLen = 7;
-					const tx = toX(to.x, W), ty = toY(to.y, H);
-					ctx.fillStyle = color;
-					ctx.beginPath();
-					ctx.moveTo(tx, ty);
-					ctx.lineTo(tx - headLen * ux + 3 * uy, ty - headLen * uy - 3 * ux);
-					ctx.lineTo(tx - headLen * ux - 3 * uy, ty - headLen * uy + 3 * ux);
-					ctx.closePath();
-					ctx.fill();
+				if (showArrowsRef.current) {
+					const ax = toX(to.x, W) - toX(from.x, W);
+					const ay = toY(to.y, H) - toY(from.y, H);
+					const len = Math.sqrt(ax * ax + ay * ay);
+					if (len > 8) {
+						const ux = ax / len, uy = ay / len;
+						const headLen = 7;
+						const tx = toX(to.x, W), ty = toY(to.y, H);
+						ctx.fillStyle = color;
+						ctx.beginPath();
+						ctx.moveTo(tx, ty);
+						ctx.lineTo(tx - headLen * ux + 3 * uy, ty - headLen * uy - 3 * ux);
+						ctx.lineTo(tx - headLen * ux - 3 * uy, ty - headLen * uy + 3 * ux);
+						ctx.closePath();
+						ctx.fill();
+					}
 				}
 
 				if (isFirst) {
@@ -393,9 +411,24 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 						ref={overlayCanvasRef}
 						className="absolute inset-0 w-full h-full"
 					/>
-
+				{/* toggle-arrows button */}
+				<button
+					onClick={() => {
+						showArrowsRef.current = !showArrowsRef.current;
+						setShowArrows(showArrowsRef.current);
+						redrawPathsCanvas();
+					}}
+					className={`absolute cursor-pointer select-none top-2 py-2 right-2 z-10 px-1.5 py-0.5 text-xs font-mono rounded border transition-all select-none ${
+						showArrows
+							? 'bg-gray-700/80 border-gray-500 text-gray-200 hover:bg-gray-600/90'
+							: 'bg-gray-900/60 border-gray-600/50 text-gray-500 hover:bg-gray-700/70'
+					}`}
+					title={showArrows ? 'Hide arrows' : 'Show arrows'}
+				>
+					<FaArrowRight className={`w-3 h-3 transition-transform ${showArrows ? 'rotate-0' : '-rotate-90'}`} />
+				</button>
 					{!hasRobots && (
-						<p className="absolute inset-0 flex items-center justify-center opacity-40 text-sm select-none pointer-events-none">
+						<p className="absolute inset-0 flex items-start pt-20 justify-center opacity-40 text-sm select-none pointer-events-none">
 							Run code to visualize robot movement.
 						</p>
 					)}

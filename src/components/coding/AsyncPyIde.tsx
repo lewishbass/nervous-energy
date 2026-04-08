@@ -106,6 +106,10 @@ export default function AsyncPyIde({
 
 	const unsureKernelLock = useRef(false);
 
+	
+	const speedRef = useRef(speed);
+	speedRef.current = speed;
+
 	const settings = useMemo(() => [
 		{ text: 'Compact UI', get: isCompact, set: setIsCompact },
 		{ text: 'Word Wrap', get: wordWrap, set: setWordWrap },
@@ -153,6 +157,8 @@ export default function AsyncPyIde({
 		return base;
 	}, []);
 
+	
+
 	// ---- subscribe to kernel worker messages ----
 	useEffect(() => {
 		const unsub = pyodidePool.subscribe(taskId, (entry: OutputEntry) => {
@@ -175,7 +181,7 @@ export default function AsyncPyIde({
 				setLastEvent(event);
 				setLastArgs(args);
 
-				highlightLine(line);
+				if(speedRef.current > 0.05)highlightLine(line);
 
 				const newFrames: FrameData[] = frameNames.map((name, i) => ({
 					name,
