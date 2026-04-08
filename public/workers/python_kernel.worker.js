@@ -53,8 +53,8 @@
 // variableinfo
 // - path: string, children: {path: VariableSummary}
 
-// robot_action
-// - action: 'spawn'|'move'|'turn', robotId, robotName, pos, angle, etc.
+// vis_action
+// - actionClass: 'robot'|'maze', type: string, ...data
 
 
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js");
@@ -256,8 +256,9 @@ class Robot:
 		self.angle = 0 # radians
 		self.uuid = str(uuid.uuid4())
 		self.name = name or ('robot_' + self.uuid[:6])
-		_js_robot_action_cb(_json.dumps({
-			"action": "spawn",
+		_js_vis_action_cb(_json.dumps({
+			"actionClass": "robot",
+			"actionType": "spawn",
 			"robotId": self.uuid,
 			"robotName": self.name,
 			"pos": self.pos,
@@ -267,8 +268,9 @@ class Robot:
 	def turn(self, radians):
 		old_angle = self.angle
 		self.angle += radians
-		_js_robot_action_cb(_json.dumps({
-			"action": "turn",
+		_js_vis_action_cb(_json.dumps({
+			"actionClass": "robot",
+			"actionType": "turn",
 			"robotId": self.uuid,
 			"robotName": self.name,
 			"pos": self.pos,
@@ -282,8 +284,9 @@ class Robot:
 	def move(self, distance):
 		old_pos = self.pos.copy()
 		self.pos = [self.pos[0] + math.cos(self.angle) * distance, self.pos[1] + math.sin(self.angle) * distance]
-		_js_robot_action_cb(_json.dumps({
-			"action": "move",
+		_js_vis_action_cb(_json.dumps({
+			"actionClass": "robot",
+			"actionType": "move",
 			"robotId": self.uuid,
 			"robotName": self.name,
 			"from": old_pos,
@@ -294,6 +297,158 @@ class Robot:
 	def __repr__(self):
 		return f"Robot at {self.pos}"
 
+  `;
+
+  const MAZE_OBJECT_SCRIPT = `
+import random as _random
+
+class Maze:
+    _DIRS = {'up': (-1, 0), 'down': (1, 0), 'left': (0, -1), 'right': (0, 1)}
+    _LEFT  = {'up': 'left',  'left': 'down',  'down': 'right', 'right': 'up'}
+    _RIGHT = {'up': 'right', 'right': 'down', 'down': 'left',  'left': 'up'}
+    _BACK  = {'up': 'down',  'down': 'up',    'left': 'right', 'right': 'left'}
+
+    def __init__(self, width=10, height=10):
+        self.width = width
+        self.height = height
+        self.rows = 2 * height + 1
+        self.cols = 2 * width + 1
+        self.uuid = str(uuid.uuid4())
+        self.grid = self._generate()
+        self.start = (1, 1)
+        self.goal = (2 * height - 1, 2 * width - 1)
+        self.grid[self.start[0]][self.start[1]] = 's'
+        self.grid[self.goal[0]][self.goal[1]] = 'g'
+        self.runner_pos = list(self.start)
+        self.runner_facing = 'right'
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "maze",
+            "actionType": "init",
+            "mazeId": self.uuid,
+            "grid": self.grid,
+            "rows": self.rows,
+            "cols": self.cols,
+            "runnerPos": self.runner_pos,
+            "runnerFacing": self.runner_facing,
+        }))
+
+    def _generate(self):
+        grid = [['w'] * self.cols for _ in range(self.rows)]
+        visited = [[False] * self.width for _ in range(self.height)]
+        stack = [(0, 0)]
+        visited[0][0] = True
+        grid[1][1] = 'e'
+        while stack:
+            cx, cy = stack[-1]
+            neighbors = []
+            for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                nx, ny = cx + dx, cy + dy
+                if 0 <= nx < self.width and 0 <= ny < self.height and not visited[ny][nx]:
+                    neighbors.append((nx, ny, dx, dy))
+            if neighbors:
+                nx, ny, dx, dy = _random.choice(neighbors)
+                visited[ny][nx] = True
+                grid[2 * cy + 1 + dy][2 * cx + 1 + dx] = 'e'
+                grid[2 * ny + 1][2 * nx + 1] = 'e'
+                stack.append((nx, ny))
+            else:
+                stack.pop()
+        return grid
+
+    def move(self):
+        dr, dc = self._DIRS[self.runner_facing]
+        nr, nc = self.runner_pos[0] + dr, self.runner_pos[1] + dc
+        if 0 <= nr < self.rows and 0 <= nc < self.cols and self.grid[nr][nc] != 'w':
+            self.runner_pos = [nr, nc]
+            _js_vis_action_cb(_json.dumps({
+                "actionClass": "maze",
+                "actionType": "move",
+                "mazeId": self.uuid,
+                "runnerPos": self.runner_pos,
+                "runnerFacing": self.runner_facing,
+                "success": True,
+            }))
+            return True
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "maze",
+            "actionType": "move",
+            "mazeId": self.uuid,
+            "runnerPos": self.runner_pos,
+            "runnerFacing": self.runner_facing,
+            "success": False,
+        }))
+        return False
+
+    def look(self):
+        result = {}
+        for d, (dr, dc) in self._DIRS.items():
+            nr, nc = self.runner_pos[0] + dr, self.runner_pos[1] + dc
+            result[d] = not (0 <= nr < self.rows and 0 <= nc < self.cols and self.grid[nr][nc] != 'w')
+        return result
+
+    def turn(self, direction):
+        if direction in self._DIRS:
+            self.runner_facing = direction
+            _js_vis_action_cb(_json.dumps({
+                "actionClass": "maze",
+                "actionType": "turn",
+                "mazeId": self.uuid,
+                "runnerPos": self.runner_pos,
+                "runnerFacing": self.runner_facing,
+            }))
+
+    def turnLeft(self):
+        self.turn(self._LEFT[self.runner_facing])
+
+    def turnRight(self):
+        self.turn(self._RIGHT[self.runner_facing])
+
+    def _is_clear(self, direction):
+        dr, dc = self._DIRS[direction]
+        nr, nc = self.runner_pos[0] + dr, self.runner_pos[1] + dc
+        return 0 <= nr < self.rows and 0 <= nc < self.cols and self.grid[nr][nc] != 'w'
+
+    def checkFront(self):
+        return self._is_clear(self.runner_facing)
+
+    def checkBack(self):
+        return self._is_clear(self._BACK[self.runner_facing])
+
+    def checkLefthand(self):
+        return self._is_clear(self._LEFT[self.runner_facing])
+
+    def checkRighthand(self):
+        return self._is_clear(self._RIGHT[self.runner_facing])
+
+    def reset(self):
+        self.runner_pos = list(self.start)
+        self.runner_facing = 'right'
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "maze",
+            "actionType": "reset",
+            "mazeId": self.uuid,
+            "runnerPos": self.runner_pos,
+            "runnerFacing": self.runner_facing,
+        }))
+
+    def hasWon(self):
+        return tuple(self.runner_pos) == self.goal
+
+    def __repr__(self):
+        return f"Maze({self.width}x{self.height})"
+
+    def toDict(self):
+        return {
+            "width": self.width,
+            "height": self.height,
+            "rows": self.rows,
+            "cols": self.cols,
+            "start": list(self.start),
+            "goal": list(self.goal),
+            "runner_pos": self.runner_pos,
+            "runner_facing": self.runner_facing,
+            "won": self.hasWon(),
+        }
   `;
 
 function resetPyodideContext() {
@@ -327,6 +482,7 @@ async function init() {
     await pyodide.runPythonAsync(RT_OUT_SCRIPT);
     await pyodide.runPythonAsync(EXEC_WRAPPER_SCRIPT);
     await pyodide.runPythonAsync(ROBOT_OBJECT_SCRIPT);
+    await pyodide.runPythonAsync(MAZE_OBJECT_SCRIPT);
 
     // register JS callbacks for Python to call
     pyodide.globals.set('_js_trace_cb', (jsonStr) => {
@@ -344,9 +500,9 @@ async function init() {
       self.postMessage({ type: stype, taskId: currentTaskId, text });
     });
 
-    pyodide.globals.set('_js_robot_action_cb', (jsonStr) => {
+    pyodide.globals.set('_js_vis_action_cb', (jsonStr) => {
       const data = JSON.parse(jsonStr);
-      self.postMessage({ type: "robot_action", taskId: currentTaskId, ...data });
+      self.postMessage({ ...data, type: "vis_action", taskId: currentTaskId });
     });
 
     // wire up _RTOut as sys.stdout / sys.stderr so print() goes through it

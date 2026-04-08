@@ -4,7 +4,7 @@ import WorkerPanel from '@/components/coding/panels/WorkerPanel';
 import EditorPanel from '@/components/coding/panels/EditorPanel';
 import ToolbarPanel from '@/components/coding/panels/ToolbarPanel';
 import VariableExplorer, { type FrameData, type VariableSummary } from '@/components/coding/panels/VariableExplorer';
-import MscVizPanel, { type MscVizPanelHandle, type RobotAction } from '@/components/coding/panels/MscVizPanel';
+import MscVizPanel, { type MscVizPanelHandle, type VisAction } from '@/components/coding/panels/MscVizPanel';
 import TerminalPane from '@/components/coding/panels/TerminalPane';
 import DraggableDivider from '@/components/DraggableDivider';
 import { pyodidePool, type OutputEntry } from '@/components/coding/PoolManager';
@@ -231,9 +231,9 @@ export default function AsyncPyIde({
 				setPaused(false);
 				highlightLine(null);
 				setTerminalLines(prev => [...prev, { text: 'Execution stopped.', type: 'info' }]);
-			} else if (responseType === 'robot_action') {
-				const action = data as unknown as RobotAction;
-				vizPanelRef.current?.handleRobotAction(action);
+			} else if (responseType === 'vis_action') {
+				const action = data as unknown as VisAction;
+				vizPanelRef.current?.handleVisAction(action);
 			} else if (responseType === 'variableinfo') {
 				const frameSummary = data.frameSummary as Record<string, VariableSummary> | undefined;
 				const targetFrame = data.target_frame as string | undefined;

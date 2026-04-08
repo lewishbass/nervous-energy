@@ -49,7 +49,7 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: FileSystemLectureIcon, lecture: FileSystemLecture, index: 12, classNumber: 11 },
 	{ finished: true, icon: InterfacesLectureIcon, lecture: InterfacesLecture, index: 13, classNumber: 12 },
 	{ finished: true, icon: VersionManagementLectureIcon, lecture: VersionManagementLecture, index: 14, classNumber: 13 },
-	{ finished: false, icon: Exercises1LectureIcon, lecture: Exercises1Lecture, index: 15, classNumber: 14 },
+	{ finished: true, icon: Exercises1LectureIcon, lecture: Exercises1Lecture, index: 15, classNumber: 14 },
 	{ finished: false, icon: Exercises2LectureIcon, lecture: Exercises2Lecture, index: 16, classNumber: 15 },
 	{ finished: false, icon: Exercises3LectureIcon, lecture: Exercises3Lecture, index: 17, classNumber: 16 },
 	{ finished: false, icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 18, classNumber: 17 },
