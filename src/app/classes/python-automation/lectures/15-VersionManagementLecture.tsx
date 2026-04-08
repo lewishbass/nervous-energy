@@ -21,7 +21,7 @@ function VersionManagementLecture(props: VersionManagementLectureProps | null) {
   const { displayMode = 'scrollable', className = '', style = {}, exitFSCallback } = props || {};
 
   // 4/6/2026 8 pm EST (UTC-5) = 2026-04-07T01:00:00Z
-  const UNLOCK_TIME = new Date('2026-04-07T01:00:00Z');
+  const UNLOCK_TIME = new Date('2026-01-07T01:00:00Z');
   const [solutionsUnlocked, setSolutionsUnlocked] = useState(false);
 
   useEffect(() => {

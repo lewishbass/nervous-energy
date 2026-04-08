@@ -18,6 +18,7 @@ const typeIdx = {
 
 const INIT_PYTHON_SCRIPT = `
 import jedi as _jedi, json as _json, dill as _dill
+
 `
 
 const SEMANTIC_SCRIPT = `

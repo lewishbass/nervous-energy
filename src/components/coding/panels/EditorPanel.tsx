@@ -83,7 +83,7 @@ export default function EditorPanel({
 	const [showLineNumbers, setShowLineNumbers] = useState<boolean>(true);
 	//const [collapsePreCode, setCollapsePreCode] = useState<boolean>(false);
 
-	console.log('editor panel render')
+	//console.log('editor panel render')
 
 
 	const onMount: OnMount = useCallback(

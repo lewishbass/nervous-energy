@@ -4,6 +4,7 @@ import WorkerPanel from '@/components/coding/panels/WorkerPanel';
 import EditorPanel from '@/components/coding/panels/EditorPanel';
 import ToolbarPanel from '@/components/coding/panels/ToolbarPanel';
 import VariableExplorer, { type FrameData, type VariableSummary } from '@/components/coding/panels/VariableExplorer';
+import MscVizPanel, { type MscVizPanelHandle, type RobotAction } from '@/components/coding/panels/MscVizPanel';
 import TerminalPane from '@/components/coding/panels/TerminalPane';
 import DraggableDivider from '@/components/DraggableDivider';
 import { pyodidePool, type OutputEntry } from '@/components/coding/PoolManager';
@@ -84,6 +85,7 @@ export default function AsyncPyIde({
 	const lastHighlightRef = useRef<string[] | null>(null);
 	const monacoInstanceRef = useRef<import('@monaco-editor/react').Monaco | null>(null);
 	const stdoutRef = useRef<string>('');
+	const vizPanelRef = useRef<MscVizPanelHandle>(null);
 
 	// ---- state ----
 	const [running, setRunning] = useState(false);
@@ -223,6 +225,9 @@ export default function AsyncPyIde({
 				setPaused(false);
 				highlightLine(null);
 				setTerminalLines(prev => [...prev, { text: 'Execution stopped.', type: 'info' }]);
+			} else if (responseType === 'robot_action') {
+				const action = data as unknown as RobotAction;
+				vizPanelRef.current?.handleRobotAction(action);
 			} else if (responseType === 'variableinfo') {
 				const frameSummary = data.frameSummary as Record<string, VariableSummary> | undefined;
 				const targetFrame = data.target_frame as string | undefined;
@@ -290,6 +295,7 @@ export default function AsyncPyIde({
 		if (!persistentExec) {
 			pyodidePool.messageWorker(workerId, { type: 'reset' });
 			setFrames([]);
+			vizPanelRef.current?.reset();
 		}
 
 		if (onCodeStartCallback) {
@@ -325,6 +331,7 @@ export default function AsyncPyIde({
 			if (!persistentExec) {
 				pyodidePool.messageWorker(workerId, { type: 'reset' });
 				setFrames([]);
+				vizPanelRef.current?.reset();
 			}
 
 			if (onCodeStartCallback) {
@@ -354,6 +361,7 @@ export default function AsyncPyIde({
 		setFrames([]);
 		setTerminalLines([]);
 		dillRef.current = null;
+		vizPanelRef.current?.reset();
 	}, [ensureKernel]);
 
 	const handleSpeedChange = useCallback((newSpeed: number) => {
@@ -520,7 +528,7 @@ export default function AsyncPyIde({
 					<WorkerPanel className="w-full h-full" />
 				</DraggableDivider>
 
-				{/* Variable Explorer + Terminal */}
+				{/* Variable Explorer + Visualizer + Terminal */}
 				<DraggableDivider
 					direction="vertical"
 					initialPosition={50}
@@ -530,13 +538,27 @@ export default function AsyncPyIde({
 					color="green"
 					className="flex-grow overflow-hidden"
 				>
-					<VariableExplorer
-						frames={frames}
-						lastEvent={lastEvent}
-						lastArgs={lastArgs}
-						onExpandCollapse={handleExpandCollapse}
-						isCompact={isCompact}
-					/>
+					<DraggableDivider
+						direction="horizontal"
+						initialPosition={100}
+						edgeSize={[15, 15]}
+						collapseEnd={true}
+						collapseStart={true}
+						color="cyan"
+						className="flex-grow overflow-hidden"
+					>
+						<VariableExplorer
+							frames={frames}
+							lastEvent={lastEvent}
+							lastArgs={lastArgs}
+							onExpandCollapse={handleExpandCollapse}
+							isCompact={isCompact}
+						/>
+						<MscVizPanel
+							ref={vizPanelRef}
+							isCompact={isCompact}
+						/>
+					</DraggableDivider>
 					<TerminalPane
 						terminalLines={terminalLines}
 						onClearTerminal={() => setTerminalLines([])}

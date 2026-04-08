@@ -53,6 +53,9 @@
 // variableinfo
 // - path: string, children: {path: VariableSummary}
 
+// robot_action
+// - action: 'spawn'|'move'|'turn', robotId, robotName, pos, angle, etc.
+
 
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.29.3/full/pyodide.js");
 
@@ -79,6 +82,8 @@ await _mp.install("dill")
 
 const INIT_PYTHON_SCRIPT = `
 import json as _json, dill as _dill, sys as _sys, time as _time, traceback as _tb, textwrap as _textwrap
+
+
 _user_vars = {}
 _current_code_filename = None
 _expanded_variables = set()
@@ -93,7 +98,10 @@ _frame_stack = []
 const LOCAL_SUMMARY_SCRIPT = `
 def _summarise_variable(var, path, expanded_variables):
     try:
-        var_json = _json.dumps(var)
+        if hasattr(var, 'toDict'):
+            var_json = _json.dumps(var.toDict())
+        else:
+            var_json = _json.dumps(var)
     except:
         var_json = None
 
@@ -232,10 +240,61 @@ class _RTOut:
 const EXEC_WRAPPER_SCRIPT = `
 def _exec_wrapper(code_str, run_id):
     _code_obj = compile(code_str, f'<playground{run_id}>', 'exec')
-    _local = {}
-    exec(_code_obj, globals(), _local)
-    return _local
+    _before_keys = set(globals().keys())
+    exec(_code_obj, globals())
+    return {_k: globals()[_k] for _k in globals() if _k not in _before_keys}
 `;
+
+const ROBOT_OBJECT_SCRIPT = `
+import json
+import uuid
+import math
+
+class Robot:
+	def __init__(self, name=None):
+		self.pos = [0, 0]
+		self.angle = 0 # radians
+		self.uuid = str(uuid.uuid4())
+		self.name = name or ('robot_' + self.uuid[:6])
+		_js_robot_action_cb(_json.dumps({
+			"action": "spawn",
+			"robotId": self.uuid,
+			"robotName": self.name,
+			"pos": self.pos,
+			"angle": self.angle,
+		}))
+
+	def turn(self, radians):
+		old_angle = self.angle
+		self.angle += radians
+		_js_robot_action_cb(_json.dumps({
+			"action": "turn",
+			"robotId": self.uuid,
+			"robotName": self.name,
+			"pos": self.pos,
+			"angle": self.angle,
+			"oldAngle": old_angle,
+		}))
+
+	def speak(self):
+		print("Beep boop!")
+
+	def move(self, distance):
+		old_pos = self.pos.copy()
+		self.pos = [self.pos[0] + math.cos(self.angle) * distance, self.pos[1] + math.sin(self.angle) * distance]
+		_js_robot_action_cb(_json.dumps({
+			"action": "move",
+			"robotId": self.uuid,
+			"robotName": self.name,
+			"from": old_pos,
+			"to": self.pos.copy(),
+			"angle": self.angle,
+		}))
+
+	def __repr__(self):
+		return f"Robot at {self.pos}"
+
+  `;
 
 function resetPyodideContext() {
   if (pyodide) {
@@ -267,6 +326,7 @@ async function init() {
     await pyodide.runPythonAsync(TRACE_SCRIPT);
     await pyodide.runPythonAsync(RT_OUT_SCRIPT);
     await pyodide.runPythonAsync(EXEC_WRAPPER_SCRIPT);
+    await pyodide.runPythonAsync(ROBOT_OBJECT_SCRIPT);
 
     // register JS callbacks for Python to call
     pyodide.globals.set('_js_trace_cb', (jsonStr) => {
@@ -282,6 +342,11 @@ async function init() {
     });
     pyodide.globals.set('_js_print_cb', (text, stype) => {
       self.postMessage({ type: stype, taskId: currentTaskId, text });
+    });
+
+    pyodide.globals.set('_js_robot_action_cb', (jsonStr) => {
+      const data = JSON.parse(jsonStr);
+      self.postMessage({ type: "robot_action", taskId: currentTaskId, ...data });
     });
 
     // wire up _RTOut as sys.stdout / sys.stderr so print() goes through it

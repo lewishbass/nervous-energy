@@ -135,7 +135,7 @@ export default function ToolbarPanel({
 					.speed-slider {
 						-webkit-appearance: none;
 						appearance: none;
-						width: 4rem;
+						width: 16rem;
 						height: 12px;
 						cursor: pointer;
 						padding: 0;
