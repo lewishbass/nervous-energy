@@ -13,9 +13,13 @@ function Exercises3Lecture(props: Exercises3LectureProps | null) {
   return (
     <LectureTemplate displayMode={displayMode} className={className} style={style} exitFSCallback={exitFSCallback}>
       <section className="mb-4">
-        <h3 className="text-xl font-semibold tc1 mb-2">Exercises 3</h3>
+        <h3 className="text-xl font-semibold tc1 mb-2">Advanced Exercises</h3>
         <ul className="list-disc list-inside tc2 space-y-1">
-          <li>Exercise content to be added</li>
+          <li>Combining multiple Python concepts into cohesive projects</li>
+          <li>File I/O with complex data structures</li>
+          <li>Object-oriented design patterns</li>
+          <li>Building larger applications</li>
+          <li>Debugging and optimization techniques</li>
         </ul>
       </section>
     </LectureTemplate>
@@ -32,7 +36,7 @@ interface Exercises3LectureIconProps {
 function Exercises3LectureIcon(props: Exercises3LectureIconProps | null) {
 	const { displayMode = 'card', className = '', style, onClick } = props || {};
   return (
-    <LectureIcon title="Exercises 3" summary="Walk through advanced exercises combining multiple concepts." displayMode={displayMode} className={className} style={style} onClick={onClick} />
+    <LectureIcon title="Exercises 3" summary="Solve advanced exercises combining multiple concepts." displayMode={displayMode} className={className} style={style} onClick={onClick} />
   );
 }
 

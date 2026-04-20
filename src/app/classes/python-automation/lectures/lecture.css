@@ -383,6 +383,30 @@
   padding: 0.3rem 0.6rem;
 }
 
+/* Equation title label */
+.lecture-equation-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  border-bottom: 3px solid rgba(75, 85, 99, 0.25);
+  width:70%;
+}
+
+.slideshow .lecture-equation-title {
+  font-size: 0.95vw;
+  margin-bottom: 0.5rem;
+}
+
+.dark .lecture-equation-title {
+  color: #9ca3af;
+  border-bottom-color: rgba(156, 163, 175, 0.25);
+}
+
 /* Equations (block) */
 .scrollview .lecture-equation {
   width: 100%;
@@ -523,4 +547,201 @@
 
 .dark .lecture-solutions-label {
   color: #9ca3af;
+}
+
+/* ── LecturePlot ── */
+
+.lecture-plot-wrapper {
+  width: 100%;
+  margin: 0.75rem 0;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+/* Scroll mode: fixed pixel height set via inline prop */
+.scrollview .lecture-plot-container {
+  border-radius: 0.5rem;
+  background: rgba(181, 213, 214, 0.07);
+}
+
+/* Inner div that wraps the chart + legend together */
+.lecture-plot-inner {
+  position: relative;
+  width: 80%;
+}
+
+/* Slideshow mode: expand to fill available viewport height */
+.slideshow .lecture-plot-wrapper {
+  width: 80vw;
+  margin: 1.5vw 0;
+}
+
+/* In slideshow the wrapper is already 80vw, so the inner fills it fully */
+.slideshow .lecture-plot-inner {
+  width: 100%;
+}
+
+.slideshow .lecture-plot-container {
+  border-radius: 1vw;
+  background: rgba(181, 213, 214, 0.07);
+  /* Override ResponsiveContainer so it scales with vw in slideshow */
+  height: 32vw !important;
+  min-height: 32vw !important;
+  max-height: 32vw !important;
+}
+
+.slideshow .recharts-cartesian-axis-tick-value {
+  font-size: 1vw;
+}
+
+.slideshow .recharts-legend-wrapper {
+  font-size: 1.1vw !important;
+}
+
+.slideshow .recharts-tooltip-wrapper {
+  font-size: 1vw;
+}
+
+/* Tooltip */
+.lecture-plot-tooltip {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  backdrop-filter: blur(4px);
+}
+
+.lecture-plot-tooltip-x {
+  color: #94a3b8;
+  margin-bottom: 2px;
+  font-size: 0.75rem;
+}
+
+.slideshow .lecture-plot-tooltip {
+  font-size: 1vw;
+  border-radius: 0.5vw;
+  padding: 0.5vw 0.8vw;
+}
+
+/* Legend box — overlaid in top-right */
+.lecture-plot-legend {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  padding: 7px 11px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.dark .lecture-plot-legend {
+  background: rgba(15, 23, 42, 0.82);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.lecture-plot-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.lecture-plot-legend-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Legend label */
+.lecture-plot-legend-label {
+  color: #374151;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dark .lecture-plot-legend-label {
+  color: #d1d5db;
+}
+
+/* Slideshow scaling */
+.slideshow .lecture-plot-legend {
+  top: 1vw;
+  right: 1vw;
+  gap: 0.5vw;
+  border-radius: 0.6vw;
+  padding: 0.5vw 0.9vw;
+}
+
+.slideshow .lecture-plot-legend-swatch {
+  width: 2vw;
+  height: 0.25vw;
+}
+
+.slideshow .lecture-plot-legend-label {
+  font-size: 1vw;
+}
+
+/* ── Vector Operation Cards (lecture-vec-grid) ── */
+
+.slideshow .lecture-vec-grid {
+  gap: 1.5vw;
+  margin-top: 1.5vw;
+}
+
+/* card outer */
+.slideshow .lecture-vec-grid > div {
+  border-radius: 1.2vw;
+}
+
+/* card header */
+.slideshow .lecture-vec-grid > div > div:first-child {
+  padding: 0.55vw 1.1vw;
+}
+
+.slideshow .lecture-vec-grid > div > div:first-child span {
+  font-size: 0.9vw;
+  letter-spacing: 0.08em;
+}
+
+/* card body */
+.slideshow .lecture-vec-grid > div > div:last-child {
+  padding: 1.1vw;
+  gap: 0.8vw;
+}
+
+/* problem prompt text */
+.slideshow .lecture-vec-grid > div > div:last-child > p {
+  font-size: 1.3vw;
+}
+
+/* reveal / hide button */
+.slideshow .lecture-vec-grid button {
+  font-size: 0.9vw;
+  padding: 0.35vw 0.8vw;
+  border-radius: 0.45vw;
+}
+
+/* solution reveal box */
+.slideshow .lecture-vec-grid > div > div:last-child > div {
+  padding: 0.8vw;
+  border-radius: 0.6vw;
+  gap: 0.4vw;
+}
+
+/* step labels inside reveal box */
+.slideshow .lecture-vec-grid > div > div:last-child > div > p {
+  font-size: 0.8vw;
 }

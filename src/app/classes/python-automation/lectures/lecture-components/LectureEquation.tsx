@@ -3,6 +3,8 @@ import React from 'react';
 interface LectureEquationProps {
   /** Mix of MathJax elements and plain text spans as children */
   children: React.ReactNode;
+  /** Optional label displayed above the equation */
+  title?: string;
   className?: string;
 }
 
@@ -20,9 +22,10 @@ interface LectureEquationProps {
  * </LectureEquation>
  * ```
  */
-function LectureEquation({ children, className = '' }: LectureEquationProps) {
+function LectureEquation({ children, title, className = '' }: LectureEquationProps) {
   return (
     <div className={`lecture-equation ${className}`.trim()}>
+      {title && <span className="lecture-equation-title">{title}</span>}
       {children}
     </div>
   );

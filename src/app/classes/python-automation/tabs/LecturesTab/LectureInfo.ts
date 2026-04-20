@@ -17,9 +17,9 @@ import { InterfacesLecture  , InterfacesLectureIcon   } from '../../lectures/14-
 import { VersionManagementLecture   , VersionManagementLectureIcon    } from '../../lectures/15-VersionManagementLecture';
 import { Exercises1Lecture  , Exercises1LectureIcon   } from '../../lectures/16-Exercises1Lecture';
 import { Exercises2Lecture  , Exercises2LectureIcon   } from '../../lectures/17-Exercises2Lecture';
-import { Exercises3Lecture  , Exercises3LectureIcon   } from '../../lectures/18-Exercises3Lecture';
-import { InlineLogicLecture , InlineLogicLectureIcon  } from '../../lectures/19-InlineLogicLecture';
-import { DecoratorsLecture  , DecoratorsLectureIcon   } from '../../lectures/20-DecoratorsLecture';
+import { IntroLinearAlgebraLecture, IntroLinearAlgebraLectureIcon } from '../../lectures/18-IntroLinearAlgebraLecture';
+import { Exercises3Lecture, Exercises3LectureIcon } from '../../lectures/19-Exercises3Lecture';
+import { IntroGradientDescentLecture, IntroGradientDescentLectureIcon } from '../../lectures/20-IntroGradientDescentLecture';
 
 
 export type LecturePair = {
@@ -51,9 +51,9 @@ export const lectureList: LecturePair[] = [
 	{ finished: true, icon: VersionManagementLectureIcon, lecture: VersionManagementLecture, index: 14, classNumber: 13 },
 	{ finished: true, icon: Exercises1LectureIcon, lecture: Exercises1Lecture, index: 15, classNumber: 14 },
 	{ finished: true, icon: Exercises2LectureIcon, lecture: Exercises2Lecture, index: 16, classNumber: 16 },
-	{ finished: false, icon: Exercises3LectureIcon, lecture: Exercises3Lecture, index: 17, classNumber: 17 },
-	{ finished: false, icon: InlineLogicLectureIcon, lecture: InlineLogicLecture, index: 18, classNumber: 18 },
-	{ finished: false, icon: DecoratorsLectureIcon, lecture: DecoratorsLecture, index: 19, classNumber: 19 },
+	{ finished: true, icon: IntroLinearAlgebraLectureIcon, lecture: IntroLinearAlgebraLecture, index: 17, classNumber: 17 },
+	{ finished: false, icon: Exercises3LectureIcon, lecture: Exercises3Lecture, index: 18, classNumber: 18 },
+	{ finished: false, icon: IntroGradientDescentLectureIcon, lecture: IntroGradientDescentLecture, index: 19, classNumber: 19 },
 ];
 
 lectureList.forEach((lecturePair, index) => {
