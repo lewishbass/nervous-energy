@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['netlify.duggydiggytunnel.store'],
   reactStrictMode: true,
   transpilePackages: ['mathjax-full'],
   images: {

@@ -101,6 +101,8 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [ ]Siamese translation
 - [ ]mandarin translation
 - [ ]add "foobar (var)" syntax to code include validation
+
+- [ ]classroom leaderboard
  
 
 // add schema for managing game lobbies and P2P connections

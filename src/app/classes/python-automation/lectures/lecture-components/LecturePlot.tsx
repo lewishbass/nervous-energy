@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
   Label,
 } from 'recharts';
+import '../lecture.css';
 
 /* ── Types ── */
 
@@ -33,6 +34,8 @@ export interface PlotPoint {
   y: number;
   label?: string;
   color?: string;
+  /** Render as an open circle (removable discontinuity / hole) */
+  hole?: boolean;
 }
 
 export interface LecturePlotProps {
@@ -55,6 +58,8 @@ export interface LecturePlotProps {
   grid?: boolean;
   /** Chart height in pixels (scroll mode) */
   height?: number;
+  /** Match the parent lecture's display mode so height scales with vw in slideshow */
+  displayMode?: 'scrollable' | 'slideshow';
   className?: string;
 }
 
@@ -101,10 +106,32 @@ function LecturePlot({
   caption,
   grid = true,
   height = 300,
+  displayMode = 'scrollable',
   className = '',
 }: LecturePlotProps) {
   const [xMin, xMax] = xDomain;
   const [yMin, yMax] = yDomain;
+
+  /* ── Responsive scaling ── */
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [containerW, setContainerW] = useState(500);
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setContainerW(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  // Base reference width 500 px — everything scales proportionally from there
+  const scale = Math.min(2.2, Math.max(0.6, containerW / 500));
+  const sw   = (base: number) => base * scale;          // stroke width
+  const fs   = (base: number) => Math.round(base * scale); // font size
+  const rad  = (base: number) => Math.round(base * scale); // radius
+
+  // In slideshow the inner container is ~80vw wide; target height is 32vw = 0.4 × containerW
+  const effectiveHeight = displayMode === 'slideshow' && containerW > 0
+    ? Math.round(containerW * 0.4)
+    : height;
 
   /** Build the recharts data array: one object per x sample with a key per line */
   const data = useMemo(() => {
@@ -126,7 +153,7 @@ function LecturePlot({
   return (
     <div className={`lecture-plot-wrapper ${className}`.trim()}>
       {/* Inner container scoped to the chart width so the legend stays inside */}
-      <div className="lecture-plot-inner">
+      <div className="lecture-plot-inner" ref={innerRef}>
         {/* Custom legend overlay — top-right corner */}
         <div className="lecture-plot-legend">
           {lines.map((line, li) => (
@@ -143,18 +170,19 @@ function LecturePlot({
           ))}
         </div>
 
-        <ResponsiveContainer width="100%" height={height} className="lecture-plot-container">
+        <ResponsiveContainer width="100%" height={effectiveHeight} className="lecture-plot-container">
 				
         <LineChart data={data} margin={{ top: 20, right: 30, bottom: 6, left: 6 }}>
           {grid && (
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="rgba(148,163,184,0.2)"
+              strokeWidth={sw(0.8)}
             />
           )}
           {/* Zero axes */}
-          <ReferenceLine x={0} stroke="rgba(148,163,184,0.45)" strokeWidth={1} />
-          <ReferenceLine y={0} stroke="rgba(148,163,184,0.45)" strokeWidth={1} />
+          <ReferenceLine x={0} stroke="rgba(148,163,184,0.45)" strokeWidth={sw(1)} />
+          <ReferenceLine y={0} stroke="rgba(148,163,184,0.45)" strokeWidth={sw(1)} />
 
           <XAxis
             dataKey="x"
@@ -163,11 +191,11 @@ function LecturePlot({
             tickCount={tickCount}
             tickFormatter={(v) => Number(v).toFixed(Number.isInteger(v) ? 0 : 1)}
             stroke="rgba(148,163,184,0.6)"
-            tick={{ fill: 'rgba(148,163,184,0.9)', fontSize: 11 }}
+            tick={{ fill: 'rgba(148,163,184,0.9)', fontSize: fs(11) }}
             allowDataOverflow
           >
             {xLabel && (
-              <Label value={xLabel} position="insideBottom" offset={0} fill="rgba(148,163,184,0.9)" fontSize={12} />
+              <Label value={xLabel} position="insideBottom" offset={0} fill="rgba(148,163,184,0.9)" fontSize={fs(12)} />
             )}
           </XAxis>
 
@@ -177,12 +205,12 @@ function LecturePlot({
             tickCount={tickCount}
             tickFormatter={(v) => Number(v).toFixed(Number.isInteger(v) ? 0 : 1)}
             stroke="rgba(148,163,184,0.6)"
-            tick={{ fill: 'rgba(148,163,184,0.9)', fontSize: 11 }}
+            tick={{ fill: 'rgba(148,163,184,0.9)', fontSize: fs(11) }}
             allowDataOverflow
-            width={36}
+            width={Math.round(36 * scale)}
           >
             {yLabel && (
-              <Label value={yLabel} position="insideLeft" angle={-90} offset={16} fill="rgba(148,163,184,0.9)" fontSize={12} style={{ textAnchor: 'middle' }} />
+              <Label value={yLabel} position="insideLeft" angle={-90} offset={16} fill="rgba(148,163,184,0.9)" fontSize={fs(12)} style={{ textAnchor: 'middle' }} />
             )}
           </YAxis>
 
@@ -195,7 +223,7 @@ function LecturePlot({
               dataKey={`line_${li}`}
               name={`line_${li}`}
               stroke={line.color ?? DEFAULT_COLORS[li % DEFAULT_COLORS.length]}
-              strokeWidth={line.strokeWidth ?? 2.5}
+              strokeWidth={sw(line.strokeWidth ?? 2.5)}
               strokeDasharray={line.dash}
               dot={false}
               isAnimationActive={false}
@@ -204,22 +232,37 @@ function LecturePlot({
           ))}
 
           {/* Reference dots (intersections, special points) */}
-          {points.map((pt, pi) => (
-            <ReferenceDot
-              key={pi}
-              x={pt.x}
-              y={pt.y}
-              r={6}
-              fill={pt.color ?? '#f59e0b'}
-              stroke="#fff"
-              strokeWidth={2}
-              label={pt.label ? { value: pt.label, position: 'top', fill: pt.color ?? '#f59e0b', fontSize: 18 } : undefined}
-            />
-          ))}
+          {points.map((pt, pi) => {
+            const color = pt.color ?? '#f59e0b';
+            return (
+              <ReferenceDot
+                key={pi}
+                x={pt.x}
+                y={pt.y}
+                r={rad(6)}
+                fill={pt.hole ? 'transparent' : color}
+                stroke={color}
+                strokeWidth={pt.hole ? sw(2.5) : sw(2)}
+                shape={pt.hole
+                  ? (shapeProps: any) => (
+                    <circle
+                      cx={shapeProps.cx}
+                      cy={shapeProps.cy}
+                      r={rad(6)}
+                      fill="transparent"
+                      stroke={color}
+                      strokeWidth={sw(2.5)}
+                    />
+                  )
+                  : undefined}
+                label={pt.label ? { value: pt.label, position: 'top', fill: color, fontSize: fs(18) } : undefined}
+              />
+            );
+          })}
         </LineChart>
       </ResponsiveContainer>
       </div>
-      {caption && <p className="lecture-caption">{caption}</p>}
+      {caption && <p className="opacity-60" style={{ fontSize: `${0.8 * scale}rem` }}>{caption}</p>}
     </div>
   );
 }

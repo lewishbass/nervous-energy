@@ -173,8 +173,7 @@ export const scheduleDates: Date[] = [
 	new Date(2026, 3, 13, 18, 0, 0),
 	new Date(2026, 3, 15, 18, 0, 0),
 	new Date(2026, 3, 20, 18, 0, 0),
-	new Date(2026, 3, 22, 18, 0, 0),
-	new Date(2026, 3, 27, 18, 0, 0)
+	new Date(2026, 3, 22, 18, 0, 0)
 ];
 
 export const unitColors: string[] = [
@@ -439,13 +438,6 @@ export const classSessions: ClassSessionInfo[] = [
 		assignmentsDue: [],
 		assignmentsAssigned: []
 	},
-	{
-		startTime: scheduleDates[19],
-		endTime: new Date(scheduleDates[19].getTime() + 2 * 60 * 60 * 1000),
-		unitNumber: 7,
-		assignmentsDue: [],
-		assignmentsAssigned: []
-	}
 ];
 
 assignments.forEach((assignment) => {
