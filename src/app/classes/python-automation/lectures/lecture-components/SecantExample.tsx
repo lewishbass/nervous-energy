@@ -180,7 +180,7 @@ function SecantExample({ className = '', displayMode = 'scrollable' }: SecantExa
         ref={svgRef}
         viewBox={`0 0 ${SVG_W} ${SVG_H}`}
         style={{ width: '90%', height: 'auto', userSelect: 'none', touchAction: 'none' }}
-        className="rounded-xl border border-white/10 bg-[#0f172a]/60 cursor-crosshair"
+        className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/60 cursor-crosshair"
       >
         <defs>
           <clipPath id="sec-clip">
@@ -308,7 +308,7 @@ function SecantExample({ className = '', displayMode = 'scrollable' }: SecantExa
 
         {/* ── legend ── */}
         <rect x={PAD_L + 8} y={PAD_T + 8} width={170} height={54} rx={6}
-          fill="rgba(15,23,42,0.75)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+          className="fill-white/90 dark:fill-[#0f172a]/75" stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
         <line x1={PAD_L + 20} y1={PAD_T + 22} x2={PAD_L + 40} y2={PAD_T + 22}
           stroke="#6366f1" strokeWidth="2.5" />
         <text x={PAD_L + 46} y={PAD_T + 26} fill="#6366f1" fontSize="12">Squirrel population</text>

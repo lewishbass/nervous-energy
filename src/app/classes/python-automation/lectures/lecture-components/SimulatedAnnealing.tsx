@@ -149,7 +149,7 @@ function SimulatedAnnealing({ className = '' }: { className?: string }) {
             className={`px-4 py-1.5 rounded-lg border text-sm font-medium transition-colors select-none ${
               mode === m
                 ? 'bg-indigo-500/40 border-indigo-400/60 tc1'
-                : 'bg-white/5 border-white/15 tc2 hover:bg-white/10'
+                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10'
             }`}>
             {m === 'gd' ? 'Gradient Descent' : 'Simulated Annealing'}
           </button>
@@ -158,7 +158,7 @@ function SimulatedAnnealing({ className = '' }: { className?: string }) {
 
       <svg viewBox={`0 0 ${SVG_W + (mode === 'sa' ? 28 : 0)} ${SVG_H}`}
         style={{ width: '100%', height: 'auto', userSelect: 'none' }}
-        className="rounded-xl border border-white/10 bg-[#0f172a]/70">
+        className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/70">
         <defs>
           <clipPath id="sa-clip">
             <rect x={PAD.l} y={PAD.t} width={PW} height={PH} />
@@ -232,25 +232,25 @@ function SimulatedAnnealing({ className = '' }: { className?: string }) {
 
         {/* Legend */}
         <rect x={PAD.l + 6} y={PAD.t + 6} width={160} height={mode === 'gd' ? 52 : 70} rx={4}
-          fill="rgba(15,23,42,0.78)" />
+          className="fill-white/90 dark:fill-[#0f172a]/78" />
         <line x1={PAD.l + 12} y1={PAD.t + 20} x2={PAD.l + 28} y2={PAD.t + 20}
           stroke="#6366f1" strokeWidth="2.5" />
-        <text x={PAD.l + 32} y={PAD.t + 24} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>f(x) (loss landscape)</text>
+        <text x={PAD.l + 32} y={PAD.t + 24} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>f(x) (loss landscape)</text>
         <circle cx={PAD.l + 18} cy={PAD.t + 36} r={5} fill="#f59e0b" stroke="#fff" strokeWidth="1" />
-        <text x={PAD.l + 28} y={PAD.t + 40} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Current x</text>
+        <text x={PAD.l + 28} y={PAD.t + 40} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Current x</text>
         {mode === 'gd' && (
           <>
             <line x1={PAD.l + 12} y1={PAD.t + 52} x2={PAD.l + 28} y2={PAD.t + 52}
               stroke="#f59e0b" strokeWidth="1.8" strokeDasharray="5 3" />
-            <text x={PAD.l + 32} y={PAD.t + 56} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Tangent</text>
+            <text x={PAD.l + 32} y={PAD.t + 56} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Tangent</text>
           </>
         )}
         {mode === 'sa' && (
           <>
             <circle cx={PAD.l + 18} cy={PAD.t + 52} r={4} fill="rgba(99,102,241,0.7)" />
-            <text x={PAD.l + 28} y={PAD.t + 56} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Accepted</text>
+            <text x={PAD.l + 28} y={PAD.t + 56} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Accepted</text>
             <circle cx={PAD.l + 18} cy={PAD.t + 66} r={4} fill="rgba(239,68,68,0.6)" />
-            <text x={PAD.l + 28} y={PAD.t + 70} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Rejected</text>
+            <text x={PAD.l + 28} y={PAD.t + 70} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Rejected</text>
           </>
         )}
 
@@ -282,7 +282,7 @@ function SimulatedAnnealing({ className = '' }: { className?: string }) {
           { label: 'steps', val: String(stepCount) },
           ...(mode === 'sa' ? [{ label: 'temp T', val: temp.toFixed(4) }] : []),
         ].map(({ label, val }) => (
-          <div key={label} className="bg-white/5 rounded-lg px-2 py-1.5">
+          <div key={label} className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
             <div className="opacity-50 text-xs mb-0.5">{label}</div>
             <div className="tc1 truncate">{val}</div>
           </div>
@@ -333,7 +333,7 @@ function SimulatedAnnealing({ className = '' }: { className?: string }) {
           {running ? 'Pause' : 'Run'}
         </button>
         <button onClick={reset}
-          className="px-5 py-1.5 rounded-lg bg-white/5 border border-white/15 tc2 hover:bg-white/10 transition-colors select-none">
+          className="px-5 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10 transition-colors select-none">
           Reset
         </button>
       </div>

@@ -100,8 +100,8 @@ function GradientDescent2D({ className = '' }: GradientDescent2DProps) {
     const result: { x: number; y: number; gx: number; gy: number; len: number }[] = [];
     for (let row = 0; row < ARROW_ROWS; row++) {
       for (let col = 0; col < ARROW_COLS; col++) {
-        const ax = X_MIN + (col + 0.5) / ARROW_COLS * (X_MAX - X_MIN);
-        const ay = Y_MIN + (row + 0.5) / ARROW_ROWS * (Y_MAX - Y_MIN);
+        const ax = X_MIN + (col + Math.random()) / ARROW_COLS * (X_MAX - X_MIN);
+        const ay = Y_MIN + (row + Math.random()) / ARROW_ROWS * (Y_MAX - Y_MIN);
         const gx = eq.dfx(ax, ay), gy = eq.dfy(ax, ay);
         const mag = Math.sqrt(gx * gx + gy * gy);
         if (mag < 1e-8) continue;
@@ -280,7 +280,7 @@ function GradientDescent2D({ className = '' }: GradientDescent2DProps) {
             className={`px-3 py-1 rounded-lg border text-xs font-mono transition-colors select-none ${
               eqIdx === i
                 ? 'bg-emerald-500/40 border-emerald-400/60 tc1'
-                : 'bg-white/5 border-white/15 tc2 hover:bg-white/10'
+                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10'
             }`}>
             {eqOpt.label}
           </button>
@@ -296,16 +296,16 @@ function GradientDescent2D({ className = '' }: GradientDescent2DProps) {
           { label: 'f(x,y)',  val: eq.fn(current.x, current.y).toFixed(4) },
           { label: 'steps',   val: String(path.length - 1) },
         ].map(({ label, val }) => (
-          <div key={label} className="bg-white/5 rounded-lg px-2 py-1.5">
+          <div key={label} className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
             <div className="opacity-50 text-xs mb-0.5">{label}</div>
             <div className="tc1 truncate">{val}</div>
           </div>
         ))}
-        <div className="bg-white/5 rounded-lg px-2 py-1.5 col-span-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5 col-span-2">
           <div className="opacity-50 text-xs mb-0.5">∇f = [∂f/∂x, ∂f/∂y]</div>
           <div className="tc1">[{gx.toFixed(4)},&nbsp;{gy.toFixed(4)}]</div>
         </div>
-        <div className="bg-white/5 rounded-lg px-2 py-1.5 col-span-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5 col-span-2">
           <div className="opacity-50 text-xs mb-0.5">|∇f|</div>
           <div className="tc1">{gradMag.toFixed(5)}</div>
         </div>
@@ -331,7 +331,7 @@ function GradientDescent2D({ className = '' }: GradientDescent2DProps) {
             {running ? 'Pause' : 'Run'}
           </button>
           <button onClick={reset}
-            className="px-5 py-1.5 rounded-lg bg-white/5 border border-white/15 tc2 hover:bg-white/10 transition-colors select-none">
+            className="px-5 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10 transition-colors select-none">
             Reset
           </button>
         </div>

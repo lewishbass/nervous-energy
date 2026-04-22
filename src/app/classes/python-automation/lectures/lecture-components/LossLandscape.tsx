@@ -4,11 +4,11 @@ import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 /* ── Fixed dataset (roughly y ≈ 2x, no intercept) ── */
 const DATA = [
   { x: 0.5, y: 1.1 },
-  { x: 1.2, y: 2.6 },
+  { x: 1.2, y: 4.6 },
   { x: 2.0, y: 3.9 },
-  { x: 2.8, y: 5.7 },
+  { x: 2.8, y: 4.2},
   { x: 3.5, y: 7.0 },
-  { x: 4.2, y: 8.4 },
+  { x: 4.2, y: 9.4 },
   { x: 5.0, y: 10.2 },
 ];
 
@@ -128,7 +128,7 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
   /* Regression line path */
   const regPath = (() => {
     const x0 = SX_MIN, x1 = SX_MAX;
-    return `M${sToPixX(x0).toFixed(1)},${sToPixY(clamp(m * x0, SY_MIN - 2, SY_MAX + 2)).toFixed(1)} L${sToPixX(x1).toFixed(1)},${sToPixY(clamp(m * x1, SY_MIN - 2, SY_MAX + 2)).toFixed(1)}`;
+    return `M${sToPixX(x0).toFixed(1)},${sToPixY(m * x0).toFixed(1)} L${sToPixX(x1).toFixed(1)},${sToPixY(m * x1).toFixed(1)}`;
   })();
 
   /* Current loss */
@@ -147,7 +147,7 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
         {/* ── Left: Scatter + regression line ── */}
         <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`}
           style={{ width: '47%', minWidth: 240, height: 'auto', userSelect: 'none' }}
-          className="rounded-xl border border-white/10 bg-[#0f172a]/70">
+          className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/70">
           <defs>
             <clipPath id="ll-scatter-clip">
               <rect x={PAD.l} y={PAD.t} width={PW} height={PH} />
@@ -209,15 +209,15 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
 
           {/* Legend */}
           <rect x={PAD.l + 6} y={PAD.t + 6} width={150} height={52} rx={4}
-            fill="rgba(15,23,42,0.78)" />
+            className="fill-white/90 dark:fill-[#0f172a]/78" />
           <circle cx={PAD.l + 17} cy={PAD.t + 20} r={5} fill="#10b981" stroke="#fff" strokeWidth="1" />
-          <text x={PAD.l + 26} y={PAD.t + 24} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Data</text>
+          <text x={PAD.l + 26} y={PAD.t + 24} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Data</text>
           <line x1={PAD.l + 12} y1={PAD.t + 38} x2={PAD.l + 26} y2={PAD.t + 38}
             stroke="#6366f1" strokeWidth="2.2" />
-          <text x={PAD.l + 30} y={PAD.t + 42} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>ŷ = {m.toFixed(2)}x</text>
+          <text x={PAD.l + 30} y={PAD.t + 42} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>ŷ = {m.toFixed(2)}x</text>
           <line x1={PAD.l + 12} y1={PAD.t + 54} x2={PAD.l + 26} y2={PAD.t + 54}
             stroke="#f59e0b" strokeWidth="1.2" strokeDasharray="3 2" />
-          <text x={PAD.l + 30} y={PAD.t + 58} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Residuals</text>
+          <text x={PAD.l + 30} y={PAD.t + 58} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Residuals</text>
 
           {/* Border */}
           <rect x={PAD.l} y={PAD.t} width={PW} height={PH}
@@ -227,7 +227,7 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
         {/* ── Right: Loss curve ── */}
         <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`}
           style={{ width: '47%', minWidth: 240, height: 'auto', userSelect: 'none' }}
-          className="rounded-xl border border-white/10 bg-[#0f172a]/70">
+          className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/70">
           <defs>
             <clipPath id="ll-loss-clip">
               <rect x={PAD.l} y={PAD.t} width={PW} height={PH} />
@@ -299,12 +299,12 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
 
           {/* Legend */}
           <rect x={PAD.l + 6} y={PAD.t + 6} width={130} height={38} rx={4}
-            fill="rgba(15,23,42,0.78)" />
+            className="fill-white/90 dark:fill-[#0f172a]/78" />
           <line x1={PAD.l + 12} y1={PAD.t + 20} x2={PAD.l + 26} y2={PAD.t + 20}
             stroke="#f59e0b" strokeWidth="2.5" />
-          <text x={PAD.l + 30} y={PAD.t + 24} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Loss(m)</text>
+          <text x={PAD.l + 30} y={PAD.t + 24} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Loss(m)</text>
           <circle cx={PAD.l + 17} cy={PAD.t + 36} r={5} fill="#6366f1" stroke="#fff" strokeWidth="1" />
-          <text x={PAD.l + 30} y={PAD.t + 40} fill="rgba(148,163,184,0.9)" fontSize={fs(10)}>Current m</text>
+          <text x={PAD.l + 30} y={PAD.t + 40} className="fill-slate-600 dark:fill-slate-400/90" fontSize={fs(10)}>Current m</text>
 
           {/* Border */}
           <rect x={PAD.l} y={PAD.t} width={PW} height={PH}
@@ -320,7 +320,7 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
           { label: 'MSE Loss',  val: curLoss.toFixed(4) },
           { label: 'steps',     val: String(history.length - 1) },
         ].map(({ label, val }) => (
-          <div key={label} className="bg-white/5 rounded-lg px-2 py-1.5">
+          <div key={label} className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
             <div className="opacity-50 text-xs mb-0.5">{label}</div>
             <div className="tc1 truncate">{val}</div>
           </div>
@@ -347,7 +347,7 @@ function LossLandscape({ className = '' }: LossLandscapeProps) {
             {running ? 'Pause' : 'Run'}
           </button>
           <button onClick={reset}
-            className="px-5 py-1.5 rounded-lg bg-white/5 border border-white/15 tc2 hover:bg-white/10 transition-colors select-none">
+            className="px-5 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10 transition-colors select-none">
             Reset
           </button>
         </div>

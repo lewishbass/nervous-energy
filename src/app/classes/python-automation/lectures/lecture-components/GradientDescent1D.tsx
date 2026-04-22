@@ -152,7 +152,7 @@ function GradientDescent1D({ className = '', displayMode = 'scrollable' }: Gradi
       <svg
         viewBox={`0 0 ${SVG_W} ${SVG_H}`}
         style={{ width: '100%', height: 'auto', userSelect: 'none' }}
-        className="rounded-xl border border-white/10 bg-[#0f172a]/70"
+        className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/70"
       >
         <defs>
           <clipPath id="gd1-clip">
@@ -234,16 +234,16 @@ function GradientDescent1D({ className = '', displayMode = 'scrollable' }: Gradi
 
         {/* Legend */}
         <rect x={PAD_L + 6} y={PAD_T + 6} width={210} height={66} rx={5}
-          fill="rgba(15,23,42,0.78)" />
+          className="fill-white/90 dark:fill-[#0f172a]/78" />
         <line x1={PAD_L + 16} y1={PAD_T + 20} x2={PAD_L + 34} y2={PAD_T + 20}
           stroke="#6366f1" strokeWidth="2.5" />
-        <text x={PAD_L + 39} y={PAD_T + 24} fill="rgba(148,163,184,0.9)" fontSize={fs(11)}>f(x) = {eq.label}</text>
+        <text x={PAD_L + 39} y={PAD_T + 24} className="fill-slate-600 dark:fill-slate-400/90 tc5" fontSize={fs(11)}>f(x) = {eq.label}</text>
         <line x1={PAD_L + 16} y1={PAD_T + 38} x2={PAD_L + 34} y2={PAD_T + 38}
           stroke="#f59e0b" strokeWidth="1.8" strokeDasharray="5 3" />
-        <text x={PAD_L + 39} y={PAD_T + 42} fill="rgba(148,163,184,0.9)" fontSize={fs(11)}>Tangent at x₀</text>
+        <text x={PAD_L + 39} y={PAD_T + 42} className="fill-slate-600 dark:fill-slate-400/90 tc5" fontSize={fs(11)}>Tangent at x₀</text>
         <line x1={PAD_L + 16} y1={PAD_T + 56} x2={PAD_L + 34} y2={PAD_T + 56}
           stroke="#10b981" strokeWidth="2" strokeDasharray="4 3" />
-        <text x={PAD_L + 39} y={PAD_T + 60} fill="rgba(148,163,184,0.9)" fontSize={fs(11)}>Gradient step x₁</text>
+        <text x={PAD_L + 39} y={PAD_T + 60} className="fill-slate-600 dark:fill-slate-400/90 tc5" fontSize={fs(11)}>Gradient step x₁</text>
 
         {/* Border */}
         <rect x={PAD_L} y={PAD_T} width={PLOT_W} height={PLOT_H}
@@ -259,7 +259,7 @@ function GradientDescent1D({ className = '', displayMode = 'scrollable' }: Gradi
           { label: "f′(x)", val: eq.dfn(x).toFixed(5) },
           { label: 'steps', val: String(history.length - 1) },
         ].map(({ label, val }) => (
-          <div key={label} className="bg-white/5 rounded-lg px-2 py-1.5">
+          <div key={label} className="bg-black/5 dark:bg-white/5 rounded-lg px-2 py-1.5">
             <div className="opacity-50 text-xs mb-0.5">{label}</div>
             <div className="tc1 truncate">{val}</div>
           </div>
@@ -273,7 +273,7 @@ function GradientDescent1D({ className = '', displayMode = 'scrollable' }: Gradi
             className={`px-3 py-1 rounded-lg border text-xs font-courier transition-colors select-none ${
               eqIdx === i
                 ? 'bg-indigo-500/40 border-indigo-400/60 tc1'
-                : 'bg-white/5 border-white/15 tc2 hover:bg-white/10'
+                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10'
             }`}>
             {eqOpt.label}
           </button>
@@ -300,7 +300,7 @@ function GradientDescent1D({ className = '', displayMode = 'scrollable' }: Gradi
             {running ? 'Pause' : 'Run'}
           </button>
           <button onClick={reset}
-            className="px-5 py-1.5 rounded-lg bg-white/5 border border-white/15 tc2 hover:bg-white/10 transition-colors select-none">
+            className="px-5 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10 transition-colors select-none">
             Reset
           </button>
         </div>

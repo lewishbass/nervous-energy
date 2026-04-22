@@ -130,8 +130,8 @@ function GradientField2D({ className = '' }: GradientField2DProps) {
 		const result: { x: number; y: number; gx: number; gy: number; len: number }[] = [];
 		for (let row = 0; row < ARROW_ROWS; row++) {
 			for (let col = 0; col < ARROW_COLS; col++) {
-				const ax = X_MIN + (col + 0.5) / ARROW_COLS * (X_MAX - X_MIN);
-				const ay = Y_MIN + (row + 0.5) / ARROW_ROWS * (Y_MAX - Y_MIN);
+				const ax = X_MIN + (col + Math.random()) / ARROW_COLS * (X_MAX - X_MIN);
+				const ay = Y_MIN + (row + Math.random()) / ARROW_ROWS * (Y_MAX - Y_MIN);
 				const gx = eq.dfx(ax, ay), gy = eq.dfy(ax, ay);
 				const mag = Math.sqrt(gx * gx + gy * gy);
 				if (mag < 1e-8) continue;
@@ -258,7 +258,7 @@ function GradientField2D({ className = '' }: GradientField2DProps) {
             className={`px-3 py-1 rounded-lg border text-xs font-mono transition-colors select-none ${
               eqIdx === i
                 ? 'bg-indigo-500/40 border-indigo-400/60 tc1'
-                : 'bg-white/5 border-white/15 tc2 hover:bg-white/10'
+                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/15 tc2 hover:bg-black/10 dark:hover:bg-white/10'
             }`}>
             {eqOpt.label}
           </button>
@@ -268,30 +268,30 @@ function GradientField2D({ className = '' }: GradientField2DProps) {
       {/* Info display */}
       <div className="grid grid-cols-2 gap-2 mt-3 w-full max-w-lg font-mono text-center"
         style={{ fontSize: `${0.78 * scale}rem` }}>
-        <div className="bg-white/5 rounded-lg px-3 py-2 col-span-2 text-left">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2 col-span-2 text-left">
           <span className="opacity-40 text-xs mr-1">f(x, y) =</span>
           <span className="tc2">{eq.label}</span>
           <span className="opacity-40 text-xs mx-2">|</span>
           <span className="opacity-40 text-xs mr-1">minima at</span>
           <span className="tc2">{eq.minimaLabel}</span>
         </div>
-        <div className="bg-white/5 rounded-lg px-3 py-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
           <div className="opacity-50 text-xs mb-0.5">Point (x, y)</div>
           <div className="tc1">({pt.x.toFixed(4)},&nbsp;{pt.y.toFixed(4)})</div>
         </div>
-        <div className="bg-white/5 rounded-lg px-3 py-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
           <div className="opacity-50 text-xs mb-0.5">f(x, y)</div>
           <div className="tc1">{eq.fn(pt.x, pt.y).toFixed(5)}</div>
         </div>
-        <div className="bg-white/5 rounded-lg px-3 py-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
           <div className="opacity-50 text-xs mb-0.5">∂f/∂x</div>
           <div className="tc1">{gx.toFixed(5)}</div>
         </div>
-        <div className="bg-white/5 rounded-lg px-3 py-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2">
           <div className="opacity-50 text-xs mb-0.5">∂f/∂y</div>
           <div className="tc1">{gy.toFixed(5)}</div>
         </div>
-        <div className="bg-white/5 rounded-lg px-3 py-2 col-span-2">
+        <div className="bg-black/5 dark:bg-white/5 rounded-lg px-3 py-2 col-span-2">
           <div className="opacity-50 text-xs mb-0.5">∇f = [∂f/∂x, ∂f/∂y]</div>
           <div className="tc1">
             [{gx.toFixed(4)},&nbsp;{gy.toFixed(4)}]

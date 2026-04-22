@@ -167,7 +167,7 @@ function LimitExample({
         viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
         style={{ width: '80%', height: 'auto', userSelect: 'none' }}
         onWheel={handleWheel}
-        className="rounded-xl border border-white/10 bg-[#0f172a]/60 cursor-crosshair"
+        className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0f172a]/60 cursor-crosshair"
       >
         <defs>
           <clipPath id="lim-clip">
@@ -238,7 +238,8 @@ function LimitExample({
           clipPath="url(#lim-clip)" strokeLinejoin="round" />
 
         {/* ── open circle at limit point (hole) ── */}
-        <circle cx={holeX} cy={holeY} r={6} fill="#0f172a" stroke="#10b981" strokeWidth="2"
+        <circle cx={holeX} cy={holeY} r={6} stroke="#10b981" strokeWidth="2"
+          className="fill-slate-50 dark:fill-[#0f172a]"
           clipPath="url(#lim-clip)" />
 
         {/* ── axis tick labels ── */}
@@ -273,7 +274,7 @@ function LimitExample({
 
         {/* ── legend ── */}
         <rect x={PAD + 6} y={PAD + 6} width={130} height={20} rx={4}
-          fill="rgba(15,23,42,0.7)" />
+          className="fill-white/90 dark:fill-[#0f172a]/70" />
         <circle cx={PAD + 18} cy={PAD + 16} r={5} fill="none" stroke="#10b981" strokeWidth="2" />
         <text x={PAD + 28} y={PAD + 20} fill="#10b981" fontSize="12">{fnLabel}</text>
 
