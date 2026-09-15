@@ -142,7 +142,7 @@ const LocationEdit: React.FC<LocationEditProps> = ({
             transition: 'opacity 1.5s ease-in-out, top 0.3s ease-in-out'
           }}
           mapStyle={mapStyles[0]}
-          mapboxAccessToken={"pk.eyJ1Ijoid29ybGRzaW5nZXIiLCJhIjoiY202Z2hscG9zMDFhczJpb296Y2I2dDlvayJ9.Fv0uqkCRxvu1tb07rt5Qog"}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
           interactive={isEditing}
           attributionControl={false}
           scrollZoom={isEditing}

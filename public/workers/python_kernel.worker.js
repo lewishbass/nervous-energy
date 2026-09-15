@@ -216,7 +216,7 @@ def _trace_function(frame, event, arg):
 
 const RT_OUT_SCRIPT = `
 class _RTOut:
-    """Realtime stdout/stderr redirect that posts to JS and keeps history."""
+    """Realtime std_js_vis_action_cbout/stderr redirect that posts to JS and keeps history."""
     def __init__(self, cb, stype):
         self._cb = cb
         self._type = stype
@@ -451,6 +451,146 @@ class Maze:
         }
   `;
 
+  
+  const GRAPH_OBJECT_SCRIPT = `
+
+class Graph2D:
+    def __init__(self, data = None, draws = None, axies = None):
+        self.data = data if data is not None else {}
+        self.draws = draws if draws is not None else {}
+        self.axies = axies if axies is not None else [{"name": n, "range": [0, 1]} for n in ['x', 'y']]
+        
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "init",
+            "data": self.data,
+            "draws": self.draws,
+            "axies": self.axies,
+        }))
+
+    def add_points(self, series, points, type="int"):
+        # sterilize points to floats or strs
+        if type == "int":
+            points = [int(x) for x in points]
+        elif type == "str":
+            points = [str(x) for x in points]
+
+        if series not in self.data:
+            self.data[series] = points
+
+        # transmit viz action to JS
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "add_points",
+            "series": series,
+            "points": points,
+            "pointType": type,
+        }))
+
+    def add_labels(self, series, labels):
+        self.add_points(series, labels, type="str")
+
+    
+    def remove_points(self, series):
+        # series and index range to remove
+        if series in self.data:
+            del self.data[series]
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "remove_points",
+            "series": series,
+        }))
+    
+    def remove_labels(self, series):
+        self.remove_points(series)
+
+    def set_points(self, series, points, type="int", indices=None):
+        # sterilize points to floats or strs
+
+        if type == "int":
+            points = [int(x) for x in points]
+        elif type == "str":
+            points = [str(x) for x in points]
+
+            
+        updatedIndices = []
+        if series not in self.data:
+            self.data[series] = points
+            updatedIndices = list(range(len(points)))
+        else:
+            if indices is None:
+                self.data[series] = points
+                updatedIndices = list(range(len(points)))
+            else:
+                for i, p in zip(indices, points):
+                    if i > len(self.data[series]):
+                        self.data[series] += [None] * (i - len(self.data[series]) + 1)
+                    
+                    if self.data[series][i] != p:
+                        self.data[series][i] = p
+                        updatedIndices.append(i)
+                      
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "set_points",
+            "series": series,
+            "points": points,
+            "pointType": type,
+            "indices": updatedIndices,
+        }))
+    
+    def set_labels(self, series, labels, index=None):
+        self.set_points(series, labels, type="str", index=index)
+
+    def add_draw(self, drawId, drawType, **kwargs):
+        self.draws[drawId] = {"type": drawType, "params": kwargs}
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "add_draw",
+            "drawId": drawId,
+            "drawType": drawType,
+            "params": kwargs,
+        }))
+
+    def remove_draw(self, drawId):
+        if drawId in self.draws:
+            del self.draws[drawId]
+            _js_vis_action_cb(_json.dumps({
+                "actionClass": "graph2d",
+                "actionType": "remove_draw",
+                "drawId": drawId,
+            }))
+    
+    def set_draw(self, drawId, drawType=None, **kwargs):
+        if drawId not in self.draws:
+            self.draws[drawId] = {"type": drawType, "params": kwargs}
+        else:
+            if drawType is not None:
+                self.draws[drawId]["type"] = drawType
+            self.draws[drawId]["params"].update(kwargs)
+        
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "set_draw",
+            "drawId": drawId,
+            "drawType": self.draws[drawId]["type"],
+            "params": self.draws[drawId]["params"],
+        }))
+    
+    def set_axis(self, index, name=None, range=None):
+        if name is not None:
+            self.axies[index]['name'] = name
+        if range is not None:
+            self.axies[index]['range'] = range
+        _js_vis_action_cb(_json.dumps({
+            "actionClass": "graph2d",
+            "actionType": "set_axis",
+            "index": index,
+            "name": self.axies[index].get('name'),
+            "range": self.axies[index].get('range'),
+        }))
+  ` ;
+
 function resetPyodideContext() {
   if (pyodide) {
     pyodide.runPython(`
@@ -483,6 +623,7 @@ async function init() {
     await pyodide.runPythonAsync(EXEC_WRAPPER_SCRIPT);
     await pyodide.runPythonAsync(ROBOT_OBJECT_SCRIPT);
     await pyodide.runPythonAsync(MAZE_OBJECT_SCRIPT);
+    await pyodide.runPythonAsync(GRAPH_OBJECT_SCRIPT);
 
     // register JS callbacks for Python to call
     pyodide.globals.set('_js_trace_cb', (jsonStr) => {

@@ -98,8 +98,7 @@ Nervous Energy 2 is a feature-rich personal portfolio and resume website, design
 - [+]analytics display
 - [ ]analytics map
 
-- [ ]Siamese translation
-- [ ]mandarin translation
+- [ ] use https://xtermjs.org/ for terminal emulation in web toys
 - [ ]add "foobar (var)" syntax to code include validation
 
 - [ ]classroom leaderboard

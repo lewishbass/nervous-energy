@@ -2,10 +2,11 @@
 import { useRef, useState, useImperativeHandle, forwardRef } from 'react';
 import RobotViz, { type RobotVizHandle, type RobotAction } from '@/components/coding/panels/visualizers/RobotViz';
 import MazeViz, { type MazeVizHandle, type MazeAction } from '@/components/coding/panels/visualizers/MazeViz';
+import GraphViz, { type GraphVizHandle, type GraphAction } from '@/components/coding/panels/visualizers/GraphViz';
 
 /* ---- unified vis action ---- */
 export type VisAction = {
-	actionClass: 'robot' | 'maze';
+	actionClass: 'robot' | 'maze' | 'graph2d';
 	actionType: string;
 	[key: string]: unknown;
 };
@@ -20,14 +21,15 @@ type MscVizPanelProps = {
 };
 
 /* re-export sub-types for convenience */
-export type { RobotAction, MazeAction };
+export type { RobotAction, MazeAction, GraphAction };
 
 const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 	function MscVizPanel({ isCompact = false }, ref) {
 		const robotRef = useRef<RobotVizHandle>(null);
 		const mazeRef = useRef<MazeVizHandle>(null);
+		const graphRef = useRef<GraphVizHandle>(null);
 
-		const [mode, setMode] = useState<'none' | 'robot' | 'maze'>('none');
+		const [mode, setMode] = useState<'none' | 'robot' | 'maze' | 'graph'>('none');
 
 		useImperativeHandle(ref, () => ({
 			handleVisAction(action: VisAction) {
@@ -57,6 +59,25 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 						success: action.success as boolean | undefined,
 					};
 					mazeRef.current?.handleMazeAction(mazeAction);
+				} else if (action.actionClass === 'graph2d') {
+					if (mode !== 'graph') setMode('graph');
+					const graphAction: GraphAction = {
+						type: action.actionType as GraphAction['type'],
+						data: action.data,
+						draws: action.draws,
+						axis: action.axies,
+						series: action.series as string | undefined,
+						points: action.points as unknown[] | undefined,
+						indices: action.indices as number[] | undefined,
+						pointType: action.pointType as string | undefined,
+						drawId: action.drawId as string | undefined,
+						drawType: action.drawType as string | undefined,
+						drawParams: action.params,
+						index: action.index as number | undefined,
+						name: action.name as string | undefined,
+						range: action.range as [number, number] | undefined,
+					};
+					graphRef.current?.handleGraphAction(graphAction);
 				}
 			},
 
@@ -64,6 +85,7 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 				setMode('none');
 				robotRef.current?.reset();
 				mazeRef.current?.reset();
+				graphRef.current?.reset();
 			},
 		}), [mode]);
 
@@ -83,7 +105,11 @@ const MscVizPanel = forwardRef<MscVizPanelHandle, MscVizPanelProps>(
 					<div className={`absolute inset-0 ${mode === 'maze' ? '' : 'hidden'}`}>
 						<MazeViz ref={mazeRef} />
 					</div>
-					{/* Placeholder when no visualizer is active */}
+				{/* Graph2D visualizer */}
+				<div className={`absolute inset-0 ${mode === 'graph' ? '' : 'hidden'}`}>
+					<GraphViz ref={graphRef} />
+				</div>
+				{/* Placeholder when no visualizer is active */}
 					{mode === 'none' && (
 						<p className="absolute inset-0 flex items-start pt-20 justify-center opacity-40 text-sm select-none pointer-events-none">
 							Run code to visualize.

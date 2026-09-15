@@ -9,7 +9,16 @@ export interface Paper {
 }
 
 export const papers: Paper[] = [
-    {
+	{
+		title: 'Curiosity-driven Exploration by Self-Supervised Prediction',
+		description: 'Intrinsic curiosity as reward signal for sparse-reward and no-reward RL exploration',
+		link: '/papers/curiosity-exploration',
+		hasPage: true,
+		keywords: 'curiosity exploration reinforcement learning intrinsic motivation self-supervised',
+		imagePath: '/images/papers/mario.png',
+		reqAuth: false
+	},
+    /*{
         title: 'A Survey on Latent Reasoning',
         description: 'A comprehensive survey on latent reasoning in machine learning',
         link: '/papers/latent-reasoning',
@@ -36,6 +45,6 @@ export const papers: Paper[] = [
         keywords: 'U-Net convolutional networks biomedical image segmentation',
         imagePath: '/KH_back.svg',
         reqAuth: false
-    }
+    }*/
 	];
 

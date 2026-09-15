@@ -2,6 +2,8 @@
 //displays the name of a paper and redirects to its page when clicked
 // on hover, loads a preview of the paper
 
+// TODO: add ability to pin previews, adds preview to site wide preview (in layout.tsx), keeps it persistent as draggable popup 
+
 import { set } from "mongoose";
 import { useState, useRef, JSX } from "react";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -11,7 +13,7 @@ interface PaperLinkProps {
   url?: string;
   pdfPath?: string; // path to the PDF file for preview
   arxivId?: string; // arxiv id for preview
-  preferredPreview?: "arxiv" | "pdf" | "url"; // preferred preview type
+  preferredPreview?: "arxiv" | "pdf" | "url" | "none"; // preferred preview type
 }
 
 const PaperLink = ({
@@ -88,6 +90,14 @@ const PaperLink = ({
       return;
     }
     loadedIinitedHook.current = true;
+
+    // if preferred preview is "none", don't load any preview
+    if (preferredPreview === "none") {
+      setLoadingPreview(false);
+      setPreviewError(undefined);
+      return;
+    }
+
     setLoadingPreview(true);
     setPreviewError(undefined);
     // placeholder loading preview text

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaGear } from 'react-icons/fa6';
 import { IoClose } from 'react-icons/io5';
 import { analytics } from '@/context/Analytics';
+import { FaArrowRight } from 'react-icons/fa6';
 
 // API endpoint
 const CONVERSATION_API = '/.netlify/functions/conv';
@@ -676,7 +677,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, modalWidth
               className="p-1 rounded hover:bg-gray-300/40  tc1 ml-auto w-8 h-8 rounded-full flex items-center justify-center"
               onClick={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
             >
-              {isLeftPanelCollapsed ? '→' : '←'}
+              <FaArrowRight className="w-4 h-4 transition-all duration-300" style={{ transform: isLeftPanelCollapsed ? 'scaleX(1)' : 'scaleX(-1)' }} />
             </button>
           </div>
 

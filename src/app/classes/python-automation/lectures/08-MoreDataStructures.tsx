@@ -67,7 +67,7 @@ function MoreDataStructures(props: MoreDataStructuresLectureProps | null) {
         </p>
 
         <p className="lecture-paragraph">
-          <span className="lecture-bold">Big O notation</span> describes how fast an algorithm&#39;s run time grows as the size of the input grows.
+            <span className="lecture-bold mr-2">Big O notation</span> describes how fast an algorithm&#39;s run time grows as the size of the input grows.
           <span className="lecture-equation-inline"><MathJax inline>{'\\( O(n) = f(n) \\)'}</MathJax></span> where <span className="lecture-equation-inline"><MathJax inline>{'\\( n \\)'}</MathJax></span> is the size of the input, and <span className="lecture-equation-inline"><MathJax inline>{'\\( f(n) \\)'}</MathJax></span> is how many operations it takes to run as a function of <span className="lecture-equation-inline"><MathJax inline>{'\\( n \\)'}</MathJax></span>.
         </p>
 

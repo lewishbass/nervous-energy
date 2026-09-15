@@ -107,6 +107,12 @@
 .slideshow .lecture-text{
   font-size: 1.5vw;
 }
+.lecture-text{
+  color: #222;
+}
+.dark .lecture-text{
+  color: #bbb;
+}
 
 .dark .lecture-paragraph {
 	color: #bbb;
@@ -195,6 +201,24 @@
 }
 .dark .lecture-bold{
   color:#ddd;
+}
+
+.scrollview .lecture-big{
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.slideshow .lecture-big{
+  font-weight: 700;
+  font-size: 2vw;
+}
+
+.scrollview .lecture-underline {
+  border-bottom: 3px solid #8884;
+}
+
+.slideshow .lecture-underline {
+  border-bottom: 0.2vw solid #8884;
 }
 
 .scrollview .lecture-small{

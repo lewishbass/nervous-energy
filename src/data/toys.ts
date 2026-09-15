@@ -71,7 +71,17 @@ export const toys: Toy[] = [
         keywords: 'python code snippets visualization interactive',
         imagePath: '/images/classes/Python-logo-notext.svg',
         reqAuth: false
+    },
+    {
+        title: 'Structure Aware RL',
+        description: 'An outline of learning in structured graphs',
+        link: '/toys/structure-aware-rl',
+        hasPage: true,
+        keywords: 'reinforcement learning structured graphs graph neural networks',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
     }
+    //TODO: image processing exaple
     /*{
         title: 'Image Captioning',
         description: "Generating image captions with with RNNs",
