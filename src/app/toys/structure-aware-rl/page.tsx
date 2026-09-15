@@ -5,7 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaExpandAlt } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
+import { MathJax, MathJaxContext } from 'better-react-mathjax';
 import { LectureTemplate } from '@/app/classes/python-automation/lectures/LectureTemplate';
+import { LectureEquation } from '@/app/classes/python-automation/lectures/lecture-components/LectureEquation';
 import '@/app/classes/python-automation/lectures/lecture.css';
 import '@/styles/buttons.css';
 import NetworkToy from './network-toy';
@@ -57,6 +59,7 @@ export default function StructureAwareRLPage() {
 	}, []);
 
 	return (
+		<MathJaxContext>
 		<div className="max-w-4xl w-full relative mx-auto">
 			{!slideMode && (
 				<div className="mb-6 flex justify-between items-center px-6 pt-6">
@@ -263,10 +266,11 @@ export default function StructureAwareRLPage() {
 					<h3 className="lecture-section-header">Metric for Structure Exploitation</h3>
 					<div className="lecture-header-decorator" />
 							<p className="lecture-paragraph lecture-bold lecture-big lecture-underline w-[60%] mt-5 mb-2">Feature Embeddings</p>
-					<p className="lecture-paragraph">H scores can estimate the generalizability of embeddings from one task to another by maximizing feature information class feature similarity </p>
-					{/* add latex for this formula \mathcal{H}(f) = \mathfrak{tr}(\mathrm{cov}(f(X))^{-1}\mathrm{cov}(\mathbb{E}_{P_{X|Y}}[f(X)|Y]))
- */}
-					<p className="lecture-paragraph">it is important to keep feature mutual information small, but instead of maximizing class relevance for transfer, structure exploitation should be independent of </p>
+					<p className="lecture-paragraph">H scores can estimate the generalizability of embeddings from one task to another by minimizing feature redundancy and maximizing class feature discrimination </p>
+					<LectureEquation>
+						<MathJax inline>{'\\( \\mathcal{H}(f) = \\mathfrak{tr}(\\mathrm{cov}(f(X))^{-1}\\mathrm{cov}(\\mathbb{E}_{P_{X|Y}}[f(X)|Y])) \\)'}</MathJax>
+					</LectureEquation>
+					<p className="lecture-paragraph">it is important to keep feature mutual information small, but instead of maximizing class relevance for transfer, structure exploitation should be independent of class labels</p>
 
 				</section>
 
@@ -275,71 +279,15 @@ export default function StructureAwareRLPage() {
 					<h3 className="lecture-section-header">Designing Custom Models</h3>
 					<div className="lecture-header-decorator" />
 					<ul className="lecture-list">
-						<li className="lecture-list-item-card">My approach to building models tailored to structured problems</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
-				</section>
-
-				{/* Simple Exploitation Toy*/}
-				<section className="lecture-section mini-scroll">
-					<h3 className="lecture-section-header">Simple Exploitation</h3>
-					<div className="lecture-header-decorator" />
-					<p className="lecture-paragraph">because the structure of these networks is easily observable, we can tailor our models to guide them towards optimal strategy</p>
-					<p className="lecture-paragraph lecture-bold lecture-big lecture-underline w-[60%] mt-5 mb-2">Heuristic Features</p>
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">distance from destination</li>
-						<li className="lecture-list-item-card">position in ring</li>
-						<li className="lecture-list-item-card">node tiers</li>
-						<li className="lecture-list-item-card">current bottleneck congestion</li>
-					</ul>
-					<p className="lecture-paragraph lecture-bold lecture-big lecture-underline w-[60%] mt-5 mb-2">Network Structure</p>
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">graph convolutional networks</li>
-						<li className="lecture-list-item-card">TBA</li>
+						<li className="lecture-list-item-card">Identify structures in data</li>
+						<li className="lecture-list-item-card">use these to make assumptions about relevant features</li>
+						<li className="lecture-list-item-card">design core embeddings that conform to these assumptions</li>
 					</ul>
 				</section>
 
-				{/* Regret */}
-				<section className="lecture-section mini-scroll">
-					<h3 className="lecture-section-header">Regret</h3>
-					<div className="lecture-header-decorator" />
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">Defining regret as a measure of learning performance in sequential decisions</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
-				</section>
-
-				{/* Bounded Regret */}
-				<section className="lecture-section mini-scroll">
-					<h3 className="lecture-section-header">Bounded Regret</h3>
-					<div className="lecture-header-decorator" />
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">When and why regret can be guaranteed to stay bounded</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
-				</section>
-
-				{/* Navel Gazing in ML Math*/}
-				<section className="lecture-section mini-scroll">
-					<h3 className="lecture-section-header">Navel Gazing in ML Math</h3>
-					<div className="lecture-header-decorator" />
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">Reflecting on useful vs. overly idealistic mathematical analysis</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
-				</section>
-
-				{/* First Steps */}
-				<section className="lecture-section mini-scroll">
-					<h3 className="lecture-section-header">First Steps</h3>
-					<div className="lecture-header-decorator" />
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">A well-defined metric and testing environment to begin the research</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
-				</section>
 			</LectureTemplate>
 		</div>
+		</MathJaxContext>
 	);
 }
 
