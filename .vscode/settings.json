@@ -4,6 +4,7 @@
   "editor.tabSize": 2,
   "cSpell.words": [
     "backpropagation",
+    "generalizability",
     "getattr",
     "projectilelist",
     "rlcompleter",

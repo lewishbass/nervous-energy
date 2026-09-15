@@ -261,13 +261,7 @@ export default function NetworkToy({ network }: NetworkToyProps) {
 			}
 		}
 
-// set line-dasharray-transition to 0
-		for (const link of linkList) {
-			const fwdId = `link-${link.uuid}-fwd`;
-			const revId = `link-${link.uuid}-rev`;
-			if (map.getLayer(fwdId)) map.setPaintProperty(fwdId, 'line-dasharray-transition', { duration: 0, delay: 0 });
-			if (map.getLayer(revId)) map.setPaintProperty(revId, 'line-dasharray-transition', { duration: 0, delay: 0 });
-		}
+
 
 		let frameId: number;
 		let animationStartTime: number = 0;

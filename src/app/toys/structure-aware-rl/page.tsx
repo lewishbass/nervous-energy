@@ -262,10 +262,12 @@ export default function StructureAwareRLPage() {
 				<section className="lecture-section mini-scroll">
 					<h3 className="lecture-section-header">Metric for Structure Exploitation</h3>
 					<div className="lecture-header-decorator" />
-					<ul className="lecture-list">
-						<li className="lecture-list-item-card">A mathematical measure of how well a model exploits the data&apos;s structure</li>
-					</ul>
-					<p className="lecture-paragraph">[placeholder]</p>
+							<p className="lecture-paragraph lecture-bold lecture-big lecture-underline w-[60%] mt-5 mb-2">Feature Embeddings</p>
+					<p className="lecture-paragraph">H scores can estimate the generalizability of embeddings from one task to another by maximizing feature information class feature similarity </p>
+					{/* add latex for this formula \mathcal{H}(f) = \mathfrak{tr}(\mathrm{cov}(f(X))^{-1}\mathrm{cov}(\mathbb{E}_{P_{X|Y}}[f(X)|Y]))
+ */}
+					<p className="lecture-paragraph">it is important to keep feature mutual information small, but instead of maximizing class relevance for transfer, structure exploitation should be independent of </p>
+
 				</section>
 
 				{/* Approach to Designing Custom Models */}
