@@ -27,7 +27,7 @@ export default function Toys() {
 				}}
 				className='invert dark:invert-0'
 			/>
-			<div style={{ /* opacity: 0, animation: "fade-in 10s ease 0.2s forwards", animationDelay: "1s" */ }}><GPUStarBackground /></div>
+			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards", animationDelay: "1s" }}><GPUStarBackground /></div>
 
 
 			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Paper Reviews</h1>

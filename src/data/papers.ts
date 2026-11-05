@@ -9,7 +9,7 @@ export interface Paper {
 }
 
 export const papers: Paper[] = [
-	{
+	/*{
 		title: 'Curiosity-driven Exploration by Self-Supervised Prediction',
 		description: 'Intrinsic curiosity as reward signal for sparse-reward and no-reward RL exploration',
 		link: '/papers/curiosity-exploration',

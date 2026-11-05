@@ -2,10 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-interface GPUStarBackgroundProps {
-	count?: number;
-	distribution?: string;
-}
 
 // WGSL: compute pass integrates particle motion (ping-pong buffers),
 // render pass draws them as points via vertex fetch from the same buffer.
@@ -243,6 +239,10 @@ function capabilityScale(adapter: GPUAdapter): number {
 const minActiveParticles = 20000;
 const baseOpacity = 0.5;
 
+interface GPUStarBackgroundProps {
+	count?: number;
+	distribution?: string;
+}
 export default function GPUStarBackground({count = 1000000, distribution}: GPUStarBackgroundProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -291,8 +291,10 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 		const pointerMove = (e: PointerEvent) => {
 			if (lastDragX === undefined || lastDragY === undefined) return;
 
-			const rotx = (e.clientY - lastDragY) * 0.0006;
-			const roty = (e.clientX - lastDragX) * 0.0006;
+			const turn_speed = 1.5 / Math.max(size.width, size.height);
+
+			const rotx = (e.clientY - lastDragY) * turn_speed;
+			const roty = (e.clientX - lastDragX) * turn_speed;
 
 			rotateView(-rotx, -roty);
 			lastDragX = e.clientX;
