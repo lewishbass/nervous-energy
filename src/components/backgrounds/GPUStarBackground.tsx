@@ -226,6 +226,23 @@ const defaultDistribution = `
 const particleStructSize = 8; // 32 bytes per particle
 const particleArrayStride = particleStructSize * 4; // 4 bytes per float
 
+// Limits only bound allocation, not speed, so tiers come from coarse hints.
+function capabilityScale(adapter: GPUAdapter): number {
+	const info = (adapter as { info?: { adapterType?: string } }).info;
+	const isFallback = (adapter as { isFallbackAdapter?: boolean }).isFallbackAdapter || info?.adapterType === "cpu";
+	if (isFallback) return 0;
+
+	let scale = info?.adapterType === "discrete-gpu" ? 1 : info?.adapterType === "integrated-gpu" ? 0.4 : 0.5;
+
+	const nav = navigator as Navigator & { deviceMemory?: number };
+	if ((nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4) scale *= 0.5;
+	if (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) scale *= 0.25;
+	return scale;
+}
+
+const minActiveParticles = 20000;
+const baseOpacity = 0.5;
+
 export default function GPUStarBackground({count = 1000000, distribution}: GPUStarBackgroundProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -291,16 +308,35 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 			if (!canvas || cancelled) return;
 			if (!("gpu" in navigator)) return;
 
-			const adapter = await navigator.gpu.requestAdapter();
-			const device = await adapter?.requestDevice();
+			const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+			if (!adapter) return;
+			const device = await adapter.requestDevice();
 			if (!device || cancelled) return;
 			disposables.push(device);
 
-			// Bail out early if there is nothing to simulate; also clamp the
-			// dispatch count to the adapter's per-dimension limit.
-			if (particleCount === 0) return;
+			// `count` is the ceiling; scale by hardware tier and clamp to buffer
+			// and dispatch limits.
 			const maxWorkgroups = device.limits.maxComputeWorkgroupsPerDimension;
-			const workgroups = Math.min(Math.ceil(particleCount / 64), maxWorkgroups);
+			const maxByLimits = Math.floor(
+				Math.min(device.limits.maxStorageBufferBindingSize, device.limits.maxBufferSize) / particleArrayStride,
+			);
+			const allocCount = Math.min(
+				Math.floor(particleCount * capabilityScale(adapter)),
+				maxByLimits,
+				maxWorkgroups * 64,
+			);
+			console.log("allocCount:", allocCount);
+			if (allocCount === 0) return;
+			// Particles are randomly ordered, so shrinking the active prefix is uniform.
+			let activeCount = allocCount;
+			let workgroups = Math.ceil(allocCount / 64);
+			const initWorkgroups = workgroups;
+
+			// Base opacity is tuned for the requested count; scale up as fewer stars are drawn.
+			const updateOpacity = () => {
+				canvas.style.opacity = String(Math.min(1, baseOpacity * (particleCount / activeCount)));
+			};
+			updateOpacity();
 
 			const context = canvas.getContext("webgpu");
 			if (!context) return;
@@ -313,7 +349,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 			// a vertex buffer (STORAGE | VERTEX) for the render pass.
 			const buffers = [0, 1].map(() => {
 				const b = device.createBuffer({
-					size: particleCount * particleArrayStride,
+					size: allocCount * particleArrayStride,
 					usage: GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX,
 				});
 				disposables.push(b);
@@ -355,7 +391,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 						{ binding: 1, resource: { buffer: initParams } },
 					],
 				}));
-				pass.dispatchWorkgroups(workgroups);
+				pass.dispatchWorkgroups(initWorkgroups);
 				pass.end();
 			}
 			device.queue.submit([initEncoder.finish()]);
@@ -482,11 +518,27 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 			// Per-frame work only. Reads/writes the vars above; never setState.
 			let frame = 0;
 			let lastTime: number | undefined;
+			let avgFrameMs = 16.7;
+			let slowFrames = 0;
 			const loop = (time: number) => {
 				if (!running) return;
 
 				const deltaTime = time - (lastTime ?? time);
 				lastTime = time;
+
+				// Shed 25% of particles after sustained slow frames; never grows back,
+				// since rAF can't reveal headroom above the display refresh rate.
+				if (deltaTime > 0 && deltaTime < 250) {
+					avgFrameMs = avgFrameMs * 0.95 + deltaTime * 0.05;
+					slowFrames = avgFrameMs > 25 ? slowFrames + 1 : 0;
+					if (slowFrames > 60 && activeCount > minActiveParticles) {
+						activeCount = Math.max(minActiveParticles, Math.floor(activeCount * 0.75));
+						workgroups = Math.ceil(activeCount / 64);
+						updateOpacity();
+						slowFrames = 0;
+						avgFrameMs = 16.7;
+					}
+				}
 
 				rotateView(0, 0.00001 * deltaTime);
 				updateCameraMatrix();
@@ -510,7 +562,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 				renderPass.setPipeline(renderPipeline);
 				renderPass.setBindGroup(0, renderBindGroup);
 				renderPass.setVertexBuffer(0, buffers[(frame + 1) % 2]);
-				renderPass.draw(particleCount);
+				renderPass.draw(activeCount);
 				renderPass.end();
 
 				device.queue.submit([commandEncoder.finish()]);
@@ -560,7 +612,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 		<canvas
 			ref={canvasRef}
 			className="fixed inset-0 dark:invert-0 invert"
-			style={{ width: "100%", height: "100%", opacity: 0.5 }}
+			style={{ width: "100%", height: "100%", opacity: baseOpacity }}
 		/>
 	);
 }
