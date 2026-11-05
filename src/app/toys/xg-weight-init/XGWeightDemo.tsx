@@ -607,7 +607,7 @@ const XGWeightDemo: React.FC = () => {
 			<div className="flex flex-row gap-3 justify-center">
 				{Array.from({ length: numLayers }).map((_, index) => (
 					<div className=" flex flex-row items-center mx-auto max-w-[100%]" key={`wholechart-layer-${index}`}>
-						<div className="flex flex-col items-center mx-auto h-100" key={`layer-${index}`}>
+						<div className="flex flex-col items-center mx-auto h-96" key={`layer-${index}`}>
 							<input
 								className='h-full'
 								type="range"

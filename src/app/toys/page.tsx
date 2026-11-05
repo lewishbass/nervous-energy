@@ -72,7 +72,7 @@ export default function Toys() {
 	};
 
 	return (
-		<div className="p-6 max-w-7xl mx-auto">
+		<div className="p-6 max-w-7xl mx-auto min-h-[100vh]">
 			<div
 				style={{
 					background: `radial-gradient(circle at top left, #FFF2, transparent 60%)`,
@@ -85,7 +85,7 @@ export default function Toys() {
 				}}
 				className='invert dark:invert-0'
 			/>
-			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards" }}><StarBackground /></div>
+			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards " }}><StarBackground /></div>
 
 
 			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Interactive ML Toys</h1>

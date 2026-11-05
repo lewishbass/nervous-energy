@@ -93,7 +93,7 @@ export default function StructureAwareRLPage() {
 					<h2 className="tc1 lecture-big-title">Structure-Aware Reinforcement Learning</h2>
 				</section>
 
-				{/* About Me */}
+					{/* About Me }
 				<section className="lecture-section mini-scroll">
 					<h3 className="lecture-section-header">About Me</h3>
 					<div className="lecture-header-decorator" />

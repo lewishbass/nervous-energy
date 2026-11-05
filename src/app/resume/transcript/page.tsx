@@ -263,9 +263,9 @@ export default function TranscriptPage() {
 	};
 
 	return (
-		<div className="relative min-h-screen">
+		<div className="relative min-h-screen print:min-h-0">
 			{/* Background animation */}
-			<div className="absolute inset-0 -z-10 invert dark:invert-0">
+			<div className="absolute inset-0 -z-10 invert dark:invert-0 print:hidden">
 				<LineAnimation
 					spacing={400}
 					seed={456}
@@ -275,8 +275,8 @@ export default function TranscriptPage() {
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 p-6 max-w-6xl mx-auto backdrop-blur-sm bg-white/50 dark:bg-black/50 min-h-screen tc2">
-				<div className="mb-6 flex justify-between items-center">
+			<div className="relative z-10 p-6 max-w-6xl mx-auto backdrop-blur-sm bg-white/50 dark:bg-black/50 min-h-screen tc2 print:p-0 print:max-w-none print:bg-white print:dark:bg-white print:min-h-0 print:backdrop-blur-none">
+				<div className="mb-6 flex justify-between items-center print:hidden">
 					<Link
 						href="/resume"
 						className="inline-flex items-center px-4 py-2 opacity-80 backdrop-blur-sm rounded-lg text-white hover:opacity-100 hover:translate-x-[-2px] transition-all duration-200 shadow-md"
@@ -300,13 +300,13 @@ export default function TranscriptPage() {
 				</div>
 
 				{/* Header */}
-				<div className="mb-0 p-4 rounded-lg flex flex-row items-center">
-					<h1 className="text-4xl font-bold tc1">Lewis H. Bass</h1>
-					<p className="tc2 italic ml-4 opacity-30">Unofficial Transcript</p>
+				<div className="mb-0 p-4 rounded-lg flex flex-row items-center print:p-0 print:mb-2">
+					<h1 className="text-4xl font-bold tc1 print:text-2xl">Lewis H. Bass</h1>
+					<p className="tc2 italic ml-4 opacity-30 print:ml-2 print:text-sm">Unofficial Transcript</p>
 				</div>
 
 				{/* Sort Settings Bar */}
-				<div className=" p-2">
+				<div className=" p-2 print:hidden">
 					<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
 						{/* Tags Filter */}
 						<div className="flex flex-col gap-2 flex-1">
@@ -377,11 +377,11 @@ export default function TranscriptPage() {
 					{getFilteredTranscriptData() && getFilteredTranscriptData()!.map((level, levelIndex) => (
 						<div key={levelIndex}>
 							<h2 
-								className="text-2xl font-semibold mt-8 mb-4 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+								className="text-2xl font-semibold mt-8 mb-4 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center print:text-lg print:mt-4 print:mb-1 print:cursor-default"
 								onClick={() => toggleLevel(levelIndex)}
 							>
 								<svg 
-									className={`w-6 h-6 mr-2 transition-transform ${expandedLevels.has(levelIndex) ? 'rotate-90' : ''}`}
+									className={`w-6 h-6 mr-2 transition-transform ${expandedLevels.has(levelIndex) ? 'rotate-90' : ''} print:hidden`}
 									fill="none" 
 									stroke="currentColor" 
 									viewBox="0 0 24 24"
@@ -395,13 +395,13 @@ export default function TranscriptPage() {
 								const isExpanded = expandedSemesters.has(semesterKey);
 								
 								return (
-									<div className="be mb-6 p-4 rounded-lg" key={semesterIndex}>
+									<div className="be mb-6 p-4 rounded-lg print:mb-1 print:p-0 print:m-0 print:rounded-none print:shadow-none print:border-0 print:break-inside-avoid" key={semesterIndex}>
 										<h3 
-											className="text-xl font-semibold mb-1 mt-1 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center"
+											className="text-xl font-semibold mb-1 mt-1 tc1 cursor-pointer hover:opacity-80 transition-opacity flex items-center print:text-base print:mb-0.5"
 											onClick={() => toggleSemester(levelIndex, semesterIndex)}
 										>
 											<svg 
-												className={`w-5 h-5 mr-2 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+												className={`w-5 h-5 mr-2 transition-transform ${isExpanded ? 'rotate-90' : ''} print:hidden`}
 												fill="none" 
 												stroke="currentColor" 
 												viewBox="0 0 24 24"
@@ -414,7 +414,7 @@ export default function TranscriptPage() {
 										{isExpanded && (
 											<>
 												{/* Semester Details */}
-												<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 select-none">
+												<div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4 text-sm tc3 select-none print:grid-cols-6 print:gap-x-3 print:gap-y-0 print:mb-1 print:text-xs">
 													{semester.term_code && (
 														<div><span className="font-semibold tc2">Term Code:</span> {semester.term_code}</div>
 													)}
@@ -436,13 +436,13 @@ export default function TranscriptPage() {
 												</div>
 
 												{/* Course Table */}
-												<div className="overflow-x-auto select-none mini-scroll">
-													<table className="w-full mb-4 text-sm">
+												<div className="overflow-x-auto select-none mini-scroll print:overflow-visible">
+													<table className="w-full mb-4 text-sm print:mb-1 print:text-xs print:leading-tight">
 														<thead>
-															<tr className="border-b-2">
-																<th className="px-2 py-2 text-left w-16">Subject</th>
-																<th className="px-2 py-2 text-left w-16">Course</th>
-																<th className="px-2 py-2 text-left flex-1">Title</th>
+															<tr className="border-b-2 print:border-b">
+																<th className="px-2 py-2 text-left w-16 print:px-1 print:py-0.5">Subject</th>
+																<th className="px-2 py-2 text-left w-16 print:px-1 print:py-0.5">Course</th>
+																<th className="px-2 py-2 text-left flex-1 print:px-1 print:py-0.5">Title</th>
 																{/*<th className="px-2 py-2 text-left w-16">Tag</th>*/}
 																{semester.classes.some(c => c.campus) && (
 																	<th className="px-2 py-2 text-left w-20">Campus</th>
@@ -461,23 +461,23 @@ export default function TranscriptPage() {
 														</thead>
 														<tbody>
 															{semester.classes.map((course, courseIndex) => (
-																<tr key={courseIndex} className="border-b">
-																	<td className="px-2 py-2 w-16">{course.subject}</td>
-																	<td className="px-2 py-2 w-16">{course.course}</td>
-																	<td className="px-2 py-2 flex-1">{course.title}</td>
+																<tr key={courseIndex} className="border-b print:border-slate-300 print:break-inside-avoid">
+																	<td className="px-2 py-2 w-16 print:px-1 print:py-0.5">{course.subject}</td>
+																	<td className="px-2 py-2 w-16 print:px-1 print:py-0.5">{course.course}</td>
+																	<td className="px-2 py-2 flex-1 print:px-1 print:py-0.5">{course.title}</td>
 																	{/*<td className="px-2 py-2 w-16">{shortTag(course.tag)}</td>*/}
 																	{semester.classes.some(c => c.campus) && (
-																		<td className="px-2 py-2 w-20">{course.campus || ''}</td>
+																		<td className="px-2 py-2 w-20 print:px-1 print:py-0.5">{course.campus || ''}</td>
 																	)}
 																	{semester.classes.some(c => c.level) && (
-																		<td className="px-2 py-2 w-16">{course.level || ''}</td>
+																		<td className="px-2 py-2 w-16 print:px-1 print:py-0.5">{course.level || ''}</td>
 																	)}
 																	{semester.classes.some(c => c.grade !== null) && (
-																		<td className="px-2 py-2 text-center w-16">{course.grade || ''}</td>
+																		<td className="px-2 py-2 text-center w-16 print:px-1 print:py-0.5">{course.grade || ''}</td>
 																	)}
-																	<td className="px-2 py-2 text-center w-20">{course.credit_hours}</td>
+																	<td className="px-2 py-2 text-center w-20 print:px-1 print:py-0.5">{course.credit_hours}</td>
 																	{semester.classes.some(c => c.quality_points !== null) && (
-																		<td className="px-2 py-2 text-center w-20">{course.quality_points !== null ? course.quality_points.toFixed(2) : ''}</td>
+																		<td className="px-2 py-2 text-center w-20 print:px-1 print:py-0.5">{course.quality_points !== null ? course.quality_points.toFixed(2) : ''}</td>
 																	)}
 																</tr>
 															))}
@@ -486,7 +486,7 @@ export default function TranscriptPage() {
 												</div>
 
 												{/* Semester Summary */}
-												<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t select-none">
+												<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mt-4 pt-4 border-t select-none print:grid-cols-4 print:gap-x-3 print:gap-y-0 print:mt-1 print:pt-1 print:text-xs">
 													<div><span className="font-semibold">Attempted Hours:</span> {semester.attempt_hours}</div>
 													{semester.passed_hours !== null && (
 														<div><span className="font-semibold">Passed Hours:</span> {semester.passed_hours}</div>
@@ -516,8 +516,8 @@ export default function TranscriptPage() {
 					))}
 
 					{/* Footer */}
-					<div className="text-center mt-8 mb-24">
-						<p className="tc2 italic text">This is an unofficial transcript</p>
+					<div className="text-center mt-8 mb-24 print:mt-2 print:mb-0">
+						<p className="tc2 italic text print:text-xs">This is an unofficial transcript</p>
 					</div>
 				</div>
 			</div>

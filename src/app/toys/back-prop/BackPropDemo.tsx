@@ -744,17 +744,18 @@ const BackPropDemo = () => {
               <div className="flex justify-around items-end h-40 mt-2">
                 {Array.from({ length: layerCount }).map((_, index) => (
                   <div key={`layer-${index}`} className="flex flex-col items-center">
-                    <input
-                      type="range"
-                      min="2"
-                      max={maxNodes}
-                      step="1"
-                      value={nodesPerLayer[index]}
-                      onChange={(e) => handleNodeChange(index, parseInt(e.target.value))}
-                      className="h-32"
-                      // @ts-expect-error custom vertical orient identifier
-                      orient="vertical"
-                    />
+                    <div className="h-32 flex items-center">
+                      <input
+                        type="range"
+                        min="2"
+                        max={maxNodes}
+                        step="1"
+                        value={nodesPerLayer[index]}
+                        onChange={(e) => handleNodeChange(index, parseInt(e.target.value))}
+                        // @ts-expect-error custom vertical orient identifier
+                        orient="vertical"
+                      />
+                    </div>
                     <span className="text-xs font-mono mt-2">{2 ** nodesPerLayer[index]}</span>
                   </div>
                 ))}

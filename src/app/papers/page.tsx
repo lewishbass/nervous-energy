@@ -4,18 +4,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { papers } from '@/data/papers';
-import { StarBackground } from '@/components/backgrounds/StarBackground';
+import GPUStarBackground from '@/components/backgrounds/GPUStarBackground';
 
 // Radial Gradient Background Component
 
 export default function Toys() {
 	// Function to generate a random rotation angle
-	const getRandomRotation = () => {
-		return Math.floor(Math.random() * 360);
-	};
+	// Deterministic so server and client renders match
+	const getRandomRotation = (i: number) => (i * 137) % 360;
 
 	return (
-		<div className="p-6 max-w-7xl mx-auto">
+		<div className="p-6 max-w-7xl mx-auto min-h-[100vh]">
 			<div
 				style={{
 					background: `radial-gradient(circle at top left, #FFF2, transparent 60%)`,
@@ -28,14 +27,14 @@ export default function Toys() {
 				}}
 				className='invert dark:invert-0'
 			/>
-			<div style={{ opacity: 0, animation: "fade-in 10s ease 0.2s forwards" }}><StarBackground /></div>
+			<div style={{ /* opacity: 0, animation: "fade-in 10s ease 0.2s forwards", animationDelay: "1s" */ }}><GPUStarBackground /></div>
 
 
 			<h1 className="text-4xl font-bold mb-8 tc1 relative z-10">Paper Reviews</h1>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
 				{papers.map((toy, index) => {
 					// Generate a random rotation for each tile
-					const rotation = getRandomRotation();
+					const rotation = getRandomRotation(index + 10);
 
 					return (
 						<div

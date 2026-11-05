@@ -73,15 +73,21 @@ input[type=range][orient=vertical] {
   writing-mode: vertical-lr;
   direction: rtl;
   width: 16px;
+  height: 100%;
+    margin: 0;
   vertical-align: bottom;
 }
 
 input[type=range][orient=vertical]::-webkit-slider-runnable-track {
+  height: 100%;
+    width: 18px;
   padding-top: 2px;
   padding-bottom: 2px;
 }
 
 input[type=range][orient=vertical]::-moz-range-track {
+  height: 100%;
+    width: 16px;
   padding-top: 2px;
   padding-bottom: 2px;
 }

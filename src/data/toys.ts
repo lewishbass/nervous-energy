@@ -24,7 +24,7 @@ export const toys: Toy[] = [
         link: '/toys/one-step-learning-rate',
         hasPage: true,
         keywords: 'learning rate optimization scheduler cyclical lr training neural network',
-        imagePath: '/KH_back.svg',
+        imagePath: '/images/toys/one-step-learning-rate.webp',
         reqAuth: false
     },
     {
@@ -33,7 +33,7 @@ export const toys: Toy[] = [
         link: '/toys/wikipedia-visualizer',
         hasPage: true,
         keywords: 'Wikipedia visualization graph network connections data exploration',
-        imagePath: '/KH_back.svg',
+        imagePath: '/images/toys/wikipedia-visualizer.webp',
         reqAuth: false
     },
     {
@@ -42,7 +42,7 @@ export const toys: Toy[] = [
         link: '/toys/xg-weight-init',
         hasPage: true,
         keywords: 'neural network weight initialization xavier glorot he random orthogonal',
-        imagePath: '/KH_back.svg',
+        imagePath: '/images/toys/xg-weight-init.webp',
         reqAuth: false
     },
     {
@@ -51,7 +51,7 @@ export const toys: Toy[] = [
         link: '/toys/back-prop',
         hasPage: true,
         keywords: 'neural network training gradient descent chain rule optimization',
-        imagePath: '/KH_back.svg',
+        imagePath: '/images/toys/back-prop.webp',
         reqAuth: false
     },
     {
@@ -78,7 +78,7 @@ export const toys: Toy[] = [
         link: '/toys/structure-aware-rl',
         hasPage: true,
         keywords: 'reinforcement learning structured graphs graph neural networks',
-        imagePath: '/KH_back.svg',
+        imagePath: '/images/toys/structure-aware-rl.webp',
         reqAuth: false
     }
     //TODO: image processing exaple

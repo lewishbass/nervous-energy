@@ -15,8 +15,10 @@ import { useAuth } from '@/context/AuthContext';
 
 
 import { Client, Room } from '@colyseus/sdk'
-const TANKS_SERVER_ENDPOINT = "tanks.lewisbass.org";
-3
+const TANKS_SERVER_ENDPOINT = "mc.lewisbass.org";
+
+const TANKS_PORT = "2567";
+
 const TankGame = dynamic(() => import('./tankgame/TankGame'), {
 	ssr: false,
 	loading: () => <LoadingSpinner className="h-full" text="Loading Tank Game..." size="lg" />,
@@ -117,7 +119,7 @@ export default function TanksPage() {
 	}
 
 	const connectColyseus = async () => {
-		const client = new Client(`wss://${TANKS_SERVER_ENDPOINT}`);
+		const client = new Client(`wss://${TANKS_SERVER_ENDPOINT}:${TANKS_PORT}`);
 		if (client) {
 			setClient(client);
 			console.log('Colyseus client initialized');

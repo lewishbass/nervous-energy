@@ -15,7 +15,7 @@ export default function AuthorLink({ name, url, imageUrl }: AuthorLinkProps) {
   const [imageError, setImageError] = useState(false);
   
   // Generate a consistent icon based on the author's name
-  const iconIndex = Math.floor(Math.random()*authorIcons.length)//;name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % authorIcons.length;
+  const iconIndex = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % authorIcons.length;
   const IconComponent = authorIcons[iconIndex];
 
   const content = (
