@@ -47,21 +47,7 @@ export default function MitreJobsPage() {
 	const educationDict = { 0: 'none', 1: 'bachelor', 2: 'masters', 3: 'doctorate' };
 
 	const [numLoadedResults, setNumLoadedResults] = useState<number>(20);
-	const loadMoreResults = (event: React.UIEvent<HTMLDivElement>) => {
-		// takes scroll event
-		// if at the end of the list, load more results
-		const target = event.currentTarget;
-		const distToBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
-		if (distToBottom < 2000) {
-			console.log('Loading more results...');
-			setNumLoadedResults(prev => Math.min(prev + 20, mitreJobs.length));
-		}
 
-		if (distToBottom > 4000) {
-			console.log('unloading results...');
-			setNumLoadedResults(prev => Math.max(prev - 20, 20));
-		}
-	};
 
 	const salaryRange = useMemo(() => {
 		let minSalary = Infinity;
@@ -109,7 +95,7 @@ export default function MitreJobsPage() {
 		mitreJobs.forEach(job => {
 			const job_title_set = new Set<string>();
 			job.title.split(/[^a-zA-Z0-9]+/).forEach(word => {
-				if (word.trim().length > 2) job_title_set.add(word.toLowerCase());
+				if (word.trim().length >= 2) job_title_set.add(word.toLowerCase());
 			});
 			job_title_set.forEach(word => {
 				if (uniqueWords[word]) {
@@ -119,7 +105,8 @@ export default function MitreJobsPage() {
 				}
 			});
 		});
-		const sortedWords = Object.entries(uniqueWords).sort((a, b) => b[1] - a[1]);
+		const EXCLUDED_WORDS = new Set(['the', 'and', 'for', 'with', 'from', 'that', 'this', 'these', 'those', 'have', 'has', 'had', 'are', 'was', 'were', 'will', 'shall', 'can', 'could', 'would', 'should', 'may', 'might', 'must', 'not', 'but', 'all', 'any', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'only', 'own', 'same', 'so', 'than', 'too', 'very']);
+		const sortedWords = Object.entries(uniqueWords).filter(([word]) => !EXCLUDED_WORDS.has(word)).sort((a, b) => b[1] - a[1]);
 		return sortedWords;
 	}, []);
 
@@ -143,7 +130,7 @@ export default function MitreJobsPage() {
 	const summaryHaystack = useMemo(() => Object.fromEntries(mitreJobs.map(job => [job.link, (job.summary || '') + (job.title || '') + (job.family || '')])), [mitreJobs]);
 
 	const filteredTitleWords = useMemo(() => {
-		if (titleWordFilter.trim() === '') return titleWords.filter(([word, count]) => (titleWordsExpanded || (word.length > 4 && count > 4) || titleWordsFilter.get(word) !== null)).sort((a, b) => (titleWordsFilter.get(b[0]) === true ? 2 : 0) - (titleWordsFilter.get(a[0]) === true ? 2 : 0) || (titleWordsFilter.get(b[0]) === false ? 1 : 0) - (titleWordsFilter.get(a[0]) === false ? 1 : 0));
+		if (titleWordFilter.trim() === '') return titleWords.filter(([word, count]) => (titleWordsExpanded || (count > 8) || titleWordsFilter.get(word) !== null)).sort((a, b) => (titleWordsFilter.get(b[0]) === true ? 2 : 0) - (titleWordsFilter.get(a[0]) === true ? 2 : 0) || (titleWordsFilter.get(b[0]) === false ? 1 : 0) - (titleWordsFilter.get(a[0]) === false ? 1 : 0));
 
 		const [idxs, info, order] = uf.search(titleWordsHaystack, titleWordFilter.trim());
 		if (!idxs) return [];
@@ -220,7 +207,7 @@ export default function MitreJobsPage() {
 					<span className="pt-1 text-sm tc3 whitespace-nowrap text-ellipsis overflow-hidden">{formatMoney(job.salary[0])}</span>
 					<span className="pt-1 text-sm tc3 text-ellipsis overflow-hidden">{job.date}</span>
 				</div>
-				<p className={`text-[0.9em]/5 ${isActive ? '' : 'line-clamp-2'}`}>{job.summary ? job.summary : ''}</p>
+				<p className={`text-[0.9em]/5 ${isActive ? '' : 'line-clamp-2'}`}>{job.summary || ''}</p>
 				{isActive && (
 					<div className="grid gap-2 mt-2 grid-cols-[1fr_2fr]">
 						<p className="text-[0.9em]/5 tc3">mode: {job.mode}</p>
@@ -233,7 +220,7 @@ export default function MitreJobsPage() {
 		);
 	}
 
-	const spacer = <div className="h-[2px] my-2 rounded-full" style={{ background: 'linear-gradient(to right, transparent, #6668 20%, #6668 80%, transparent)' }}></div>;
+	const spacer = <div className="h-0.5 my-2 rounded-full" style={{ background: 'linear-gradient(to right, transparent, #6668 20%, #6668 80%, transparent)' }}></div>;
 
 
 	const job_elements = useMemo(() => {
@@ -274,7 +261,8 @@ export default function MitreJobsPage() {
 	function filterByJobExperience(link: string, education_level: number | null, years_exp: number | null, is_student: boolean): boolean {
 		if (education_level === null) education_level = 3;
 		if (years_exp === null) years_exp = 100;
-		return !expExpressions[link](education_level, years_exp, is_student);
+		console.log(`Filtering job ${expExpressions[link]} with d=${education_level}, e=${years_exp}, s=${is_student} => result: ${expExpressions[link](education_level, years_exp, is_student)}`);
+		return expExpressions[link](education_level, years_exp, is_student);
 	}
 
 	const filteredJobs = useMemo(() => {
@@ -348,9 +336,25 @@ export default function MitreJobsPage() {
 		return sortedElements.map((job) => job_elements[job.link]);
 	}, [sortedElements, activeJob]);
 
-	const tagFitlerBoxStyle = 'bg2 relative';
+	const loadMoreResults = (event: React.UIEvent<HTMLDivElement>) => {
+		// takes scroll event
+		// if at the end of the list, load more results
+		const target = event.currentTarget;
+		const distToBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+		if (distToBottom < 2000) {
+			console.log('Loading more results...');
+			setNumLoadedResults(prev => Math.min(prev + 20, Math.max(sortedElements.length, 20)));
+		}
+
+		if (distToBottom > 4000) {
+			console.log('unloading results...');
+			setNumLoadedResults(prev => Math.max(prev - 20, 20));
+		}
+	};
+
+	const tagFitlerBoxStyle = 'bg-[#f4f4ffe8] dark:bg-[#141111e8] relative';
 	const tagGridStyle = 'p-3 '
-	const searchBarsStyle = ' bg2 p-4';
+	const searchBarsStyle = 'bg-[#f4f4ffe8] dark:bg-[#141111e8] p-4';
 	const uiGapStyle = 'gap-px';
 
 
@@ -365,6 +369,7 @@ export default function MitreJobsPage() {
 					<p>This is a tool i made for myself to make it easier to search the MITRE job board</p>
 					<p>The main improvement is FILTERING BY EXPERIENCE LEVEL!! What a concept.</p>
 					<p>Supports fuzzy searching and instant results</p>
+					<p>Listed locations are not reliable, as they are not consistently scalable</p>
 				</div>
 				<div className={`p-px flex flex-col ${uiGapStyle} bg-[radial-gradient(ellipse_100%_120%,#333_0%,#fff_70%)] dark:bg-[radial-gradient(ellipse_100%_120%,#888_0%,#000_70%)]`}>
 					{/* tag grids */}

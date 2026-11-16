@@ -51,7 +51,7 @@ export default function ThreeStateCheckbox({
       ? "bg-green-500"
       : value === false
       ? "bg-red-500"
-      : "bg-gray-300 dark:bg-gray-700";
+        : "bg-black/20 dark:bg-white/20";
 
   return (
     <button
@@ -61,11 +61,11 @@ export default function ThreeStateCheckbox({
       aria-checked={value === null ? "mixed" : value}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className={`cursor-pointer select-none inline-flex items-center gap-2 select-none focus:outline-none ${className}`}
+      className={`cursor-pointer inline-flex items-center gap-2 select-none focus:outline-none ${className}`}
     >
       <span
         className={`flex items-center justify-center ${bgColor}`}
-        style={{ width: size, height: size, borderRadius: `calc(${size} / 4)` }}
+        style={{ width: size, height: size, borderRadius: `calc(${size} / 6)` }}
       >
         {value === true  && <FaCheck className="text-white" style={{ width: `calc(${size} * ${iconRatio})`, height: `calc(${size} * ${iconRatio})` }} />}
         {value === false && <FaTimes className="text-white" style={{ width: `calc(${size} * ${iconRatio})`, height: `calc(${size} * ${iconRatio})` }} />}

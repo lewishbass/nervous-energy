@@ -58,7 +58,7 @@ const TagCheckboxRow = memo(function TagCheckboxRow({
 	onChange,
 }: TagCheckboxRowProps) {
 	return (
-		<div className="flex flex-row items-center gap-1" title={label}>
+		<div className="flex flex-row items-center gap-1.5" title={label}>
 			<ThreeStateCheckbox
 				id={label + '-checkbox'}
 				value={value}
