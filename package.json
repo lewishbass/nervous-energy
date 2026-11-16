@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@colyseus/sdk": "^0.17.26",
+    "@leeoniya/ufuzzy": "^1.0.19",
     "@monaco-editor/react": "^4.7.0",
     "@netlify/functions": "^2.8.2",
     "@react-icons/all-files": "^4.1.0",
@@ -75,10 +76,10 @@
     "tailwindcss": "^4.0.14",
     "typescript": "^5",
     "typescript-eslint": "^8.72.1"
-    },
-    "overrides": {
-      "dompurify": "3.4.17",
-      "katex": "0.19.1",
-      "minimatch": "11.0.4"
+  },
+  "overrides": {
+    "dompurify": "3.4.17",
+    "katex": "0.19.1",
+    "minimatch": "11.0.4"
   }
 }

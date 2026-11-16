@@ -11,7 +11,7 @@
   outline: #0f0 2px solid;
   
 }
-*:hover{
+*:hover {
   outline: #00f 2px solid;
 }*/
 
@@ -26,26 +26,34 @@
   --khv: #9544ff;
 }
 
-.tout{
+::selection {
+  background: black;
+  color: white;
+}
+
+.dark ::selection {
+  background: white;
+  color: black;
+}
+
+.tout {
   -webkit-text-fill-color: #FFF;
   -webkit-text-stroke: 11px #000;
   paint-order: stroke fill;
 }
-
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+      font-family: Arial, Helvetica, sans-serif;
 }
-
 .font-courier {
   font-family: 'Courier New', Courier, monospace;
 }
 
 
 .tc1 {
-  color:#000;
-}
+  color: #000;
+  }
 .dark .tc1 {
   color:#ddd;
 }
@@ -60,8 +68,9 @@ body {
 .tc3 {
   color:#555;
 }
+
 .dark .tc3 {
-  color:#777;
+  color: #777;
 }
 
 .tc4 {
@@ -72,8 +81,9 @@ body {
 }
 
 .tc5 {
-  color:#ddd;
+  color: #ddd;
 }
+
 .dark .tc5 {
   color:#000;
 }
@@ -82,19 +92,20 @@ body {
 .bg1 {
   background-color:#fff;
 }
-.dark .bg1 {
-  background-color:#040404;
-}
 
+.dark .bg1 {
+  background-color: #040404;
+}
 .bg2 {
   background-color:#eee;
 }
+
 .dark .bg2 {
   background-color:#141418;
 }
 
 .bg3 {
-  background-color:#ddd;
+    background-color: #ddd;
 }
 .dark .bg3 {
   background-color:#181620;
@@ -104,7 +115,7 @@ body {
   background-color:#222;
 }
 .dark .bg4 {
-  background-color:#ddd;
+    background-color: #ddd;
 }
 
 .bg5 {
@@ -131,17 +142,16 @@ body {
 
 
 .bt2{
-  cursor: pointer;
+    cursor: pointer;
   user-select: none;
   background-color: #0001;
   transition: transform 0.2s ease,
-              background-color 0.3s ease,
+      background-color 0.3s ease,
               box-shadow 0.3s ease;
 }
-
 .bt2:hover:active{
   transform: translateY(1px);
-  box-shadow: inset 0 0 10px 0 rgba(0,0,0,0.2);
+    box-shadow: inset 0 0 10px 0 rgba(0, 0, 0, 0.2);
 }
 
 .dark .bt2{

@@ -165,18 +165,7 @@ const initShaderCode = /* wgsl */ `
 
   <distribution_code>
 
-	fn candidate() -> vec3<f32> {
-		const spread = 1.01; // how much the edge can disperse
-		const falloff = 100.0; // how fast the edg falls off
-
-		let pp_r = rand();
-		let pre_r = pp_r + (1.0 / (falloff * (spread - pp_r))) - 1.0 / (falloff * spread) ; // steep falloff at edge
-		let r = pow(pre_r, 1.0 / 3.0) * 2.4;
-		let theta = rand() * 2.0 * 3.14159265359;
-		let cosPhi = rand() * 2.0 - 1.0;
-		let sinPhi = sqrt(1.0 - cosPhi * cosPhi);
-		return vec3<f32>(r * sinPhi * cos(theta), r * cosPhi, r * sinPhi * sin(theta));
-	}
+	<candidate_code>
 
 	@compute @workgroup_size(64)
 	fn initMain(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -185,10 +174,10 @@ const initShaderCode = /* wgsl */ `
 
 		rngState = pcg(index ^ pcg(params.seed));
 
-		var pos = candidate();
+		var pos = candidate(index);
 		for (var i = 0; i < 512; i++) {
 			if (rand() < particleDensity(pos)) { break; }
-			pos = candidate();
+			pos = candidate(index);
 		}
 
 		var p: Particle;
@@ -212,6 +201,21 @@ const defaultDistribution = `
 		return vec3<f32>(fractalPerlin(p * noiseScale * 0.2, 5)) * 0.0001;
 	}
 		`;
+
+const defaultCandidate = `
+fn candidate(index: u32) -> vec3<f32> {
+		const spread = 1.01; // how much the edge can disperse
+		const falloff = 100.0; // how fast the edg falls off
+
+		let pp_r = rand();
+		let pre_r = pp_r + (1.0 / (falloff * (spread - pp_r))) - 1.0 / (falloff * spread) ; // steep falloff at edge
+		let r = pow(pre_r, 1.0 / 3.0) * 2.4;
+		let theta = rand() * 2.0 * 3.14159265359;
+		let cosPhi = rand() * 2.0 - 1.0;
+		let sinPhi = sqrt(1.0 - cosPhi * cosPhi);
+		return vec3<f32>(r * sinPhi * cos(theta), r * cosPhi, r * sinPhi * sin(theta));
+	}
+`
 
 // WGSL struct layout for `Particle` (vec3<f32> has 16-byte alignment):
 //   offset  0: position (3 floats) + 1 pad
@@ -242,8 +246,10 @@ const baseOpacity = 0.5;
 interface GPUStarBackgroundProps {
 	count?: number;
 	distribution?: string;
+	candidate?: string;
+	rotateSpeed?: number;
 }
-export default function GPUStarBackground({count = 1000000, distribution}: GPUStarBackgroundProps) {
+export default function GPUStarBackground({ count = 1000000, distribution, candidate, rotateSpeed = 1.0 }: GPUStarBackgroundProps) {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
 	// dispatchWorkgroups requires a finite, non-negative integer (WebIDL
@@ -260,8 +266,9 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 		const disposables: Array<{ destroy(): void }> = [];
 		
 		const cameraOffset = { x: 0, y: 0, z: 3 };
-		// Row-major 3x3 camera rotation, initially Rx(-0.3).
-		let rot = [1, 0, 0, 0, Math.cos(-0.3), -Math.sin(-0.3), 0, Math.sin(-0.3), Math.cos(-0.3)];
+		// Row-major 3x3 camera rotation, initially no rotation.
+		const ir = Math.PI / 6;//initial z rotation
+		let rot = [Math.cos(ir), Math.sin(ir), 0, Math.sin(ir), -Math.cos(ir), 0, 0, 0, 1];
 
 		// Left-multiplies Ry(ay) * Rx(ax), so rotation happens about the camera's current axes.
 		const rotateView = (ax: number, ay: number) => {
@@ -276,6 +283,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 			}
 			rot = out;
 		};
+		rotateView(0.2, 0.2);
 
 		// Pointer drag (covers both mouse and touch): horizontal drag distance
 		// rotates the camera around the x axis. The last clientX is tracked so
@@ -364,6 +372,12 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 				isc = isc.replace("<distribution_code>", distribution);
 			} else {
 				isc = isc.replace("<distribution_code>", defaultDistribution);
+			}
+
+			if (candidate) {
+				isc = isc.replace("<candidate_code>", candidate);
+			} else {
+				isc = isc.replace("<candidate_code>", defaultCandidate);
 			}
 
 			// ---- initial distribution (GPU) --------------------------------
@@ -542,7 +556,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 					}
 				}
 
-				rotateView(0, 0.00001 * deltaTime);
+				rotateView(0, 0.00001 * rotateSpeed * deltaTime);
 				updateCameraMatrix();
 
 				const commandEncoder = device.createCommandEncoder();
@@ -613,7 +627,7 @@ export default function GPUStarBackground({count = 1000000, distribution}: GPUSt
 	return (
 		<canvas
 			ref={canvasRef}
-			className="fixed inset-0 dark:invert-0 invert"
+			className="fixed inset-0 dark:invert-0 invert select-none"
 			style={{ width: "100%", height: "100%", opacity: baseOpacity }}
 		/>
 	);

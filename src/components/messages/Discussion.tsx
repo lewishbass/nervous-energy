@@ -11,6 +11,8 @@ import remarkGfm from 'remark-gfm'; // Import the plugin
 import remarkMath from 'remark-math';
 import relTimeFormat from '@/scripts/relativetime';
 import rehypeKatex from 'rehype-katex';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const THREADS_ROUTE = "/.netlify/functions/thread";
 
@@ -47,6 +49,9 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
   const { username, token, isLoggedIn, userId } = useAuth();
 
   const today = new Date();
+  const router = useRouter();
+
+  const currentPath = usePathname();
 
   useEffect(() => {
     const toFetch = [];
@@ -206,6 +211,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
   const voteThread = async (threadId: string, username: string, token: string | null, voteType: 'upvote' | 'downvote' | 'clear', oldVote: 'upvote' | 'downvote' | 'clear') => {
     if (!isLoggedIn || !username || !token) {
       setLoadingText('You must be logged in to vote');
+      promptLogin();
       return;
     }
     setLoadingText(voteType + '...');
@@ -529,6 +535,10 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
     }
   };
 
+  const promptLogin = () => {
+    router.push(currentPath + '?openAuth=true');
+  };
+
   const colorIndex: string[] = [
     '#EC343E',
     '#F47820',
@@ -544,6 +554,22 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       inlineMath: [['$', '$']],
       displayMath: [['$$', '$$']]
     }
+  }
+
+  const animals = ['dog', 'cat', 'bird', 'fish', 'rabbit', 'hamster', 'guine_pig', 'mouse', 'rat', 'horse', 'cow', 'bull', 'calf', 'pig', 'sheep', 'goat', 'chicken', 'duck', 'goose', 'porpoise', 'lion', 'tiger', 'bear', 'elephant', 'giraffe', 'zebra', 'kangaroo', 'koala', 'panda', 'rhinoceros', 'hippopotamus', 'crocodile', 'alligator', 'snake', 'lizard', 'frog', 'turtle', 'whale', 'dolphin', 'shark', 'octopus', 'squid', 'crab', 'lobster', 'jellyfish', 'starfish', 'seahorse', 'clam', 'oyster', 'snail', 'butterfly', 'bee', 'ant', 'spider', 'scorpion', 'centipede', 'millipede', 'unicorn'];
+  const adjectives = ['other', 'new', 'good', 'american', 'great', 'big', 'high', 'old', 'different', 'national', 'small', 'little', 'black', 'important', 'political', 'social', 'long', 'young', 'right', 'best', 'real', 'white', 'public', 'sure', 'only', 'large', 'able', 'human', 'local', 'early', 'bad', 'better', 'economic', 'free', 'possible', 'whole', 'major', 'military', 'federal', 'international', 'true', 'full', 'hard', 'special', 'recent', 'red', 'open', 'personal', 'general', 'clear']
+
+  const hashUsername = (userId: string) => {
+    // generates a random username based on the userId
+    let hash = 0;
+    for (let i = 0; i < userId.length; i++) {
+      hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    hash = hash % (adjectives.length * animals.length);
+    const adjective = adjectives[Math.abs(hash) % adjectives.length];
+    const animal = animals[Math.floor(Math.abs(hash) / adjectives.length) % animals.length];
+    const color = colorIndex[Math.abs(hash) % colorIndex.length];
+    return `${adjective}_${animal}`;
   }
 
   const formatThreadContent = (content: string) => {
@@ -602,13 +628,18 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             )}
           </div>
 
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <div
               className="mb-4 p-4 border border-dashed border-gray-400 rounded tc1 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               onClick={() => setReplyingTo(threadID)}
             >
               <FaPlus className="inline mr-2" />
               New Topic
+            </div>
+          ) : (
+            <div className="mb-4 p-4 border border-dashed border-gray-400 rounded tc1">
+              Please <span className="font-bold hover:opacity-70 cursor-pointer px-1 rounded-full transition-all duration-300" onClick={promptLogin}>log in / register</span> to comment
+
             </div>
           )}
 
@@ -677,18 +708,30 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
         </div>
         <div className="flex-1">
           <h3 className="text-lg font-bold tc1">{thread.title || ''}
-            <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId] || thread.creatorId}</span>
+            {usernameDict[thread.creatorId] ? (
+              <span className="font-normal tc3 text-xs ml-2">{usernameDict[thread.creatorId]}</span>
+            ) : (
+              <span className="font-normal tc3 italic text-xs ml-2">{hashUsername(thread.creatorId)}</span>
+            )}
           </h3>
           <div className="mb-2 tc2">
             {formatThreadContent(thread.content)}
           </div>
           <div className="text-sm tc3 mb-2">
-            {isLoggedIn && <span
+            {isLoggedIn ? (<span
               className="hover:underline cursor-pointer mr-1 select-none"
               onClick={() => setReplyingTo(replyingTo === threadID ? null : threadID)}
             >
               {replyingTo === threadID ? 'cancel' : 'reply'}
-            </span>}
+            </span>
+            ) : (
+              <span
+                className="hover:opacity-70 cursor-pointer px-1 rounded-full transition-all duration-300"
+                onClick={promptLogin}
+              >
+                log in to reply
+              </span>
+            )}
             {isLoggedIn && userId === thread.creatorId && <>
               <span
                 className="hover:underline cursor-pointer mr-1 select-none"
@@ -726,7 +769,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
             {!childrenLoaded && thread.children && thread.children.length > 0 &&
               <span className="ml-1">
                 |
-                <span className="hover:underline cursor-pointer mr-1 select-none ml-1" onClick={() => toggleThreadLoaded(threadID)}>
+                <span className="tc2 hover:underline cursor-pointer mr-1 select-none ml-1" onClick={() => toggleThreadLoaded(threadID)}>
                   load replies
                 </span>
               </span>
@@ -737,7 +780,7 @@ export default function Discussion({ baseThreadID, baseThreadTitle = 'Discussion
       </div>
         :
         <div className="flex flex-col align-center">
-          <p className="text-sm tc3 line-clamp-1 text-ellipsis break-all">{usernameDict[thread.creatorId] || thread.creatorId} - {relTimeFormat(today, new Date(thread.timestamp))} - {(thread.title && thread.title.trim().length > 0) ? thread.title : thread.content}</p>
+          <p className="text-sm tc3 line-clamp-1 text-ellipsis break-all">{usernameDict[thread.creatorId] || <span className='italic'>{hashUsername(thread.creatorId)}</span>} - {relTimeFormat(today, new Date(thread.timestamp))} - {(thread.title && thread.title.trim().length > 0) ? thread.title : thread.content}</p>
         </div>
       }
       {editing === threadID && (

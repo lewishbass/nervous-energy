@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 
 import { FaGithub } from '@react-icons/all-files/fa/FaGithub';
@@ -7,13 +8,18 @@ import { FaLinkedin } from '@react-icons/all-files/fa/FaLinkedin';
 import { FaEnvelope } from '@react-icons/all-files/fa/FaEnvelope';
 import { FaHeart } from '@react-icons/all-files/fa/FaHeart';
 
-import { copyToClipboard } from '@/scripts/clipboard';
+import { copyToClipboard, createToast } from '@/scripts/clipboard';
 
 interface FooterContentProps {
 }
 
 export default function FooterContent(props: FooterContentProps) {
   const currentYear = new Date().getFullYear();
+
+  const registerForNewsletter = (e: React.FormEvent) => {
+    e.preventDefault();
+    createToast('geez you want a newsletter, im flattered', 2000, null, 'var(--kho)');
+  };
 
   return (
 		<footer className="w-full bg1 border-t-3 border-gray-300 dark:border-gray-700 mt-auto">
@@ -69,14 +75,14 @@ export default function FooterContent(props: FooterContentProps) {
                 </a>
               </li>
               <li>
-                <Link href="/faq" className="tc2 text-sm hover:tc1 transition-colors">
+                <div className="tc2 text-sm hover:tc1 transition-colors cursor-pointer select-none" onClick={() => createToast('you can start asking questions', 2000, null, 'var(--kho)')}>
                   FAQ
-                </Link>
+                </div>
               </li>
               <li>
-                <Link href="/contact" className="tc2 text-sm hover:tc1 transition-colors">
+                <div className="tc2 text-sm hover:tc1 transition-colors cursor-pointer select-none" onClick={() => createToast('sign in and message me', 2000, null, 'var(--kho)')}>
                   Contact
-                </Link>
+                </div>
               </li>
             </ul>
           </div>
@@ -94,15 +100,14 @@ export default function FooterContent(props: FooterContentProps) {
               >
                 <FaGithub size={18} />
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              < div
                 rel="noopener noreferrer"
 								className="tc2 hover:tc1 transition-colors cursor-pointer select-none"
                 aria-label="Twitter"
+                onClick={() => createToast('LMAO who uses twitter anymore', 2000, 'x', 'var(--khr)')}
               >
                 <FaTwitter size={18} />
-              </a>
+              </div>
               <a 
 								href="https://www.linkedin.com/in/lewis-bass/" 
                 target="_blank" 
@@ -126,8 +131,9 @@ export default function FooterContent(props: FooterContentProps) {
                   type="email" 
                   placeholder="Email"
                   className="flex-1 px-4 py-2 text-sm bg-transparent border-none rounded-full focus:outline-none tc4 w-2 "
+                  onKeyDown={(e) => e.key === 'Enter' && registerForNewsletter(e)}
                 />
-                <button title="register for newsletter" className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg1 tc6 hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full">
+                <button title="register for newsletter" className="cursor-pointer select-none mr-[2px] h-8 w-8 text-sm bg1 tc6 hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center rounded-full" onClick={(e) => registerForNewsletter(e)}>
                   <FaEnvelope size={14} />
                   {/*TODO: Add newsletter functionality*/}
                 </button>

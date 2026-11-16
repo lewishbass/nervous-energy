@@ -26,16 +26,21 @@ const Menu = lazy(() => import('@/components/Menu'));
 
 function AuthModalHandler({
   isLoggedIn,
-  setIsAuthModalOpen
+  setIsAuthModalOpen,
+  setIsMessageModalOpen,
 }: {
   isLoggedIn: boolean;
-  setIsAuthModalOpen: (value: boolean) => void
+    setIsAuthModalOpen: (value: boolean) => void,
+    setIsMessageModalOpen: (value: boolean) => void
 }) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (searchParams.get('openAuth') === 'true' && !isLoggedIn) {
       setIsAuthModalOpen(true);
+    }
+    if (searchParams.get('openMessage') === 'true' && isLoggedIn) {
+      setIsMessageModalOpen(true);
     }
   }, [searchParams, isLoggedIn, setIsAuthModalOpen]);
 
@@ -140,6 +145,7 @@ function RootLayoutContent({
           <AuthModalHandler
             isLoggedIn={isLoggedIn}
             setIsAuthModalOpen={setIsAuthModalOpen}
+            setIsMessageModalOpen={setIsMessageModalOpen}
           />
         </ Suspense>
         {/* Menu */}

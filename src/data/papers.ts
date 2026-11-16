@@ -45,6 +45,15 @@ export const papers: Paper[] = [
         keywords: 'U-Net convolutional networks biomedical image segmentation',
         imagePath: '/KH_back.svg',
         reqAuth: false
-    }*/
+    }
+    {
+        title: 'Effective Altruism',
+        description: 'A reflection on the real world legacy of effective altruism',
+        link: '/papers/effective-altruism',
+        hasPage: true,
+        keywords: 'effective altruism critique',
+        imagePath: '/KH_back.svg',
+        reqAuth: false
+    }/**/
 	];
 

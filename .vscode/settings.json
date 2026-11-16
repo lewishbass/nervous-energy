@@ -14,5 +14,6 @@
   "python-envs.defaultEnvManager": "ms-python.python:conda",
   "python-envs.defaultPackageManager": "ms-python.python:conda",
   "idf.currentSetup": "c:\\Users\\Lewis\\Documents\\esp-idf\\container\\v5.5.1\\esp-idf",
-  "idf.portWin": "COM1"
+  "idf.portWin": "COM1",
+  "python.terminal.useEnvFile": true
 }

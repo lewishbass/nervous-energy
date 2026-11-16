@@ -80,6 +80,15 @@ export const toys: Toy[] = [
         keywords: 'reinforcement learning structured graphs graph neural networks',
         imagePath: '/images/toys/structure-aware-rl.webp',
         reqAuth: false
+    },
+    {
+        title: 'MITRE jobs',
+        description: 'scrape and re-implementation of MITRE job board',
+        link: '/toys/mitre-jobs',
+        hasPage: true,
+        keywords: 'MITRE jobs job board',
+        imagePath: '/images/toys/mitre-jobs.webp',
+        reqAuth: false
     }
     //TODO: image processing exaple
     /*{
