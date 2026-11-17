@@ -568,7 +568,7 @@ export default function MitreJobsPage() {
 				</div>
 
 				<div className='pt-1 pb-2 tc3 text-sm pl-4'>found {sortedJobElements.length.toString().padStart(4)} : shown {numLoadedResults.toString().padStart(4)}</div>
-				<div className='h-screen overflow-y-auto mini-scroll rounded-lg border border-gray-500/20' onScroll={loadMoreResults}>
+				<div className='h-screen overflow-y-auto mini-scroll border-top border-bottom border-gray-500/30' onScroll={loadMoreResults}>
 					<ul className="pt-2 pb-[40vh]">
 						{sortedJobElements.slice(0, numLoadedResults).map((element, index) => (
 							<>
